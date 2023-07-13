@@ -1,6 +1,6 @@
 # PanGenoGrapher - visual analyzer for pan genomes via graphs
 
-PanGenoGrapher is based on Visu*all*, which in turn is based on the Cytoscape.js library.
+PanGenoGrapher is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
 
 ## License
 
