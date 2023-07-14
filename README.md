@@ -2,6 +2,8 @@
 
 PanGenoGrapher is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
 
+A sample demo deployment can be found [here](??).
+
 ## License
 
 TBD
