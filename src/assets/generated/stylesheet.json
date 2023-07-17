@@ -8,7 +8,7 @@
   {
     "selector": "node",
     "style": {
-      "background-opacity": 0,
+      "background-opacity": 1,
       "font-size": "13px",
       "text-valign": "center",
       "text-halign": "center",
@@ -86,201 +86,55 @@
     }
   },
   {
-    "selector": "node.Person",
+    "selector": "node.Segment",
     "style": {
-      "label": "data(primary_name)",
-      "color": "#a7d6eb",
-      "text-valign": "bottom",
-      "text-margin-y": "-8px",
+      "label": "data(segmentData)",
+      "color": "black",
+      "text-align": "center",
       "font-size": "7px",
-      "shape": "ellipse",
+      "shape": "round-rectangle",
       "background-fit": "contain",
-      "background-image": "app/custom/assets/person.svg",
+      "background-color": "grey",
       "width": "32px",
       "height": "32px"
     }
   },
   {
-    "selector": "node.Title",
+    "selector": "edge.LINK",
     "style": {
-      "label": "data(primary_title)",
-      "color": "#ffc5a8",
-      "text-valign": "bottom",
-      "text-margin-y": "-10px",
-      "font-size": "7px",
-      "background-image": "app/custom/assets/movie-roll.svg",
-      "shape": "ellipse",
-      "background-fit": "contain",
-      "width": "mapData(rating, 0, 10, 16px, 30px)",
-      "height": "mapData(rating, 0, 10, 16px, 30px)"
-    }
-  },
-  {
-    "selector": "edge.ACTOR",
-    "style": {
-      "label": "actor",
+      "label": "Link",
       "width": "3px",
       "font-size": "7px",
       "line-color": "#f5c4ca",
       "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#f5c4ca",
+      "target-arrow-shape": "none",
+      "source-arrow-shape": "none",
       "text-rotation": "autorotate"
     }
   },
   {
-    "selector": "edge.ACTRESS",
+    "selector": "edge.JUMP",
     "style": {
-      "label": "actress",
+      "label": "Jump",
       "width": "3px",
       "font-size": "7px",
       "line-color": "#f5c4ca",
-      "line-style": "solid",
-      "target-arrow-shape": "circle",
-      "target-arrow-color": "#f5c4ca",
+      "line-style": "dotted",
+      "target-arrow-shape": "none",
+      "source-arrow-shape": "none",
       "text-rotation": "autorotate"
     }
   },
   {
-    "selector": "edge.DIRECTOR",
+    "selector": "edge.CONTAINMENT",
     "style": {
-      "label": "director",
+      "label": "Containment",
       "width": "3px",
       "font-size": "7px",
-      "line-color": "#b3f2eb",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#b3f2eb",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.WRITER",
-    "style": {
-      "label": "writer",
-      "width": "3px",
-      "font-size": "7px",
-      "line-color": "#b3f2eb",
-      "line-style": "solid",
-      "target-arrow-shape": "circle",
-      "target-arrow-color": "#b3f2eb",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.PRODUCER",
-    "style": {
-      "label": "producer",
-      "width": "3px",
-      "font-size": "7px",
-      "line-color": "#b3f2eb",
-      "line-style": "solid",
-      "target-arrow-shape": "tee",
-      "target-arrow-color": "#b3f2eb",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.EDITOR",
-    "style": {
-      "label": "editor",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#abcaf2",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#abcaf2",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.COMPOSER",
-    "style": {
-      "label": "composer",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#abcaf2",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#abcaf2",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.CINEMATOGRAPHER",
-    "style": {
-      "label": "cinematographer",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#abcaf2",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#abcaf2",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.PRODUCTION_DESIGNER",
-    "style": {
-      "label": "production designer",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#abcaf2",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#abcaf2",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.ARCHIVE_FOOTAGE",
-    "style": {
-      "label": "archive footage",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#abcaf2",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#abcaf2",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.ARCHIVE_SOUND",
-    "style": {
-      "label": "archive sound",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#abcaf2",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#abcaf2",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.KNOWN_FOR",
-    "style": {
-      "label": "known for",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#aaaaaa",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#aaaaaa",
-      "text-rotation": "autorotate"
-    }
-  },
-  {
-    "selector": "edge.SELF",
-    "style": {
-      "label": "self",
-      "width": "2px",
-      "font-size": "7px",
-      "line-color": "#aaaaaa",
-      "line-style": "solid",
-      "target-arrow-shape": "triangle",
-      "target-arrow-color": "#aaaaaa",
+      "line-color": "#f5c4ca",
+      "line-style": "dashed",
+      "target-arrow-shape": "none",
+      "source-arrow-shape": "none",
       "text-rotation": "autorotate"
     }
   }

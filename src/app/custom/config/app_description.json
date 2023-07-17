@@ -1,407 +1,93 @@
 {
   "appInfo": {
-    "name": "Visu<i>all</i> Sample App",
-    "html_header": "Visuall Sample App",
+    "name": "PanGenoGrapher",
+    "html_header": "PanGenoGrapher",
     "icon": "app/custom/assets/logo.png",
     "version": "1.0.0 beta",
     "company_name": "i-Vis at Bilkent",
     "company_contact": "ivis@cs.bilkent.edu.tr"
   },
   "objects": {
-    "Person": {
+    "Segment": {
       "properties": {
-        "primary_name": "string",
-        "primary_profession": "list",
-        "birth_year": "int",
-        "death_year": "int",
-        "start_t": "datetime",
-        "end_t": "datetime"
+        "segmentId": "string",
+        "segmentData": "string",
+        "segmentLength": "number"
       },
       "style": {
-        "label": "data(primary_name)",
-        "color": "#a7d6eb",
-        "text-valign": "bottom",
-        "text-margin-y": "-8px",
+        "label": "data(segmentData)",
+        "color": "black",
+        "text-align": "center",
         "font-size": "7px",
-        "shape": "ellipse",
+        "shape": "round-rectangle",
         "background-fit": "contain",
-        "background-image": "app/custom/assets/person.svg",
+        "background-color": "grey",
         "width": "32px",
         "height": "32px"
-      }
-    },
-    "Title": {
-      "properties": {
-        "primary_title": "string",
-        "genres": "list",
-        "runtime_minutes": "int",
-        "title_type": "enum,string",
-        "rating": "float",
-        "count_votes": "int",
-        "start_year": "int",
-        "end_year": "int",
-        "is_adult": "enum,int",
-        "original_title": "string",
-        "shooting_start_date": "datetime",
-        "shooting_end_date": "datetime",
-        "production_start_date": "datetime",
-        "production_end_date": "datetime"
-      },
-      "style": {
-        "label": "data(primary_title)",
-        "color": "#ffc5a8",
-        "text-valign": "bottom",
-        "text-margin-y": "-10px",
-        "font-size": "7px",
-        "background-image": "app/custom/assets/movie-roll.svg",
-        "shape": "ellipse",
-        "background-fit": "contain",
-        "width": "mapData(rating, 0, 10, 16px, 30px)",
-        "height": "mapData(rating, 0, 10, 16px, 30px)"
       }
     }
   },
   "relations": {
-    "ACTOR": {
-      "source": "Person",
-      "target": "Title",
+    "LINK": {
+      "source": "Segment",
+      "target": "Segment",
       "isBidirectional": false,
       "properties": {
-        "characters": "list",
-        "job": "string",
-        "act_begin": "datetime",
-        "act_end": "datetime"
+        "targetNegativity": "bool",
+        "sourceNegativity": "bool"
       },
       "style": {
-        "label": "actor",
+        "label": "Link",
         "width": "3px",
         "font-size": "7px",
         "line-color": "#f5c4ca",
         "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#f5c4ca",
+        "target-arrow-shape": "none",
+        "source-arrow-shape": "none",
         "text-rotation": "autorotate"
       }
     },
-    "ACTRESS": {
-      "source": "Person",
-      "target": "Title",
+    "JUMP": {
+      "source": "Segment",
+      "target": "Segment",
       "isBidirectional": false,
       "properties": {
-        "characters": "list",
-        "job": "string",
-        "act_begin": "datetime",
-        "act_end": "datetime"
+        "targetNegativity": "bool",
+        "sourceNegativity": "bool"
       },
       "style": {
-        "label": "actress",
+        "label": "Jump",
         "width": "3px",
         "font-size": "7px",
         "line-color": "#f5c4ca",
-        "line-style": "solid",
-        "target-arrow-shape": "circle",
-        "target-arrow-color": "#f5c4ca",
+        "line-style": "dotted",
+        "target-arrow-shape": "none",
+        "source-arrow-shape": "none",
         "text-rotation": "autorotate"
       }
     },
-    "DIRECTOR": {
-      "source": "Person",
-      "target": "Title",
+    "CONTAINMENT": {
+      "source": "Segment",
+      "target": "Segment",
       "isBidirectional": false,
       "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
+        "targetNegativity": "bool",
+        "sourceNegativity": "bool"
       },
       "style": {
-        "label": "director",
+        "label": "Containment",
         "width": "3px",
         "font-size": "7px",
-        "line-color": "#b3f2eb",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#b3f2eb",
-        "text-rotation": "autorotate"
-      }
-    },
-    "WRITER": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "writer",
-        "width": "3px",
-        "font-size": "7px",
-        "line-color": "#b3f2eb",
-        "line-style": "solid",
-        "target-arrow-shape": "circle",
-        "target-arrow-color": "#b3f2eb",
-        "text-rotation": "autorotate"
-      }
-    },
-    "PRODUCER": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "producer",
-        "width": "3px",
-        "font-size": "7px",
-        "line-color": "#b3f2eb",
-        "line-style": "solid",
-        "target-arrow-shape": "tee",
-        "target-arrow-color": "#b3f2eb",
-        "text-rotation": "autorotate"
-      }
-    },
-    "EDITOR": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "editor",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#abcaf2",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#abcaf2",
-        "text-rotation": "autorotate"
-      }
-    },
-    "COMPOSER": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "composer",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#abcaf2",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#abcaf2",
-        "text-rotation": "autorotate"
-      }
-    },
-    "CINEMATOGRAPHER": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "cinematographer",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#abcaf2",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#abcaf2",
-        "text-rotation": "autorotate"
-      }
-    },
-    "PRODUCTION_DESIGNER": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "production designer",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#abcaf2",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#abcaf2",
-        "text-rotation": "autorotate"
-      }
-    },
-    "ARCHIVE_FOOTAGE": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "archive footage",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#abcaf2",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#abcaf2",
-        "text-rotation": "autorotate"
-      }
-    },
-    "ARCHIVE_SOUND": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "archive sound",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#abcaf2",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#abcaf2",
-        "text-rotation": "autorotate"
-      }
-    },
-    "KNOWN_FOR": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "known for",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#aaaaaa",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#aaaaaa",
-        "text-rotation": "autorotate"
-      }
-    },
-    "SELF": {
-      "source": "Person",
-      "target": "Title",
-      "isBidirectional": false,
-      "properties": {
-        "characters": "list",
-        "job": "string",
-        "begin": "datetime",
-        "end": "datetime"
-      },
-      "style": {
-        "label": "self",
-        "width": "2px",
-        "font-size": "7px",
-        "line-color": "#aaaaaa",
-        "line-style": "solid",
-        "target-arrow-shape": "triangle",
-        "target-arrow-color": "#aaaaaa",
+        "line-color": "#f5c4ca",
+        "line-style": "dashed",
+        "target-arrow-shape": "none",
+        "source-arrow-shape": "none",
         "text-rotation": "autorotate"
       }
     }
   },
-  "timebarDataMapping": {
-    "Person": {
-      "begin_datetime": "start_t",
-      "end_datetime": "end_t"
-    },
-    "Title": {
-      "begin_datetime": "production_start_date",
-      "end_datetime": "production_end_date"
-    },
-    "ACTOR": {
-      "begin_datetime": "act_begin",
-      "end_datetime": "act_end"
-    },
-    "ACTRESS": {
-      "begin_datetime": "act_begin",
-      "end_datetime": "act_end"
-    },
-    "SELF": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "DIRECTOR": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "CINEMATOGRAPHER": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "PRODUCER": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "WRITER": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "COMPOSER": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "PRODUCTION_DESIGNER": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "EDITOR": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "ARCHIVE_FOOTAGE": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "ARCHIVE_SOUND": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    },
-    "KNOWN_FOR": {
-      "begin_datetime": "begin",
-      "end_datetime": "end"
-    }
-  },
-  "enumMapping": {
-    "Title": {
-      "is_adult": "is_adult",
-      "title_type": "title_type"
-    }
-  },
+  "timebarDataMapping": {},
+  "enumMapping": {},
   "appPreferences": {
     "isAutoIncrementalLayoutOnChange": true,
     "isHighlightOnHover": false,

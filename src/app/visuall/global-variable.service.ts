@@ -541,6 +541,60 @@ export class GlobalVariableService {
         "label": ""
       }).update();
 
+      this.cy.style().selector('edge.LINK').style({
+        "target-arrow-shape" : function (e) {
+          if (!e.data('targetNegativity')) {
+            return "none";
+          }
+          return "tee";
+        }
+      }).update();
+
+      this.cy.style().selector('edge.LINK').style({
+        "source-arrow-shape" : function (e) {
+          if (!e.data('sourceNegativity')) {
+            return "none";
+          }
+          return "tee";
+        }
+      }).update();
+
+      this.cy.style().selector('edge.JUMP').style({
+        "target-arrow-shape" : function (e) {
+          if (!e.data('targetNegativity')) {
+            return "none";
+          }
+          return "tee";
+        }
+      }).update();
+
+      this.cy.style().selector('edge.JUMP').style({
+        "source-arrow-shape" : function (e) {
+          if (!e.data('sourceNegativity')) {
+            return "none";
+          }
+          return "tee";
+        }
+      }).update();
+
+      this.cy.style().selector('edge.CONTAINMENT').style({
+        "target-arrow-shape" : function (e) {
+          if (!e.data('targetNegativity')) {
+            return "none";
+          }
+          return "tee";
+        }
+      }).update();
+
+      this.cy.style().selector('edge.CONTAINMENT').style({
+        "source-arrow-shape" : function (e) {
+          if (!e.data('sourceNegativity')) {
+            return "none";
+          }
+          return "tee";
+        }
+      }).update();
+
     setTimeout(() => { this.cy.endBatch(); }, CY_BATCH_END_DELAY);
   }
 

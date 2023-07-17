@@ -357,6 +357,7 @@ input.form-check-input {
 }
 
 /* custom selected bar charts in Timebar */
+
 rect[fill-opacity="0"]:not([stroke="none"]) {
   stroke: white;
   stroke-width: 2px;

@@ -8,7 +8,7 @@
     {
       "selector": "node",
       "style": {
-        "background-opacity": 0,
+        "background-opacity": 1,
         "font-size": "13px",
         "text-valign": "center",
         "text-halign": "center",

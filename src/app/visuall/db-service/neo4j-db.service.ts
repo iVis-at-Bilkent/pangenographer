@@ -53,7 +53,7 @@ export class Neo4jDb implements DbService {
         this._g.showErrorModal('Database Timeout', 'Your query took too long!  <br> Consider adjusting timeout setting.');
       } else {
         this._g.statusMsg.next('Database query execution raised error!');
-        this._g.showErrorModal('Database Query Qxecution Error', err.message);
+        this._g.showErrorModal('Database Query Execution Error', err.message);
       }
       this._g.setLoadingStatus(false);
     };
