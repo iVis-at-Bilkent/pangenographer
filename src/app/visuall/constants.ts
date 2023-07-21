@@ -336,11 +336,11 @@ export function readTxtFile(file: File, cb: (s: string) => void) {
   fileReader.readAsText(file);
 }
 
-function createSegmentNodeFromGFA(segmentLine: string) {
-  var segmentNode = {
+function createSegmentFromGFA(segmentLine: string) {
+  var segment = {
     "data": {
       "segmentData": "",
-      "segmentId": "",
+      "segmentName": "",
       "segmentLength": 0,
       "id": ""
     },
@@ -355,15 +355,33 @@ function createSegmentNodeFromGFA(segmentLine: string) {
     "classes": "Segment"
   };
   var segmentLineTabSeperated = segmentLine.substring(0, segmentLine.length - 1).split(/\t/);
-  segmentNode.data.segmentId = segmentLineTabSeperated[1];
-  segmentNode.data.id = segmentLineTabSeperated[1];
-  segmentNode.data.segmentData = segmentLineTabSeperated[2];
-  segmentNode.data.segmentLength = segmentLineTabSeperated[2].length;
+  segment.data.segmentName = segmentLineTabSeperated[1];
+  segment.data.id = segmentLineTabSeperated[1];
+  segment.data.segmentData = segmentLineTabSeperated[2];
+  segment.data.segmentLength = segmentLineTabSeperated[2].length;
+  for (let i = 3; i < segmentLineTabSeperated.length; i++) {
+    var optField = (segmentLineTabSeperated[i] as string).trim();
+    if (optField.startsWith("LN")) {
+      segment["data"]["segmentLength"] = Number(optField.substring(5));
+    } else if (optField.startsWith("RC")) {
+      segment["data"]["readCount"] = Number(optField.substring(5));
+    } else if (optField.startsWith("FC")) {
+      segment["data"]["fragmentCount"] = Number(optField.substring(5));
+    } else if (optField.startsWith("KC")) {
+      segment["data"]["kmerCount"] = Number(optField.substring(5));
+    } else if (optField.startsWith("SH")) {
+      segment["data"]["SHA256Checksum"] = optField;
+    } else if (optField.startsWith("UR")) {
+      segment["data"]["URIorLocalSystemPath"] = optField;
+    } else {
+      console.log("This field is not parsed: " + optField);
+    }
+  }
 
-  return segmentNode;
+  return segment;
 }
 
-function createSegmentLinkFromGFA(linkLine: string) {
+function createLinkFromGFA(linkLine: string) {
   var link = {
     "data":{},
     "position": { "x": 0, "y": 0 },
@@ -376,23 +394,53 @@ function createSegmentLinkFromGFA(linkLine: string) {
     "pannable": true,
   };
   var linkLineTabSeperated = linkLine.substring(0, linkLine.length - 1).split(/\t/);
-  link["data"]["sourceNegativity"] = linkLineTabSeperated[2] === '+' ? true : false;
+  link["data"]["sourceOrientation"] = linkLineTabSeperated[2] === '+' ? true : false;
   link["data"]["source"] = linkLineTabSeperated[1];
-  link["data"]["targetNegativity"] = linkLineTabSeperated[4] === '-' ? true : false;
+  link["data"]["targetOrientation"] = linkLineTabSeperated[4] === '-' ? true : false;
   link["data"]["target"] = linkLineTabSeperated[3];
   if (linkLineTabSeperated[0] === 'L') {
-    if (linkLineTabSeperated.length > 5) {
-      link["data"]["overlap"] = linkLineTabSeperated[5];
+    for (let i = 4; i < linkLineTabSeperated.length; i++) {
+      var optField = (linkLineTabSeperated[i] as string).trim();
+      if (optField.startsWith("MQ")) {
+        link["data"]["mappingQuality"] = Number(optField.substring(5));
+      } else if (optField.startsWith("NM")) {
+        link["data"]["numberOfMismatchesOrGaps"] = Number(optField.substring(5));
+      } else if (optField.startsWith("RC")) {
+        link["data"]["readCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("FC")) {
+        link["data"]["fragmentCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("KC")) {
+        link["data"]["kmerCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("ID")) {
+        link["data"]["edgeIdentifier"] = optField;
+      } else {
+        link["data"]["overlap"] = optField;
+      }
     }
     link["classes"] = "LINK";
   } else if (linkLineTabSeperated[0] === 'J') {
-    if (linkLineTabSeperated.length > 5) {
-      link["data"]["distance"] = linkLineTabSeperated[5];
+    for (let i = 4; i < linkLineTabSeperated.length; i++) {
+      var optField = (linkLineTabSeperated[i] as string).trim();
+      if (optField.startsWith("SC")) {
+        link["data"]["indirectShortcutConnections"] = Number(optField.substring(5));
+      } else {
+        link["data"]["distance"] = optField;
+      }
     }
     link["classes"] = "JUMP";
   } else {
     link["data"]["pos"] = Number(linkLineTabSeperated[5]);
     link["data"]["overlap"] = linkLineTabSeperated[6];
+    for (let i = 4; i < linkLineTabSeperated.length; i++) {
+      var optField = (linkLineTabSeperated[i] as string).trim();
+      if (optField.startsWith("RC")) {
+        link["data"]["readCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("NM")) {
+        link["data"]["numberOfMismatchesOrGaps"] = Number(optField.substring(5));
+      } else if (optField.startsWith("ID")) {
+        link["data"]["edgeIdentifier"] = optField;
+      }
+    }
     link["classes"] = "CONTAINMENT";
   }
 
@@ -412,10 +460,15 @@ export function readGFAFile(gfaFile: File, cb: (any) => void) {
 
       lines.forEach((line) => {
         if (line[0] === 'S') {
-          GFAdata.nodes.push(createSegmentNodeFromGFA(line));
+          GFAdata.nodes.push(createSegmentFromGFA(line));
         } else if (line[0].match(/(L|C|J)/)) {
-          GFAdata.edges.push(createSegmentLinkFromGFA(line));
-        } else {
+          GFAdata.edges.push(createLinkFromGFA(line));
+        } else if (line[0] === 'H') {
+          // version of GFA file
+        } else if (line[0] === '#') {
+          // GFA file comments
+        }
+        else {
           console.log("tag" + line[0] + "is not implemented");
         }
       });

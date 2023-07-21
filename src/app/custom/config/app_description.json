@@ -10,9 +10,14 @@
   "objects": {
     "Segment": {
       "properties": {
-        "segmentId": "string",
+        "segmentName": "string",
         "segmentData": "string",
-        "segmentLength": "number"
+        "segmentLength": "number",
+        "readCount": "number",
+        "fragmentCount": "number",
+        "kmerCount": "number",
+        "SHA256Checksum": "string",
+        "URIorLocalSystemPath": "string"
       },
       "style": {
         "label": "data(segmentData)",
@@ -34,8 +39,14 @@
       "isBidirectional": false,
       "properties": {
         "overlap": "string",
-        "targetNegativity": "bool",
-        "sourceNegativity": "bool"
+        "targetOrientation": "bool",
+        "sourceOrientation": "bool",
+        "mappingQuality": "number",
+        "numberOfMismatchesOrGaps" : "number",
+        "readCount": "number",
+        "fragmentCount": "number",
+        "kmerCount": "number",
+        "edgeIdentifier": "string"
       },
       "style": {
         "label": "Link",
@@ -54,8 +65,9 @@
       "isBidirectional": false,
       "properties": {
         "distance": "string",
-        "targetNegativity": "bool",
-        "sourceNegativity": "bool"
+        "targetOrientation": "bool",
+        "sourceOrientation": "bool",
+        "indirectShortcutConnections": "number"
       },
       "style": {
         "label": "Jump",
@@ -75,8 +87,11 @@
       "properties": {
         "pos" : "number",
         "overlap": "string",
-        "targetNegativity": "bool",
-        "sourceNegativity": "bool"
+        "targetOrientation": "bool",
+        "sourceOrientation": "bool",
+        "readCount": "number",
+        "numberOfMismatchesOrGaps": "number",
+        "edgeIdentifier": "string"
       },
       "style": {
         "label": "Containment",

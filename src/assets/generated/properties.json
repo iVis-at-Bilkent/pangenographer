@@ -1,27 +1,42 @@
 {
   "nodes": {
     "Segment": {
-      "segmentId": "string",
+      "segmentName": "string",
       "segmentData": "string",
-      "segmentLength": "number"
+      "segmentLength": "number",
+      "readCount": "number",
+      "fragmentCount": "number",
+      "kmerCount": "number",
+      "SHA256Checksum": "string",
+      "URIorLocalSystemPath": "string"
     }
   },
   "edges": {
     "LINK": {
       "overlap": "string",
-      "targetNegativity": "bool",
-      "sourceNegativity": "bool"
+      "targetOrientation": "bool",
+      "sourceOrientation": "bool",
+      "mappingQuality": "number",
+      "numberOfMismatchesOrGaps": "number",
+      "readCount": "number",
+      "fragmentCount": "number",
+      "kmerCount": "number",
+      "edgeIdentifier": "string"
     },
     "JUMP": {
       "distance": "string",
-      "targetNegativity": "bool",
-      "sourceNegativity": "bool"
+      "targetOrientation": "bool",
+      "sourceOrientation": "bool",
+      "indirectShortcutConnections": "number"
     },
     "CONTAINMENT": {
       "pos": "number",
       "overlap": "string",
-      "targetNegativity": "bool",
-      "sourceNegativity": "bool"
+      "targetOrientation": "bool",
+      "sourceOrientation": "bool",
+      "readCount": "number",
+      "numberOfMismatchesOrGaps": "number",
+      "edgeIdentifier": "string"
     }
   }
 }

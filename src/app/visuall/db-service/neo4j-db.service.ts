@@ -606,36 +606,69 @@ export class Neo4jDb implements DbService {
       nodes: gfaJSON.nodes,
       edges: gfaJSON.edges
     }
-    var txt = "CREATE\n";
+
+    var query = "CREATE\n";
     curGfaJson.nodes.forEach((node) => {
-      txt += "(n" + node.data.segmentId + ":Segment ";
-      txt += "{segmentData: '" + node.data.segmentData + "', ";
-      txt += "segmentId: '" + node.data.segmentId + "', ";
-      txt += "segmentLength: " + node.data.segmentLength;
-      txt += "}),\n";
+      var node2Create = `(n${node.data.segmentName} :Segment {segmentData: 
+        '${node.data.segmentData}', segmentName: '${node.data.segmentName}'
+        , segmentLength: ${node.data.segmentLength}`;
+      if (node.data.hasOwnProperty("readCount")) {
+        node2Create += `, readCount: ${node.data.readCount}`;
+      }
+      if (node.data.hasOwnProperty("fragmentCount")) {
+        node2Create += `, fragmentCount: ${node.data.fragmentCount}`; 
+      }
+      if (node.data.hasOwnProperty("kmerCount")) {
+        node2Create += `, kmerCount: ${node.data.kmerCount}`;
+      }
+      if (node.data.hasOwnProperty("SHA256Checksum")) {
+        node2Create += `, SHA256Checksum: '${node.data.SHA256Checksum}'`;
+      }
+      if (node.data.hasOwnProperty("URIorLocalSystemPath")) {
+        node2Create += `, URIorLocalSystemPath: '${node.data.URIorLocalSystemPath}'`;
+      }
+      query += node2Create + "}),\n";
     });
-    txt = txt.substr(0,txt.length-2);
-    txt += "\nCREATE\n";
+
+    query = query.substring(0, query.length - 2) + "\nCREATE\n";
+
     curGfaJson.edges.forEach((edge) => {
-      txt += "(n" + edge.data.source + ")-[:" + edge.classes;
-      txt += " {sourceNegativity: " +  edge.data.sourceNegativity + ", ";
-      txt += "source: '" + edge.data.source + "', ";
-      txt += "targetNegativity: " + edge.data.targetNegativity + ", ";
-      txt += "target: '" + edge.data.target + "', ";
+      var edge2Create = `(n${edge.data.source})-[:${edge.classes}
+        {sourceOrientation: ${edge.data.sourceOrientation}, source: '${edge.data.source}'
+        , targetOrientation: ${edge.data.targetOrientation}, target: '${edge.data.target}'`;
       if (edge.data.hasOwnProperty("overlap")) {
-        txt += "overlap: '" + edge.data.overlap + "', ";
+        edge2Create += `, overlap: '${edge.data.overlap}'`;
       }
       if (edge.data.hasOwnProperty("pos")) {
-        txt += "pos: " + edge.data.pos + ", ";
+        edge2Create += `, pos: ${edge.data.pos}`;
       }
       if (edge.data.hasOwnProperty("distance")) {
-        txt += "distance: '" + edge.data.distance + "', "
+        edge2Create += `, distance: '${edge.data.distance}'`;
       }
-      txt = txt.substr(0,txt.length-2);
-      txt += "}]->(n" + edge.data.target + "),\n";
+      if (edge.data.hasOwnProperty("mappingQuality")) {
+        edge2Create += `, mappingQuality: ${edge.data.mappingQuality}`;
+      }
+      if (edge.data.hasOwnProperty("numberOfMismatchesOrGaps")) {
+        edge2Create += `, numberOfMismatchesOrGaps: ${edge.data.numberOfMismatchesOrGaps}`;
+      }
+      if (edge.data.hasOwnProperty("readCount")) {
+        edge2Create += `, readCount: ${edge.data.readCount}`;
+      }
+      if (edge.data.hasOwnProperty("fragmentCount")) {
+        edge2Create += `, fragmentCount: ${edge.data.fragmentCount}`;
+      }
+      if (edge.data.hasOwnProperty("kmerCount")) {
+        edge2Create += `, kmerCount: ${edge.data.kmerCount}`;
+      }
+      if (edge.data.hasOwnProperty("indirectShortcutConnections")) {
+        edge2Create += `, indirectShortcutConnections: ${edge.data.indirectShortcutConnections}`; 
+      }
+      edge2Create +=`}]->(n${edge.data.target}),\n`;
+      query += edge2Create;
     });
-    txt = txt.substr(0,txt.length-2);
-    return txt;
+
+    query = query.substring(0, query.length-2);
+    return query;
   }
 
   // ------------------------------------------------- end of methods for conversion to CQL -------------------------------------------------
