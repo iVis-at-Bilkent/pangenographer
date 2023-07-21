@@ -42,7 +42,7 @@
         "targetOrientation": "bool",
         "sourceOrientation": "bool",
         "mappingQuality": "number",
-        "numberOfMismatchesOrGaps" : "number",
+        "numberOfMismatchesOrGaps": "number",
         "readCount": "number",
         "fragmentCount": "number",
         "kmerCount": "number",
@@ -85,7 +85,7 @@
       "target": "Segment",
       "isBidirectional": false,
       "properties": {
-        "pos" : "number",
+        "pos": "number",
         "overlap": "string",
         "targetOrientation": "bool",
         "sourceOrientation": "bool",
