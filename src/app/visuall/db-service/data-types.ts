@@ -9,6 +9,7 @@ export interface DbService {
   getGraphOfInterest(dbIds: (string | number)[], ignoredTypes: string[], lengthLimit: number, isDirected: boolean, type: DbResponseType, filter: TableFiltering, idFilter: (string | number)[], cb: (x) => void);
   getCommonStream(dbIds: (string | number)[], ignoredTypes: string[], lengthLimit: number, dir: Neo4jEdgeDirection, type: DbResponseType, filter: TableFiltering, idFilter: (string | number)[], cb: (x) => void);
   getNeighborhood(dbIds: (string | number)[], ignoredTypes: string[], lengthLimit: number, isDirected: boolean, filter: TableFiltering, idFilter: (string | number)[], cb: (x) => void);
+  loadGFA(GFAdata: any);
 }
 
 export interface GraphResponse {

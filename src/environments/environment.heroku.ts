@@ -1,7 +1,8 @@
 export const environment = {
   production: true,
   dbConfig: {
-    url: 'http://ivis.cs.bilkent.edu.tr:3001/db/data/transaction/commit',
+    getSampleUrl: 'http://localhost:7474/db/data/transaction/commit',
+    loadGFADataUrl: 'http://localhost:7474/db/data/cypher',
     username: 'neo4j',
     password: '123123123'
   }

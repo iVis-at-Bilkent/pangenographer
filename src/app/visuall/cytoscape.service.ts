@@ -512,6 +512,12 @@ export class CytoscapeService {
     });
   }
 
+  readGFAFile(file: File, cb: (any) => void) {
+    C.readGFAFile(file, (GFAdata) => {
+      cb(GFAdata);
+    });
+  }
+
   private str2file(str: string, fileName: string) {
     const blob = new Blob([str], { type: 'text/plain' });
     const anchor = document.createElement('a');

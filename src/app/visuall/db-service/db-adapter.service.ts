@@ -81,4 +81,8 @@ export class DbAdapterService {
     let fn = (x) => { cb(x); this._g.add2GraphHistory(`Common target/regulator`); };
     this._db.getNeighborhood(dbIds, ignoredTypes, lengthLimit, isDirected, filter, idFilter, fn);
   }
+
+  getGFAdata2LoadGFA(GFAdata: any) {
+    this._db.loadGFA(GFAdata);
+  }
 }

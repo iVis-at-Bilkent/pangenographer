@@ -310,7 +310,7 @@ export const deepCopy = <T>(target: T): T => {
     (target as any[]).forEach((v) => { cp.push(v); });
     return cp.map((n: any) => deepCopy<any>(n)) as any;
   }
-  if (typeof target === 'object' && target !== {}) {
+  if (typeof target === 'object') {
     const cp = { ...(target as { [key: string]: any }) } as { [key: string]: any };
     Object.keys(cp).forEach(k => {
       cp[k] = deepCopy<any>(cp[k]);
@@ -334,6 +334,104 @@ export function readTxtFile(file: File, cb: (s: string) => void) {
     fileReader.abort();
   };
   fileReader.readAsText(file);
+}
+
+function createSegmentNodeFromGFA(segmentLine: string) {
+  var segmentNode = {
+    "data": {
+      "segmentData": "",
+      "segmentId": "",
+      "segmentLength": 0,
+      "id": ""
+    },
+    "position": { "x": 0, "y": 0 },
+    "group": "nodes",
+    "removed": false,
+    "selected": false,
+    "selectable": true,
+    "locked": false,
+    "grabbable": true,
+    "pannable": false,
+    "classes": "Segment"
+  };
+  var segmentLineTabSeperated = segmentLine.substring(0, segmentLine.length - 1).split(/\t/);
+  segmentNode.data.segmentId = segmentLineTabSeperated[1];
+  segmentNode.data.id = segmentLineTabSeperated[1];
+  segmentNode.data.segmentData = segmentLineTabSeperated[2];
+  segmentNode.data.segmentLength = segmentLineTabSeperated[2].length;
+
+  return segmentNode;
+}
+
+function createSegmentLinkFromGFA(linkLine: string) {
+  var link = {
+    "data":{},
+    "position": { "x": 0, "y": 0 },
+    "group" : "edges",
+    "removed": false,
+    "selected": false,
+    "selectable": true,
+    "locked": false,
+    "grabbable": true,
+    "pannable": true,
+  };
+  var linkLineTabSeperated = linkLine.substring(0, linkLine.length - 1).split(/\t/);
+  link["data"]["sourceNegativity"] = linkLineTabSeperated[2] === '+' ? true : false;
+  link["data"]["source"] = linkLineTabSeperated[1];
+  link["data"]["targetNegativity"] = linkLineTabSeperated[4] === '-' ? true : false;
+  link["data"]["target"] = linkLineTabSeperated[3];
+  if (linkLineTabSeperated[0] === 'L') {
+    if (linkLineTabSeperated.length > 5) {
+      link["data"]["overlap"] = linkLineTabSeperated[5];
+    }
+    link["classes"] = "LINK";
+  } else if (linkLineTabSeperated[0] === 'J') {
+    if (linkLineTabSeperated.length > 5) {
+      link["data"]["distance"] = linkLineTabSeperated[5];
+    }
+    link["classes"] = "JUMP";
+  } else {
+    link["data"]["pos"] = Number(linkLineTabSeperated[5]);
+    link["data"]["overlap"] = linkLineTabSeperated[6];
+    link["classes"] = "CONTAINMENT";
+  }
+
+  return link;
+}
+
+export function readGFAFile(gfaFile: File, cb: (any) => void) {
+  const fileReader = new FileReader();
+  fileReader.onload = (e) => {
+    try {
+      const fileContent = e.target.result;
+      const lines = (fileContent as string).split(/\n/);
+      const GFAdata = {
+        nodes: [],
+        edges: []
+      };
+
+      lines.forEach((line) => {
+        if (line[0] === 'S') {
+          GFAdata.nodes.push(createSegmentNodeFromGFA(line));
+        } else if (line[0].match(/(L|C|J)/)) {
+          GFAdata.edges.push(createSegmentLinkFromGFA(line));
+        } else {
+          console.log("tag" + line[0] + "is not implemented");
+        }
+      });
+
+      cb(GFAdata);
+    } catch (error) {
+      console.error('Given GFA file is not suitable.', error);
+    }
+  };
+
+  fileReader.onerror = (error) => {
+    console.error('GFA File could not be read!', error);
+    fileReader.abort();
+  };
+
+  fileReader.readAsText(gfaFile);
 }
 
 export function arrayDiff(smallArr: string[], bigArr: string[]): string[] {

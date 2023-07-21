@@ -8,14 +8,18 @@
   },
   "edges": {
     "LINK": {
+      "overlap": "string",
       "targetNegativity": "bool",
       "sourceNegativity": "bool"
     },
     "JUMP": {
+      "distance": "string",
       "targetNegativity": "bool",
       "sourceNegativity": "bool"
     },
     "CONTAINMENT": {
+      "pos": "number",
+      "overlap": "string",
       "targetNegativity": "bool",
       "sourceNegativity": "bool"
     }

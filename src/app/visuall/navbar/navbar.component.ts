@@ -28,6 +28,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   toolName: string;
   toolLogo: string;
   isLoadFile4Graph: boolean = false;
+  isLoadFileGFA: boolean = false;
   appDescSubs: Subscription;
 
   constructor(private _dbService: DbAdapterService, private _cyService: CytoscapeService, private _modalService: NgbModal,
@@ -35,12 +36,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _urlload: URLLoadService) {
     this.menu = [
       {
-        dropdown: 'File', actions: [{ txt: 'Load...', id: 'nbi00', fn: 'loadFile', isStd: true },
-        { txt: 'Save', id: 'nbi01', fn: 'saveAsJson', isStd: true },
-        { txt: 'Save Selected Objects', id: 'nbi02', fn: 'saveSelectedAsJson', isStd: true },
-        { txt: 'Save as PNG...', id: 'nbi03', fn: 'saveAsPng', isStd: true },
-        { txt: 'Load User Profile...', id: 'nbi04', fn: 'loadUserProfile', isStd: true },
-        { txt: 'Save User Profile...', id: 'nbi05', fn: 'saveUserProfile', isStd: true }]
+        dropdown: 'File', actions: [
+          { txt: 'Load...', id: 'nbi00', fn: 'loadFile', isStd: true },
+          { txt: 'Save', id: 'nbi01', fn: 'saveAsJson', isStd: true },
+          { txt: 'Save Selected Objects', id: 'nbi02', fn: 'saveSelectedAsJson', isStd: true },
+          { txt: 'Save as PNG...', id: 'nbi03', fn: 'saveAsPng', isStd: true },
+          { txt: 'Load User Profile...', id: 'nbi04', fn: 'loadUserProfile', isStd: true },
+          { txt: 'Save User Profile...', id: 'nbi05', fn: 'saveUserProfile', isStd: true }
+        ]
       },
       {
         dropdown: 'Edit', actions: [{ txt: 'Add Group for Selected', id: 'nbi10', fn: 'addGroup4Selected', isStd: true },
@@ -75,8 +78,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
         { txt: 'About', id: 'nbi51', fn: 'openAbout', isStd: true }]
       },
       {
-        dropdown: 'Data', actions: [{ txt: 'Sample Data', id: 'nbi60', fn: 'getSampleData', isStd: true },
-        { txt: 'Clear Data', id: 'nbi62', fn: 'clearData', isStd: true }]
+        dropdown: 'Data', actions: [
+          { txt: 'Sample Data', id: 'nbi60', fn: 'getSampleData', isStd: true },
+          { txt: 'Clear Data', id: 'nbi62', fn: 'clearData', isStd: true },
+          { txt: 'Load GFA', id: 'nbi63', fn: 'loadGFAFile2Db', isStd: true }
+        ]
       }
     ];
   }
@@ -114,7 +120,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   fileSelected() {
-    if (this.isLoadFile4Graph) {
+    if (this.isLoadFileGFA) {
+      this._cyService.readGFAFile(this.file.nativeElement.files[0], (GFAdata) => {
+        this._dbService.getGFAdata2LoadGFA(GFAdata);
+      });
+    } else if (this.isLoadFile4Graph) {
       this._cyService.loadFile(this.file.nativeElement.files[0]);
     } else {
       readTxtFile(this.file.nativeElement.files[0], (s) => {
@@ -133,6 +143,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   loadFile() {
     this.isLoadFile4Graph = true;
+    this.isLoadFileGFA = false;
+    this.openFileInput();
+  }
+
+  loadGFAFile2Db() {
+    this.isLoadFile4Graph = true;
+    this.isLoadFileGFA = true;
     this.openFileInput();
   }
 
@@ -204,6 +221,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   loadUserProfile() {
     this.isLoadFile4Graph = false;
+    this.isLoadFileGFA = false;
     this.openFileInput();
   }
 

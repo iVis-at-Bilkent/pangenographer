@@ -17,7 +17,7 @@ export class Neo4jDb implements DbService {
 
   runQuery(query: string, callback: (x: any) => any, responseType: DbResponseType = 0, isTimeboxed = true) {
     const conf = environment.dbConfig;
-    const url = conf.url;
+    const url = conf.getSampleUrl;
     const username = conf.username;
     const password = conf.password;
     const requestType = responseType == DbResponseType.graph ? 'graph' : 'row';
@@ -388,6 +388,39 @@ export class Neo4jDb implements DbService {
 
   }
 
+  loadGFA(GFAdata: any) {
+    var query = this.GFAdata2CQL(GFAdata);
+    const conf = environment.dbConfig;
+    const url = conf.loadGFADataUrl;
+    const username = conf.username;
+    const password = conf.password;
+    this._g.setLoadingStatus(true);
+    console.log(query);
+    this._g.statusMsg.next('Executing database query...');
+    const requestBody = {
+      query: query
+    };
+    const errFn = (err) => {
+      this._g.statusMsg.next('Database query execution raised error!');
+      this._g.showErrorModal('Database Query Execution Error', err.message);
+      this._g.setLoadingStatus(false);
+    };
+    this._http.post(url, requestBody, {
+      headers: {
+        'Accept': 'application/json; charset=UTF-8',
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic ' + btoa(username + ':' + password)
+      }
+    }).subscribe(x => {
+      this._g.setLoadingStatus(false);
+      if (x['errors'] && x['errors'].length > 0) {
+        errFn(x['errors'][0]);
+        return;
+      }
+      this._g.statusMsg.next('');
+    }, errFn);
+  }
+
   // ------------------------------------------------- methods for conversion to CQL -------------------------------------------------
   private rule2cql2(rules: ClassBasedRules, skip: number, limit: number, type: DbResponseType, filter: TableFiltering = null) {
     let query = '';
@@ -567,5 +600,43 @@ export class Neo4jDb implements DbService {
     }
     return cql;
   }
+
+  private GFAdata2CQL(gfaJSON : any) {
+    const curGfaJson = {
+      nodes: gfaJSON.nodes,
+      edges: gfaJSON.edges
+    }
+    var txt = "CREATE\n";
+    curGfaJson.nodes.forEach((node) => {
+      txt += "(n" + node.data.segmentId + ":Segment ";
+      txt += "{segmentData: '" + node.data.segmentData + "', ";
+      txt += "segmentId: '" + node.data.segmentId + "', ";
+      txt += "segmentLength: " + node.data.segmentLength;
+      txt += "}),\n";
+    });
+    txt = txt.substr(0,txt.length-2);
+    txt += "\nCREATE\n";
+    curGfaJson.edges.forEach((edge) => {
+      txt += "(n" + edge.data.source + ")-[:" + edge.classes;
+      txt += " {sourceNegativity: " +  edge.data.sourceNegativity + ", ";
+      txt += "source: '" + edge.data.source + "', ";
+      txt += "targetNegativity: " + edge.data.targetNegativity + ", ";
+      txt += "target: '" + edge.data.target + "', ";
+      if (edge.data.hasOwnProperty("overlap")) {
+        txt += "overlap: '" + edge.data.overlap + "', ";
+      }
+      if (edge.data.hasOwnProperty("pos")) {
+        txt += "pos: " + edge.data.pos + ", ";
+      }
+      if (edge.data.hasOwnProperty("distance")) {
+        txt += "distance: '" + edge.data.distance + "', "
+      }
+      txt = txt.substr(0,txt.length-2);
+      txt += "}]->(n" + edge.data.target + "),\n";
+    });
+    txt = txt.substr(0,txt.length-2);
+    return txt;
+  }
+
   // ------------------------------------------------- end of methods for conversion to CQL -------------------------------------------------
 }

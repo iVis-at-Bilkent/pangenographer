@@ -33,6 +33,7 @@
       "target": "Segment",
       "isBidirectional": false,
       "properties": {
+        "overlap": "string",
         "targetNegativity": "bool",
         "sourceNegativity": "bool"
       },
@@ -52,6 +53,7 @@
       "target": "Segment",
       "isBidirectional": false,
       "properties": {
+        "distance": "string",
         "targetNegativity": "bool",
         "sourceNegativity": "bool"
       },
@@ -71,6 +73,8 @@
       "target": "Segment",
       "isBidirectional": false,
       "properties": {
+        "pos" : "number",
+        "overlap": "string",
         "targetNegativity": "bool",
         "sourceNegativity": "bool"
       },
