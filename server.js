@@ -16,7 +16,7 @@ app.use(compression());
 const appPath = '/dist/ng-visuall';
 app.use(express.static(__dirname + appPath));
 
-const port = process.env.PORT || 4200;
+const port = process.env.PORT || 5200;
 app.listen(port);
 
 app.get('/urlquery/*', function (req, res) {
