@@ -238,14 +238,15 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           renderedValue = '';
         }
       }
-
-      if (key.toLowerCase() === DATE_PROP_START ||
-        key.toLowerCase() === DATE_PROP_END) {
+      if (renderedValue !== undefined) {
+        if (key.toLowerCase() === DATE_PROP_START ||
+              key.toLowerCase() === DATE_PROP_END) {
+          this.selectedItemProps.push({ key: renderedKey, val: renderedValue });
+          continue;
+        }
+        renderedValue = this.getMappedProperty(this.selectedClasses, key, renderedValue);
         this.selectedItemProps.push({ key: renderedKey, val: renderedValue });
-        continue;
       }
-      renderedValue = this.getMappedProperty(this.selectedClasses, key, renderedValue);
-      this.selectedItemProps.push({ key: renderedKey, val: renderedValue });
     }
   }
 
