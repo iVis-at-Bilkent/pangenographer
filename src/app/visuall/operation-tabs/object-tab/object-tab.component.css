@@ -8,3 +8,12 @@ td {
   padding-top: 0.1rem;
   padding-bottom: 0.1rem;
 }
+
+.segment-data-container {
+  margin-top: 1%;
+  padding: 1.5%;
+  max-height: 350px;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  overflow-y: auto;
+}

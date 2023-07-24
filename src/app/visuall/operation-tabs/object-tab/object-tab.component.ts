@@ -1,18 +1,35 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GlobalVariableService } from '../../global-variable.service';
-import { getPropNamesFromObj, DATE_PROP_END, DATE_PROP_START, findTypeOfAttribute, debounce, COLLAPSED_EDGE_CLASS, OBJ_INFO_UPDATE_DELAY, CLUSTER_CLASS, extend } from '../../constants';
-import { TableViewInput, TableData, TableDataType, TableFiltering, property2TableData, filterTableDatas } from '../../../shared/table-view/table-view-types';
-import { Subject, Subscription } from 'rxjs';
-import { CytoscapeService } from '../../cytoscape.service';
-import { CustomizationModule } from '../../../custom/customization.module';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { GlobalVariableService } from "../../global-variable.service";
+import {
+  getPropNamesFromObj,
+  DATE_PROP_END,
+  DATE_PROP_START,
+  findTypeOfAttribute,
+  debounce,
+  COLLAPSED_EDGE_CLASS,
+  OBJ_INFO_UPDATE_DELAY,
+  CLUSTER_CLASS,
+  extend,
+  PROPERITY_NAMES,
+} from "../../constants";
+import {
+  TableViewInput,
+  TableData,
+  TableDataType,
+  TableFiltering,
+  property2TableData,
+  filterTableDatas,
+} from "../../../shared/table-view/table-view-types";
+import { Subject, Subscription } from "rxjs";
+import { CytoscapeService } from "../../cytoscape.service";
+import { CustomizationModule } from "../../../custom/customization.module";
 
 @Component({
-  selector: 'app-object-tab',
-  templateUrl: './object-tab.component.html',
-  styleUrls: ['./object-tab.component.css']
+  selector: "app-object-tab",
+  templateUrl: "./object-tab.component.html",
+  styleUrls: ["./object-tab.component.css"],
 })
 export class ObjectTabComponent implements OnInit, OnDestroy {
-
   nodeClasses: Set<string>;
   edgeClasses: Set<string>;
   selectedClasses: string;
@@ -22,32 +39,61 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   clearMultiObjTableFilter = new Subject<boolean>();
   isShowStatsTable: boolean = false;
   isShowObjTable = false;
-  customSubTabs: { component: any, text: string }[] = CustomizationModule.objSubTabs;
+  customSubTabs: { component: any; text: string }[] =
+    CustomizationModule.objSubTabs;
 
   tableInput: TableViewInput = {
-    columns: ['Type', 'Count', 'Selected', 'Hidden'], isHide0: true, results: [], resultCnt: 0, currPage: 1, pageSize: 20, tableTitle: 'Statistics',
-    isShowExportAsCSV: true, isLoadGraph: true, columnLimit: 5, isMergeGraph: false, isNodeData: false, isUseCySelector4Highlight: true, isHideLoadGraph: true
+    columns: ["Type", "Count", "Selected", "Hidden"],
+    isHide0: true,
+    results: [],
+    resultCnt: 0,
+    currPage: 1,
+    pageSize: 20,
+    tableTitle: "Statistics",
+    isShowExportAsCSV: true,
+    isLoadGraph: true,
+    columnLimit: 5,
+    isMergeGraph: false,
+    isNodeData: false,
+    isUseCySelector4Highlight: true,
+    isHideLoadGraph: true,
   };
   multiObjTableInp: TableViewInput = {
-    columns: ['Type'], isHide0: true, results: [], resultCnt: 0, currPage: 1, pageSize: 20, isReplace_inHeaders: true, tableTitle: 'Properties',
-    isShowExportAsCSV: true, isEmphasizeOnHover: true, isLoadGraph: true, isMergeGraph: false, isNodeData: false, isUseCySelector4Highlight: true, isHideLoadGraph: true
+    columns: ["Type"],
+    isHide0: true,
+    results: [],
+    resultCnt: 0,
+    currPage: 1,
+    pageSize: 20,
+    isReplace_inHeaders: true,
+    tableTitle: "Properties",
+    isShowExportAsCSV: true,
+    isEmphasizeOnHover: true,
+    isLoadGraph: true,
+    isMergeGraph: false,
+    isNodeData: false,
+    isUseCySelector4Highlight: true,
+    isHideLoadGraph: true,
   };
-  private NODE_TYPE = '_NODE_';
-  private EDGE_TYPE = '_EDGE_';
+  private NODE_TYPE = "_NODE_";
+  private EDGE_TYPE = "_EDGE_";
   shownElemsSubs: Subscription;
   appDescSubs: Subscription;
   dataModelSubs: Subscription;
 
-  constructor(private _g: GlobalVariableService, private _cyService: CytoscapeService) {
+  constructor(
+    private _g: GlobalVariableService,
+    private _cyService: CytoscapeService
+  ) {
     this.selectedItemProps = [];
   }
 
   ngOnInit() {
-    this.appDescSubs = this._g.appDescription.subscribe(x => {
+    this.appDescSubs = this._g.appDescription.subscribe((x) => {
       if (x === null) {
         return;
       }
-      this.dataModelSubs = this._g.dataModel.subscribe(x2 => {
+      this.dataModelSubs = this._g.dataModel.subscribe((x2) => {
         if (x2 === null) {
           return;
         }
@@ -62,11 +108,19 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           this.edgeClasses.add(key);
         }
 
-        this.shownElemsSubs = this._g.shownElemsChanged.subscribe(() => { this.showStats() });
+        this.shownElemsSubs = this._g.shownElemsChanged.subscribe(() => {
+          this.showStats();
+        });
         this.showObjectProps();
         this.showStats();
-        this._cyService.showObjPropsFn = debounce(this.showObjectProps, OBJ_INFO_UPDATE_DELAY).bind(this);
-        this._cyService.showStatsFn = debounce(this.showStats, OBJ_INFO_UPDATE_DELAY).bind(this);
+        this._cyService.showObjPropsFn = debounce(
+          this.showObjectProps,
+          OBJ_INFO_UPDATE_DELAY
+        ).bind(this);
+        this._cyService.showStatsFn = debounce(
+          this.showStats,
+          OBJ_INFO_UPDATE_DELAY
+        ).bind(this);
       });
     });
   }
@@ -84,24 +138,31 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   showObjectProps() {
-    let selected = this._g.cy.$(':selected');
+    let selected = this._g.cy.$(":selected");
     this.isShowObjTable = false;
-    if (selected.filter('.' + COLLAPSED_EDGE_CLASS).length > 0) {
+    if (selected.filter("." + COLLAPSED_EDGE_CLASS).length > 0) {
       this.isShowObjTable = true;
       this.showCompoundEdgeProps(true);
       return;
     }
-    if (selected.length > 1 && (selected.length == selected.filter('node').length || selected.length == selected.filter('edge').length)) {
+    if (
+      selected.length > 1 &&
+      (selected.length == selected.filter("node").length ||
+        selected.length == selected.filter("edge").length)
+    ) {
       this.isShowObjTable = true;
       this.showMultiObjTable(true);
       return;
     }
-    const selectedNonMeta = selected.not('.' + COLLAPSED_EDGE_CLASS);
-    let props: { [x: string]: any; }, classNames: any[];
+    const selectedNonMeta = selected.not("." + COLLAPSED_EDGE_CLASS);
+    let props: { [x: string]: any }, classNames: any[];
     [props, classNames] = this.getCommonObjectProps(selectedNonMeta);
     const properties = this._g.dataModel.getValue();
     // remove undefined but somehow added properties (cuz of extensions)
-    let definedProperties = getPropNamesFromObj([properties.nodes, properties.edges], false);
+    let definedProperties = getPropNamesFromObj(
+      [properties.nodes, properties.edges],
+      false
+    );
     for (let k in props) {
       if (!definedProperties.has(k)) {
         delete props[k];
@@ -109,14 +170,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
 
     // remove classes added from extensions and other stuff
-    classNames = classNames.filter(x => this.nodeClasses.has(x) || this.edgeClasses.has(x));
+    classNames = classNames.filter(
+      (x) => this.nodeClasses.has(x) || this.edgeClasses.has(x)
+    );
     this.renderObjectProps(props, classNames, selectedNonMeta.length);
   }
 
   showCompoundEdgeProps(isNeed2Filter: boolean) {
-    const compoundEdges = this._g.cy.edges(':selected').filter('.' + COLLAPSED_EDGE_CLASS);
-    const selectedNodeCnt = this._g.cy.nodes(':selected').length;
-    this.selectedClasses = '';
+    const compoundEdges = this._g.cy
+      .edges(":selected")
+      .filter("." + COLLAPSED_EDGE_CLASS);
+    const selectedNodeCnt = this._g.cy.nodes(":selected").length;
+    this.selectedClasses = "";
     this.selectedItemProps.length = 0;
     if (compoundEdges.length < 1 || selectedNodeCnt > 0) {
       return;
@@ -124,23 +189,31 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     let idMappingForHighlight = {};
     let edges = this._g.cy.collection();
     for (let i = 0; i < compoundEdges.length; i++) {
-      let collapsed = compoundEdges[i].data('collapsedEdges');
+      let collapsed = compoundEdges[i].data("collapsedEdges");
       edges = edges.union(collapsed);
       for (let j = 0; j < collapsed.length; j++) {
         idMappingForHighlight[collapsed[j].id()] = compoundEdges[i].id();
       }
     }
-    let stdSelectedEdges = this._g.cy.edges(':selected').not('.' + COLLAPSED_EDGE_CLASS)
+    let stdSelectedEdges = this._g.cy
+      .edges(":selected")
+      .not("." + COLLAPSED_EDGE_CLASS);
     for (let i = 0; i < stdSelectedEdges.length; i++) {
-      idMappingForHighlight[stdSelectedEdges[i].id()] = stdSelectedEdges[i].id();
+      idMappingForHighlight[stdSelectedEdges[i].id()] =
+        stdSelectedEdges[i].id();
     }
     edges = edges.union(stdSelectedEdges);
     this.fillMultiObjTable(edges, false, idMappingForHighlight, isNeed2Filter);
   }
 
-  private fillMultiObjTable(elems, isNode: boolean, idMappingForHighlight: any, isNeed2Filter: boolean) {
+  private fillMultiObjTable(
+    elems,
+    isNode: boolean,
+    idMappingForHighlight: any,
+    isNeed2Filter: boolean
+  ) {
     this.multiObjTableInp.isNodeData = isNode;
-    let elemTypesArr = elems.map(x => x.classes()[0]);
+    let elemTypesArr = elems.map((x) => x.classes()[0]);
     let elemTypes = {};
     for (let i = 0; i < elemTypesArr.length; i++) {
       elemTypes[elemTypesArr[i]] = true;
@@ -158,7 +231,9 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         }
       }
     }
-    this.multiObjTableInp.columns = ['Type'].concat(Object.keys(definedProperties));
+    this.multiObjTableInp.columns = ["Type"].concat(
+      Object.keys(definedProperties)
+    );
     this.multiObjTableInp.results = [];
     this.multiObjTableInp.classNames = [];
     let elemTypeCnt = {};
@@ -170,15 +245,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       } else {
         elemTypeCnt[className] = 1;
       }
-      let row: TableData[] = [{ type: TableDataType.string, val: '#' + idMappingForHighlight[elems[i].id()] }, { type: TableDataType.string, val: className }];
+      let row: TableData[] = [
+        {
+          type: TableDataType.string,
+          val: "#" + idMappingForHighlight[elems[i].id()],
+        },
+        { type: TableDataType.string, val: className },
+      ];
       for (let j in definedProperties) {
-        row.push(property2TableData(properties, enumMapping, j, elems[i].data(j) ?? '', className, !isNode));
+        row.push(
+          property2TableData(
+            properties,
+            enumMapping,
+            j,
+            elems[i].data(j) ?? "",
+            className,
+            !isNode
+          )
+        );
       }
       this.multiObjTableInp.results.push(row);
       this.multiObjTableInp.classNames.push(className);
     }
     for (let k in elemTypeCnt) {
-      this.selectedClasses += k + '(' + elemTypeCnt[k] + ') ';
+      this.selectedClasses += k + "(" + elemTypeCnt[k] + ") ";
     }
     this.multiObjTableInp.pageSize = this._g.userPrefs.dataPageSize.getValue();
     this.multiObjTableInp.currPage = 1;
@@ -186,7 +276,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     // if too many edges need to be shown, we should make pagination
     if (isNeed2Filter) {
       this.clearMultiObjTableFilter.next(true);
-      filterTableDatas({ orderBy: '', orderDirection: '', txt: '' }, this.multiObjTableInp, this._g.userPrefs.isIgnoreCaseInText.getValue());
+      filterTableDatas(
+        { orderBy: "", orderDirection: "", txt: "" },
+        this.multiObjTableInp,
+        this._g.userPrefs.isIgnoreCaseInText.getValue()
+      );
     }
     setTimeout(() => {
       this.multiObjTableFilled.next(true);
@@ -194,11 +288,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   showMultiObjTable(isNeed2Filter: boolean) {
-    let selected = this._g.cy.$(':selected').not('.' + CLUSTER_CLASS);
-    this.selectedClasses = '';
+    let selected = this._g.cy.$(":selected").not("." + CLUSTER_CLASS);
+    this.selectedClasses = "";
     this.selectedItemProps.length = 0;
-    let hasNode = selected.filter('node').length > 0;
-    if (hasNode && selected.filter('edge').length > 0) {
+    let hasNode = selected.filter("node").length > 0;
+    if (hasNode && selected.filter("edge").length > 0) {
       return;
     }
     let idMappingForHighlight = {};
@@ -206,13 +300,17 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       let id = selected[i].id();
       idMappingForHighlight[id] = id;
     }
-    this.fillMultiObjTable(selected, hasNode, idMappingForHighlight, isNeed2Filter);
+    this.fillMultiObjTable(
+      selected,
+      hasNode,
+      idMappingForHighlight,
+      isNeed2Filter
+    );
   }
 
   renderObjectProps(props, classNames, selectedCount) {
-
     if (classNames && classNames.length > 0) {
-      classNames = classNames.join(' & ');
+      classNames = classNames.join(" & ");
     }
 
     this.selectedClasses = classNames;
@@ -225,27 +323,44 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
     const properties = this._g.dataModel.getValue();
     for (const key of propKeys) {
-
       // Replace - and _ with space
-      let renderedKey = key.replace(/[_\-]/g, ' ');
+      let renderedKey = key.replace(/[_\-]/g, " ");
       let renderedValue = props[key];
 
-      const attributeType = findTypeOfAttribute(key, properties.nodes, properties.edges);
-      if (attributeType === 'datetime') {
-        if (typeof renderedValue !== 'undefined') {
+      const attributeType = findTypeOfAttribute(
+        key,
+        properties.nodes,
+        properties.edges
+      );
+      if (attributeType === "datetime") {
+        if (typeof renderedValue !== "undefined") {
           renderedValue = new Date(renderedValue).toLocaleString();
         } else {
-          renderedValue = '';
+          renderedValue = "";
         }
       }
       if (renderedValue !== undefined) {
-        if (key.toLowerCase() === DATE_PROP_START ||
-              key.toLowerCase() === DATE_PROP_END) {
-          this.selectedItemProps.push({ key: renderedKey, val: renderedValue });
+        if (
+          key.toLowerCase() === DATE_PROP_START ||
+          key.toLowerCase() === DATE_PROP_END
+        ) {
+          this.selectedItemProps.push({
+            key: renderedKey,
+            val: renderedValue,
+            name: PROPERITY_NAMES[renderedKey],
+          });
           continue;
         }
-        renderedValue = this.getMappedProperty(this.selectedClasses, key, renderedValue);
-        this.selectedItemProps.push({ key: renderedKey, val: renderedValue });
+        renderedValue = this.getMappedProperty(
+          this.selectedClasses,
+          key,
+          renderedValue
+        );
+        this.selectedItemProps.push({
+          key: renderedKey,
+          val: renderedValue,
+          name: PROPERITY_NAMES[renderedKey],
+        });
       }
     }
   }
@@ -259,11 +374,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     let firstElem = null;
 
     // Assume ele is instance of Cytoscape.js element
-    eleList.forEach(ele => {
+    eleList.forEach((ele) => {
       const e = ele.json();
       const data = e.data;
       const classes = e.classes;
-      const classArray = classes.split(' ');
+      const classArray = classes.split(" ");
 
       // construct superClassNames
       for (let i = 0; i < classArray.length; i++) {
@@ -315,12 +430,12 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   countKeyValuePairs(data, superObj) {
     for (const [k, v] of Object.entries(data)) {
-      const valueProperty = v + '';
+      const valueProperty = v + "";
       if (superObj[k]) {
         if (superObj[k][valueProperty]) {
           superObj[k][valueProperty] += 1;
         } else {
-          superObj[k][valueProperty] = 1
+          superObj[k][valueProperty] = 1;
         }
       } else {
         const o2 = {};
@@ -342,10 +457,14 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  getMappedProperty(className: string, propertyName: string, propertyValue: string): string {
+  getMappedProperty(
+    className: string,
+    propertyName: string,
+    propertyValue: string
+  ): string {
     const enumMap = this._g.getEnumMapping();
     let classes = Object.keys(enumMap);
-    let c = classes.find(x => x == className);
+    let c = classes.find((x) => x == className);
     if (!c) {
       return propertyValue;
     }
@@ -371,21 +490,25 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       let isSelected = curr.selected();
       let isVisible = curr.visible();
       for (let j = 0; j < c.length; j++) {
-        if (!this.nodeClasses.has(c[j]) && !this.edgeClasses.has(c[j]) && c[j] != COLLAPSED_EDGE_CLASS) {
+        if (
+          !this.nodeClasses.has(c[j]) &&
+          !this.edgeClasses.has(c[j]) &&
+          c[j] != COLLAPSED_EDGE_CLASS
+        ) {
           continue;
         }
         classSet.add(c[j]);
         let TYPE_CLASS = curr.isNode() ? this.NODE_TYPE : this.EDGE_TYPE;
-        this.increaseCountInObj(stat, TYPE_CLASS, 'total');
-        this.increaseCountInObj(stat, c[j], 'total');
+        this.increaseCountInObj(stat, TYPE_CLASS, "total");
+        this.increaseCountInObj(stat, c[j], "total");
 
         if (isSelected) {
-          this.increaseCountInObj(stat, c[j], 'selected');
-          this.increaseCountInObj(stat, TYPE_CLASS, 'selected');
+          this.increaseCountInObj(stat, c[j], "selected");
+          this.increaseCountInObj(stat, TYPE_CLASS, "selected");
         }
         if (!isVisible) {
-          this.increaseCountInObj(stat, c[j], 'hidden');
-          this.increaseCountInObj(stat, TYPE_CLASS, 'hidden');
+          this.increaseCountInObj(stat, c[j], "hidden");
+          this.increaseCountInObj(stat, TYPE_CLASS, "hidden");
         }
       }
     }
@@ -396,37 +519,36 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   private setStatStrFromObj(stat, classSet: Set<string>) {
-
     this.tableInput.results = [];
     this.tableInput.classNames = [];
     for (let c of classSet) {
       if (stat[c] === undefined) {
         continue;
       }
-      let cySelector = '.' + c;
+      let cySelector = "." + c;
       // first element must be ID, ID is irrelevant here
       let row: TableData[] = [{ val: cySelector, type: TableDataType.string }];
       if (c == this.NODE_TYPE) {
-        row[0].val = 'node';
-        row.push({ val: 'Node', type: TableDataType.string });
+        row[0].val = "node";
+        row.push({ val: "Node", type: TableDataType.string });
       } else if (c == this.EDGE_TYPE) {
-        row[0].val = 'edge';
-        row.push({ val: 'Edge', type: TableDataType.string });
+        row[0].val = "edge";
+        row.push({ val: "Edge", type: TableDataType.string });
       } else if (c == COLLAPSED_EDGE_CLASS) {
-        row[0].val = '.' + COLLAPSED_EDGE_CLASS;
-        row.push({ val: 'Meta edge', type: TableDataType.string });
+        row[0].val = "." + COLLAPSED_EDGE_CLASS;
+        row.push({ val: "Meta edge", type: TableDataType.string });
       } else {
         row.push({ val: c, type: TableDataType.string });
       }
       row.push({ val: stat[c].total, type: TableDataType.number });
 
-      if (stat[c]['selected']) {
-        row.push({ val: stat[c]['selected'], type: TableDataType.number });
+      if (stat[c]["selected"]) {
+        row.push({ val: stat[c]["selected"], type: TableDataType.number });
       } else {
         row.push({ val: 0, type: TableDataType.number });
       }
-      if (stat[c]['hidden']) {
-        row.push({ val: stat[c]['hidden'], type: TableDataType.number });
+      if (stat[c]["hidden"]) {
+        row.push({ val: stat[c]["hidden"], type: TableDataType.number });
       } else {
         row.push({ val: 0, type: TableDataType.number });
       }
@@ -454,17 +576,28 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   filterTable(filter: TableFiltering) {
     this.showStats();
-    filterTableDatas(filter, this.tableInput, this._g.userPrefs.isIgnoreCaseInText.getValue());
+    filterTableDatas(
+      filter,
+      this.tableInput,
+      this._g.userPrefs.isIgnoreCaseInText.getValue()
+    );
     setTimeout(() => this.tableFilled.next(true), 100);
   }
 
   filterMultiObjTable(filter: TableFiltering) {
-    if (this._g.cy.edges(':selected').filter('.' + COLLAPSED_EDGE_CLASS).length > 0) {
+    if (
+      this._g.cy.edges(":selected").filter("." + COLLAPSED_EDGE_CLASS).length >
+      0
+    ) {
       this.showCompoundEdgeProps(false);
     } else {
       this.showMultiObjTable(false);
     }
-    filterTableDatas(filter, this.multiObjTableInp, this._g.userPrefs.isIgnoreCaseInText.getValue());
+    filterTableDatas(
+      filter,
+      this.multiObjTableInp,
+      this._g.userPrefs.isIgnoreCaseInText.getValue()
+    );
     setTimeout(() => this.multiObjTableFilled.next(true), 100);
   }
 }

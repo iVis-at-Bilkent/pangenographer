@@ -51,6 +51,7 @@ export interface DbService {
     cb: (x) => void
   );
   loadGFA(GFAdata: any);
+  clearData();
 }
 
 export interface GraphResponse {

@@ -186,4 +186,8 @@ export class DbAdapterService {
   getGFAdata2LoadGFA(GFAdata: any) {
     this._db.loadGFA(GFAdata);
   }
+
+  clearData() {
+    this._db.clearData();
+  }
 }

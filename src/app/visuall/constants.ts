@@ -143,6 +143,26 @@ export const SHORT_MONTHS = [
   "Dec",
 ];
 
+export const PROPERITY_NAMES = {
+  segmentName: "Name",
+  segmentData: "Data",
+  segmentLength: "Length",
+  readCount: "Read count",
+  fragmentCount: "Fragment count",
+  kmerCount: "K-mer count",
+  SHA256Checksum: "SHA-256 checksum",
+  URIorLocalSystemPath: "URI or local file-system path",
+  overlap: "Overlap",
+  targetOrientation: "Target orientation",
+  sourceOrientation: "Source orientation",
+  mappingQuality: "Mapping quality",
+  numberOfMismatchesOrGaps: "Number of mismatches/gaps",
+  edgeIdentifier: "Edge identifier",
+  distance: "Distance",
+  indirectShortcutConnections: "Indirect shortcut connections",
+  pos: "Pos",
+};
+
 /** https://davidwalsh.name/javascript-debounce-function
  * Returns a function, that, as long as it continues to be invoked, will not
  * be triggered. The function will be called after it stops being called for

@@ -533,10 +533,9 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
-  loadGFA(GFAdata: any) {
-    var query = this.GFAdata2CQL(GFAdata);
+  runCypherQuery(query: string) {
     const conf = environment.dbConfig;
-    const url = conf.loadGFADataUrl;
+    const url = conf.cypherQueryUrl;
     const username = conf.username;
     const password = conf.password;
     this._g.setLoadingStatus(true);
@@ -566,6 +565,14 @@ export class Neo4jDb implements DbService {
         }
         this._g.statusMsg.next("");
       }, errFn);
+  }
+
+  loadGFA(GFAdata: any) {
+    this.runCypherQuery(this.GFAdata2CQL(GFAdata));
+  }
+
+  clearData() {
+    this.runCypherQuery("MATCH (n) DETACH DELETE n");
   }
 
   // ------------------------------------------------- methods for conversion to CQL -------------------------------------------------
