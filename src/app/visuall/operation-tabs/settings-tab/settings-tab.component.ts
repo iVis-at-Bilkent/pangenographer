@@ -32,7 +32,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   timebarStatsInclusionTypes: string[] = ['all', 'begin', 'middle', 'end'];
   mergedElemIndicators: string[] = ['None', 'Selection', 'Highlight'];
   groupingOptions: string[] = ['Compounds', 'Circles'];
-  nodeLabelWrapTypes: string[] = ['None', 'Wrap', 'Ellipsis'];
   // multiple choice settings
   graphInclusionType: TimebarGraphInclusionTypes;
   queryResultPagination: 'Client' | 'Server';

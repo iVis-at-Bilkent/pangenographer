@@ -27,14 +27,6 @@
       </div>
     </div>
     <div>
-      <div class="form-check-label va-text">Node label style:</div>
-      <div class="form-check-inline form-check va-text" *ngFor="let str of nodeLabelWrapTypes; let i = index;">
-        <input type="radio" [(ngModel)]="nodeLabelWrap" [value]="i" class="form-check-input"
-          [id]="'nodeLabelWrapType' + i" (click)="settingChanged(i, 'nodeLabelWrap')" name="optradio3">
-        <label class="form-check-label" [for]="'nodeLabelWrapType' + i"> {{str}} </label>
-      </div>
-    </div>
-    <div>
       <label class="va-text">Selection style:</label>
       <div class="form-inline mx-1">
         <input type="number" max="20" min="1" step="any" (change)="onSelWidSelected($event)"

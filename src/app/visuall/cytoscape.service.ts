@@ -12,7 +12,6 @@ import {
 import { UserPrefHelper } from "./user-pref-helper";
 import {
   MergedElemIndicatorTypes,
-  TextWrapTypes,
   GroupingOptionTypes,
 } from "./user-preference";
 import { UserProfileService } from "./user-profile.service";
@@ -405,16 +404,11 @@ export class CytoscapeService {
 
   fitLabel2Node() {
     this._g.cy.startBatch();
-    let nodes = this._g.cy
-      .nodes()
-      .not(":parent")
-      .not("." + C.CLUSTER_CLASS);
-    let wrapType = this._g.userPrefs.nodeLabelWrap.getValue();
-
+    let nodes = this._g.cy.nodes().not(":parent").not("." + C.CLUSTER_CLASS);
     nodes.removeClass("ellipsis_label wrap_label");
     for (let i = 0; i < nodes.length; i++) {
       let toFit = this.truncateText((nodes[i].data("segmentName") as string), nodes[i])
-       + "\n\n" + this.truncateText(nodes[i].style("label"), nodes[i]);
+       + "\n\n" + this.truncateText(nodes[i].data("segmentData"), nodes[i]);
       nodes[i].data("__label__", toFit);
     }
     nodes.addClass("ellipsis_label");

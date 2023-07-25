@@ -64,7 +64,7 @@ export enum GroupingOptionTypes {
 }
 
 export enum TextWrapTypes {
-  none = 0, wrap = 1, ellipsis = 2
+  ellipsis = 0
 }
 
 export interface BoolSetting {
