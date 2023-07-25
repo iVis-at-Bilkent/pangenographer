@@ -412,15 +412,12 @@ export class CytoscapeService {
     let wrapType = this._g.userPrefs.nodeLabelWrap.getValue();
 
     nodes.removeClass("ellipsis_label wrap_label");
-    if (wrapType == TextWrapTypes.ellipsis) {
-      for (let i = 0; i < nodes.length; i++) {
-        let origLabel = nodes[i].style("label");
-        nodes[i].data("__label__", this.truncateText(origLabel, nodes[i]));
-      }
-      nodes.addClass("ellipsis_label");
-    } else if (wrapType == TextWrapTypes.wrap) {
-      nodes.addClass("wrap_label");
+    for (let i = 0; i < nodes.length; i++) {
+      let toFit = this.truncateText((nodes[i].data("segmentName") as string), nodes[i])
+       + "\n\n" + this.truncateText(nodes[i].style("label"), nodes[i]);
+      nodes[i].data("__label__", toFit);
     }
+    nodes.addClass("ellipsis_label");
     setTimeout(() => {
       this._g.cy.endBatch();
     }, C.CY_BATCH_END_DELAY);
@@ -436,7 +433,7 @@ export class CytoscapeService {
 
     context.font = fStyle + " " + weight + " " + size + " " + family;
     let text = label || "";
-    let textWidth = ele.width();
+    let textWidth = ele.width() - 8;
     return this.findFittedTxt(context, text, textWidth);
   }
 

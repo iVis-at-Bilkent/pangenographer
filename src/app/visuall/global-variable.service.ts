@@ -529,15 +529,8 @@ export class GlobalVariableService {
     this.cy.style()
       .selector('node.ellipsis_label')
       .style({
+        "text-wrap": "wrap",
         "label": "data(__label__)"
-      })
-      .selector('node.wrap_label')
-      .style({
-        "text-wrap": "wrap"
-      })
-      .selector('edge.nolabel')
-      .style({
-        "label": ""
       }).update();
 
     this.cy.style().selector('edge.LINK').style({
