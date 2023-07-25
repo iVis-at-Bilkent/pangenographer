@@ -154,8 +154,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     let styles = this._g.viewUtils.getHighlightStyles();
     for (let i = 0; i < styles.length; i++) {
       this.currHighlightStyles.push('Style ' + (i + 1));
-      let c = styles[i].node['overlay-color'];
-      let w = styles[i].node['overlay-padding'];
+      let c = styles[i].node['underlay-color'];
+      let w = styles[i].node['underlay-padding'];
       if (this._g.userPrefs.highlightStyles[i]) {
         this._g.userPrefs.highlightStyles[i].color.next(c);
         this._g.userPrefs.highlightStyles[i].wid.next(w);
@@ -182,12 +182,17 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   settingChanged(val: any, userPref: string) {
+    console.log(val);
+    console.log(userPref);
     let path = userPref.split('.');
+    console.log(path);
     let obj = this._g.userPrefs[path[0]];
+    console.log(obj);
     for (let i = 1; i < path.length; i++) {
       obj = obj[path[i]];
     }
     obj.next(val);
+    console.log(obj);
     this._profile.saveUserPrefs();
   }
 
@@ -270,8 +275,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.highlightStyleIdx = i;
     this._g.userPrefs.currHighlightIdx.next(i);
     let style = this._g.viewUtils.getHighlightStyles()[i];
-    this.highlightColor = style.node['overlay-color'];
-    this.highlightWidth = style.node['overlay-padding'];
+    this.highlightColor = style.node['underlay-color'];
+    this.highlightWidth = style.node['underlay-padding'];
     this._profile.saveUserPrefs();
   }
 

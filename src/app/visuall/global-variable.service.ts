@@ -169,15 +169,14 @@ export class GlobalVariableService {
   updateSelectionCyStyle() {
     this.cy.style().selector(':selected').style({
       'overlay-color': this.userPrefs.selectionColor.getValue(),
-      'overlay-padding': this.userPrefs.selectionWidth.getValue()
-    })
-      .selector('edge:selected')
-      .style({
-        'overlay-padding': (e) => {
-          return (this.userPrefs.selectionWidth.getValue() + e.width()) / 2 + 'px';
-        },
-      }).update();
-
+      'overlay-padding': this.userPrefs.selectionWidth.getValue(),
+      "target-arrow-color": "gray",
+      "source-arrow-color": "gray",
+    }).selector('edge:selected').style({
+      'overlay-padding': (e) => {
+        return (this.userPrefs.selectionWidth.getValue() + e.width()) / 2 + 'px';
+      },
+    }).update();
     this.addStyle4Emphasize();
   }
 
@@ -541,59 +540,49 @@ export class GlobalVariableService {
         "label": ""
       }).update();
 
-      this.cy.style().selector('edge.LINK').style({
-        "target-arrow-shape" : function (e) {
-          if (!e.data('targetNegativity')) {
-            return "none";
-          }
-          return "tee";
+    this.cy.style().selector('edge.LINK').style({
+      "target-arrow-shape" : function (e) {
+        if (!e.data('targetOrientation')) {
+          return "none";
         }
-      }).update();
+        return "tee";
+      },"source-arrow-shape" : function (e) {
+        if (!e.data('sourceOrientation')) {
+          return "none";
+        }
+        return "tee";
+      }
+    }).update();
 
-      this.cy.style().selector('edge.LINK').style({
-        "source-arrow-shape" : function (e) {
-          if (!e.data('sourceNegativity')) {
-            return "none";
-          }
-          return "tee";
+    this.cy.style().selector('edge.JUMP').style({
+      "target-arrow-shape" : function (e) {
+        if (!e.data('targetOrientation')) {
+          return "none";
         }
-      }).update();
+        return "tee";
+      },
+      "source-arrow-shape" : function (e) {
+        if (!e.data('sourceOrientation')) {
+          return "none";
+        }
+        return "tee";
+      }
+    }).update();
 
-      this.cy.style().selector('edge.JUMP').style({
-        "target-arrow-shape" : function (e) {
-          if (!e.data('targetNegativity')) {
-            return "none";
-          }
-          return "tee";
+    this.cy.style().selector('edge.CONTAINMENT').style({
+      "target-arrow-shape" : function (e) {
+        if (!e.data('targetOrientation')) {
+          return "none";
         }
-      }).update();
-
-      this.cy.style().selector('edge.JUMP').style({
-        "source-arrow-shape" : function (e) {
-          if (!e.data('sourceNegativity')) {
-            return "none";
-          }
-          return "tee";
+        return "tee";
+      },
+      "source-arrow-shape" : function (e) {
+        if (!e.data('sourceOrientation')) {
+          return "none";
         }
-      }).update();
-
-      this.cy.style().selector('edge.CONTAINMENT').style({
-        "target-arrow-shape" : function (e) {
-          if (!e.data('targetNegativity')) {
-            return "none";
-          }
-          return "tee";
-        }
-      }).update();
-
-      this.cy.style().selector('edge.CONTAINMENT').style({
-        "source-arrow-shape" : function (e) {
-          if (!e.data('sourceNegativity')) {
-            return "none";
-          }
-          return "tee";
-        }
-      }).update();
+        return "tee";
+      }
+    }).update();
 
     setTimeout(() => { this.cy.endBatch(); }, CY_BATCH_END_DELAY);
   }
@@ -605,12 +594,12 @@ export class GlobalVariableService {
 
     this.cy.style().selector('node.emphasize')
       .style({
-        'overlay-color': color, 'overlay-opacity': HIGHLIGHT_OPACITY + OPACITY_DIFF, 'overlay-padding': wid
+        'underlay-color': color, 'underlay-opacity': HIGHLIGHT_OPACITY + OPACITY_DIFF, 'underlay-padding': wid
       }).update();
 
     this.cy.style().selector('edge.emphasize')
       .style({
-        'overlay-color': color, 'overlay-opacity': HIGHLIGHT_OPACITY + OPACITY_DIFF, 'overlay-padding': (e) => {
+        'underlay-color': color, 'underlay-opacity': HIGHLIGHT_OPACITY + OPACITY_DIFF, 'underlay-padding': (e) => {
           return (wid + e.width()) / 2 + 'px';
         }
       }).update();

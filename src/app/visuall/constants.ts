@@ -585,14 +585,14 @@ export function getCyStyleFromColorAndWid(
 ): { node: any; edge: any } {
   return {
     node: {
-      "overlay-color": color,
-      "overlay-opacity": HIGHLIGHT_OPACITY,
-      "overlay-padding": wid,
+      "underlay-color": color,
+      "underlay-opacity": HIGHLIGHT_OPACITY,
+      "underlay-padding": wid,
     },
     edge: {
-      "overlay-color": color,
-      "overlay-opacity": HIGHLIGHT_OPACITY,
-      "overlay-padding": (e) => {
+      "underlay-color": color,
+      "underlay-opacity": HIGHLIGHT_OPACITY,
+      "underlay-padding": (e) => {
         return (wid + e.width()) / 2 + "px";
       },
     },
