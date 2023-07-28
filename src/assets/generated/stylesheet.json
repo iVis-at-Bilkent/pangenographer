@@ -88,15 +88,18 @@
   {
     "selector": "node.Segment",
     "style": {
-      "label": "data(segmentData)",
-      "color": "black",
+      "label": "segment",
+      "color": "white",
+      "text-outline-color": "gray",
+      "text-outline-width": "1.8px",
       "text-align": "center",
       "font-size": "7px",
+      "font-family": "Inconsolata, monospace",
       "shape": "round-rectangle",
       "background-fit": "contain",
       "background-color": "grey",
-      "width": "40px",
-      "height": "32px"
+      "width": "36px",
+      "height": "18px"
     }
   },
   {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import navigator from 'cytoscape-navigator';
 import fcose from 'cytoscape-fcose';
+import popper from 'cytoscape-popper';
 import expandCollapse from 'cytoscape-expand-collapse';
 import viewUtilities from 'cytoscape-view-utilities';
 import layoutUtilities from 'cytoscape-layout-utilities';
@@ -28,14 +29,16 @@ export class CyExtService {
     navigator(cytoscape);
     // register view utilities extension
     viewUtilities(cytoscape);
-    //register expand-collapse extension
+    // register expand-collapse extension
     expandCollapse(cytoscape);
-    //register layour utilities extension
+    // register layour utilities extension
     layoutUtilities(cytoscape);
     // use fcose layout algorithm
     cytoscape.use(fcose);
     // use cise layout algorithm
     cytoscape.use(cise);
+    // use popper extension
+    cytoscape.use(popper);
 
     panzoom(cytoscape);  // register extension
   }
@@ -223,5 +226,4 @@ export class CyExtService {
     }
     return r;
   }
-
 }

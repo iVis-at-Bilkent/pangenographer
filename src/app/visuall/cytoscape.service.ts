@@ -262,6 +262,78 @@ export class CytoscapeService {
     }
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
+    this.addTooltips();
+  }
+
+  private addTooltips() {
+    this._g.cy.nodes().unbind("mouseover");
+    this._g.cy.nodes().forEach(node => {
+      node.bind("mouseover", (event) => {
+        let popper = event.target.popper({
+          content: () => {
+            let content = document.createElement("div");
+            content.classList.add("popper-tooltip");
+            content.id = `popper-tooltip-${node.data("segmentName")}`;
+            content.innerHTML = this.tooltipText(node);
+            content.style.fontWeight = "700";
+            content.style.fontSize = "15px";
+            content.style.fontFamily = "Inconsolata, monospace";
+            content.style.overflowWrap = "break-word";
+            content.style.maxWidth = "340px";
+            content.style.position = "absolute";
+            content.style.paddingLeft = "3px";
+            content.style.opacity = "0.65";
+            content.style.background = "#c1cade";
+            content.style.display = "flex";
+            content.style.justifyContent = "left";
+            content.style.alignItems = "left";
+            content.style.color = "black";
+            content.style.border = "2px solid #585c66";
+            content.style.borderRadius = "2px";
+            content.style.boxShadow = "0 2px 1px #bcbcbc";
+            document.body.appendChild(content);
+            return content;
+          },
+        });
+        event.target.popperRefObj = popper;
+        let update = () => {
+          popper.update();
+        };
+
+        node.on('position', update);
+        
+        this._g.cy.on('pan zoom resize', update);
+      });
+    });
+
+    this._g.cy.nodes().unbind("mouseout");
+    this._g.cy.nodes().bind("mouseout", (event) => {
+      if (event.target.popper) {
+        event.target.popperRefObj.state.elements.popper.remove();
+        event.target.popperRefObj.destroy();
+      }
+    });
+  }
+
+  private tooltipText(node: any) {
+    var text = "";
+    var startIndex;
+    var nodeTextData = node.data("segmentData");
+    for (startIndex = 0; startIndex < 200; startIndex += 40) {
+      if (startIndex >= nodeTextData.length) {
+        break;
+      }
+      text += nodeTextData.substr(startIndex, 
+        nodeTextData.length < 40 + startIndex ? nodeTextData.length - startIndex : 40)
+         + "\n";
+    }
+    if (nodeTextData.length > 240) {
+      text += nodeTextData.substr(startIndex, 38) + ".."; 
+    } else if (nodeTextData.length >= startIndex) {
+      text += nodeTextData.substr(startIndex, 
+        nodeTextData.length < 40 + startIndex ? nodeTextData.length - startIndex : 40);
+    }
+    return text;
   }
 
   hasNewElem(newElemIds: string[], prevElems: any) {
@@ -405,10 +477,10 @@ export class CytoscapeService {
   fitLabel2Node() {
     this._g.cy.startBatch();
     let nodes = this._g.cy.nodes().not(":parent").not("." + C.CLUSTER_CLASS);
-    nodes.removeClass("ellipsis_label wrap_label");
+    nodes.removeClass("ellipsis_label");
     for (let i = 0; i < nodes.length; i++) {
-      let toFit = this.truncateText((nodes[i].data("segmentName") as string), nodes[i])
-       + "\n\n" + this.truncateText(nodes[i].data("segmentData"), nodes[i]);
+      let toFit = this.truncateText(nodes[i].data("segmentName"), nodes[i], -4)
+       + "\n" + this.truncateText(nodes[i].data("segmentData"), nodes[i], -4);
       nodes[i].data("__label__", toFit);
     }
     nodes.addClass("ellipsis_label");
@@ -417,9 +489,8 @@ export class CytoscapeService {
     }, C.CY_BATCH_END_DELAY);
   }
 
-  truncateText(label: string, ele: any): string {
+  truncateText(label: string, ele: any, widthOffset?: number): string {
     let context = document.createElement("canvas").getContext("2d");
-
     let fStyle = ele.pstyle("font-style").strValue;
     let size = ele.pstyle("font-size").pfValue + "px";
     let family = ele.pstyle("font-family").strValue;
@@ -427,7 +498,7 @@ export class CytoscapeService {
 
     context.font = fStyle + " " + weight + " " + size + " " + family;
     let text = label || "";
-    let textWidth = ele.width() - 8;
+    let textWidth = ele.width() + widthOffset;
     return this.findFittedTxt(context, text, textWidth);
   }
 
