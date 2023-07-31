@@ -272,25 +272,9 @@ export class CytoscapeService {
         let popper = event.target.popper({
           content: () => {
             let content = document.createElement("div");
-            content.classList.add("popper-tooltip");
-            content.id = `popper-tooltip-${node.data("segmentName")}`;
+            content.classList.add("node-tooltip");
+            content.id = `node-tooltip-${node.data("segmentName")}`;
             content.innerHTML = this.tooltipText(node);
-            content.style.fontWeight = "700";
-            content.style.fontSize = "15px";
-            content.style.fontFamily = "Inconsolata, monospace";
-            content.style.overflowWrap = "break-word";
-            content.style.maxWidth = "340px";
-            content.style.position = "absolute";
-            content.style.paddingLeft = "3px";
-            content.style.opacity = "0.65";
-            content.style.background = "#c1cade";
-            content.style.display = "flex";
-            content.style.justifyContent = "left";
-            content.style.alignItems = "left";
-            content.style.color = "black";
-            content.style.border = "2px solid #585c66";
-            content.style.borderRadius = "2px";
-            content.style.boxShadow = "0 2px 1px #bcbcbc";
             document.body.appendChild(content);
             return content;
           },

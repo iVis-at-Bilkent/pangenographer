@@ -362,3 +362,22 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   stroke: white;
   stroke-width: 2px;
 }
+
+.node-tooltip {
+  font-weight: 700;
+  font-size: 15px;
+  font-family: Inconsolata, monospace;
+  overflow-wrap: break-word;
+  max-width: 340px;
+  position: absolute;
+  padding-left: 3px;
+  opacity: 0.65;
+  background: #c1cade;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  color: black;
+  border: 2px solid #585c66;
+  border-radius: 2px;
+  box-shadow: 0 2px 1px #bcbcbc;
+}
