@@ -53,15 +53,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
             isStd: true,
           },
           { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng", isStd: true },
+          { txt: "Import GFA..", id: "nbi04", fn: "loadGFAFile2Db", isStd: true },
           {
             txt: "Load User Profile...",
-            id: "nbi04",
+            id: "nbi05",
             fn: "loadUserProfile",
             isStd: true,
           },
           {
             txt: "Save User Profile...",
-            id: "nbi05",
+            id: "nbi06",
             fn: "saveUserProfile",
             isStd: true,
           },
@@ -197,7 +198,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
         actions: [
           { txt: "Sample Data", id: "nbi60", fn: "getSampleData", isStd: true },
           { txt: "Clear Data", id: "nbi62", fn: "clearData", isStd: true },
-          { txt: "Load GFA", id: "nbi63", fn: "loadGFAFile2Db", isStd: true },
         ],
       },
     ];
