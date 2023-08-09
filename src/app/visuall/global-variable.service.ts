@@ -531,6 +531,9 @@ export class GlobalVariableService {
       .style({
         "text-wrap": "wrap",
         "label": "data(__label__)"
+      }).selector('edge.nolabel')
+      .style({
+        "label": ""
       }).update();
 
     this.cy.style().selector('edge.LINK').style({
