@@ -52,8 +52,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
             fn: "saveSelectedAsJson",
             isStd: true,
           },
-          { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng", isStd: true },
           { txt: "Import GFA..", id: "nbi04", fn: "loadGFAFile2Db", isStd: true },
+          { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng", isStd: true },
           {
             txt: "Load User Profile...",
             id: "nbi05",
