@@ -168,6 +168,24 @@ export class Neo4jDb implements DbService {
     );
   }
 
+  getElementsUpToCertainDistance (
+    nodeId: string, 
+    distance: number,
+    callback: (x: GraphResponse) => any,
+    isUp: boolean
+  ) {
+    var query = `MATCH (startNode { segmentName: '${nodeId}' }) MATCH path = (startNode)`;
+    if (!isUp) {
+      query += "<";
+    }
+    query += `-[*1..${distance}]-`;
+    if (isUp) {
+      query += ">"
+    }
+    query += "(endNode) RETURN nodes(path) AS nodes, relationships(path) AS relationships";
+    this.runQuery(query, callback);
+  }
+
   getElems(
     ids: string[] | number[],
     callback: (x: GraphResponse) => any,

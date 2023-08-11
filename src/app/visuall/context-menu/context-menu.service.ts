@@ -3,6 +3,7 @@ import cytoscape from 'cytoscape';
 import * as contextMenus from 'cytoscape-context-menus';
 import { CytoscapeService } from '../cytoscape.service';
 import { GlobalVariableService } from '../global-variable.service';
+import { DbAdapterService } from "../db-service/db-adapter.service";
 import { ContextMenuItem } from './icontext-menu';
 import { ContextMenuCustomizationService } from '../../custom/context-menu-customization.service';
 import { COLLAPSED_EDGE_CLASS, CLUSTER_CLASS } from './../constants';
@@ -14,7 +15,12 @@ export class ContextMenuService {
 
   menu: ContextMenuItem[];
 
-  constructor(private _cyService: CytoscapeService, private _g: GlobalVariableService, private _customizationService: ContextMenuCustomizationService) {
+  constructor(
+    private _cyService: CytoscapeService,
+    private _g: GlobalVariableService,
+    private _customizationService: ContextMenuCustomizationService,
+    private _dbService: DbAdapterService,
+  ) {
 
     this.menu = [
       {
@@ -46,6 +52,30 @@ export class ContextMenuService {
         content: 'Select Objects of This Type',
         selector: 'node,edge',
         onClickFunction: this.selectAllThisType.bind(this)
+      },
+      {
+        id: 'showUpstream',
+        content: 'Show Upstream',
+        selector: 'node',
+        onClickFunction: this.showUpstream.bind(this)
+      },
+      {
+        id: 'hideUpstream',
+        content: 'Hide Upstream',
+        selector: 'node',
+        onClickFunction: this.hideUpstream.bind(this)
+      },
+      {
+        id: 'showDownstream',
+        content: 'Show Downstream',
+        selector: 'node',
+        onClickFunction: this.showDownstream.bind(this)
+      },
+      {
+        id: 'hideDownstream',
+        content: 'Hide Downstream',
+        selector: 'node',
+        onClickFunction: this.hideDownstream.bind(this)
       },
       {
         id: 'collapseEdge',
@@ -118,4 +148,43 @@ export class ContextMenuService {
     this._cyService.expandMultiEdges(ele);
   }
 
+  showUpstream(event) {
+    this.showUpDownstream(event, true);
+  }
+
+  showDownstream(event) {
+    this.showUpDownstream(event, false);
+  }
+
+  showUpDownstream(event, isUp: boolean) {
+    const ele = event.target || event.cyTarget;
+    if (!ele) {
+      return;
+    }
+    const callback = (data) => {
+        this._cyService.loadElementsFromDatabase(data, true);
+    };
+    this._g.layout.clusters = null;
+    this._dbService.getElementsToCertainDistance(ele.data().segmentName, this._g.userPrefs.lengthOfUpDownstream.getValue(), callback, isUp);
+  }
+
+  hideUpstream(event) {
+    this.hideUpDownstream(event, true);
+  }
+
+  hideDownstream(event) {
+    this.hideUpDownstream(event, false);
+  }
+
+  hideUpDownstream(event, isUp) {
+    const ele = event.target || event.cyTarget;
+    if (!ele) {
+      return;
+    }
+    const callback = (data) => {
+      this._cyService.deleteElements(data, ele.data().segmentName);
+    };
+    this._g.layout.clusters = null;
+    this._dbService.getElementsToCertainDistance(ele.data().segmentName, this._g.userPrefs.lengthOfUpDownstream.getValue(), callback, isUp);
+  }
 }

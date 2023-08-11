@@ -3,7 +3,7 @@ import { GlobalVariableService } from '../../global-variable.service';
 import { TimebarGraphInclusionTypes, TimebarStatsInclusionTypes, MergedElemIndicatorTypes, BoolSetting, GroupingOptionTypes } from '../../user-preference';
 import { UserProfileService } from '../../user-profile.service';
 import { BehaviorSubject, Subscription } from 'rxjs';
-import { MIN_HIGHTLIGHT_WIDTH, MAX_HIGHTLIGHT_WIDTH, getCyStyleFromColorAndWid } from '../../constants';
+import { MIN_HIGHTLIGHT_WIDTH, MAX_HIGHTLIGHT_WIDTH, getCyStyleFromColorAndWid, MIN_LENGTH_OF_UP_DOWN_STREAM, MAX_LENGTH_OF_UP_DOWN_STREAM } from '../../constants';
 import { CustomizationModule } from 'src/app/custom/customization.module';
 
 @Component({
@@ -45,6 +45,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   isStoreUserProfile = true;
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
+  lengthOfUpDownstream = 1;
   customSubTabs: { component: any, text: string }[] = CustomizationModule.settingsSubTabs;
   loadFromFileSubs: Subscription;
   tabChangeSubs: Subscription;
@@ -132,6 +133,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.isStoreUserProfile = up.isStoreUserProfile.getValue();
     this.graphInclusionType = up.objectInclusionType.getValue();
     this.queryResultPagination = up.queryResultPagination.getValue();
+
+    this.lengthOfUpDownstream = up.lengthOfUpDownstream.getValue();
 
     this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
     this.timebarBoolSettings[1].isEnable = up_t.isHideDisconnectedNodesOnAnim.getValue();
@@ -232,6 +235,18 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  onlengthOfUpDownstreamSelected(x) {
+    let length = parseInt(x.target.value);
+    if (length > MAX_LENGTH_OF_UP_DOWN_STREAM) {
+      length = MAX_LENGTH_OF_UP_DOWN_STREAM;
+    }
+    if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
+      length = MIN_LENGTH_OF_UP_DOWN_STREAM;
+    }
+    this._g.userPrefs.lengthOfUpDownstream.next(length);
+    this.lengthOfUpDownstream = length;
+  }
+
   // used to change border width or color. One of them should be defined. (exclusively)
   changeHighlightStyle() {
     this.bandPassHighlightWidth();
@@ -298,6 +313,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   resetTimebarSettings() {
     this.transferSubjectValues(this._g.userPrefsFromFiles.timebar, this._g.userPrefs.timebar);
     this.fillUIFromMemory();
+  }
+
+  resetPangenographSettings() {
+      //TODO
   }
 
   private transferSubjectValues(from, to, skip = null) {

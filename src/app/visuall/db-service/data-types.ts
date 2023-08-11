@@ -52,6 +52,12 @@ export interface DbService {
   );
   loadGFA(GFAdata: any);
   clearData();
+  getElementsUpToCertainDistance (
+    nodeId: string, 
+    distance: number,
+    callback: (x: GraphResponse) => any,
+    isUp: boolean
+  );
 }
 
 export interface GraphResponse {

@@ -77,6 +77,15 @@ export class DbAdapterService {
     this._db.getElems(ids, fn, queryMeta);
   }
 
+  getElementsToCertainDistance (
+    nodeId: string, 
+    distance: number,
+    callback: (x: GraphResponse) => any,
+    isUp: boolean
+  ) {
+    this._db.getElementsUpToCertainDistance(nodeId, distance, callback, isUp);
+  }
+
   getSampleData(callback: (x: GraphResponse) => any) {
     let fn = (x) => {
       callback(x);

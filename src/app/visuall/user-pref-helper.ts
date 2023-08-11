@@ -31,7 +31,7 @@ export class UserPrefHelper {
       up.tableColumnLimit.subscribe(x => { this.tableColumnLimitChanged(x); });
       up.compoundPadding.subscribe(x => { this.changeCompoundPadding(x); });
       up.objectInclusionType.subscribe(x => { tb.changeGraphInclusionType(x); });
-      up.groupingOption.subscribe(x => { this._cyService.changeGroupingOption(x); })
+      up.groupingOption.subscribe(x => { this._cyService.changeGroupingOption(x); });
 
       upT.isEnabled.subscribe(x => this.isEnableTimebar(x));
       upT.isHideDisconnectedNodesOnAnim.subscribe(x => { tb.setisHideDisconnectedNodes(x); });

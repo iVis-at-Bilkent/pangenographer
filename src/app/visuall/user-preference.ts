@@ -34,7 +34,9 @@ export interface UserPref {
   queryResultPagination: BehaviorSubject<'Client' | 'Server'>;
   selectionColor: BehaviorSubject<string>;
   selectionWidth: BehaviorSubject<number>;
-  tilingPadding: BehaviorSubject<number>,
+  tilingPadding: BehaviorSubject<number>;
+  //  PanGenomeGraph Settings
+  lengthOfUpDownstream: BehaviorSubject<number>;
 
   timebar: {
     isEnabled: BehaviorSubject<boolean>;

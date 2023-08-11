@@ -696,6 +696,20 @@ export class CytoscapeService {
     this.runLayoutIfNoTimebar();
   }
 
+  deleteElements(data: GraphResponse, sourceNodeName: string) {
+    for (let i = 0; i < data.nodes.length; i++) {
+      for (let j = 0; j < this._g.cy.nodes().length; j++) {
+        if (data.nodes[i].properties.segmentName 
+              !== sourceNodeName && data.nodes[i].properties.segmentName 
+              === this._g.cy.nodes()[j].data().segmentName) {
+          this._g.cy.remove(this._g.cy.nodes()[j]);
+        }
+      }
+    }
+    this._g.handleCompoundsOnHideDelete();
+    this.runLayoutIfNoTimebar();
+  }
+
   addParentNode(idSuffix: string | number, parent = undefined): string {
     const id = "c" + idSuffix;
     const parentNode = this.createCyNode(
