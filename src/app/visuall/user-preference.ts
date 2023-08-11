@@ -36,7 +36,9 @@ export interface UserPref {
   selectionWidth: BehaviorSubject<number>;
   tilingPadding: BehaviorSubject<number>;
   //  PanGenomeGraph Settings
-  lengthOfUpDownstream: BehaviorSubject<number>;
+  pangenograph: {
+    lengthOfUpDownstream: BehaviorSubject<number>;
+  }
 
   timebar: {
     isEnabled: BehaviorSubject<boolean>;

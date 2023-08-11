@@ -50,7 +50,9 @@
     "objectInclusionType": 0,
     "queryResultPagination": "Client",
     "tilingPadding": 4,
-    "lengthOfUpDownstream" : 1,
+    "pangenograph": {
+        "lengthOfUpDownstream" : 1
+    },
     "timebar": {
         "isEnabled": false,
         "playingStep": 50,

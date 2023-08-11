@@ -165,7 +165,7 @@ export class ContextMenuService {
         this._cyService.loadElementsFromDatabase(data, true);
     };
     this._g.layout.clusters = null;
-    this._dbService.getElementsToCertainDistance(ele.data().segmentName, this._g.userPrefs.lengthOfUpDownstream.getValue(), callback, isUp);
+    this._dbService.getElementsToCertainDistance(ele.data().segmentName, this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(), callback, isUp);
   }
 
   hideUpstream(event) {
@@ -185,6 +185,6 @@ export class ContextMenuService {
       this._cyService.deleteElements(data, ele.data().segmentName);
     };
     this._g.layout.clusters = null;
-    this._dbService.getElementsToCertainDistance(ele.data().segmentName, this._g.userPrefs.lengthOfUpDownstream.getValue(), callback, isUp);
+    this._dbService.getElementsToCertainDistance(ele.data().segmentName, this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(), callback, isUp);
   }
 }

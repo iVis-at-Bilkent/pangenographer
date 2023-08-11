@@ -102,6 +102,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     // reference variables for shorter text
     const up = this._g.userPrefs;
     const up_t = this._g.userPrefs.timebar;
+    const up_p = this._g.userPrefs.pangenograph;
 
     this.generalBoolSettings[0].isEnable = up.isAutoIncrementalLayoutOnChange.getValue();
     this.generalBoolSettings[1].isEnable = up.isHighlightOnHover.getValue();
@@ -134,7 +135,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.graphInclusionType = up.objectInclusionType.getValue();
     this.queryResultPagination = up.queryResultPagination.getValue();
 
-    this.lengthOfUpDownstream = up.lengthOfUpDownstream.getValue();
+    this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
 
     this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
     this.timebarBoolSettings[1].isEnable = up_t.isHideDisconnectedNodesOnAnim.getValue();
@@ -243,7 +244,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
       length = MIN_LENGTH_OF_UP_DOWN_STREAM;
     }
-    this._g.userPrefs.lengthOfUpDownstream.next(length);
+    this._g.userPrefs.pangenograph.lengthOfUpDownstream.next(length);
     this.lengthOfUpDownstream = length;
   }
 
@@ -304,7 +305,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   resetGeneralSettings() {
-    this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, 'timebar');
+    this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, ['timebar', 'pangenograph']);
     this.setViewUtilsStyle();
     this.fillUIFromMemory();
     this._g.updateSelectionCyStyle();
@@ -316,12 +317,13 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   resetPangenographSettings() {
-      //TODO
+    this.transferSubjectValues(this._g.userPrefsFromFiles.pangenograph, this._g.userPrefs.pangenograph);
+    this.fillUIFromMemory();
   }
 
   private transferSubjectValues(from, to, skip = null) {
     for (const k in from) {
-      if (skip && k == skip) {
+      if ((skip && k == skip[0]) || (skip && k == skip[1])) {
         continue;
       }
       let p1 = from[k];
