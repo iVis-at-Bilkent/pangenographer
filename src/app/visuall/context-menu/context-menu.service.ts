@@ -48,34 +48,48 @@ export class ContextMenuService {
         onClickFunction: this.deleteSelected.bind(this)
       },
       {
+        id: 'Upstream',
+        content: 'Upstream',
+        selector: 'node',
+        submenu: [
+          {
+            id: 'showUpstream',
+            content: 'Show Upstream',
+            selector: 'node',
+            onClickFunction: this.showUpstream.bind(this)
+          },
+          {
+            id: 'hideUpstream',
+            content: 'Hide Upstream',
+            selector: 'node',
+            onClickFunction: this.hideUpstream.bind(this)
+          },
+        ]
+      },
+      {
+        id: 'DownStream',
+        content: 'DownStream',
+        selector: 'node',
+        submenu: [
+          {
+            id: 'showDownstream',
+            content: 'Show Downstream',
+            selector: 'node',
+            onClickFunction: this.showDownstream.bind(this)
+          },
+          {
+            id: 'hideDownstream',
+            content: 'Hide Downstream',
+            selector: 'node',
+            onClickFunction: this.hideDownstream.bind(this)
+          },
+        ]
+      },
+      {
         id: 'selectObjectsOfThisType',
         content: 'Select Objects of This Type',
         selector: 'node,edge',
         onClickFunction: this.selectAllThisType.bind(this)
-      },
-      {
-        id: 'showUpstream',
-        content: 'Show Upstream',
-        selector: 'node',
-        onClickFunction: this.showUpstream.bind(this)
-      },
-      {
-        id: 'hideUpstream',
-        content: 'Hide Upstream',
-        selector: 'node',
-        onClickFunction: this.hideUpstream.bind(this)
-      },
-      {
-        id: 'showDownstream',
-        content: 'Show Downstream',
-        selector: 'node',
-        onClickFunction: this.showDownstream.bind(this)
-      },
-      {
-        id: 'hideDownstream',
-        content: 'Hide Downstream',
-        selector: 'node',
-        onClickFunction: this.hideDownstream.bind(this)
       },
       {
         id: 'collapseEdge',
@@ -109,7 +123,14 @@ export class ContextMenuService {
     // register context menu extension
     cytoscape.use(contextMenus);
     this.menu = this._customizationService.menu.concat(this.menu);
-    this._g.cy.contextMenus({ menuItems: this.menu, menuItemClasses: ['vall-ctx-menu-item'], contextMenuClasses: ['vall-ctx-menu'] });
+    this._g.cy.contextMenus(
+      {
+        menuItems: this.menu,
+        menuItemClasses: ['vall-ctx-menu-item'], 
+        contextMenuClasses: ['vall-ctx-menu'], 
+        submenuIndicator: { src: 'https://raw.githubusercontent.com/iVis-at-Bilkent/cytoscape.js-context-menus/97877acfa77914ee01c4c74c12b0e1ccc362852d/assets/submenu-indicator-default.svg', width: 12, height: 12 } 
+      }
+    );
   }
 
   deleteElem(event) { this._cyService.deleteSelected(event); }
