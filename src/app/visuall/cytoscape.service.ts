@@ -275,7 +275,7 @@ export class CytoscapeService {
             let content = document.createElement("div");
             content.classList.add("node-tooltip");
             content.id = `node-tooltip-${node.data("segmentName")}`;
-            content.innerHTML = this.tooltipText(node);
+            content.innerHTML = this.tooltipText(node, false);
             document.body.appendChild(content);
             return content;
           },
@@ -298,32 +298,79 @@ export class CytoscapeService {
         event.target.popperRefObj.destroy();
       }
     });
+
+    this._g.cy.edges().unbind("mouseover");
+    this._g.cy.edges().forEach((edge) => {
+      edge.bind("mouseover", (event) => {
+        let popper = event.target.popper({
+          content: () => {
+            let content = document.createElement("div");
+            content.classList.add("edge-tooltip");
+            content.id = `edge-tooltip-${edge
+              .source()
+              .data("segmentName")}-${edge.source().data("segmentName")}`;
+            content.innerHTML = this.tooltipText(edge, true);
+            document.body.appendChild(content);
+            return content;
+          },
+        });
+        event.target.popperRefObj = popper;
+        let update = () => {
+          popper.update();
+        };
+
+        edge.on("position", update);
+
+        this._g.cy.on("pan zoom resize", update);
+      });
+    });
+
+    this._g.cy.edges().unbind("mouseout");
+    this._g.cy.edges().bind("mouseout", (event) => {
+      if (event.target.popper) {
+        event.target.popperRefObj.state.elements.popper.remove();
+        event.target.popperRefObj.destroy();
+      }
+    });
   }
 
-  private tooltipText(node: any) {
+  private tooltipText(element: any, isEdge: boolean = false) {
     var text = "";
     var startIndex;
-    var nodeTextData = node.data("segmentData");
+    var textData = "";
+    if (isEdge) {
+      var overlapNumeric = 0;
+      if (element.data("overlap")) {
+        overlapNumeric = element.data("overlap").match(/[0-9]+/)[0];
+      }
+      textData += element.source().data("segmentData");
+      if (!element.data("sourceOrientation")) {
+        textData = textData.split("").reverse().join("");
+      }
+      var targetData = element.target().data("segmentData");
+      if (!element.data("targetOrientation")) {
+        targetData = targetData.split("").reverse().join("");
+      }
+      textData += targetData.substr(overlapNumeric);
+    } else {
+      textData = element.data("segmentData");
+    }
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
-      if (startIndex >= nodeTextData.length) {
+      if (startIndex >= textData.length) {
         break;
       }
       text +=
-        nodeTextData.substr(
+        textData.substr(
           startIndex,
-          nodeTextData.length < 40 + startIndex
-            ? nodeTextData.length - startIndex
-            : 40
+          textData.length < 40 + startIndex ? textData.length - startIndex : 40
         ) + "\n";
     }
-    if (nodeTextData.length > 240) {
-      text += nodeTextData.substr(startIndex, 38) + "..";
-    } else if (nodeTextData.length >= startIndex) {
-      text += nodeTextData.substr(
+    if (textData.length > 240) {
+      text += textData.substr(startIndex, 38) + "..";
+    } else if (textData.length >= startIndex) {
+      text += textData.substr(
         startIndex,
-        nodeTextData.length < 40 + startIndex
-          ? nodeTextData.length - startIndex
-          : 40
+        textData.length < 40 + startIndex ? textData.length - startIndex : 40
       );
     }
     return text;

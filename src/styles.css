@@ -29,7 +29,7 @@ html {
 }
 
 body {
-  font-family: 'Arial' !important;
+  font-family: "Arial" !important;
 }
 
 .navbar {
@@ -37,7 +37,7 @@ body {
 }
 
 .toolbar-element {
-  height: 2.0vh;
+  height: 2vh;
   min-height: 24px;
   cursor: pointer;
 }
@@ -55,7 +55,7 @@ body {
   left: 10px;
   width: 100%;
   height: 100%;
-  border: 2px solid #2F4154;
+  border: 2px solid #2f4154;
   border-radius: 6px;
   background: #ffffff;
 }
@@ -87,7 +87,7 @@ app-operation-tabs {
 
 .root {
   display: grid;
-  grid-template-areas: 'nb nb''tb tb''cy ot''ti ti';
+  grid-template-areas: "nb nb" "tb tb" "cy ot" "ti ti";
   height: 99vh;
   grid-template-columns: 75% 25%;
   grid-template-rows: min-content min-content auto max-content;
@@ -192,7 +192,7 @@ app-operation-tabs {
 /* CSS Method for adding Font Awesome Chevron Icons  symbol for "opening" panels*/
 
 .accordion-toggle:after {
-  font-family: 'FontAwesome', sans-serif;
+  font-family: "FontAwesome", sans-serif;
   content: "\f077";
   float: right;
   padding-right: 4px;
@@ -218,7 +218,7 @@ app-operation-tabs {
   width: 300px;
   height: 200px;
   overflow: hidden;
-  border: 2px solid #2F4154;
+  border: 2px solid #2f4154;
   border-radius: 6px;
   background: #fff;
 }
@@ -253,11 +253,11 @@ app-operation-tabs {
 }
 
 .vall-ctx-menu {
-  padding: .5rem 0 !important;
-  margin: .125rem 0 0 !important;
-  border: 1px solid rgba(0, 0, 0, .15) !important;
+  padding: 0.5rem 0 !important;
+  margin: 0.125rem 0 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
   background-color: #ffffff !important;
-  border-radius: .25rem !important;
+  border-radius: 0.25rem !important;
 }
 
 .modal-title {
@@ -301,7 +301,8 @@ app-operation-tabs {
 
 .strokeme {
   color: white;
-  text-shadow: 1px 0px 1px black, 0px 1px 1px black, -1px 0px 1px black, 0px -1px 1px black;
+  text-shadow: 1px 0px 1px black, 0px 1px 1px black, -1px 0px 1px black,
+    0px -1px 1px black;
 }
 
 .tight-select {
@@ -333,7 +334,7 @@ app-operation-tabs {
 
 .std-inp-hei {
   height: 2em;
-  padding: .25rem !important;
+  padding: 0.25rem !important;
 }
 
 .std-inp-hei-sec {
@@ -363,7 +364,8 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   stroke-width: 2px;
 }
 
-.node-tooltip {
+.node-tooltip,
+.edge-tooltip {
   font-weight: 700;
   font-size: 15px;
   font-family: Inconsolata, monospace;
