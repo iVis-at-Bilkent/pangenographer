@@ -268,7 +268,7 @@ export class CytoscapeService {
 
   private addTooltips() {
     this._g.cy.nodes().unbind("mouseover");
-    this._g.cy.nodes().forEach(node => {
+    this._g.cy.nodes().forEach((node) => {
       node.bind("mouseover", (event) => {
         let popper = event.target.popper({
           content: () => {
@@ -285,9 +285,9 @@ export class CytoscapeService {
           popper.update();
         };
 
-        node.on('position', update);
-        
-        this._g.cy.on('pan zoom resize', update);
+        node.on("position", update);
+
+        this._g.cy.on("pan zoom resize", update);
       });
     });
 
@@ -308,15 +308,23 @@ export class CytoscapeService {
       if (startIndex >= nodeTextData.length) {
         break;
       }
-      text += nodeTextData.substr(startIndex, 
-        nodeTextData.length < 40 + startIndex ? nodeTextData.length - startIndex : 40)
-         + "\n";
+      text +=
+        nodeTextData.substr(
+          startIndex,
+          nodeTextData.length < 40 + startIndex
+            ? nodeTextData.length - startIndex
+            : 40
+        ) + "\n";
     }
     if (nodeTextData.length > 240) {
-      text += nodeTextData.substr(startIndex, 38) + ".."; 
+      text += nodeTextData.substr(startIndex, 38) + "..";
     } else if (nodeTextData.length >= startIndex) {
-      text += nodeTextData.substr(startIndex, 
-        nodeTextData.length < 40 + startIndex ? nodeTextData.length - startIndex : 40);
+      text += nodeTextData.substr(
+        startIndex,
+        nodeTextData.length < 40 + startIndex
+          ? nodeTextData.length - startIndex
+          : 40
+      );
     }
     return text;
   }
@@ -461,11 +469,16 @@ export class CytoscapeService {
 
   fitLabel2Node() {
     this._g.cy.startBatch();
-    let nodes = this._g.cy.nodes().not(":parent").not("." + C.CLUSTER_CLASS);
+    let nodes = this._g.cy
+      .nodes()
+      .not(":parent")
+      .not("." + C.CLUSTER_CLASS);
     nodes.removeClass("ellipsis_label");
     for (let i = 0; i < nodes.length; i++) {
-      let toFit = this.truncateText(nodes[i].data("segmentName"), nodes[i], -4)
-       + "\n" + this.truncateText(nodes[i].data("segmentData"), nodes[i], -4);
+      let toFit =
+        this.truncateText(nodes[i].data("segmentName"), nodes[i], -4) +
+        "\n" +
+        this.truncateText(nodes[i].data("segmentData"), nodes[i], -4);
       nodes[i].data("__label__", toFit);
     }
     nodes.addClass("ellipsis_label");
@@ -700,9 +713,11 @@ export class CytoscapeService {
   deleteElements(data: GraphResponse, sourceNodeName: string) {
     for (let i = 0; i < data.nodes.length; i++) {
       for (let j = 0; j < this._g.cy.nodes().length; j++) {
-        if (data.nodes[i].properties.segmentName 
-              !== sourceNodeName && data.nodes[i].properties.segmentName 
-              === this._g.cy.nodes()[j].data().segmentName) {
+        if (
+          data.nodes[i].properties.segmentName !== sourceNodeName &&
+          data.nodes[i].properties.segmentName ===
+            this._g.cy.nodes()[j].data().segmentName
+        ) {
           this._g.cy.remove(this._g.cy.nodes()[j]);
         }
       }

@@ -77,13 +77,17 @@ export class DbAdapterService {
     this._db.getElems(ids, fn, queryMeta);
   }
 
-  getElementsUpToCertainDistance (
-    nodeId: string, 
+  getElementsUpToCertainDistance(
+    nodeId: string,
     distance: number,
     callback: (x: GraphResponse) => any,
     isUp: boolean
   ) {
-    this._db.getElementsUpToCertainDistance(nodeId, distance, callback, isUp);
+    let fn = (x) => {
+      callback(x);
+      this._g.add2GraphHistory("Show up/downstream");
+    };
+    this._db.getElementsUpToCertainDistance(nodeId, distance, fn, isUp);
   }
 
   getSampleData(callback: (x: GraphResponse) => any) {
@@ -192,11 +196,13 @@ export class DbAdapterService {
     );
   }
 
-  getGFAdata2LoadGFA(GFAdata: any) {
-    this._db.loadGFA(GFAdata);
+  getGFAdata2ImportGFA(GFAdata: any) {
+    this._g.add2GraphHistory(`Import GFA`);
+    this._db.importGFA(GFAdata);
   }
 
   clearData() {
+    this._g.add2GraphHistory(`Clear Data`);
     this._db.clearData();
   }
 }

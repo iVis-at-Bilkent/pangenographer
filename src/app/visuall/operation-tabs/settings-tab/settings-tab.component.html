@@ -1,227 +1,466 @@
 <div class="panel">
-  <div class="panel-heading" data-bs-toggle="collapse" data-bs-target="#pangenograph-settings" aria-expanded="true">
-    <span class="panel-title accordion-toggle"><b class="va-heading2">PanGenomeGraph</b></span>
+  <div
+    class="panel-heading"
+    data-bs-toggle="collapse"
+    data-bs-target="#pangenograph-settings"
+    aria-expanded="true"
+  >
+    <span class="panel-title accordion-toggle"
+      ><b class="va-heading2">PanGenomeGraph</b></span
+    >
   </div>
   <div id="pangenograph-settings" class="collapse show">
     <div>
       <div>
         <label class="va-text">Length of up/downstream</label>
         <div class="form-inline mx-1">
-          <input type="number" max="10" min="1" step="any" (change)="onlengthOfUpDownstreamSelected($event)"
-            [(ngModel)]="lengthOfUpDownstream" class="form-control std-inp-hei va-small-text ms-1 w5-5" placeholder="Length of up/downstream">
+          <input
+            type="number"
+            max="10"
+            min="1"
+            step="any"
+            (change)="onlengthOfUpDownstreamSelected($event)"
+            [(ngModel)]="lengthOfUpDownstream"
+            class="form-control std-inp-hei va-small-text ms-1 w5-5"
+            placeholder="Length of up/downstream"
+          />
         </div>
       </div>
       <div>
-        <input class="btn btn-sm btn-dark va-text m-2 center" type="button" (click)="resetPangenographSettings()"
-          value="Default" title="Reset to Default">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="resetPangenographSettings()"
+          value="Default"
+          title="Reset to Default"
+        />
       </div>
     </div>
   </div>
 </div>
 
 <div class="panel">
-  <div class="panel-heading" data-bs-toggle="collapse" data-bs-target="#general-settings" aria-expanded="true">
-    <span class="panel-title accordion-toggle"><b class="va-heading2">General</b></span>
+  <div
+    class="panel-heading"
+    data-bs-toggle="collapse"
+    data-bs-target="#general-settings"
+    aria-expanded="true"
+  >
+    <span class="panel-title accordion-toggle"
+      ><b class="va-heading2">General</b></span
+    >
   </div>
   <div id="general-settings" class="collapse show">
-    <div class="va-text" *ngFor="let setting of generalBoolSettings; let i = index;">
+    <div
+      class="va-text"
+      *ngFor="let setting of generalBoolSettings; let i = index"
+    >
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" [(ngModel)]="setting.isEnable" [id]="'generalBool' + i"
-          (change)="settingChanged(setting.isEnable, setting.path2userPref)">
-        <label class="form-check-label" [for]="'generalBool' + i">{{setting.text}}</label>
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [(ngModel)]="setting.isEnable"
+          [id]="'generalBool' + i"
+          (change)="settingChanged(setting.isEnable, setting.path2userPref)"
+        />
+        <label class="form-check-label" [for]="'generalBool' + i">{{
+          setting.text
+        }}</label>
       </div>
     </div>
     <div>
       <div class="form-check-label va-text">Show query results using</div>
-      <div class="form-check-inline form-check va-text" *ngFor="let str of mergedElemIndicators; let i = index;">
-        <input type="radio" [(ngModel)]="mergedElemIndicator" [value]="i" class="form-check-input"
-          (click)="settingChanged(i, 'mergedElemIndicator')" name="optradio1" [id]="'mergedElemIndic' + i">
-        <label class="form-check-label" [for]="'mergedElemIndic' + i"> {{str}} </label>
+      <div
+        class="form-check-inline form-check va-text"
+        *ngFor="let str of mergedElemIndicators; let i = index"
+      >
+        <input
+          type="radio"
+          [(ngModel)]="mergedElemIndicator"
+          [value]="i"
+          class="form-check-input"
+          (click)="settingChanged(i, 'mergedElemIndicator')"
+          name="optradio1"
+          [id]="'mergedElemIndic' + i"
+        />
+        <label class="form-check-label" [for]="'mergedElemIndic' + i">
+          {{ str }}
+        </label>
       </div>
     </div>
     <div>
       <div class="form-check-label va-text">Group using</div>
-      <div class="form-check-inline form-check va-text" *ngFor="let str of groupingOptions; let i = index;">
-        <input type="radio" [(ngModel)]="groupingOption" [value]="i" class="form-check-input" [id]="'groupOpt' + i"
-          (click)="settingChanged(i, 'groupingOption')" name="optradio2">
-        <label class="form-check-label" [for]="'groupOpt' + i"> {{str}} </label>
+      <div
+        class="form-check-inline form-check va-text"
+        *ngFor="let str of groupingOptions; let i = index"
+      >
+        <input
+          type="radio"
+          [(ngModel)]="groupingOption"
+          [value]="i"
+          class="form-check-input"
+          [id]="'groupOpt' + i"
+          (click)="settingChanged(i, 'groupingOption')"
+          name="optradio2"
+        />
+        <label class="form-check-label" [for]="'groupOpt' + i">
+          {{ str }}
+        </label>
       </div>
     </div>
     <div>
       <label class="va-text">Selection style:</label>
       <div class="form-inline mx-1">
-        <input type="number" max="20" min="1" step="any" (change)="onSelWidSelected($event)"
-          [(ngModel)]="selectionWidth" class="form-control std-inp-hei va-small-text ms-1 w5-5" placeholder="width">
-        <app-color-picker (onColorSelected)="onSelColorSelected($event)" [currColor]="selectionColor"
-          class="align-middle"></app-color-picker>
+        <input
+          type="number"
+          max="20"
+          min="1"
+          step="any"
+          (change)="onSelWidSelected($event)"
+          [(ngModel)]="selectionWidth"
+          class="form-control std-inp-hei va-small-text ms-1 w5-5"
+          placeholder="width"
+        />
+        <app-color-picker
+          (onColorSelected)="onSelColorSelected($event)"
+          [currColor]="selectionColor"
+          class="align-middle"
+        ></app-color-picker>
       </div>
     </div>
     <div>
       <div class="form-check-label va-text">Highlight style</div>
       <div class="form-inline mx-1">
-        <select class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="highlightStyleSelected($event.target)">
-          <option *ngFor="let t of currHighlightStyles; let i=index" [selected]="highlightStyleIdx == i" [value]="t">
-            {{t}}
+        <select
+          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+          (change)="highlightStyleSelected($event.target)"
+        >
+          <option
+            *ngFor="let t of currHighlightStyles; let i = index"
+            [selected]="highlightStyleIdx == i"
+            [value]="t"
+          >
+            {{ t }}
           </option>
         </select>
-        <input type="number" max="20" min="1" step="any" (change)="bandPassHighlightWidth()"
-          [(ngModel)]="highlightWidth" class="form-control std-inp-hei va-small-text w5-5" placeholder="width">
-        <app-color-picker (onColorSelected)="onColorSelected($event)" [currColor]="highlightColor" class="align-middle">
+        <input
+          type="number"
+          max="20"
+          min="1"
+          step="any"
+          (change)="bandPassHighlightWidth()"
+          [(ngModel)]="highlightWidth"
+          class="form-control std-inp-hei va-small-text w5-5"
+          placeholder="width"
+        />
+        <app-color-picker
+          (onColorSelected)="onColorSelected($event)"
+          [currColor]="highlightColor"
+          class="align-middle"
+        >
         </app-color-picker>
-        <a href="#" title="Update this style" (click)="changeHighlightStyle()" class="m-1">
-          <img src="../../../assets/img/refresh.svg" alt="Update this style">
+        <a
+          href="#"
+          title="Update this style"
+          (click)="changeHighlightStyle()"
+          class="m-1"
+        >
+          <img src="../../../assets/img/refresh.svg" alt="Update this style" />
         </a>
-        <a href="#" title="Delete this style" (click)="deleteHighlightStyle()" class="m-1">
-          <img src="../../../assets/img/close.svg" alt="Delete this style">
+        <a
+          href="#"
+          title="Delete this style"
+          (click)="deleteHighlightStyle()"
+          class="m-1"
+        >
+          <img src="../../../assets/img/close.svg" alt="Delete this style" />
         </a>
-        <a href="#" title="Add new style" (click)="addHighlightStyle()" class="m-1">
-          <img src="../../../assets/img/add.svg" alt="Add new style">
+        <a
+          href="#"
+          title="Add new style"
+          (click)="addHighlightStyle()"
+          class="m-1"
+        >
+          <img src="../../../assets/img/add.svg" alt="Add new style" />
         </a>
       </div>
     </div>
     <div>
-      <div class="form-check-label va-text">Object inclusion type: </div>
-      <div class="form-check-inline form-check va-text" *ngFor="let str of timebarGraphInclusionTypes; let i = index;">
-        <input type="radio" [(ngModel)]="graphInclusionType" [value]="i" class="form-check-input"
-          [id]="'objInclusionType' + i" (click)="settingChanged(i, 'objectInclusionType')" name="optradio4">
-        <label class="form-check-label" [for]="'objInclusionType' + i"> {{str}} </label>
+      <div class="form-check-label va-text">Object inclusion type:</div>
+      <div
+        class="form-check-inline form-check va-text"
+        *ngFor="let str of timebarGraphInclusionTypes; let i = index"
+      >
+        <input
+          type="radio"
+          [(ngModel)]="graphInclusionType"
+          [value]="i"
+          class="form-check-input"
+          [id]="'objInclusionType' + i"
+          (click)="settingChanged(i, 'objectInclusionType')"
+          name="optradio4"
+        />
+        <label class="form-check-label" [for]="'objInclusionType' + i">
+          {{ str }}
+        </label>
       </div>
     </div>
     <div>
-      <div class="form-check-label va-text">Query result pagination: </div>
+      <div class="form-check-label va-text">Query result pagination:</div>
       <div class="form-check-inline form-check va-text">
-        <input type="radio" [(ngModel)]="queryResultPagination" value="Client" class="form-check-input"
-          (click)="settingChanged('Client', 'queryResultPagination')" name="optradio6" id="clientPaginate">
+        <input
+          type="radio"
+          [(ngModel)]="queryResultPagination"
+          value="Client"
+          class="form-check-input"
+          (click)="settingChanged('Client', 'queryResultPagination')"
+          name="optradio6"
+          id="clientPaginate"
+        />
         <label class="form-check-label" for="clientPaginate"> Client </label>
       </div>
       <div class="form-check-inline form-check va-text">
-        <input type="radio" [(ngModel)]="queryResultPagination" value="Server" class="form-check-input"
-          (click)="settingChanged('Server', 'queryResultPagination')" name="optradio6" id="serverPaginate">
+        <input
+          type="radio"
+          [(ngModel)]="queryResultPagination"
+          value="Server"
+          class="form-check-input"
+          (click)="settingChanged('Server', 'queryResultPagination')"
+          name="optradio6"
+          id="serverPaginate"
+        />
         <label class="form-check-label" for="serverPaginate"> Server </label>
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Query result page size</label>
       <div class="mx-1">
-        <input type="number" max="10000" min="1" (keydown.enter)="settingChanged(dataPageSize, 'dataPageSize')"
-          [(ngModel)]="dataPageSize" class="form-control inp-3-char std-inp-hei va-small-text">
+        <input
+          type="number"
+          max="10000"
+          min="1"
+          (keydown.enter)="settingChanged(dataPageSize, 'dataPageSize')"
+          [(ngModel)]="dataPageSize"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Query result page limit</label>
       <div class="mx-1">
-        <input type="number" [disabled]="queryResultPagination=='Server'" max="10000" min="1"
-          (keydown.enter)="settingChanged(dataPageLimit, 'dataPageLimit')" [(ngModel)]="dataPageLimit"
-          class="form-control inp-3-char std-inp-hei va-small-text">
+        <input
+          type="number"
+          [disabled]="queryResultPagination == 'Server'"
+          max="10000"
+          min="1"
+          (keydown.enter)="settingChanged(dataPageLimit, 'dataPageLimit')"
+          [(ngModel)]="dataPageLimit"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Query history limit</label>
       <div class="mx-1">
-        <input type="number" max="100" min="1" (keydown.enter)="settingChanged(queryHistoryLimit, 'queryHistoryLimit')"
-          [(ngModel)]="queryHistoryLimit" class="form-control inp-3-char std-inp-hei va-small-text">
-
+        <input
+          type="number"
+          max="100"
+          min="1"
+          (keydown.enter)="
+            settingChanged(queryHistoryLimit, 'queryHistoryLimit')
+          "
+          [(ngModel)]="queryHistoryLimit"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Database execution timeout (sec)</label>
       <div class="mx-1">
-        <input type="number" max="100" min="1" (keydown.enter)="settingChanged(dbTimeout, 'dbTimeout')"
-          [(ngModel)]="dbTimeout" class="form-control inp-3-char std-inp-hei va-small-text">
+        <input
+          type="number"
+          max="100"
+          min="1"
+          (keydown.enter)="settingChanged(dbTimeout, 'dbTimeout')"
+          [(ngModel)]="dbTimeout"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Maximum number of columns in tables</label>
       <div class="mx-1">
-        <input type="number" max="100" min="1" (keydown.enter)="settingChanged(tableColumnLimit, 'tableColumnLimit')"
-          [(ngModel)]="tableColumnLimit" class="form-control inp-3-char std-inp-hei va-small-text">
+        <input
+          type="number"
+          max="100"
+          min="1"
+          (keydown.enter)="settingChanged(tableColumnLimit, 'tableColumnLimit')"
+          [(ngModel)]="tableColumnLimit"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Multiple edge collapse limit</label>
       <div class="mx-1">
-        <input type="number" max="100" min="1" (keydown.enter)="settingChanged(edgeCollapseLimit, 'edgeCollapseLimit')"
-          [(ngModel)]="edgeCollapseLimit" class="form-control inp-3-char std-inp-hei va-small-text">
+        <input
+          type="number"
+          max="100"
+          min="1"
+          (keydown.enter)="
+            settingChanged(edgeCollapseLimit, 'edgeCollapseLimit')
+          "
+          [(ngModel)]="edgeCollapseLimit"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-inline m-1">
       <label class="va-text">Compound padding</label>
       <div class="mx-1">
-        <input type="text" (keydown.enter)="settingChanged(compoundPadding, 'compoundPadding')"
-          [(ngModel)]="compoundPadding" class="form-control inp-3-char std-inp-hei va-small-text">
+        <input
+          type="text"
+          (keydown.enter)="settingChanged(compoundPadding, 'compoundPadding')"
+          [(ngModel)]="compoundPadding"
+          class="form-control inp-3-char std-inp-hei va-small-text"
+        />
       </div>
     </div>
     <div class="form-check form-check-inline va-text">
-      <input class="form-check-input" type="checkbox" [(ngModel)]="isStoreUserProfile"
-        (change)="settingChanged(isStoreUserProfile, 'isStoreUserProfile')">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        [(ngModel)]="isStoreUserProfile"
+        (change)="settingChanged(isStoreUserProfile, 'isStoreUserProfile')"
+      />
       <label class="va-text">Store user profile</label>
     </div>
     <div>
-      <input class="btn btn-sm btn-dark va-text m-2 center" type="button" (click)="resetGeneralSettings()"
-        value="Default" title="Reset to Default">
+      <input
+        class="btn btn-sm btn-dark va-text m-2 center"
+        type="button"
+        (click)="resetGeneralSettings()"
+        value="Default"
+        title="Reset to Default"
+      />
     </div>
   </div>
 </div>
 
 <div class="panel">
-  <div class="panel-heading collapsed" data-bs-toggle="collapse" data-bs-target="#timebar-settings"
-    aria-expanded="false">
-    <span class="panel-title accordion-toggle"><b class="va-heading2">Timebar</b></span>
+  <div
+    class="panel-heading collapsed"
+    data-bs-toggle="collapse"
+    data-bs-target="#timebar-settings"
+    aria-expanded="false"
+  >
+    <span class="panel-title accordion-toggle"
+      ><b class="va-heading2">Timebar</b></span
+    >
   </div>
   <div id="timebar-settings" class="collapse">
-    <div class="va-text" *ngFor="let setting of timebarBoolSettings; let i = index;">
+    <div
+      class="va-text"
+      *ngFor="let setting of timebarBoolSettings; let i = index"
+    >
       <div class="form-check form-check-inline">
-        <input class="form-check-input" type="checkbox" [(ngModel)]="setting.isEnable"
-          (change)="settingChanged(setting.isEnable, setting.path2userPref)" [id]="'timebarBool' + i"
-          [disabled]="!timebarBoolSettings[0].isEnable && i > 0">
-        <label class="form-check-label" [for]="'timebarBool' + i">{{setting.text}}</label>
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [(ngModel)]="setting.isEnable"
+          (change)="settingChanged(setting.isEnable, setting.path2userPref)"
+          [id]="'timebarBool' + i"
+          [disabled]="!timebarBoolSettings[0].isEnable && i > 0"
+        />
+        <label class="form-check-label" [for]="'timebarBool' + i">{{
+          setting.text
+        }}</label>
       </div>
     </div>
     <div>
       <div class="form-inline" disable>
         <label class="va-text me-1">Animation step</label>
         <div class="me-1">
-          <input (click)="settingChanged(timebarPlayingStep, 'timebar.playingStep')" [(ngModel)]="timebarPlayingStep"
-            class="form-range" type="range" min="1" max="100" [disabled]="!timebarBoolSettings[0].isEnable">
+          <input
+            (click)="settingChanged(timebarPlayingStep, 'timebar.playingStep')"
+            [(ngModel)]="timebarPlayingStep"
+            class="form-range"
+            type="range"
+            min="1"
+            max="100"
+            [disabled]="!timebarBoolSettings[0].isEnable"
+          />
         </div>
-        <div class="va-text"> {{timebarPlayingStep}} </div>
+        <div class="va-text">{{ timebarPlayingStep }}</div>
       </div>
       <div>
         <div class="form-inline">
           <label class="va-text me-1">Animation period</label>
           <div class="me-1">
-            <input (click)="settingChanged(timebarPlayingPeriod, 'timebar.playingPeriod')" class="form-range"
-              type="range" [(ngModel)]="timebarPlayingPeriod" min="10" max="2500"
-              [disabled]="!timebarBoolSettings[0].isEnable">
+            <input
+              (click)="
+                settingChanged(timebarPlayingPeriod, 'timebar.playingPeriod')
+              "
+              class="form-range"
+              type="range"
+              [(ngModel)]="timebarPlayingPeriod"
+              min="10"
+              max="2500"
+              [disabled]="!timebarBoolSettings[0].isEnable"
+            />
           </div>
-          <div class="va-text"> {{timebarPlayingPeriod}} </div>
+          <div class="va-text">{{ timebarPlayingPeriod }}</div>
         </div>
       </div>
       <div>
         <div class="form-inline">
           <label class="va-text me-1">Zoom sensitivity</label>
           <div class="me-1">
-            <input (click)="settingChanged(timebarZoomingStep, 'timebar.zoomingStep')" class="form-range" type="range"
-              [(ngModel)]="timebarZoomingStep" min="0" max="100" [disabled]="!timebarBoolSettings[0].isEnable">
+            <input
+              (click)="
+                settingChanged(timebarZoomingStep, 'timebar.zoomingStep')
+              "
+              class="form-range"
+              type="range"
+              [(ngModel)]="timebarZoomingStep"
+              min="0"
+              max="100"
+              [disabled]="!timebarBoolSettings[0].isEnable"
+            />
           </div>
-          <div class="va-text"> {{timebarZoomingStep}} </div>
+          <div class="va-text">{{ timebarZoomingStep }}</div>
         </div>
       </div>
       <div>
         <div>
-          <div class="form-check-label va-text">Statistics inclusion type: </div>
-          <div class="form-check-inline form-check va-text"
-            *ngFor="let str of timebarStatsInclusionTypes; let i = index;">
-            <input type="radio" [(ngModel)]="statsInclusionType" [value]="i" class="form-check-input"
-              (click)="settingChanged(i, 'timebar.statsInclusionType')" name="optradio5"
-              [disabled]="!timebarBoolSettings[0].isEnable" [id]="'statsInclusionType' + i">
-            <label class="form-check-label" [for]="'statsInclusionType' + i"> {{str}} </label>
+          <div class="form-check-label va-text">Statistics inclusion type:</div>
+          <div
+            class="form-check-inline form-check va-text"
+            *ngFor="let str of timebarStatsInclusionTypes; let i = index"
+          >
+            <input
+              type="radio"
+              [(ngModel)]="statsInclusionType"
+              [value]="i"
+              class="form-check-input"
+              (click)="settingChanged(i, 'timebar.statsInclusionType')"
+              name="optradio5"
+              [disabled]="!timebarBoolSettings[0].isEnable"
+              [id]="'statsInclusionType' + i"
+            />
+            <label class="form-check-label" [for]="'statsInclusionType' + i">
+              {{ str }}
+            </label>
           </div>
         </div>
       </div>
-      <input class="btn btn-sm btn-dark va-text m-2 center" type="button" (click)="resetTimebarSettings()"
-        value="Default" title="Reset to Default">
+      <input
+        class="btn btn-sm btn-dark va-text m-2 center"
+        type="button"
+        (click)="resetTimebarSettings()"
+        value="Default"
+        title="Reset to Default"
+      />
       <div>
         <div>
           <app-timebar-metric-editor></app-timebar-metric-editor>
@@ -230,4 +469,9 @@
     </div>
   </div>
 
-  <app-panel-container [panels]="customSubTabs" [containerId]="'settings-custom-sub-tab'"> </app-panel-container>
+  <app-panel-container
+    [panels]="customSubTabs"
+    [containerId]="'settings-custom-sub-tab'"
+  >
+  </app-panel-container>
+</div>

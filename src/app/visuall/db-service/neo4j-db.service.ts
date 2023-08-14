@@ -168,8 +168,8 @@ export class Neo4jDb implements DbService {
     );
   }
 
-  getElementsUpToCertainDistance (
-    nodeId: string, 
+  getElementsUpToCertainDistance(
+    nodeId: string,
     distance: number,
     callback: (x: GraphResponse) => any,
     isUp: boolean
@@ -180,9 +180,10 @@ export class Neo4jDb implements DbService {
     }
     query += `-[*1..${distance}]-`;
     if (isUp) {
-      query += ">"
+      query += ">";
     }
-    query += "(endNode) RETURN nodes(path) AS nodes, relationships(path) AS relationships";
+    query +=
+      "(endNode) RETURN nodes(path) AS nodes, relationships(path) AS relationships";
     this.runQuery(query, callback);
   }
 
@@ -585,7 +586,7 @@ export class Neo4jDb implements DbService {
       }, errFn);
   }
 
-  loadGFA(GFAdata: any) {
+  importGFA(GFAdata: any) {
     this.runCypherQuery(this.GFAdata2CQL(GFAdata));
   }
 

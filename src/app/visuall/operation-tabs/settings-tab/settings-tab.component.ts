@@ -1,15 +1,33 @@
-import { Component, OnInit, ElementRef, ViewChild, OnDestroy } from '@angular/core';
-import { GlobalVariableService } from '../../global-variable.service';
-import { TimebarGraphInclusionTypes, TimebarStatsInclusionTypes, MergedElemIndicatorTypes, BoolSetting, GroupingOptionTypes } from '../../user-preference';
-import { UserProfileService } from '../../user-profile.service';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { MIN_HIGHTLIGHT_WIDTH, MAX_HIGHTLIGHT_WIDTH, getCyStyleFromColorAndWid, MIN_LENGTH_OF_UP_DOWN_STREAM, MAX_LENGTH_OF_UP_DOWN_STREAM } from '../../constants';
-import { CustomizationModule } from 'src/app/custom/customization.module';
+import {
+  Component,
+  OnInit,
+  ElementRef,
+  ViewChild,
+  OnDestroy,
+} from "@angular/core";
+import { GlobalVariableService } from "../../global-variable.service";
+import {
+  TimebarGraphInclusionTypes,
+  TimebarStatsInclusionTypes,
+  MergedElemIndicatorTypes,
+  BoolSetting,
+  GroupingOptionTypes,
+} from "../../user-preference";
+import { UserProfileService } from "../../user-profile.service";
+import { BehaviorSubject, Subscription } from "rxjs";
+import {
+  MIN_HIGHTLIGHT_WIDTH,
+  MAX_HIGHTLIGHT_WIDTH,
+  getCyStyleFromColorAndWid,
+  MIN_LENGTH_OF_UP_DOWN_STREAM,
+  MAX_LENGTH_OF_UP_DOWN_STREAM,
+} from "../../constants";
+import { CustomizationModule } from "src/app/custom/customization.module";
 
 @Component({
-  selector: 'app-settings-tab',
-  templateUrl: './settings-tab.component.html',
-  styleUrls: ['./settings-tab.component.css']
+  selector: "app-settings-tab",
+  templateUrl: "./settings-tab.component.html",
+  styleUrls: ["./settings-tab.component.css"],
 })
 export class SettingsTabComponent implements OnInit, OnDestroy {
   generalBoolSettings: BoolSetting[];
@@ -20,21 +38,25 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   timebarPlayingPeriod: number;
   timebarZoomingStep: number;
   compoundPadding: string;
-  @ViewChild('dbQueryDate1', { static: false }) dbQueryDate1: ElementRef;
-  @ViewChild('dbQueryDate2', { static: false }) dbQueryDate2: ElementRef;
+  @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
+  @ViewChild("dbQueryDate2", { static: false }) dbQueryDate2: ElementRef;
   dataPageSize: number;
   dataPageLimit: number;
   queryHistoryLimit: number;
   dbTimeout: number;
   tableColumnLimit: number;
   edgeCollapseLimit: number;
-  timebarGraphInclusionTypes: string[] = ['overlaps', 'contains', 'contained by'];
-  timebarStatsInclusionTypes: string[] = ['all', 'begin', 'middle', 'end'];
-  mergedElemIndicators: string[] = ['None', 'Selection', 'Highlight'];
-  groupingOptions: string[] = ['Compounds', 'Circles'];
+  timebarGraphInclusionTypes: string[] = [
+    "overlaps",
+    "contains",
+    "contained by",
+  ];
+  timebarStatsInclusionTypes: string[] = ["all", "begin", "middle", "end"];
+  mergedElemIndicators: string[] = ["None", "Selection", "Highlight"];
+  groupingOptions: string[] = ["Compounds", "Circles"];
   // multiple choice settings
   graphInclusionType: TimebarGraphInclusionTypes;
-  queryResultPagination: 'Client' | 'Server';
+  queryResultPagination: "Client" | "Server";
   statsInclusionType: TimebarStatsInclusionTypes;
   mergedElemIndicator: MergedElemIndicatorTypes;
   groupingOption: GroupingOptionTypes;
@@ -46,12 +68,16 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
   lengthOfUpDownstream = 1;
-  customSubTabs: { component: any, text: string }[] = CustomizationModule.settingsSubTabs;
+  customSubTabs: { component: any; text: string }[] =
+    CustomizationModule.settingsSubTabs;
   loadFromFileSubs: Subscription;
   tabChangeSubs: Subscription;
 
-  constructor(private _g: GlobalVariableService, private _profile: UserProfileService) {
-    this.loadFromFileSubs = this._profile.onLoadFromFile.subscribe(x => {
+  constructor(
+    private _g: GlobalVariableService,
+    private _profile: UserProfileService
+  ) {
+    this.loadFromFileSubs = this._profile.onLoadFromFile.subscribe((x) => {
       if (!x) {
         return;
       }
@@ -63,27 +89,76 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.generalBoolSettings = [
-      { text: 'Perform layout on changes', isEnable: false, path2userPref: 'isAutoIncrementalLayoutOnChange' },
-      { text: 'Emphasize on hover', isEnable: false, path2userPref: 'isHighlightOnHover' },
-      { text: 'Show overview window', isEnable: false, path2userPref: 'isShowOverviewWindow' },
-      { text: 'Show edge labels', isEnable: false, path2userPref: 'isShowEdgeLabels' },
-      { text: 'Ignore case in text operations', isEnable: false, path2userPref: 'isIgnoreCaseInText' },
-      { text: 'Show results of latest query only', isEnable: false, path2userPref: 'isOnlyHighlight4LatestQuery' },
-      { text: 'Collapse multiple edges based on type', isEnable: false, path2userPref: 'isCollapseEdgesBasedOnType' },
-      { text: 'Collapse multiple edges on load', isEnable: false, path2userPref: 'isCollapseMultiEdgesOnLoad' },
-      { text: 'Tile disconnected nodes on layout', isEnable: true, path2userPref: 'isTileDisconnectedOnLayout' },
+      {
+        text: "Perform layout on changes",
+        isEnable: false,
+        path2userPref: "isAutoIncrementalLayoutOnChange",
+      },
+      {
+        text: "Emphasize on hover",
+        isEnable: false,
+        path2userPref: "isHighlightOnHover",
+      },
+      {
+        text: "Show overview window",
+        isEnable: false,
+        path2userPref: "isShowOverviewWindow",
+      },
+      {
+        text: "Show edge labels",
+        isEnable: false,
+        path2userPref: "isShowEdgeLabels",
+      },
+      {
+        text: "Ignore case in text operations",
+        isEnable: false,
+        path2userPref: "isIgnoreCaseInText",
+      },
+      {
+        text: "Show results of latest query only",
+        isEnable: false,
+        path2userPref: "isOnlyHighlight4LatestQuery",
+      },
+      {
+        text: "Collapse multiple edges based on type",
+        isEnable: false,
+        path2userPref: "isCollapseEdgesBasedOnType",
+      },
+      {
+        text: "Collapse multiple edges on load",
+        isEnable: false,
+        path2userPref: "isCollapseMultiEdgesOnLoad",
+      },
+      {
+        text: "Tile disconnected nodes on layout",
+        isEnable: true,
+        path2userPref: "isTileDisconnectedOnLayout",
+      },
     ];
 
     this.timebarBoolSettings = [
-      { text: 'Show timebar', isEnable: false, path2userPref: 'timebar.isEnabled' },
-      { text: 'Hide disconnected nodes on animation', isEnable: false, path2userPref: 'timebar.isHideDisconnectedNodesOnAnim' },
-      { text: 'Maintain graph range on topology changes', isEnable: false, path2userPref: 'timebar.isMaintainGraphRange' }
+      {
+        text: "Show timebar",
+        isEnable: false,
+        path2userPref: "timebar.isEnabled",
+      },
+      {
+        text: "Hide disconnected nodes on animation",
+        isEnable: false,
+        path2userPref: "timebar.isHideDisconnectedNodesOnAnim",
+      },
+      {
+        text: "Maintain graph range on topology changes",
+        isEnable: false,
+        path2userPref: "timebar.isMaintainGraphRange",
+      },
     ];
 
     this.isInit = true;
 
-    this.tabChangeSubs = this._g.operationTabChanged.subscribe(x => {
-      if (x == 3) { // check if my tab is opened
+    this.tabChangeSubs = this._g.operationTabChanged.subscribe((x) => {
+      if (x == 3) {
+        // check if my tab is opened
         this.fillUIFromMemory();
       }
     });
@@ -104,15 +179,20 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     const up_t = this._g.userPrefs.timebar;
     const up_p = this._g.userPrefs.pangenograph;
 
-    this.generalBoolSettings[0].isEnable = up.isAutoIncrementalLayoutOnChange.getValue();
+    this.generalBoolSettings[0].isEnable =
+      up.isAutoIncrementalLayoutOnChange.getValue();
     this.generalBoolSettings[1].isEnable = up.isHighlightOnHover.getValue();
     this.generalBoolSettings[2].isEnable = up.isShowOverviewWindow.getValue();
     this.generalBoolSettings[3].isEnable = up.isShowEdgeLabels.getValue();
     this.generalBoolSettings[4].isEnable = up.isIgnoreCaseInText.getValue();
-    this.generalBoolSettings[5].isEnable = up.isOnlyHighlight4LatestQuery.getValue();
-    this.generalBoolSettings[6].isEnable = up.isCollapseEdgesBasedOnType.getValue();
-    this.generalBoolSettings[7].isEnable = up.isCollapseMultiEdgesOnLoad.getValue();
-    this.generalBoolSettings[8].isEnable = up.isTileDisconnectedOnLayout.getValue();
+    this.generalBoolSettings[5].isEnable =
+      up.isOnlyHighlight4LatestQuery.getValue();
+    this.generalBoolSettings[6].isEnable =
+      up.isCollapseEdgesBasedOnType.getValue();
+    this.generalBoolSettings[7].isEnable =
+      up.isCollapseMultiEdgesOnLoad.getValue();
+    this.generalBoolSettings[8].isEnable =
+      up.isTileDisconnectedOnLayout.getValue();
 
     this.nodeLabelWrap = up.nodeLabelWrap.getValue();
     this.mergedElemIndicator = up.mergedElemIndicator.getValue();
@@ -123,13 +203,24 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.dbTimeout = up.dbTimeout.getValue();
     this.tableColumnLimit = up.tableColumnLimit.getValue();
     this.edgeCollapseLimit = up.edgeCollapseLimit.getValue();
-    this.currHighlightStyles = up.highlightStyles.map((_, i) => 'Style ' + (i + 1));
+    this.currHighlightStyles = up.highlightStyles.map(
+      (_, i) => "Style " + (i + 1)
+    );
     this.highlightStyleIdx = up.currHighlightIdx.getValue();
-    this.highlightColor = up.highlightStyles[this._g.userPrefs.currHighlightIdx.getValue()].color.getValue();
-    this.highlightWidth = up.highlightStyles[this._g.userPrefs.currHighlightIdx.getValue()].wid.getValue();
+    this.highlightColor =
+      up.highlightStyles[
+        this._g.userPrefs.currHighlightIdx.getValue()
+      ].color.getValue();
+    this.highlightWidth =
+      up.highlightStyles[
+        this._g.userPrefs.currHighlightIdx.getValue()
+      ].wid.getValue();
     this.selectionColor = up.selectionColor.getValue();
     this.selectionWidth = up.selectionWidth.getValue();
-    this._g.cy.style().selector('core').style({ 'selection-box-color': this.selectionColor });
+    this._g.cy
+      .style()
+      .selector("core")
+      .style({ "selection-box-color": this.selectionColor });
     this.compoundPadding = up.compoundPadding.getValue();
     this.isStoreUserProfile = up.isStoreUserProfile.getValue();
     this.graphInclusionType = up.objectInclusionType.getValue();
@@ -138,7 +229,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
 
     this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
-    this.timebarBoolSettings[1].isEnable = up_t.isHideDisconnectedNodesOnAnim.getValue();
+    this.timebarBoolSettings[1].isEnable =
+      up_t.isHideDisconnectedNodesOnAnim.getValue();
     this.timebarBoolSettings[2].isEnable = up_t.isMaintainGraphRange.getValue();
     this.timebarPlayingStep = up_t.playingStep.getValue();
     this.timebarPlayingPeriod = up_t.playingPeriod.getValue();
@@ -156,14 +248,17 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.currHighlightStyles = [];
     let styles = this._g.viewUtils.getHighlightStyles();
     for (let i = 0; i < styles.length; i++) {
-      this.currHighlightStyles.push('Style ' + (i + 1));
-      let c = styles[i].node['underlay-color'];
-      let w = styles[i].node['underlay-padding'];
+      this.currHighlightStyles.push("Style " + (i + 1));
+      let c = styles[i].node["underlay-color"];
+      let w = styles[i].node["underlay-padding"];
       if (this._g.userPrefs.highlightStyles[i]) {
         this._g.userPrefs.highlightStyles[i].color.next(c);
         this._g.userPrefs.highlightStyles[i].wid.next(w);
       } else {
-        this._g.userPrefs.highlightStyles[i] = { wid: new BehaviorSubject<number>(w), color: new BehaviorSubject<string>(c) };
+        this._g.userPrefs.highlightStyles[i] = {
+          wid: new BehaviorSubject<number>(w),
+          color: new BehaviorSubject<string>(c),
+        };
       }
     }
     this._g.userPrefs.highlightStyles.splice(styles.length);
@@ -175,11 +270,17 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     const styles = this._g.userPrefs.highlightStyles;
     let vuStyles = this._g.viewUtils.getHighlightStyles();
     for (let i = 0; i < vuStyles.length; i++) {
-      let cyStyle = getCyStyleFromColorAndWid(styles[i].color.getValue(), styles[i].wid.getValue());
+      let cyStyle = getCyStyleFromColorAndWid(
+        styles[i].color.getValue(),
+        styles[i].wid.getValue()
+      );
       this._g.viewUtils.changeHighlightStyle(i, cyStyle.node, cyStyle.edge);
     }
     for (let i = vuStyles.length; i < styles.length; i++) {
-      let cyStyle = getCyStyleFromColorAndWid(styles[i].color.getValue(), this.highlightWidth);
+      let cyStyle = getCyStyleFromColorAndWid(
+        styles[i].color.getValue(),
+        this.highlightWidth
+      );
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     }
   }
@@ -187,7 +288,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   settingChanged(val: any, userPref: string) {
     console.log(val);
     console.log(userPref);
-    let path = userPref.split('.');
+    let path = userPref.split(".");
     console.log(path);
     let obj = this._g.userPrefs[path[0]];
     console.log(obj);
@@ -206,30 +307,38 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   onSelColorSelected(c: string) {
     this._g.userPrefs.selectionColor.next(c);
     this.selectionColor = c;
-    this._g.cy.style().selector('core').style({ 'selection-box-color': this.selectionColor });
-    this._g.cy.style().selector(':selected').style({ 'overlay-color': this.selectionColor }).update();
+    this._g.cy
+      .style()
+      .selector("core")
+      .style({ "selection-box-color": this.selectionColor });
+    this._g.cy
+      .style()
+      .selector(":selected")
+      .style({ "overlay-color": this.selectionColor })
+      .update();
     this._profile.saveUserPrefs();
   }
 
   onSelWidSelected(w) {
     let width = parseFloat(w.target.value);
     if (Number(width)) {
-      if (width < 0)
-        width = 1;
-      else if (width > 20)
-        width = 20;
+      if (width < 0) width = 1;
+      else if (width > 20) width = 20;
       this._g.userPrefs.selectionWidth.next(width);
       this.selectionWidth = width;
-      this._g.cy.style().selector(':selected').style({ 'overlay-padding': width })
-        .selector('edge:selected')
+      this._g.cy
+        .style()
+        .selector(":selected")
+        .style({ "overlay-padding": width })
+        .selector("edge:selected")
         .style({
-          'overlay-padding': (e) => {
-            return (width + e.width()) / 2 + 'px';
+          "overlay-padding": (e) => {
+            return (width + e.width()) / 2 + "px";
           },
-        }).update();
+        })
+        .update();
       this._profile.saveUserPrefs();
-    }
-    else {
+    } else {
       this._g.userPrefs.selectionWidth.next(1);
       this.selectionWidth = this._g.userPrefs.selectionWidth.getValue();
       w.target.valueAsNumber = this.selectionWidth;
@@ -251,8 +360,15 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   // used to change border width or color. One of them should be defined. (exclusively)
   changeHighlightStyle() {
     this.bandPassHighlightWidth();
-    let cyStyle = getCyStyleFromColorAndWid(this.highlightColor, this.highlightWidth);
-    this._g.viewUtils.changeHighlightStyle(this.highlightStyleIdx, cyStyle.node, cyStyle.edge);
+    let cyStyle = getCyStyleFromColorAndWid(
+      this.highlightColor,
+      this.highlightWidth
+    );
+    this._g.viewUtils.changeHighlightStyle(
+      this.highlightStyleIdx,
+      cyStyle.node,
+      cyStyle.edge
+    );
     this.setHighlightStyles();
     this._g.updateSelectionCyStyle();
   }
@@ -272,7 +388,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   addHighlightStyle() {
     this.bandPassHighlightWidth();
-    let cyStyle = getCyStyleFromColorAndWid(this.highlightColor, this.highlightWidth);
+    let cyStyle = getCyStyleFromColorAndWid(
+      this.highlightColor,
+      this.highlightWidth
+    );
     this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     this.setHighlightStyles();
     this.highlightStyleIdx = this.currHighlightStyles.length - 1;
@@ -282,7 +401,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   highlightStyleSelected(t: EventTarget | number) {
     let i = 0;
-    if (typeof t == 'number') {
+    if (typeof t == "number") {
       i = t;
     } else {
       i = (<HTMLSelectElement>t).selectedIndex;
@@ -290,8 +409,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.highlightStyleIdx = i;
     this._g.userPrefs.currHighlightIdx.next(i);
     let style = this._g.viewUtils.getHighlightStyles()[i];
-    this.highlightColor = style.node['underlay-color'];
-    this.highlightWidth = style.node['underlay-padding'];
+    this.highlightColor = style.node["underlay-color"];
+    this.highlightWidth = style.node["underlay-padding"];
     this._profile.saveUserPrefs();
   }
 
@@ -305,19 +424,28 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   resetGeneralSettings() {
-    this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, ['timebar', 'pangenograph']);
+    this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, [
+      "timebar",
+      "pangenograph",
+    ]);
     this.setViewUtilsStyle();
     this.fillUIFromMemory();
     this._g.updateSelectionCyStyle();
   }
 
   resetTimebarSettings() {
-    this.transferSubjectValues(this._g.userPrefsFromFiles.timebar, this._g.userPrefs.timebar);
+    this.transferSubjectValues(
+      this._g.userPrefsFromFiles.timebar,
+      this._g.userPrefs.timebar
+    );
     this.fillUIFromMemory();
   }
 
   resetPangenographSettings() {
-    this.transferSubjectValues(this._g.userPrefsFromFiles.pangenograph, this._g.userPrefs.pangenograph);
+    this.transferSubjectValues(
+      this._g.userPrefsFromFiles.pangenograph,
+      this._g.userPrefs.pangenograph
+    );
     this.fillUIFromMemory();
   }
 
@@ -329,7 +457,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       let p1 = from[k];
       let p2 = to[k];
       if (p1 instanceof BehaviorSubject) {
-        (p2 as BehaviorSubject<any>).next((p1 as BehaviorSubject<any>).getValue());
+        (p2 as BehaviorSubject<any>).next(
+          (p1 as BehaviorSubject<any>).getValue()
+        );
       } else {
         this.transferSubjectValues(p1, p2);
       }

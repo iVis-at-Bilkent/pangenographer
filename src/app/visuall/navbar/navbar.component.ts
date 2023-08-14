@@ -52,7 +52,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
             fn: "saveSelectedAsJson",
             isStd: true,
           },
-          { txt: "Import GFA..", id: "nbi04", fn: "loadGFAFile2Db", isStd: true },
+          {
+            txt: "Import GFA..",
+            id: "nbi04",
+            fn: "loadGFAFile2Db",
+            isStd: true,
+          },
           { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng", isStd: true },
           {
             txt: "Load User Profile...",
@@ -240,7 +245,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this._cyService.readGFAFile(
         this.file.nativeElement.files[0],
         (GFAdata) => {
-          this._dbService.getGFAdata2LoadGFA(GFAdata);
+          this._dbService.getGFAdata2ImportGFA(GFAdata);
         }
       );
     } else if (this.isLoadFile4Graph) {

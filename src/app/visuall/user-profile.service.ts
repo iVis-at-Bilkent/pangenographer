@@ -1,19 +1,26 @@
-import { Injectable } from '@angular/core';
-import { UserProfile } from './user-preference';
-import { QueryRule, TimebarMetric, RuleNode, deepCopyTimebarMetrics, deepCopyQueryRules } from './operation-tabs/map-tab/query-types';
-import { BehaviorSubject } from 'rxjs';
-import { GlobalVariableService } from './global-variable.service';
+import { Injectable } from "@angular/core";
+import { UserProfile } from "./user-preference";
+import {
+  QueryRule,
+  TimebarMetric,
+  RuleNode,
+  deepCopyTimebarMetrics,
+  deepCopyQueryRules,
+} from "./operation-tabs/map-tab/query-types";
+import { BehaviorSubject } from "rxjs";
+import { GlobalVariableService } from "./global-variable.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class UserProfileService {
-
-  onLoadFromFile: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  constructor(private _g: GlobalVariableService) { }
+  onLoadFromFile: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
+  constructor(private _g: GlobalVariableService) {}
 
   private getUserProfile() {
-    const p = localStorage.getItem('profile');
+    const p = localStorage.getItem("profile");
     if (!p) {
       return null;
     }
@@ -71,7 +78,11 @@ export class UserProfileService {
     return [];
   }
 
-  downloadProfileAsFile(isSaveSettings = true, isSaveQueryRules = true, isSaveTimebarStats = true) {
+  downloadProfileAsFile(
+    isSaveSettings = true,
+    isSaveQueryRules = true,
+    isSaveTimebarStats = true
+  ) {
     const p = this.getUserProfile();
     if (p) {
       if (!isSaveSettings) {
@@ -85,11 +96,14 @@ export class UserProfileService {
       }
     }
     const str = JSON.stringify(p);
-    const element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(str));
-    element.setAttribute('download', 'Visuall_User_Profile.vall');
+    const element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:text/plain;charset=utf-8," + encodeURIComponent(str)
+    );
+    element.setAttribute("download", "Visuall_User_Profile.vall");
 
-    element.style.display = 'none';
+    element.style.display = "none";
     document.body.appendChild(element);
 
     element.click();
@@ -98,13 +112,18 @@ export class UserProfileService {
   }
 
   setUserProfile(txt: string) {
-    localStorage.setItem('profile', txt);
+    localStorage.setItem("profile", txt);
     this.onLoadFromFile.next(true);
   }
 
   isStoreProfile() {
     const p = this.getUserProfile();
-    if (!p || !p.userPref || p.userPref.isStoreUserProfile === undefined || p.userPref.isStoreUserProfile == null) {
+    if (
+      !p ||
+      !p.userPref ||
+      p.userPref.isStoreUserProfile === undefined ||
+      p.userPref.isStoreUserProfile == null
+    ) {
       return this._g.userPrefs.isStoreUserProfile;
     }
     return p.userPref.isStoreUserProfile;
@@ -118,9 +137,9 @@ export class UserProfileService {
         this.deleteParents(m.rules.rules);
       }
       p.queryRules = m2;
-      localStorage.setItem('profile', JSON.stringify(p));
+      localStorage.setItem("profile", JSON.stringify(p));
     } else {
-      localStorage.setItem('profile', JSON.stringify({ queryRules: f }));
+      localStorage.setItem("profile", JSON.stringify({ queryRules: f }));
     }
   }
 
@@ -140,9 +159,9 @@ export class UserProfileService {
         this.deleteParents(m.rules);
       }
       p.timebarMetrics = t2;
-      localStorage.setItem('profile', JSON.stringify(p));
+      localStorage.setItem("profile", JSON.stringify(p));
     } else {
-      localStorage.setItem('profile', JSON.stringify({ timebarMetrics: [] }));
+      localStorage.setItem("profile", JSON.stringify({ timebarMetrics: [] }));
     }
   }
 
@@ -153,7 +172,7 @@ export class UserProfileService {
 
   transferIsStoreUserProfile() {
     const p = this.getUserProfile();
-    if (p && p.userPref && typeof p.userPref.isStoreUserProfile === 'boolean') {
+    if (p && p.userPref && typeof p.userPref.isStoreUserProfile === "boolean") {
       this._g.userPrefs.isStoreUserProfile.next(p.userPref.isStoreUserProfile);
     }
   }
@@ -162,11 +181,10 @@ export class UserProfileService {
     const p = this.getUserProfile();
     if (p) {
       p.userPref = this.userPref2RawData();
-      localStorage.setItem('profile', JSON.stringify(p));
+      localStorage.setItem("profile", JSON.stringify(p));
     } else {
       const up = this.userPref2RawData();
-      localStorage.setItem('profile', JSON.stringify({ userPref: up }));
+      localStorage.setItem("profile", JSON.stringify({ userPref: up }));
     }
   }
-
 }

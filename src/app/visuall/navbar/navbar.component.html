@@ -1,28 +1,57 @@
 <nav class="navbar navbar-expand-md navbar-light bg-light">
-
   <a class="navbar-brand" href="#">
-    <img [src]="toolLogo" id="brand-logo" class="d-inline-block p-1" alt="Logo">
+    <img
+      [src]="toolLogo"
+      id="brand-logo"
+      class="d-inline-block p-1"
+      alt="Logo"
+    />
     <b class="va-title" [innerHTML]="toolName"></b>
   </a>
 
-  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+  <button
+    class="navbar-toggler"
+    type="button"
+    data-bs-toggle="collapse"
+    data-bs-target="#navbarSupportedContent"
+    aria-controls="navbarSupportedContent"
+    aria-expanded="false"
+    aria-label="Toggle navigation"
+  >
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav heading me-auto">
-      <input #file type="file" (change)="fileSelected()" accept="text/*, .json, .vall, .gfa" style="display: none;" />
+      <input
+        #file
+        type="file"
+        (change)="fileSelected()"
+        accept="text/*, .json, .vall, .gfa"
+        style="display: none"
+      />
 
       <li class="nav-item" *ngFor="let item of menu; let i = index">
         <div class="dropdown btn-group">
-          <button class="btn btn-light dropdown-toggle va-heading1" type="button" data-bs-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            {{item.dropdown}}
+          <button
+            class="btn btn-light dropdown-toggle va-heading1"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            {{ item.dropdown }}
           </button>
           <div class="dropdown-menu">
-            <button class="dropdown-item va-text" type="button" *ngFor="let act of item.actions" id="{{act.id}}"
-              (click)="triggerAct(act)">{{act.txt}}</button>
+            <button
+              class="dropdown-item va-text"
+              type="button"
+              *ngFor="let act of item.actions"
+              id="{{ act.id }}"
+              (click)="triggerAct(act)"
+            >
+              {{ act.txt }}
+            </button>
           </div>
         </div>
       </li>

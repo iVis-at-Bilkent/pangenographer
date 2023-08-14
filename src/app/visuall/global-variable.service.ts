@@ -1,16 +1,26 @@
-import { Injectable } from '@angular/core';
-import { UserPref, GroupingOptionTypes } from './user-preference';
-import { BehaviorSubject } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import appPref from '../../assets/appPref.json';
-import { isPrimitiveType, debounce, LAYOUT_ANIM_DUR, COLLAPSED_EDGE_CLASS, COLLAPSED_NODE_CLASS, CLUSTER_CLASS, CY_BATCH_END_DELAY, EXPAND_COLLAPSE_FAST_OPT, HIGHLIGHT_OPACITY } from './constants';
-import { GraphHistoryItem, GraphElem } from './db-service/data-types';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ErrorModalComponent } from './popups/error-modal/error-modal.component';
-import { CyStyleCustomizationService } from '../custom/cy-style-customization.service';
+import { Injectable } from "@angular/core";
+import { UserPref, GroupingOptionTypes } from "./user-preference";
+import { BehaviorSubject } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import appPref from "../../assets/appPref.json";
+import {
+  isPrimitiveType,
+  debounce,
+  LAYOUT_ANIM_DUR,
+  COLLAPSED_EDGE_CLASS,
+  COLLAPSED_NODE_CLASS,
+  CLUSTER_CLASS,
+  CY_BATCH_END_DELAY,
+  EXPAND_COLLAPSE_FAST_OPT,
+  HIGHLIGHT_OPACITY,
+} from "./constants";
+import { GraphHistoryItem, GraphElem } from "./db-service/data-types";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
+import { CyStyleCustomizationService } from "../custom/cy-style-customization.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class GlobalVariableService {
   private HISTORY_SNAP_DELAY = 1500; // we should wait for layout to finish
@@ -19,7 +29,14 @@ export class GlobalVariableService {
   cy: any;
   viewUtils: any;
   layoutUtils: any;
-  layout: { clusters: string[][], randomize: boolean, tile: boolean, animationDuration: number, tilingPaddingVertical: number, tilingPaddingHorizontal: number };
+  layout: {
+    clusters: string[][];
+    randomize: boolean;
+    tile: boolean;
+    animationDuration: number;
+    tilingPaddingVertical: number;
+    tilingPaddingHorizontal: number;
+  };
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
   setLoadingStatus: (boolean) => void;
@@ -35,51 +52,64 @@ export class GlobalVariableService {
   isLoadFromDB: boolean = false;
   isLoadFromExpandCollapse: boolean = false;
   isUserPrefReady = new BehaviorSubject<boolean>(false);
-  statusMsg = new BehaviorSubject<string>('');
+  statusMsg = new BehaviorSubject<string>("");
   performLayout: Function;
   cyNaviPositionSetter: any;
   appDescription = new BehaviorSubject<any>(null);
   dataModel = new BehaviorSubject<any>(null);
   enums = new BehaviorSubject<any>(null);
 
-  constructor(private _http: HttpClient, private _modalService: NgbModal, private _cyCustomStyle: CyStyleCustomizationService) {
+  constructor(
+    private _http: HttpClient,
+    private _modalService: NgbModal,
+    private _cyCustomStyle: CyStyleCustomizationService
+  ) {
     this.hiddenClasses = new Set([]);
     // set user preferences staticly (necessary for rendering html initially)
     this.setUserPrefs(appPref, this.userPrefs);
     // set default values dynamically
-    this._http.get('./assets/appPref.json').subscribe(x => {
+    this._http.get("./assets/appPref.json").subscribe((x) => {
       this.setUserPrefs(x, this.userPrefs);
       this.setUserPrefs(x, this.userPrefsFromFiles);
 
       // set user prefered values. These will be overriden if "Store User Profile" is checked
-      this._http.get('/app/custom/config/app_description.json').subscribe(x => {
-        this.appDescription.next(x);
-        this.setUserPrefs(x['appPreferences'], this.userPrefs);
-        this.setUserPrefs(x['appPreferences'], this.userPrefsFromFiles);
-        this.isUserPrefReady.next(true);
-      }, this.showErr.bind(this));
+      this._http
+        .get("/app/custom/config/app_description.json")
+        .subscribe((x) => {
+          this.appDescription.next(x);
+          this.setUserPrefs(x["appPreferences"], this.userPrefs);
+          this.setUserPrefs(x["appPreferences"], this.userPrefsFromFiles);
+          this.isUserPrefReady.next(true);
+        }, this.showErr.bind(this));
     }, this.showErr.bind(this));
 
-    let isGraphEmpty = () => { return this.cy.elements().not(':hidden, :transparent').length > 0 };
-    this.performLayout = debounce(this.performLayoutFn, LAYOUT_ANIM_DUR, false, isGraphEmpty);
+    let isGraphEmpty = () => {
+      return this.cy.elements().not(":hidden, :transparent").length > 0;
+    };
+    this.performLayout = debounce(
+      this.performLayoutFn,
+      LAYOUT_ANIM_DUR,
+      false,
+      isGraphEmpty
+    );
 
     // set cytoscape.js style dynamicly
-    this._http.get('./assets/generated/stylesheet.json').subscribe(x => {
+    this._http.get("./assets/generated/stylesheet.json").subscribe((x) => {
       this.cy.style(x);
       this.addOtherStyles();
     }, this.showErr.bind(this));
 
-    this._http.get('./assets/generated/properties.json').subscribe(x => {
+    this._http.get("./assets/generated/properties.json").subscribe((x) => {
       this.dataModel.next(x);
     }, this.showErr.bind(this));
 
-    this._http.get('/app/custom/config/enums.json').subscribe(x => {
+    this._http.get("/app/custom/config/enums.json").subscribe((x) => {
       this.enums.next(x);
     }, this.showErr.bind(this));
   }
 
   private showErr(e) {
-    this.showErrorModal('Internet Error', e);
+    this.showErrorModal("Internet Error", e);
   }
 
   transfer2UserPrefs(u: any) {
@@ -89,14 +119,14 @@ export class GlobalVariableService {
   }
 
   runLayout() {
-    const elems4layout = this.cy.elements().not(':hidden, :transparent');
+    const elems4layout = this.cy.elements().not(":hidden, :transparent");
     if (elems4layout.length < 1) {
       return;
     }
     if (this.layout.randomize) {
-      this.statusMsg.next('Recalculating layout...');
+      this.statusMsg.next("Recalculating layout...");
     } else {
-      this.statusMsg.next('Performing layout...');
+      this.statusMsg.next("Performing layout...");
     }
     this.setLoadingStatus(true);
     if (this.layout.clusters && this.layout.clusters.length > 0) {
@@ -105,7 +135,7 @@ export class GlobalVariableService {
     } else {
       elems4layout.layout(this.layout).run();
     }
-    this.statusMsg.next('Rendering graph...');
+    this.statusMsg.next("Rendering graph...");
   }
 
   private removeDeletedClusters() {
@@ -126,13 +156,13 @@ export class GlobalVariableService {
 
   switchLayoutRandomization(isRandomize: boolean) {
     this.layout.randomize = isRandomize;
-    this.layoutUtils.setOption('randomize', isRandomize);
+    this.layoutUtils.setOption("randomize", isRandomize);
   }
 
   applyClassFiltering() {
-    let hiddenSelector = '';
+    let hiddenSelector = "";
     for (let i of this.hiddenClasses) {
-      hiddenSelector += '.' + i + ',';
+      hiddenSelector += "." + i + ",";
     }
 
     hiddenSelector = hiddenSelector.substr(0, hiddenSelector.length - 1);
@@ -145,9 +175,9 @@ export class GlobalVariableService {
   }
 
   filterByClass(elems) {
-    let hiddenSelector = '';
+    let hiddenSelector = "";
     for (let i of this.hiddenClasses) {
-      hiddenSelector += '.' + i + ',';
+      hiddenSelector += "." + i + ",";
     }
 
     hiddenSelector = hiddenSelector.substr(0, hiddenSelector.length - 1);
@@ -159,7 +189,7 @@ export class GlobalVariableService {
   }
 
   getGraphElemSet() {
-    return new Set<string>(this.cy.elements().map(x => x.id()));
+    return new Set<string>(this.cy.elements().map((x) => x.id()));
   }
 
   highlightElems(elems) {
@@ -167,50 +197,69 @@ export class GlobalVariableService {
   }
 
   updateSelectionCyStyle() {
-    this.cy.style().selector(':selected').style({
-      'overlay-color': this.userPrefs.selectionColor.getValue(),
-      'overlay-padding': this.userPrefs.selectionWidth.getValue(),
-      "target-arrow-color": "gray",
-      "source-arrow-color": "gray",
-    }).selector('edge:selected').style({
-      'overlay-padding': (e) => {
-        return (this.userPrefs.selectionWidth.getValue() + e.width()) / 2 + 'px';
-      },
-    }).update();
+    this.cy
+      .style()
+      .selector(":selected")
+      .style({
+        "overlay-color": this.userPrefs.selectionColor.getValue(),
+        "overlay-padding": this.userPrefs.selectionWidth.getValue(),
+        "target-arrow-color": "gray",
+        "source-arrow-color": "gray",
+      })
+      .selector("edge:selected")
+      .style({
+        "overlay-padding": (e) => {
+          return (
+            (this.userPrefs.selectionWidth.getValue() + e.width()) / 2 + "px"
+          );
+        },
+      })
+      .update();
     this.addStyle4Emphasize();
   }
 
   add2GraphHistory(expo: string) {
     setTimeout(() => {
-      if (this.graphHistory.length > this.userPrefs.queryHistoryLimit.getValue() - 1) {
+      if (
+        this.graphHistory.length >
+        this.userPrefs.queryHistoryLimit.getValue() - 1
+      ) {
         this.graphHistory.splice(0, 1);
       }
-      const options = { bg: 'white', scale: 1, full: true };
+      const options = { bg: "white", scale: 1, full: true };
       const base64png: string = this.cy.png(options);
       const elements = this.cy.json().elements;
 
       let g: GraphHistoryItem = {
         expo: expo,
         base64png: base64png,
-        json: elements
+        json: elements,
       };
       this.graphHistory.push(g);
       this.addNewGraphHistoryItem.next(true);
     }, this.HISTORY_SNAP_DELAY);
   }
 
-  getLabels4Elems(elemIds: string[] | number[], isNode: boolean = true, objDatas: GraphElem[] = null): string {
-    return this.getLabels4ElemsAsArray(elemIds, isNode, objDatas).join(',');
+  getLabels4Elems(
+    elemIds: string[] | number[],
+    isNode: boolean = true,
+    objDatas: GraphElem[] = null
+  ): string {
+    return this.getLabels4ElemsAsArray(elemIds, isNode, objDatas).join(",");
   }
 
-  getLabels4ElemsAsArray(elemIds: string[] | number[], isNode: boolean = true, objDatas: GraphElem[] = null): string[] {
+  getLabels4ElemsAsArray(
+    elemIds: string[] | number[],
+    isNode: boolean = true,
+    objDatas: GraphElem[] = null
+  ): string[] {
     let cyIds: string[] = [];
-    let idChar = 'n';
+    let idChar = "n";
     if (!isNode) {
-      idChar = 'e';
+      idChar = "e";
     }
     if (objDatas) {
-      cyIds = objDatas.map(x => x.data.id);
+      cyIds = objDatas.map((x) => x.data.id);
     } else {
       for (let i = 0; i < elemIds.length; i++) {
         cyIds.push(idChar + elemIds[i]);
@@ -223,25 +272,25 @@ export class GlobalVariableService {
       labelParent = this.appDescription.getValue().relations;
     }
     for (let i = 0; i < cyIds.length; i++) {
-      let cName = '';
+      let cName = "";
       if (!objDatas) {
-        cName = this.cy.$('#' + cyIds[i]).className()[0];
+        cName = this.cy.$("#" + cyIds[i]).className()[0];
       } else {
-        cName = objDatas[i].classes.split(' ')[0];
+        cName = objDatas[i].classes.split(" ")[0];
       }
 
-      let s = labelParent[cName]['style']['label'] as string;
-      if (s.indexOf('(') < 0) {
+      let s = labelParent[cName]["style"]["label"] as string;
+      if (s.indexOf("(") < 0) {
         labels.push(s);
       } else {
-        let propName = s.slice(s.indexOf('(') + 1, s.indexOf(')'));
+        let propName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
         if (!objDatas) {
-          labels.push(this.cy.$('#' + cyIds[i]).data(propName));
+          labels.push(this.cy.$("#" + cyIds[i]).data(propName));
         } else {
           const currData = objDatas[i].data;
           let l = currData[propName];
           if (!l) {
-            l = currData[Object.keys(currData)[0]]
+            l = currData[Object.keys(currData)[0]];
           }
           labels.push(l);
         }
@@ -252,9 +301,9 @@ export class GlobalVariableService {
   }
 
   listen4graphEvents() {
-    this.cy.on('layoutstop', () => {
+    this.cy.on("layoutstop", () => {
       this.setLoadingStatus(false);
-      this.statusMsg.next('');
+      this.statusMsg.next("");
     });
   }
 
@@ -264,7 +313,7 @@ export class GlobalVariableService {
       p = this.userPrefsFromFiles.tilingPadding.getValue();
     }
     return {
-      name: 'fcose',
+      name: "fcose",
       randomize: false,
       // whether or not to animate the layout
       animate: true,
@@ -280,39 +329,41 @@ export class GlobalVariableService {
       tilingPaddingVertical: p,
       // Represents the amount of the horizontal space to put between the zero degree members during the tiling operation(can also be a function)
       tilingPaddingHorizontal: p,
-      clusters: null // cise argument
+      clusters: null, // cise argument
     };
   }
 
   // delete/expand compounds if they don't have any visible elements
   handleCompoundsOnHideDelete() {
-    const metaEdges = this.cy.edges('.' + COLLAPSED_EDGE_CLASS);
+    const metaEdges = this.cy.edges("." + COLLAPSED_EDGE_CLASS);
     // some collapsed edges should be expanded, or their data should be updated
     for (let i = 0; i < metaEdges.length; i++) {
-      const collapsedEdges = metaEdges[i].data('collapsedEdges');
-      if (collapsedEdges.filter(':visible').length < 2) {
+      const collapsedEdges = metaEdges[i].data("collapsedEdges");
+      if (collapsedEdges.filter(":visible").length < 2) {
         this.expandCollapseApi.expandEdges(metaEdges[i]);
       } else {
-        metaEdges[i].data('collapsedEdges', collapsedEdges.filter(':visible'))
-        this.cy.add(collapsedEdges.not(':visible'));
+        metaEdges[i].data("collapsedEdges", collapsedEdges.filter(":visible"));
+        this.cy.add(collapsedEdges.not(":visible"));
       }
     }
 
-    const metaNodes = this.cy.nodes('.' + COLLAPSED_NODE_CLASS);
+    const metaNodes = this.cy.nodes("." + COLLAPSED_NODE_CLASS);
     // First, expand the collapsed if they don't have anything visible inside
     for (let i = 0; i < metaNodes.length; i++) {
-      const collapsedChildren = metaNodes[i].data('collapsedChildren');
-      if (collapsedChildren.filter(':visible').length < 1) {
+      const collapsedChildren = metaNodes[i].data("collapsedChildren");
+      if (collapsedChildren.filter(":visible").length < 1) {
         this.expandCollapseApi.expand(metaNodes[i], EXPAND_COLLAPSE_FAST_OPT);
       }
     }
 
     //if an expanded compound does not have anything visible, delete it
-    const clusterNodes = this.cy.nodes('.' + CLUSTER_CLASS).not('.' + COLLAPSED_NODE_CLASS);
+    const clusterNodes = this.cy
+      .nodes("." + CLUSTER_CLASS)
+      .not("." + COLLAPSED_NODE_CLASS);
     for (let i = 0; i < clusterNodes.length; i++) {
       // if there are empty compounds, delete them
       const children = clusterNodes[i].children();
-      if (children.filter(':visible').length < 1) {
+      if (children.filter(":visible").length < 1) {
         children.move({ parent: null });
         this.cy.remove(clusterNodes[i]);
       }
@@ -349,17 +400,17 @@ export class GlobalVariableService {
     instance.componentInstance.msg = msg;
   }
 
-  /** 
+  /**
    * @param  {} fn should be a function that takes a cytoscape.js element and returns true or false
    */
   filterRemovedElems(fn) {
     const r = this.cy.collection();
-    const collapsedNodes = this.cy.nodes('.' + COLLAPSED_NODE_CLASS);
+    const collapsedNodes = this.cy.nodes("." + COLLAPSED_NODE_CLASS);
     for (let i = 0; i < collapsedNodes.length; i++) {
       const ancestors = this.cy.collection();
       this.filterOnElem(collapsedNodes[i], fn, r, ancestors);
     }
-    const collapsedEdges = this.cy.edges('.' + COLLAPSED_EDGE_CLASS);
+    const collapsedEdges = this.cy.edges("." + COLLAPSED_EDGE_CLASS);
     for (let i = 0; i < collapsedEdges.length; i++) {
       const ancestors = this.cy.collection();
       this.filterOnElem(collapsedEdges[i], fn, r, ancestors);
@@ -368,8 +419,8 @@ export class GlobalVariableService {
   }
 
   filterOnElem(elem, fn, r, ancestors) {
-    const collapsedChildren = elem.data('collapsedChildren');
-    const collapsedEdges = elem.data('collapsedEdges');
+    const collapsedChildren = elem.data("collapsedChildren");
+    const collapsedEdges = elem.data("collapsedEdges");
     let collapsed = this.cy.collection();
     if (collapsedChildren) {
       collapsed.merge(collapsedChildren);
@@ -390,12 +441,22 @@ export class GlobalVariableService {
     }
   }
 
-  private performLayoutFn(isRandomize: boolean, isDirectCommand: boolean = false, animationDuration: number = LAYOUT_ANIM_DUR) {
-    if (!this.userPrefs.isAutoIncrementalLayoutOnChange.getValue() && !isRandomize && !isDirectCommand) {
+  private performLayoutFn(
+    isRandomize: boolean,
+    isDirectCommand: boolean = false,
+    animationDuration: number = LAYOUT_ANIM_DUR
+  ) {
+    if (
+      !this.userPrefs.isAutoIncrementalLayoutOnChange.getValue() &&
+      !isRandomize &&
+      !isDirectCommand
+    ) {
       this.cy.fit();
       return;
     }
-    if (this.userPrefs.groupingOption.getValue() != GroupingOptionTypes.clusterId) {
+    if (
+      this.userPrefs.groupingOption.getValue() != GroupingOptionTypes.clusterId
+    ) {
       this.layout = this.getFcoseOptions();
     }
     this.layout.animationDuration = animationDuration;
@@ -407,7 +468,7 @@ export class GlobalVariableService {
   private getCiseOptions() {
     return {
       // -------- Mandatory parameters --------
-      name: 'cise',
+      name: "cise",
 
       // ClusterInfo can be a 2D array contaning node id's or a function that returns cluster ids.
       // For the 2D array option, the index of the array indicates the cluster ID for all elements in
@@ -429,7 +490,7 @@ export class GlobalVariableService {
       // - true : Animate while the layout is running
       // - false : Just show the end result
       // - 'end' : Animate directly to the end result
-      animate: 'end',
+      animate: "end",
 
       // number of ticks per frame; higher is faster but more jerky
       refresh: 10,
@@ -477,8 +538,8 @@ export class GlobalVariableService {
       packComponents: true,
 
       // Layout event callbacks; equivalent to `layout.one('layoutready', callback)` for example
-      ready: function () { }, // on layoutready
-      stop: function () { }, // on layoutstop
+      ready: function () {}, // on layoutready
+      stop: function () {}, // on layoutstop
     };
   }
 
@@ -510,111 +571,142 @@ export class GlobalVariableService {
   // some styles uses functions, so they can't be added using JSON
   private addOtherStyles() {
     this.cy.startBatch();
-    this.cy.style().selector('edge.' + COLLAPSED_EDGE_CLASS)
+    this.cy
+      .style()
+      .selector("edge." + COLLAPSED_EDGE_CLASS)
       .style({
-        'label': (e) => {
-          return '(' + e.data('collapsedEdges').length + ')';
+        label: (e) => {
+          return "(" + e.data("collapsedEdges").length + ")";
         },
-        'width': (e) => {
-          let n = e.data('collapsedEdges').length;
-          return (3 + Math.log2(n)) + 'px';
+        width: (e) => {
+          let n = e.data("collapsedEdges").length;
+          return 3 + Math.log2(n) + "px";
         },
-        'line-color': this.setColor4CompoundEdge.bind(this),
-        'target-arrow-color': this.setColor4CompoundEdge.bind(this),
-        'target-arrow-shape': this.setTargetArrowShape.bind(this),
-      }).update();
+        "line-color": this.setColor4CompoundEdge.bind(this),
+        "target-arrow-color": this.setColor4CompoundEdge.bind(this),
+        "target-arrow-shape": this.setTargetArrowShape.bind(this),
+      })
+      .update();
     this._cyCustomStyle.addCustomStyles(this.cy);
 
     // add override styles
-    this.cy.style()
-      .selector('node.ellipsis_label')
+    this.cy
+      .style()
+      .selector("node.ellipsis_label")
       .style({
         "text-wrap": "wrap",
-        "label": "data(__label__)"
-      }).selector('edge.nolabel')
+        label: "data(__label__)",
+      })
+      .selector("edge.nolabel")
       .style({
-        "label": ""
-      }).update();
+        label: "",
+      })
+      .update();
 
-    this.cy.style().selector('edge.LINK').style({
-      "target-arrow-shape" : function (e) {
-        if (!e.data('targetOrientation')) {
-          return "none";
-        }
-        return "tee";
-      },"source-arrow-shape" : function (e) {
-        if (!e.data('sourceOrientation')) {
-          return "none";
-        }
-        return "tee";
-      }
-    }).update();
+    this.cy
+      .style()
+      .selector("edge.LINK")
+      .style({
+        "target-arrow-shape": function (e) {
+          if (!e.data("targetOrientation")) {
+            return "none";
+          }
+          return "tee";
+        },
+        "source-arrow-shape": function (e) {
+          if (!e.data("sourceOrientation")) {
+            return "none";
+          }
+          return "tee";
+        },
+      })
+      .update();
 
-    this.cy.style().selector('edge.JUMP').style({
-      "target-arrow-shape" : function (e) {
-        if (!e.data('targetOrientation')) {
-          return "none";
-        }
-        return "tee";
-      },
-      "source-arrow-shape" : function (e) {
-        if (!e.data('sourceOrientation')) {
-          return "none";
-        }
-        return "tee";
-      }
-    }).update();
+    this.cy
+      .style()
+      .selector("edge.JUMP")
+      .style({
+        "target-arrow-shape": function (e) {
+          if (!e.data("targetOrientation")) {
+            return "none";
+          }
+          return "tee";
+        },
+        "source-arrow-shape": function (e) {
+          if (!e.data("sourceOrientation")) {
+            return "none";
+          }
+          return "tee";
+        },
+      })
+      .update();
 
-    this.cy.style().selector('edge.CONTAINMENT').style({
-      "target-arrow-shape" : function (e) {
-        if (!e.data('targetOrientation')) {
-          return "none";
-        }
-        return "tee";
-      },
-      "source-arrow-shape" : function (e) {
-        if (!e.data('sourceOrientation')) {
-          return "none";
-        }
-        return "tee";
-      }
-    }).update();
+    this.cy
+      .style()
+      .selector("edge.CONTAINMENT")
+      .style({
+        "target-arrow-shape": function (e) {
+          if (!e.data("targetOrientation")) {
+            return "none";
+          }
+          return "tee";
+        },
+        "source-arrow-shape": function (e) {
+          if (!e.data("sourceOrientation")) {
+            return "none";
+          }
+          return "tee";
+        },
+      })
+      .update();
 
-    setTimeout(() => { this.cy.endBatch(); }, CY_BATCH_END_DELAY);
+    setTimeout(() => {
+      this.cy.endBatch();
+    }, CY_BATCH_END_DELAY);
   }
 
   private addStyle4Emphasize() {
-    const color = '#da14ff';
+    const color = "#da14ff";
     const wid = this.userPrefs.highlightStyles[0].wid.getValue();
     const OPACITY_DIFF = 0.05;
 
-    this.cy.style().selector('node.emphasize')
+    this.cy
+      .style()
+      .selector("node.emphasize")
       .style({
-        'underlay-color': color, 'underlay-opacity': HIGHLIGHT_OPACITY + OPACITY_DIFF, 'underlay-padding': wid
-      }).update();
+        "underlay-color": color,
+        "underlay-opacity": HIGHLIGHT_OPACITY + OPACITY_DIFF,
+        "underlay-padding": wid,
+      })
+      .update();
 
-    this.cy.style().selector('edge.emphasize')
+    this.cy
+      .style()
+      .selector("edge.emphasize")
       .style({
-        'underlay-color': color, 'underlay-opacity': HIGHLIGHT_OPACITY + OPACITY_DIFF, 'underlay-padding': (e) => {
-          return (wid + e.width()) / 2 + 'px';
-        }
-      }).update();
+        "underlay-color": color,
+        "underlay-opacity": HIGHLIGHT_OPACITY + OPACITY_DIFF,
+        "underlay-padding": (e) => {
+          return (wid + e.width()) / 2 + "px";
+        },
+      })
+      .update();
   }
 
   private setColor4CompoundEdge(e) {
-    let collapsedEdges = e.data('collapsedEdges');
+    let collapsedEdges = e.data("collapsedEdges");
     if (this.doElemsMultiClasses(collapsedEdges)) {
-      return '#b3b3b3';
+      return "#b3b3b3";
     }
-    return collapsedEdges[0].style('line-color')
+    return collapsedEdges[0].style("line-color");
   }
 
   private setTargetArrowShape(e) {
-    let collapsedEdges = e.data('collapsedEdges');
+    let collapsedEdges = e.data("collapsedEdges");
     if (this.doElemsMultiClasses(collapsedEdges)) {
-      return 'triangle';
+      return "triangle";
     }
-    return collapsedEdges[0].style('target-arrow-shape')
+    return collapsedEdges[0].style("target-arrow-shape");
   }
 
   private doElemsMultiClasses(elems) {
