@@ -262,6 +262,7 @@ export class CytoscapeService {
     }
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
+    this.applyStyle4NewElements();
     this.addTooltips();
   }
 

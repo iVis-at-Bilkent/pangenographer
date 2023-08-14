@@ -77,7 +77,7 @@ export class DbAdapterService {
     this._db.getElems(ids, fn, queryMeta);
   }
 
-  getElementsToCertainDistance (
+  getElementsUpToCertainDistance (
     nodeId: string, 
     distance: number,
     callback: (x: GraphResponse) => any,
