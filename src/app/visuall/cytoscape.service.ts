@@ -355,6 +355,7 @@ export class CytoscapeService {
     } else {
       textData = element.data("segmentData");
     }
+    textData = this.truncateText(textData, this._g.cy.nodes()[0], 6*330 - 36, 8);
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
       if (startIndex >= textData.length) {
         break;
@@ -534,10 +535,10 @@ export class CytoscapeService {
     }, C.CY_BATCH_END_DELAY);
   }
 
-  truncateText(label: string, ele: any, widthOffset?: number): string {
+  truncateText(label: string, ele: any, widthOffset?: number, fontSizeOffset: number = 0): string {
     let context = document.createElement("canvas").getContext("2d");
     let fStyle = ele.pstyle("font-style").strValue;
-    let size = ele.pstyle("font-size").pfValue + "px";
+    let size = (ele.pstyle("font-size").pfValue + fontSizeOffset) + "px";
     let family = ele.pstyle("font-family").strValue;
     let weight = ele.pstyle("font-weight").strValue;
 

@@ -373,6 +373,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   max-width: 340px;
   position: absolute;
   padding-left: 3px;
+  padding-right: 3px;
   opacity: 0.65;
   background: #c1cade;
   display: flex;
