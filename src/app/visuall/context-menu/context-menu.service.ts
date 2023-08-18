@@ -203,6 +203,7 @@ export class ContextMenuService {
       callback,
       isUp
     );
+    this._g.performLayout(false);
   }
 
   hideUpstream(event) {
@@ -228,5 +229,6 @@ export class ContextMenuService {
       callback,
       isUp
     );
+    this._g.performLayout(false);
   }
 }

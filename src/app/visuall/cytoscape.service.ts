@@ -17,6 +17,7 @@ import {
 import { UserProfileService } from "./user-profile.service";
 import { LouvainClustering } from "../../lib/louvain-clustering/LouvainClustering";
 import { CyExtService } from "./cy-ext.service";
+import { DbAdapterService } from "./db-service/db-adapter.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
 @Injectable({
@@ -35,7 +36,8 @@ export class CytoscapeService {
     private _cyExtService: CyExtService,
     private _profile: UserProfileService,
     private _ngZone: NgZone,
-    private _modalService: NgbModal
+    private _modalService: NgbModal,
+    private _dbService: DbAdapterService
   ) {
     this.userPrefHelper = new UserPrefHelper(
       this,
@@ -264,6 +266,124 @@ export class CytoscapeService {
     this._g.isLoadFromDB = true;
     this.applyStyle4NewElements();
     this.addTooltips();
+    this.addVisualCues();
+  }
+
+  private addVisualCues() {
+    this._g.cy.nodes().forEach((node) => {
+      const contentDownStream1 = document.createElement("div");
+      contentDownStream1.innerHTML = `<span class="badge rounded-pill bg-info"><</span>`;
+      node.addCue({
+        id: `node-cue-${node.data("segmentName")}-down-stream-1`,
+        show: "hover",
+        position: "left",
+        marginX: 0,
+        marginY: 0,
+        htmlElem: contentDownStream1,
+        onCueClicked: (ele: any, id: number | string) => {
+          const callback = (data) => {
+            this.loadElementsFromDatabase(data, true);
+          };
+          this._g.layout.clusters = null;
+          this._dbService.getElementsUpToCertainDistance(
+            ele.data().segmentName,
+            1,
+            callback,
+            false
+          );
+          this._g.performLayout(false);
+        },
+        imgData: null,
+        isFixedSize: false,
+        zIndex: 1000,
+        tooltip: "",
+        cursor: "pointer",
+      });
+      const contentDownStream3 = document.createElement("div");
+      contentDownStream3.innerHTML = `<span class="badge rounded-pill bg-info"><<</span>`;
+      node.addCue({
+        id: `node-cue-${node.data("segmentName")}-down-stream-3`,
+        show: "hover",
+        position: "bottom-left",
+        marginX: 0,
+        marginY: 0,
+        onCueClicked: (ele: any, id: number | string) => {
+          const callback = (data) => {
+            this.loadElementsFromDatabase(data, true);
+          };
+          this._g.layout.clusters = null;
+          this._dbService.getElementsUpToCertainDistance(
+            ele.data().segmentName,
+            3,
+            callback,
+            false
+          );
+          this._g.performLayout(false);
+        },
+        htmlElem: contentDownStream3,
+        imgData: null,
+        isFixedSize: false,
+        zIndex: 1000,
+        tooltip: "",
+        cursor: "pointer",
+      });
+      const contentUpStream1 = document.createElement("div");
+      contentUpStream1.innerHTML = `<span class="badge rounded-pill bg-info">></span>`;
+      node.addCue({
+        id: `node-cue-${node.data("segmentName")}-up-stream-1`,
+        show: "hover",
+        position: "right",
+        marginX: 0,
+        marginY: 0,
+        onCueClicked: (ele: any, id: number | string) => {
+          const callback = (data) => {
+            this.loadElementsFromDatabase(data, true);
+          };
+          this._g.layout.clusters = null;
+          this._dbService.getElementsUpToCertainDistance(
+            ele.data().segmentName,
+            1,
+            callback,
+            true
+          );
+          this._g.performLayout(false);
+        },
+        htmlElem: contentUpStream1,
+        imgData: null,
+        isFixedSize: false,
+        zIndex: 1000,
+        tooltip: "",
+        cursor: "pointer",
+      });
+      const contentUpStream3 = document.createElement("div");
+      contentUpStream3.innerHTML = `<span class="badge rounded-pill bg-info">>></span>`;
+      node.addCue({
+        id: `node-cue-${node.data("segmentName")}-up-stream-3`,
+        show: "hover",
+        position: "bottom-right",
+        marginX: 0,
+        marginY: 0,
+        onCueClicked: (ele: any, id: number | string) => {
+          const callback = (data) => {
+            this.loadElementsFromDatabase(data, true);
+          };
+          this._g.layout.clusters = null;
+          this._dbService.getElementsUpToCertainDistance(
+            ele.data().segmentName,
+            3,
+            callback,
+            true
+          );
+          this._g.performLayout(false);
+        },
+        htmlElem: contentUpStream3,
+        imgData: null,
+        isFixedSize: false,
+        zIndex: 1000,
+        tooltip: "",
+        cursor: "pointer",
+      });
+    });
   }
 
   private addTooltips() {
@@ -355,7 +475,12 @@ export class CytoscapeService {
     } else {
       textData = element.data("segmentData");
     }
-    textData = this.truncateText(textData, this._g.cy.nodes()[0], 6*330 - 36, 8);
+    textData = this.truncateText(
+      textData,
+      this._g.cy.nodes()[0],
+      6 * 330 - this._g.cy.nodes()[0].pstyle("font-size").pfValue,
+      8
+    );
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
       if (startIndex >= textData.length) {
         break;
@@ -535,10 +660,15 @@ export class CytoscapeService {
     }, C.CY_BATCH_END_DELAY);
   }
 
-  truncateText(label: string, ele: any, widthOffset?: number, fontSizeOffset: number = 0): string {
+  truncateText(
+    label: string,
+    ele: any,
+    widthOffset?: number,
+    fontSizeOffset: number = 0
+  ): string {
     let context = document.createElement("canvas").getContext("2d");
     let fStyle = ele.pstyle("font-style").strValue;
-    let size = (ele.pstyle("font-size").pfValue + fontSizeOffset) + "px";
+    let size = ele.pstyle("font-size").pfValue + fontSizeOffset + "px";
     let family = ele.pstyle("font-family").strValue;
     let weight = ele.pstyle("font-weight").strValue;
 
