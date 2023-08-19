@@ -2,7 +2,16 @@
   padding: 1px;
 }
 #brand-logo {
-  height: 48px;
-  padding: 0px;
-  margin: 0px;
+  height: 42px;
+  margin-right: 5px;
+}
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.va-title {
+  font-weight: bold;
+  font-size: 1.2rem;
 }
