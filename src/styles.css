@@ -366,11 +366,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 
 .node-tooltip,
 .edge-tooltip {
-  font-weight: 700;
-  font-size: 15px;
-  font-family: Inconsolata, monospace;
   overflow-wrap: break-word;
-  max-width: 340px;
   position: absolute;
   padding-left: 3px;
   padding-right: 3px;

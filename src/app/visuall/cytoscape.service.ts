@@ -384,17 +384,26 @@ export class CytoscapeService {
     });
   }
 
-  private textWidthCyElement(ele: any) {
+  private textWidthCyElement(
+    ele: any,
+    text: string = ele.data("segmentName"),
+    fontSize: number = ele.pstyle("font-size").pfValue,
+    fontFamily: string = ele.pstyle("font-family").strValue,
+    fontWeight: string = ele.pstyle("font-weight").strValue,
+    fontStyle: string = ele.pstyle("font-style").strValue
+  ) {
     let context = document.createElement("canvas").getContext("2d");
-    let fStyle = ele.pstyle("font-style").strValue;
-    let size = ele.pstyle("font-size").pfValue + "px";
-    let family = ele.pstyle("font-family").strValue;
-    let weight = ele.pstyle("font-weight").strValue;
-    context.font = fStyle + " " + weight + " " + size + " " + family;
-    return context.measureText(ele.data("segmentName")).width;
+    let fsize = fontSize + "px";
+    context.font =
+      fontStyle + " " + fontWeight + " " + fsize + " " + fontFamily;
+    return context.measureText(text).width;
   }
 
   private addTooltips() {
+    let widthOffset = 10;
+    let fontSize = 15;
+    let fontWeight = "700";
+    let fontFamily = "Inconsolata, monospace";
     this._g.cy.nodes().unbind("mouseover");
     this._g.cy.nodes().forEach((node) => {
       node.bind("mouseover", (event) => {
@@ -404,6 +413,19 @@ export class CytoscapeService {
             content.classList.add("node-tooltip");
             content.id = `node-tooltip-${node.data("segmentName")}`;
             content.innerHTML = this.tooltipText(node, false);
+            content.style.fontSize = `${fontSize}px`;
+            content.style.fontWeight = fontWeight;
+            content.style.fontFamily = fontFamily;
+            let firstLine = content.innerHTML.split("\n")[0];
+            content.style.maxWidth = `${
+              this.textWidthCyElement(
+                node,
+                firstLine,
+                fontSize,
+                fontFamily,
+                fontWeight
+              ) + widthOffset
+            }px`;
             document.body.appendChild(content);
             return content;
           },
@@ -438,6 +460,19 @@ export class CytoscapeService {
               .source()
               .data("segmentName")}-${edge.source().data("segmentName")}`;
             content.innerHTML = this.tooltipText(edge, true);
+            content.style.fontSize = `${fontSize}px`;
+            content.style.fontWeight = fontWeight;
+            content.style.fontFamily = fontFamily;
+            let firstLine = content.innerHTML.split("\n")[0];
+            content.style.maxWidth = `${
+              this.textWidthCyElement(
+                edge,
+                firstLine,
+                fontSize,
+                fontFamily,
+                fontWeight
+              ) + widthOffset
+            }px`;
             document.body.appendChild(content);
             return content;
           },
