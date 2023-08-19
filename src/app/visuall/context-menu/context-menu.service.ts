@@ -193,17 +193,7 @@ export class ContextMenuService {
     if (!ele) {
       return;
     }
-    const callback = (data) => {
-      this._cyService.loadElementsFromDatabase(data, true);
-    };
-    this._g.layout.clusters = null;
-    this._dbService.getElementsUpToCertainDistance(
-      ele.data().segmentName,
-      this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
-      callback,
-      isUp
-    );
-    this._g.performLayout(false);
+    this._cyService.showUpDownStream(ele, this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(), isUp);
   }
 
   hideUpstream(event) {
