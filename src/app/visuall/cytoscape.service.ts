@@ -280,7 +280,7 @@ export class CytoscapeService {
     let zIndex = 1000;
     let cursor = "pointer";
     let isFixedSize = false;
-    let show = "hover";
+    let show = "select";
     let marginY = 5;
     let marginX = 9;
     let marginXTwo = 6;
@@ -288,11 +288,14 @@ export class CytoscapeService {
     let innerHtml = (content: string) => {
       return `<span class="badge rounded-pill" style="background-color: black; font-size: 5px; font-weight: 1000; ">${content}</span>`;
     };
+    let tooltip = (stream: string, val: number) => {
+      return `Show ${stream}stream (${val} Levels)`;
+    } 
     this._g.cy.nodes().forEach((node) => {
       let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
-      const contentDownStream1 = document.createElement("div");
-      contentDownStream1.innerHTML = innerHtml("<");
+      const contentDownstream1 = document.createElement("div");
+      contentDownstream1.innerHTML = innerHtml("<");
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-down-stream-1`,
         show: show,
@@ -300,15 +303,16 @@ export class CytoscapeService {
         marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
-          this.showUpDownStream(ele, 1, false);
+          this.showUpDownstream(ele, 1, false);
         },
-        htmlElem: contentDownStream1,
+        htmlElem: contentDownstream1,
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
+        tooltip: tooltip("Down", 1),
       });
-      const contentDownStream3 = document.createElement("div");
-      contentDownStream3.innerHTML = innerHtml("<<");
+      const contentDownstream3 = document.createElement("div");
+      contentDownstream3.innerHTML = innerHtml("<<");
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-down-stream-3`,
         show: show,
@@ -316,15 +320,16 @@ export class CytoscapeService {
         marginX: this._g.cy.zoom() * (marginX + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
-          this.showUpDownStream(ele, 3, false);
+          this.showUpDownstream(ele, 3, false);
         },
-        htmlElem: contentDownStream3,
+        htmlElem: contentDownstream3,
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
+        tooltip: tooltip("Down", 3),
       });
-      const contentUpStream1 = document.createElement("div");
-      contentUpStream1.innerHTML = innerHtml(">");
+      const contentUpstream1 = document.createElement("div");
+      contentUpstream1.innerHTML = innerHtml(">");
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-up-stream-1`,
         show: show,
@@ -332,15 +337,16 @@ export class CytoscapeService {
         marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
-          this.showUpDownStream(ele, 1, true);
+          this.showUpDownstream(ele, 1, true);
         },
-        htmlElem: contentUpStream1,
+        htmlElem: contentUpstream1,
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
+        tooltip: tooltip("Up", 1),
       });
-      const contentUpStream3 = document.createElement("div");
-      contentUpStream3.innerHTML = innerHtml(">>");
+      const contentUpstream3 = document.createElement("div");
+      contentUpstream3.innerHTML = innerHtml(">>");
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-up-stream-3`,
         show: show,
@@ -348,12 +354,13 @@ export class CytoscapeService {
         marginX: -this._g.cy.zoom() * (marginX + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
-          this.showUpDownStream(ele, 3, true);
+          this.showUpDownstream(ele, 3, true);
         },
-        htmlElem: contentUpStream3,
+        htmlElem: contentUpstream3,
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
+        tooltip: tooltip("Up", 3),
       });
       let update = () => {
         let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
@@ -497,7 +504,7 @@ export class CytoscapeService {
     });
   }
 
-  showUpDownStream(ele: any, length: number, isUp: boolean) {
+  showUpDownstream(ele: any, length: number, isUp: boolean) {
     const callback = (data) => {
       this.loadElementsFromDatabase(data, true);
     };

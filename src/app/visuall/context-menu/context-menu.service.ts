@@ -69,8 +69,8 @@ export class ContextMenuService {
         ],
       },
       {
-        id: "DownStream",
-        content: "DownStream",
+        id: "Downstream",
+        content: "Downstream",
         selector: "node",
         submenu: [
           {
@@ -193,7 +193,7 @@ export class ContextMenuService {
     if (!ele) {
       return;
     }
-    this._cyService.showUpDownStream(ele, this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(), isUp);
+    this._cyService.showUpDownstream(ele, this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(), isUp);
   }
 
   hideUpstream(event) {
