@@ -109,7 +109,7 @@
     "selector": "edge.LINK",
     "style": {
       "label": "Link",
-      "width": "3px",
+      "width": "1px",
       "font-size": "5px",
       "line-color": "gray",
       "line-style": "solid",
@@ -122,7 +122,7 @@
     "selector": "edge.JUMP",
     "style": {
       "label": "Jump",
-      "width": "3px",
+      "width": "1px",
       "font-size": "5px",
       "line-color": "gray",
       "line-style": "dotted",
@@ -135,7 +135,7 @@
     "selector": "edge.CONTAINMENT",
     "style": {
       "label": "Containment",
-      "width": "3px",
+      "width": "1px",
       "font-size": "5px",
       "line-color": "gray",
       "line-style": "dashed",

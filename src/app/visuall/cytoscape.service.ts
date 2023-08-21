@@ -424,7 +424,7 @@ export class CytoscapeService {
             let content = document.createElement("div");
             content.classList.add("node-tooltip");
             content.id = `node-tooltip-${node.data("segmentName")}`;
-            content.innerHTML = this.tooltipText(node, false);
+            content.innerHTML = this.tooltipText(node);
             content.style.fontSize = `${fontSize}px`;
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
@@ -471,7 +471,7 @@ export class CytoscapeService {
             content.id = `edge-tooltip-${edge
               .source()
               .data("segmentName")}-${edge.source().data("segmentName")}`;
-            content.innerHTML = this.tooltipText(edge, true);
+            content.innerHTML = this.tooltipText(edge);
             content.style.fontSize = `${fontSize}px`;
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
@@ -523,24 +523,78 @@ export class CytoscapeService {
     this._g.performLayout(false);
   }
 
-  private tooltipText(element: any, isEdge: boolean = false) {
+  private tooltipText(element: any) {
     var text = "";
     var startIndex;
     var textData = "";
-    if (isEdge) {
-      var overlapNumeric = 0;
-      if (element.data("overlap")) {
-        overlapNumeric = element.data("overlap").match(/[0-9]+/)[0];
+    if (element.data("sourceOrientation")) {
+      // if edge
+      if (element.data("pos")) {
+        // containment
+        var overlapNumeric = 0;
+        var pos = element.data("pos");
+        var sourceSegmentData = "";
+        var beforeAfterLength = 5;
+        if (!pos) {
+          pos = 0;
+        }
+        if (element.data("overlap")) {
+          overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
+        }
+        textData = element.source().data("segmentData");
+        if (element.data("sourceOrientation") === "-") {
+          textData = this.reverseComplementSegmentData(textData);
+        }
+        sourceSegmentData = textData;
+        textData = textData.substr(
+          Math.max(pos - 1 - beforeAfterLength, 0),
+          beforeAfterLength
+        );
+        textData += "-[";
+        var targetData = element.target().data("segmentData");
+        if (element.data("targetOrientation") === "-") {
+          targetData = this.reverseComplementSegmentData(targetData);
+        }
+        textData += targetData + "]-";
+        textData += sourceSegmentData.substr(
+          pos - 1 + overlapNumeric,
+          beforeAfterLength
+        );
+      } else if (element.data("distance")) {
+        // jump
+        var beforeAfterLength = 5;
+        var distance = element.data("distance");
+        textData = element.source().data("segmentData");
+        if (element.data("sourceOrientation") === "-") {
+          textData = this.reverseComplementSegmentData(textData);
+        }
+
+        textData = textData.substr(
+          Math.max(textData.length - beforeAfterLength, 0),
+          beforeAfterLength
+        );
+        textData += `--(${distance})--`;
+        var targetData = element.target().data("segmentData");
+        if (element.data("targetOrientation") === "-") {
+          targetData = this.reverseComplementSegmentData(targetData);
+        }
+        textData += targetData.substr(0, beforeAfterLength);
+      } else {
+        // link
+        var overlapNumeric = 0;
+        if (element.data("overlap")) {
+          overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
+        }
+        textData += element.source().data("segmentData");
+        if (element.data("sourceOrientation") === "-") {
+          textData = this.reverseComplementSegmentData(textData);
+        }
+        var targetData = element.target().data("segmentData");
+        if (element.data("targetOrientation") === "-") {
+          targetData = this.reverseComplementSegmentData(targetData);
+        }
+        textData += targetData.substr(overlapNumeric);
       }
-      textData += element.source().data("segmentData");
-      if (element.data("sourceOrientation") === "-") {
-        textData = this.reverseComplementSegmentData(textData);
-      }
-      var targetData = element.target().data("segmentData");
-      if (element.data("targetOrientation") === "-") {
-        targetData = this.reverseComplementSegmentData(textData);
-      }
-      textData += targetData.substr(overlapNumeric);
     } else {
       textData = element.data("segmentData");
     }
