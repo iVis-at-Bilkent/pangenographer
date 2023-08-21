@@ -289,8 +289,13 @@ export class CytoscapeService {
       return `<span class="badge rounded-pill" style="background-color: black; font-size: 5px; font-weight: 1000; ">${content}</span>`;
     };
     let tooltip = (stream: string, val: number) => {
-      return `Show ${stream}stream (${val} Levels)`;
-    } 
+      var s = `Show ${stream}stream (${val} Level`;
+      if (val > 1) {
+        s += "s";
+      }
+      s += ")";
+      return s;
+    };
     this._g.cy.nodes().forEach((node) => {
       let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
