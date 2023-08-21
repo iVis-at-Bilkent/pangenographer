@@ -533,12 +533,12 @@ export class CytoscapeService {
         overlapNumeric = element.data("overlap").match(/[0-9]+/)[0];
       }
       textData += element.source().data("segmentData");
-      if (!element.data("sourceOrientation")) {
-        textData = textData.split("").reverse().join("");
+      if (element.data("sourceOrientation") === "-") {
+        textData = this.reverseComplementSegmentData(textData);
       }
       var targetData = element.target().data("segmentData");
-      if (!element.data("targetOrientation")) {
-        targetData = targetData.split("").reverse().join("");
+      if (element.data("targetOrientation") === "-") {
+        targetData = this.reverseComplementSegmentData(textData);
       }
       textData += targetData.substr(overlapNumeric);
     } else {
@@ -569,6 +569,23 @@ export class CytoscapeService {
       );
     }
     return text;
+  }
+
+  reverseComplementSegmentData(segmentData: string) {
+    segmentData = segmentData.split("").reverse().join("");
+    let s = "";
+    for (let i = 0; i < segmentData.length; i++) {
+      if (segmentData[i] === "A") {
+        s += "T";
+      } else if (segmentData[i] === "T") {
+        s += "A";
+      } else if (segmentData[i] === "C") {
+        s += "G";
+      } else {
+        s += "C";
+      }
+    }
+    return s;
   }
 
   hasNewElem(newElemIds: string[], prevElems: any) {

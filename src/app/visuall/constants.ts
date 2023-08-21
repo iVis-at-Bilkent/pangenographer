@@ -464,11 +464,9 @@ function createLinkFromGFA(linkLine: string) {
     pannable: true,
   };
   var linkLineTabSeperated = linkLine.split(/\t/);
-  link["data"]["sourceOrientation"] =
-    linkLineTabSeperated[2] === "+" ? true : false;
+  link["data"]["sourceOrientation"] = linkLineTabSeperated[2];
   link["data"]["source"] = linkLineTabSeperated[1];
-  link["data"]["targetOrientation"] =
-    linkLineTabSeperated[4] === "-" ? true : false;
+  link["data"]["targetOrientation"] = linkLineTabSeperated[4];
   link["data"]["target"] = linkLineTabSeperated[3];
   if (linkLineTabSeperated[0] === "L") {
     for (let i = 4; i < linkLineTabSeperated.length; i++) {

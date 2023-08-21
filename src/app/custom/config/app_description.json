@@ -45,8 +45,8 @@
       "isBidirectional": false,
       "properties": {
         "overlap": "string",
-        "targetOrientation": "bool",
-        "sourceOrientation": "bool",
+        "targetOrientation": "string",
+        "sourceOrientation": "string",
         "mappingQuality": "number",
         "numberOfMismatchesOrGaps": "number",
         "readCount": "number",
@@ -71,8 +71,8 @@
       "isBidirectional": false,
       "properties": {
         "distance": "string",
-        "targetOrientation": "bool",
-        "sourceOrientation": "bool",
+        "targetOrientation": "string",
+        "sourceOrientation": "string",
         "indirectShortcutConnections": "number"
       },
       "style": {
@@ -93,8 +93,8 @@
       "properties": {
         "pos": "number",
         "overlap": "string",
-        "targetOrientation": "bool",
-        "sourceOrientation": "bool",
+        "targetOrientation": "string",
+        "sourceOrientation": "string",
         "readCount": "number",
         "numberOfMismatchesOrGaps": "number",
         "edgeIdentifier": "string"

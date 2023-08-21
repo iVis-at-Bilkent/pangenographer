@@ -603,21 +603,22 @@ export class GlobalVariableService {
       })
       .update();
 
+    function arrowShape(orientation: string) {
+      if (orientation === "+") {
+        return "none";
+      }
+      return "tee";
+    }
+
     this.cy
       .style()
       .selector("edge.LINK")
       .style({
         "target-arrow-shape": function (e) {
-          if (!e.data("targetOrientation")) {
-            return "none";
-          }
-          return "tee";
+          return arrowShape(e.data("targetOrientation"));
         },
         "source-arrow-shape": function (e) {
-          if (!e.data("sourceOrientation")) {
-            return "none";
-          }
-          return "tee";
+          return arrowShape(e.data("sourceOrientation"));
         },
       })
       .update();
@@ -627,16 +628,10 @@ export class GlobalVariableService {
       .selector("edge.JUMP")
       .style({
         "target-arrow-shape": function (e) {
-          if (!e.data("targetOrientation")) {
-            return "none";
-          }
-          return "tee";
+          return arrowShape(e.data("targetOrientation"));
         },
         "source-arrow-shape": function (e) {
-          if (!e.data("sourceOrientation")) {
-            return "none";
-          }
-          return "tee";
+          return arrowShape(e.data("sourceOrientation"));
         },
       })
       .update();
@@ -646,16 +641,10 @@ export class GlobalVariableService {
       .selector("edge.CONTAINMENT")
       .style({
         "target-arrow-shape": function (e) {
-          if (!e.data("targetOrientation")) {
-            return "none";
-          }
-          return "tee";
+          return arrowShape(e.data("targetOrientation"));
         },
         "source-arrow-shape": function (e) {
-          if (!e.data("sourceOrientation")) {
-            return "none";
-          }
-          return "tee";
+          return arrowShape(e.data("sourceOrientation"));
         },
       })
       .update();

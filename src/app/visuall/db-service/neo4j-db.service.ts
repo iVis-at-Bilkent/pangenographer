@@ -862,8 +862,8 @@ export class Neo4jDb implements DbService {
 
     curGfaJson.edges.forEach((edge) => {
       var edge2Create = `(n${edge.data.source})-[:${edge.classes}
-        {sourceOrientation: ${edge.data.sourceOrientation}, source: '${edge.data.source}'
-        , targetOrientation: ${edge.data.targetOrientation}, target: '${edge.data.target}'`;
+        {sourceOrientation: "${edge.data.sourceOrientation}", source: '${edge.data.source}'
+        , targetOrientation: "${edge.data.targetOrientation}", target: '${edge.data.target}'`;
       if (edge.data.hasOwnProperty("overlap")) {
         edge2Create += `, overlap: '${edge.data.overlap}'`;
       }

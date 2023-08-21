@@ -14,8 +14,8 @@
   "edges": {
     "LINK": {
       "overlap": "string",
-      "targetOrientation": "bool",
-      "sourceOrientation": "bool",
+      "targetOrientation": "string",
+      "sourceOrientation": "string",
       "mappingQuality": "number",
       "numberOfMismatchesOrGaps": "number",
       "readCount": "number",
@@ -25,15 +25,15 @@
     },
     "JUMP": {
       "distance": "string",
-      "targetOrientation": "bool",
-      "sourceOrientation": "bool",
+      "targetOrientation": "string",
+      "sourceOrientation": "string",
       "indirectShortcutConnections": "number"
     },
     "CONTAINMENT": {
       "pos": "number",
       "overlap": "string",
-      "targetOrientation": "bool",
-      "sourceOrientation": "bool",
+      "targetOrientation": "string",
+      "sourceOrientation": "string",
       "readCount": "number",
       "numberOfMismatchesOrGaps": "number",
       "edgeIdentifier": "string"
