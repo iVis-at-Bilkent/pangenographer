@@ -377,6 +377,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   color: black;
   border: 2px solid #585c66;
   border-radius: 2px;
+  line-height: 20px;
 }
 
 .node-tooltip-outer,
