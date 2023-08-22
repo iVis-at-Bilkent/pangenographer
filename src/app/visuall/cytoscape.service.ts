@@ -421,6 +421,9 @@ export class CytoscapeService {
       node.bind("mouseover", (event) => {
         let popper = event.target.popper({
           content: () => {
+            let contentOuter = document.createElement("div");
+            contentOuter.classList.add("node-tooltip-outer");
+            contentOuter.id = `node-tooltip-${node.data("segmentName")}-outer`;
             let content = document.createElement("div");
             content.classList.add("node-tooltip");
             content.id = `node-tooltip-${node.data("segmentName")}`;
@@ -438,8 +441,9 @@ export class CytoscapeService {
                 fontWeight
               ) + widthOffset
             }px`;
-            document.body.appendChild(content);
-            return content;
+            contentOuter.appendChild(content);
+            document.body.appendChild(contentOuter);
+            return contentOuter;
           },
         });
         event.target.popperRefObj = popper;
@@ -466,6 +470,11 @@ export class CytoscapeService {
       edge.bind("mouseover", (event) => {
         let popper = event.target.popper({
           content: () => {
+            let contentOuter = document.createElement("div");
+            contentOuter.classList.add("edge-tooltip-outer");
+            contentOuter.id = `edge-tooltip-${edge
+              .source()
+              .data("segmentName")}-${edge.source().data("segmentName")}-outer`;
             let content = document.createElement("div");
             content.classList.add("edge-tooltip");
             content.id = `edge-tooltip-${edge
@@ -485,8 +494,9 @@ export class CytoscapeService {
                 fontWeight
               ) + widthOffset
             }px`;
-            document.body.appendChild(content);
-            return content;
+            contentOuter.appendChild(content);
+            document.body.appendChild(contentOuter);
+            return contentOuter;
           },
         });
         event.target.popperRefObj = popper;
