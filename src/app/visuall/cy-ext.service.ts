@@ -5,7 +5,7 @@ import popper from "cytoscape-popper";
 import expandCollapse from "cytoscape-expand-collapse";
 import viewUtilities from "cytoscape-view-utilities";
 import layoutUtilities from "cytoscape-layout-utilities";
-import cytoscapeVisualCues from "../../lib/cytoscape-visual-cues/cytoscape-visual-cues";
+import cytoscapeVisualCues from "../../lib/cytoscape-visual-cues/cytoscape-visual-cues.esm.js";
 import cise from "cytoscape-cise";
 import cytoscape from "cytoscape";
 import timebar from "../../lib/timebar/cytoscape-timebar";
