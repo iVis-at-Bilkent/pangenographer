@@ -264,10 +264,19 @@ export class CytoscapeService {
     }
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
+    this.addExternalTools();
+  }
+
+  addExternalTools() {
     this.applyStyle4NewElements();
     this.addTooltips();
     this.removeCues();
     this.addCues();
+  }
+
+  removeExternalTools() {
+    this.removeCues();
+    this.applyStyle4NewElements();
   }
 
   private removeCues() {
@@ -422,6 +431,9 @@ export class CytoscapeService {
         let popper = event.target.popper({
           content: () => {
             let contentOuter = document.createElement("div");
+            if (!node.data("segmentName")) {
+              return contentOuter;
+            }
             contentOuter.classList.add("node-tooltip-outer");
             contentOuter.id = `node-tooltip-${node.data("segmentName")}-outer`;
             let content = document.createElement("div");
@@ -443,6 +455,7 @@ export class CytoscapeService {
             }px`;
             contentOuter.appendChild(content);
             document.body.appendChild(contentOuter);
+            
             return contentOuter;
           },
         });
@@ -471,6 +484,9 @@ export class CytoscapeService {
         let popper = event.target.popper({
           content: () => {
             let contentOuter = document.createElement("div");
+            if (!edge.data("combinedSequence")) {
+              return contentOuter;
+            }
             contentOuter.classList.add("edge-tooltip-outer");
             contentOuter.id = `edge-tooltip-${edge
               .source()
@@ -869,6 +885,7 @@ export class CytoscapeService {
       try {
         if (this._g.cy.$().length == 0) {
           this._g.expandCollapseApi.loadJson(txt, false);
+          this.addExternalTools();
         } else {
           const modal = this._modalService.open(
             LoadGraphFromFileModalComponent
