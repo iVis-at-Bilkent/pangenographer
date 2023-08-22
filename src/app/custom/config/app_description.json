@@ -62,7 +62,8 @@
         "line-style": "solid",
         "target-arrow-shape": "none",
         "source-arrow-shape": "none",
-        "text-rotation": "autorotate"
+        "text-rotation": "autorotate",
+        "arrow-scale": "0.75"
       }
     },
     "JUMP": {
@@ -83,7 +84,8 @@
         "line-style": "dotted",
         "target-arrow-shape": "none",
         "source-arrow-shape": "none",
-        "text-rotation": "autorotate"
+        "text-rotation": "autorotate",
+        "arrow-scale": "0.75"
       }
     },
     "CONTAINMENT": {
@@ -107,7 +109,8 @@
         "line-style": "dashed",
         "target-arrow-shape": "none",
         "source-arrow-shape": "none",
-        "text-rotation": "autorotate"
+        "text-rotation": "autorotate",
+        "arrow-scale": "0.75"
       }
     }
   },
