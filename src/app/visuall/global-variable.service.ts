@@ -329,6 +329,7 @@ export class GlobalVariableService {
       tilingPaddingVertical: p,
       // Represents the amount of the horizontal space to put between the zero degree members during the tiling operation(can also be a function)
       tilingPaddingHorizontal: p,
+      idealEdgeLength: 30,
       clusters: null, // cise argument
     };
   }
