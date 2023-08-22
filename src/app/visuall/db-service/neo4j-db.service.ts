@@ -834,7 +834,7 @@ export class Neo4jDb implements DbService {
       nodes: gfaJSON.nodes,
       edges: gfaJSON.edges,
     };
-
+    const nodeMap = new Map();
     var query = "CREATE\n";
     curGfaJson.nodes.forEach((node) => {
       var node2Create = `(n${node.data.segmentName} :Segment {segmentData: 
@@ -856,6 +856,7 @@ export class Neo4jDb implements DbService {
         node2Create += `, URIorLocalSystemPath: '${node.data.URIorLocalSystemPath}'`;
       }
       query += node2Create + "}),\n";
+      nodeMap.set(node.data.segmentName, node);
     });
 
     query = query.substring(0, query.length - 2) + "\nCREATE\n";
@@ -891,12 +892,105 @@ export class Neo4jDb implements DbService {
       if (edge.data.hasOwnProperty("indirectShortcutConnections")) {
         edge2Create += `, indirectShortcutConnections: ${edge.data.indirectShortcutConnections}`;
       }
+      edge2Create += `, combinedSequence: '${this.combinedSequenceGen(
+        edge,
+        nodeMap.get(edge.data.source),
+        nodeMap.get(edge.data.target)
+      )}'`;
       edge2Create += `}]->(n${edge.data.target}),\n`;
       query += edge2Create;
     });
 
     query = query.substring(0, query.length - 2);
     return query;
+  }
+
+  private combinedSequenceGen(edge: any, sourceNode: any, targetNode: any) {
+    var combinedSequence = ""
+    if (edge.data.pos) {
+      // containment
+      var overlapNumeric = 0;
+      var pos = edge.data.pos;
+      var sourceSegmentData = "";
+      var beforeAfterLength = 5;
+      if (!pos) {
+        pos = 0;
+      }
+      if (edge.data.overlap) {
+        overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
+      }
+      combinedSequence = sourceNode.data.segmentData;
+      if (edge.data.sourceOrientation === "-") {
+        combinedSequence = this.reverseComplementSegmentData(combinedSequence);
+      }
+      sourceSegmentData = combinedSequence;
+      combinedSequence = combinedSequence.substr(
+        Math.max(pos - 1 - beforeAfterLength, 0),
+        beforeAfterLength
+      );
+      combinedSequence += "[";
+      var targetData = targetNode.data.segmentData;
+      if (edge.data.targetOrientation === "-") {
+        targetData = this.reverseComplementSegmentData(targetData);
+      }
+      combinedSequence += targetData + "]";
+      combinedSequence += sourceSegmentData.substr(
+        pos - 1 + overlapNumeric,
+        beforeAfterLength
+      );
+    } else if (edge.data.distance) {
+      // jump
+      var beforeAfterLength = 5;
+      var distance = edge.data.distance;
+      combinedSequence = sourceNode.data.segmentData;
+      if (edge.data.sourceOrientation === "-") {
+        combinedSequence = this.reverseComplementSegmentData(combinedSequence);
+      }
+
+      combinedSequence = combinedSequence.substr(
+        Math.max(combinedSequence.length - beforeAfterLength, 0),
+        beforeAfterLength
+      );
+      combinedSequence += `..(${distance})..`;
+      var targetData = targetNode.data.segmentData;
+      if (edge.data.targetOrientation === "-") {
+        targetData = this.reverseComplementSegmentData(targetData);
+      }
+      combinedSequence += targetData.substr(0, beforeAfterLength);
+    } else {
+      // link
+      var overlapNumeric = 0;
+      if (edge.data.overlap) {
+        overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
+      }
+      combinedSequence += sourceNode.data.segmentData;
+      if (edge.data.sourceOrientation === "-") {
+        combinedSequence = this.reverseComplementSegmentData(combinedSequence);
+      }
+      var targetData = targetNode.data.segmentData;
+      if (edge.data.targetOrientation === "-") {
+        targetData = this.reverseComplementSegmentData(targetData);
+      }
+      combinedSequence += targetData.substr(overlapNumeric);
+    }
+    return combinedSequence;
+  }
+
+  private reverseComplementSegmentData(segmentData: string) {
+    segmentData = segmentData.split("").reverse().join("");
+    let s = "";
+    for (let i = 0; i < segmentData.length; i++) {
+      if (segmentData[i] === "A") {
+        s += "T";
+      } else if (segmentData[i] === "T") {
+        s += "A";
+      } else if (segmentData[i] === "C") {
+        s += "G";
+      } else {
+        s += "C";
+      }
+    }
+    return s;
   }
 
   // ------------------------------------------------- end of methods for conversion to CQL -------------------------------------------------

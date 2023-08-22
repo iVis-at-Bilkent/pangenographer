@@ -538,73 +538,7 @@ export class CytoscapeService {
     var startIndex;
     var textData = "";
     if (element.data("sourceOrientation")) {
-      // if edge
-      if (element.data("pos")) {
-        // containment
-        var overlapNumeric = 0;
-        var pos = element.data("pos");
-        var sourceSegmentData = "";
-        var beforeAfterLength = 5;
-        if (!pos) {
-          pos = 0;
-        }
-        if (element.data("overlap")) {
-          overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
-        }
-        textData = element.source().data("segmentData");
-        if (element.data("sourceOrientation") === "-") {
-          textData = this.reverseComplementSegmentData(textData);
-        }
-        sourceSegmentData = textData;
-        textData = textData.substr(
-          Math.max(pos - 1 - beforeAfterLength, 0),
-          beforeAfterLength
-        );
-        textData += "-[";
-        var targetData = element.target().data("segmentData");
-        if (element.data("targetOrientation") === "-") {
-          targetData = this.reverseComplementSegmentData(targetData);
-        }
-        textData += targetData + "]-";
-        textData += sourceSegmentData.substr(
-          pos - 1 + overlapNumeric,
-          beforeAfterLength
-        );
-      } else if (element.data("distance")) {
-        // jump
-        var beforeAfterLength = 5;
-        var distance = element.data("distance");
-        textData = element.source().data("segmentData");
-        if (element.data("sourceOrientation") === "-") {
-          textData = this.reverseComplementSegmentData(textData);
-        }
-
-        textData = textData.substr(
-          Math.max(textData.length - beforeAfterLength, 0),
-          beforeAfterLength
-        );
-        textData += `--(${distance})--`;
-        var targetData = element.target().data("segmentData");
-        if (element.data("targetOrientation") === "-") {
-          targetData = this.reverseComplementSegmentData(targetData);
-        }
-        textData += targetData.substr(0, beforeAfterLength);
-      } else {
-        // link
-        var overlapNumeric = 0;
-        if (element.data("overlap")) {
-          overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
-        }
-        textData += element.source().data("segmentData");
-        if (element.data("sourceOrientation") === "-") {
-          textData = this.reverseComplementSegmentData(textData);
-        }
-        var targetData = element.target().data("segmentData");
-        if (element.data("targetOrientation") === "-") {
-          targetData = this.reverseComplementSegmentData(targetData);
-        }
-        textData += targetData.substr(overlapNumeric);
-      }
+      textData = element.data("combinedSequence");
     } else {
       textData = element.data("segmentData");
     }
@@ -633,23 +567,6 @@ export class CytoscapeService {
       );
     }
     return text;
-  }
-
-  reverseComplementSegmentData(segmentData: string) {
-    segmentData = segmentData.split("").reverse().join("");
-    let s = "";
-    for (let i = 0; i < segmentData.length; i++) {
-      if (segmentData[i] === "A") {
-        s += "T";
-      } else if (segmentData[i] === "T") {
-        s += "A";
-      } else if (segmentData[i] === "C") {
-        s += "G";
-      } else {
-        s += "C";
-      }
-    }
-    return s;
   }
 
   hasNewElem(newElemIds: string[], prevElems: any) {

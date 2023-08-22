@@ -6,7 +6,7 @@
 
     <div id="prop-tab" class="collapse show text-center m-1">
       <ng-container *ngFor="let item of selectedItemProps; let index = index">
-        <div *ngIf="item.key === 'segmentData'" class="segment-data-container">
+        <div *ngIf="item.key === 'segmentData' || item.key === 'combinedSequence'" class="segment-data-container">
           {{item.val}}
         </div>
       </ng-container>
@@ -14,7 +14,7 @@
       <table class="table table-responsive table-borderless table-sm">
         <tbody>
           <ng-container *ngFor="let item of selectedItemProps">
-            <tr *ngIf="item.key !== 'segmentData'">
+            <tr *ngIf="item.key !== 'segmentData' && item.key !== 'combinedSequence'">
               <td class="text-start"><b class="va-text">{{item.name}}</b></td>
               <td class="va-text text-end">{{item.val}}</td>
             </tr>

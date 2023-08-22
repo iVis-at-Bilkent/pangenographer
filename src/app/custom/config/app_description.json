@@ -52,7 +52,8 @@
         "readCount": "number",
         "fragmentCount": "number",
         "kmerCount": "number",
-        "edgeIdentifier": "string"
+        "edgeIdentifier": "string",
+        "combinedSequence": "string"
       },
       "style": {
         "label": "Link",
@@ -74,7 +75,8 @@
         "distance": "string",
         "targetOrientation": "string",
         "sourceOrientation": "string",
-        "indirectShortcutConnections": "number"
+        "indirectShortcutConnections": "number",
+        "combinedSequence": "string"
       },
       "style": {
         "label": "Jump",
@@ -99,7 +101,8 @@
         "sourceOrientation": "string",
         "readCount": "number",
         "numberOfMismatchesOrGaps": "number",
-        "edgeIdentifier": "string"
+        "edgeIdentifier": "string",
+        "combinedSequence": "string"
       },
       "style": {
         "label": "Containment",
