@@ -37,6 +37,7 @@ export class GlobalVariableService {
     tilingPaddingVertical: number;
     tilingPaddingHorizontal: number;
   };
+  relativePlacementConstraint: any[];
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
   setLoadingStatus: (boolean) => void;
@@ -331,7 +332,17 @@ export class GlobalVariableService {
       tilingPaddingHorizontal: p,
       idealEdgeLength: 30,
       clusters: null, // cise argument
+      relativePlacementConstraint: this.relativePlacementConstraint,
     };
+  }
+
+  addRelativePlacementConstraint(toAdd: any) {
+    this.relativePlacementConstraint.push(toAdd);
+    console.log(toAdd);
+  }
+
+  clearRelativePlacementConstraints() {
+    this.relativePlacementConstraint = [];
   }
 
   // delete/expand compounds if they don't have any visible elements

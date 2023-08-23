@@ -259,12 +259,41 @@ export class CytoscapeService {
 
     const shouldRandomize = !isIncremental || wasEmpty;
     const hasNew = this.hasNewElem(elemIds, prevElems);
+    this.addConstraints();
     if (hasNew) {
       this._g.performLayout(shouldRandomize);
     }
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
     this.addExternalTools();
+  }
+
+  addConstraints() {
+    this._g.clearRelativePlacementConstraints();
+    this._g.cy.nodes().forEach((node) => {
+      if (node.incomers().length === 0) {
+        node.outgoers().forEach((ele) => {
+          if (ele.data().hasOwnProperty("source")) {
+            this._g.addRelativePlacementConstraint({
+              left: ele.data().source,
+              right: ele.data().target,
+              gap: 30,
+            });
+          }
+        });
+      } else if (node.outgoers().length === 0) {
+        console.log(node.data());
+        node.incomers().forEach((ele) => {
+          if (ele.data().hasOwnProperty("source")) {
+            this._g.addRelativePlacementConstraint({
+              left: ele.data().source,
+              right: ele.data().target,
+              gap: 30,
+            });
+          }
+        });
+      }
+    });
   }
 
   addExternalTools() {
@@ -455,7 +484,7 @@ export class CytoscapeService {
             }px`;
             contentOuter.appendChild(content);
             document.body.appendChild(contentOuter);
-            
+
             return contentOuter;
           },
         });
