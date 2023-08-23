@@ -338,7 +338,6 @@ export class GlobalVariableService {
 
   addRelativePlacementConstraint(toAdd: any) {
     this.relativePlacementConstraint.push(toAdd);
-    console.log(toAdd);
   }
 
   clearRelativePlacementConstraints() {

@@ -282,7 +282,6 @@ export class CytoscapeService {
           }
         });
       } else if (node.outgoers().length === 0) {
-        console.log(node.data());
         node.incomers().forEach((ele) => {
           if (ele.data().hasOwnProperty("source")) {
             this._g.addRelativePlacementConstraint({
@@ -450,7 +449,7 @@ export class CytoscapeService {
   }
 
   private addTooltips() {
-    let widthOffset = 10;
+    let widthOffset = 11;
     let fontSize = 15;
     let fontWeight = "700";
     let fontFamily = "Inconsolata, monospace";
@@ -472,11 +471,10 @@ export class CytoscapeService {
             content.style.fontSize = `${fontSize}px`;
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
-            let firstLine = content.innerHTML.split("\n")[0];
             content.style.maxWidth = `${
               this.textWidthCyElement(
                 node,
-                firstLine,
+                content.innerHTML.split("\n")[0],
                 fontSize,
                 fontFamily,
                 fontWeight
@@ -529,16 +527,18 @@ export class CytoscapeService {
             content.style.fontSize = `${fontSize}px`;
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
-            let firstLine = content.innerHTML.split("\n")[0];
             content.style.maxWidth = `${
               this.textWidthCyElement(
                 edge,
-                firstLine,
+                content.innerHTML.split("\n")[0],
                 fontSize,
                 fontFamily,
                 fontWeight
               ) + widthOffset
             }px`;
+            if (this.additionsNeededForTooltipStyle(edge)) {
+              content.innerHTML = this.tooltipTextAdditions(edge, content.innerHTML);
+            }
             contentOuter.appendChild(content);
             document.body.appendChild(contentOuter);
             return contentOuter;
@@ -610,6 +610,26 @@ export class CytoscapeService {
         startIndex,
         textData.length < 40 + startIndex ? textData.length - startIndex : 40
       );
+    }
+    return text;
+  }
+
+  private additionsNeededForTooltipStyle (ele: any) {
+    if (ele.data("pos") !== undefined) {
+      return true;
+    }
+  }
+
+  private tooltipTextAdditions(ele: any, text: string) {
+    if (ele.data("pos") !== undefined) {
+      let index1 = text.indexOf("[");
+      text = text.slice(0, index1) + "<i>" + text.slice(index1);
+      let index2 = text.lastIndexOf("]");
+      if (index2 === -1) {
+        text += "</i>";
+      } else {
+        text = text.slice(0, index2) + "</i>" + text.slice(index2);
+      }
     }
     return text;
   }
