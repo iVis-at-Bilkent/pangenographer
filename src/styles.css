@@ -364,7 +364,22 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   stroke-width: 2px;
 }
 
-.node-tooltip,
+.node-tooltip {
+  overflow-wrap: break-word;
+  padding-left: 3px;
+  padding-right: 3px;
+  opacity: 0.65;
+  background: white;
+  justify-content: left;
+  align-items: left;
+  color: black;
+  border: 2px solid #585c66;
+  border-radius: 2px;
+  line-height: 20px;
+  display: inline-block;
+  vertical-align: top;
+}
+
 .edge-tooltip {
   overflow-wrap: break-word;
   padding-left: 3px;
