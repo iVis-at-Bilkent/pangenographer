@@ -219,6 +219,5 @@ export class ContextMenuService {
       callback,
       isUp
     );
-    this._g.performLayout(false);
   }
 }

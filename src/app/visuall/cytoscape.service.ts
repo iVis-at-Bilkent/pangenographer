@@ -195,6 +195,8 @@ export class CytoscapeService {
       elemIds.push(cyNodeId);
     }
 
+    this._g.userPrefs.isAutoIncrementalLayoutOnChange.next(isIncremental);
+
     let cyEdges = [];
     let collapsedEdgeIds = {};
     if (isIncremental) {
@@ -575,7 +577,6 @@ export class CytoscapeService {
       callback,
       isUp
     );
-    this._g.performLayout(false);
   }
 
   private tooltipText(element: any) {

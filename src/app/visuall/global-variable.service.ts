@@ -320,7 +320,7 @@ export class GlobalVariableService {
       animate: true,
       // duration of animation in ms, if enabled
       animationDuration: LAYOUT_ANIM_DUR,
-      fit: true,
+      fit: !this.userPrefs.isAutoIncrementalLayoutOnChange.getValue(),
       // padding around layout
       padding: 10,
       // whether to include labels in node dimensions. Valid in 'proof' quality
@@ -514,7 +514,7 @@ export class GlobalVariableService {
 
       // Whether to fit the viewport to the repositioned graph
       // true : Fits at end of layout for animate:false or animate:'end'
-      fit: true,
+      fit: !this.userPrefs.isAutoIncrementalLayoutOnChange.getValue(),
 
       // Padding in rendered co-ordinates around the layout
       padding: 30,
