@@ -327,14 +327,6 @@ export class CytoscapeService {
     let innerHtml = (content: string) => {
       return `<span class="badge rounded-pill" style="background-color: black; font-size: 5px; font-weight: 1000; ">${content}</span>`;
     };
-    let tooltip = (stream: string, val: number) => {
-      var s = `Show ${stream}stream (${val} Level`;
-      if (val > 1) {
-        s += "s";
-      }
-      s += ")";
-      return s;
-    };
     this._g.cy.nodes().forEach((node) => {
       let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
@@ -353,24 +345,28 @@ export class CytoscapeService {
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
-        tooltip: tooltip("Down", 1),
+        tooltip: "Show Previous",
       });
-      const contentDownstream3 = document.createElement("div");
-      contentDownstream3.innerHTML = innerHtml("<<");
+      const contentDownstreamLevel = document.createElement("div");
+      contentDownstreamLevel.innerHTML = innerHtml("<<");
       node.addCue({
-        id: `node-cue-${node.data("segmentName")}-down-stream-3`,
+        id: `node-cue-${node.data("segmentName")}-down-stream-level`,
         show: show,
         position: "top-left",
         marginX: this._g.cy.zoom() * (marginX + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
-          this.showUpDownstream(ele, 3, false);
+          this.showUpDownstream(
+            ele,
+            this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
+            false
+          );
         },
-        htmlElem: contentDownstream3,
+        htmlElem: contentDownstreamLevel,
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
-        tooltip: tooltip("Down", 3),
+        tooltip: "Show Downstream",
       });
       const contentUpstream1 = document.createElement("div");
       contentUpstream1.innerHTML = innerHtml(">");
@@ -387,24 +383,28 @@ export class CytoscapeService {
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
-        tooltip: tooltip("Up", 1),
+        tooltip: "Show Next",
       });
-      const contentUpstream3 = document.createElement("div");
-      contentUpstream3.innerHTML = innerHtml(">>");
+      const contentUpstreamLevel = document.createElement("div");
+      contentUpstreamLevel.innerHTML = innerHtml(">>");
       node.addCue({
-        id: `node-cue-${node.data("segmentName")}-up-stream-3`,
+        id: `node-cue-${node.data("segmentName")}-up-stream-level`,
         show: show,
         position: "top-right",
         marginX: -this._g.cy.zoom() * (marginX + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
-          this.showUpDownstream(ele, 3, true);
+          this.showUpDownstream(
+            ele,
+            this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
+            true
+          );
         },
-        htmlElem: contentUpstream3,
+        htmlElem: contentUpstreamLevel,
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
-        tooltip: tooltip("Up", 3),
+        tooltip: "Show Upstream",
       });
       let update = () => {
         let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
@@ -415,7 +415,7 @@ export class CytoscapeService {
           marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-down-stream-3`,
+          id: `node-cue-${node.data("segmentName")}-down-stream-level`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: this._g.cy.zoom() * (marginX + nameSize),
         });
@@ -425,7 +425,7 @@ export class CytoscapeService {
           marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-up-stream-3`,
+          id: `node-cue-${node.data("segmentName")}-up-stream-level`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: -this._g.cy.zoom() * (marginX + nameSize),
         });
@@ -539,7 +539,10 @@ export class CytoscapeService {
               ) + widthOffset
             }px`;
             if (this.additionsNeededForTooltipStyle(edge)) {
-              content.innerHTML = this.tooltipTextAdditions(edge, content.innerHTML);
+              content.innerHTML = this.tooltipTextAdditions(
+                edge,
+                content.innerHTML
+              );
             }
             contentOuter.appendChild(content);
             document.body.appendChild(contentOuter);
@@ -615,7 +618,7 @@ export class CytoscapeService {
     return text;
   }
 
-  private additionsNeededForTooltipStyle (ele: any) {
+  private additionsNeededForTooltipStyle(ele: any) {
     if (ele.data("pos") !== undefined) {
       return true;
     }

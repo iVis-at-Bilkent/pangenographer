@@ -134,12 +134,6 @@ export class ContextMenuCustomizationService {
           );
         },
       },
-      {
-        id: "displayAllPosters",
-        content: "Use Title Posters",
-        coreAsWell: true,
-        onClickFunction: this.useMoviePoster.bind(this),
-      },
     ];
   }
 

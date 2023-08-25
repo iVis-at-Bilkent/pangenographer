@@ -36,6 +36,7 @@ export class GlobalVariableService {
     animationDuration: number;
     tilingPaddingVertical: number;
     tilingPaddingHorizontal: number;
+    idealEdgeLength: number;
   };
   relativePlacementConstraint: any[];
   expandCollapseApi: any;

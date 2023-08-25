@@ -172,7 +172,7 @@
     "queryResultPagination": "Client",
     "tilingPadding": 4,
     "pangenograph": {
-      "lengthOfUpDownstream": 1
+      "lengthOfUpDownstream": 3
     },
     "timebar": {
       "isEnabled": false,
