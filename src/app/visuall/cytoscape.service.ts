@@ -261,7 +261,7 @@ export class CytoscapeService {
 
     const shouldRandomize = !isIncremental || wasEmpty;
     const hasNew = this.hasNewElem(elemIds, prevElems);
-    this.addConstraints();
+    this.applyConstraints();
     if (hasNew) {
       this._g.performLayout(shouldRandomize);
     }
@@ -270,7 +270,7 @@ export class CytoscapeService {
     this.addExternalTools();
   }
 
-  addConstraints() {
+  applyConstraints() {
     this._g.clearRelativePlacementConstraints();
     this._g.cy.nodes().forEach((node) => {
       if (node.incomers().length === 0) {

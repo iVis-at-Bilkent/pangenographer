@@ -14,7 +14,7 @@ import {
   EXPAND_COLLAPSE_FAST_OPT,
   HIGHLIGHT_OPACITY,
 } from "./constants";
-import { GraphHistoryItem, GraphElem } from "./db-service/data-types";
+import { GraphHistoryItem, GraphElem, RelativePlacementConstraint } from "./db-service/data-types";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
 import { CyStyleCustomizationService } from "../custom/cy-style-customization.service";
@@ -336,7 +336,7 @@ export class GlobalVariableService {
     };
   }
 
-  addRelativePlacementConstraint(toAdd: any) {
+  addRelativePlacementConstraint(toAdd: RelativePlacementConstraint) {
     this.relativePlacementConstraint.push(toAdd);
   }
 
