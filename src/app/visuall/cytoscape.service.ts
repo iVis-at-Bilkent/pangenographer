@@ -330,51 +330,13 @@ export class CytoscapeService {
     this._g.cy.nodes().forEach((node) => {
       let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
-      const contentDownstream1 = document.createElement("div");
-      contentDownstream1.innerHTML = innerHtml("<");
-      node.addCue({
-        id: `node-cue-${node.data("segmentName")}-down-stream-1`,
-        show: show,
-        position: "top-left",
-        marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
-        marginY: this._g.cy.zoom() * marginY,
-        onCueClicked: (ele: any) => {
-          this.showUpDownstream(ele, 1, false);
-        },
-        htmlElem: contentDownstream1,
-        isFixedSize: isFixedSize,
-        zIndex: zIndex,
-        cursor: cursor,
-        tooltip: "Show Previous",
-      });
-      const contentDownstreamLevel = document.createElement("div");
-      contentDownstreamLevel.innerHTML = innerHtml("<<");
-      node.addCue({
-        id: `node-cue-${node.data("segmentName")}-down-stream-level`,
-        show: show,
-        position: "top-left",
-        marginX: this._g.cy.zoom() * (marginX + nameSize),
-        marginY: this._g.cy.zoom() * marginY,
-        onCueClicked: (ele: any) => {
-          this.showUpDownstream(
-            ele,
-            this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
-            false
-          );
-        },
-        htmlElem: contentDownstreamLevel,
-        isFixedSize: isFixedSize,
-        zIndex: zIndex,
-        cursor: cursor,
-        tooltip: "Show Downstream",
-      });
       const contentUpstream1 = document.createElement("div");
-      contentUpstream1.innerHTML = innerHtml(">");
+      contentUpstream1.innerHTML = innerHtml("<");
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-up-stream-1`,
         show: show,
-        position: "top-right",
-        marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
+        position: "top-left",
+        marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
           this.showUpDownstream(ele, 1, true);
@@ -383,15 +345,15 @@ export class CytoscapeService {
         isFixedSize: isFixedSize,
         zIndex: zIndex,
         cursor: cursor,
-        tooltip: "Show Next",
+        tooltip: "Show Previous",
       });
       const contentUpstreamLevel = document.createElement("div");
-      contentUpstreamLevel.innerHTML = innerHtml(">>");
+      contentUpstreamLevel.innerHTML = innerHtml("<<");
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-up-stream-level`,
         show: show,
-        position: "top-right",
-        marginX: -this._g.cy.zoom() * (marginX + nameSize),
+        position: "top-left",
+        marginX: this._g.cy.zoom() * (marginX + nameSize),
         marginY: this._g.cy.zoom() * marginY,
         onCueClicked: (ele: any) => {
           this.showUpDownstream(
@@ -406,26 +368,64 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Upstream",
       });
+      const contentDownstream1 = document.createElement("div");
+      contentDownstream1.innerHTML = innerHtml(">");
+      node.addCue({
+        id: `node-cue-${node.data("segmentName")}-down-stream-1`,
+        show: show,
+        position: "top-right",
+        marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
+        marginY: this._g.cy.zoom() * marginY,
+        onCueClicked: (ele: any) => {
+          this.showUpDownstream(ele, 1, false);
+        },
+        htmlElem: contentDownstream1,
+        isFixedSize: isFixedSize,
+        zIndex: zIndex,
+        cursor: cursor,
+        tooltip: "Show Next",
+      });
+      const contentDownstreamLevel = document.createElement("div");
+      contentDownstreamLevel.innerHTML = innerHtml(">>");
+      node.addCue({
+        id: `node-cue-${node.data("segmentName")}-down-stream-level`,
+        show: show,
+        position: "top-right",
+        marginX: -this._g.cy.zoom() * (marginX + nameSize),
+        marginY: this._g.cy.zoom() * marginY,
+        onCueClicked: (ele: any) => {
+          this.showUpDownstream(
+            ele,
+            this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
+            false
+          );
+        },
+        htmlElem: contentDownstreamLevel,
+        isFixedSize: isFixedSize,
+        zIndex: zIndex,
+        cursor: cursor,
+        tooltip: "Show Downstream",
+      });
       let update = () => {
         let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-down-stream-1`,
+          id: `node-cue-${node.data("segmentName")}-up-stream-1`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-down-stream-level`,
+          id: `node-cue-${node.data("segmentName")}-up-stream-level`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: this._g.cy.zoom() * (marginX + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-up-stream-1`,
+          id: `node-cue-${node.data("segmentName")}-down-stream-1`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-up-stream-level`,
+          id: `node-cue-${node.data("segmentName")}-down-stream-level`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: -this._g.cy.zoom() * (marginX + nameSize),
         });
@@ -632,7 +632,7 @@ export class CytoscapeService {
       if (index2 === -1) {
         text += "</i>";
       } else {
-        text = text.slice(0, index2) + "</i>" + text.slice(index2);
+        text = text.slice(0, index2 + 1) + "</i>" + text.slice(index2);
       }
     }
     return text;

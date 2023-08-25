@@ -175,11 +175,11 @@ export class Neo4jDb implements DbService {
     isUp: boolean
   ) {
     var query = `MATCH (startNode { segmentName: '${nodeId}' }) MATCH path = (startNode)`;
-    if (!isUp) {
+    if (isUp) {
       query += "<";
     }
     query += `-[*1..${distance}]-`;
-    if (isUp) {
+    if (!isUp) {
       query += ">";
     }
     query +=
