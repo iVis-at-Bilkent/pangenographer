@@ -21,3 +21,18 @@ td {
   overflow-y: auto;
   line-height: 20px;
 }
+
+.combined-sequence-container {
+  margin-top: 1%;
+  padding: 1.5%;
+  max-height: 350px;
+  overflow-wrap: break-word;
+  text-align: left;
+  font-family: Inconsolata, monospace;
+  font-weight: 700;
+  max-width: 100%;
+  overflow-y: auto;
+  line-height: 20px;
+  background-color: #c1cade;
+  border-radius: 5px;
+}

@@ -1,44 +1,83 @@
 <div class="panel-group">
   <div class="panel" *ngIf="selectedClasses && selectedClasses.length > 0">
-    <div class="panel-heading" data-bs-toggle="collapse" data-bs-target="#prop-tab" aria-expanded="true">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">{{selectedClasses}}</b></span>
+    <div
+      class="panel-heading"
+      data-bs-toggle="collapse"
+      data-bs-target="#prop-tab"
+      aria-expanded="true"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">{{ selectedClasses }}</b></span
+      >
     </div>
 
     <div id="prop-tab" class="collapse show text-center m-1">
       <ng-container *ngFor="let item of selectedItemProps; let index = index">
-        <div *ngIf="item.key === 'segmentData' || item.key === 'combinedSequence'" class="segment-data-container">
-          {{item.val}}
-        </div>
+        <div
+          *ngIf="item.key === 'segmentData'"
+          class="segment-data-container"
+          [innerHTML]="item.val"
+        ></div>
+        <div
+          *ngIf="item.key === 'combinedSequence'"
+          class="combined-sequence-container"
+          [innerHTML]="item.val"
+        ></div>
       </ng-container>
 
       <table class="table table-responsive table-borderless table-sm">
         <tbody>
           <ng-container *ngFor="let item of selectedItemProps">
-            <tr *ngIf="item.key !== 'segmentData' && item.key !== 'combinedSequence'">
-              <td class="text-start"><b class="va-text">{{item.name}}</b></td>
-              <td class="va-text text-end">{{item.val}}</td>
+            <tr
+              *ngIf="
+                item.key !== 'segmentData' && item.key !== 'combinedSequence'
+              "
+            >
+              <td class="text-start">
+                <b class="va-text">{{ item.name }}</b>
+              </td>
+              <td class="va-text text-end">{{ item.val }}</td>
             </tr>
           </ng-container>
         </tbody>
       </table>
-      
-      <app-table-view *ngIf="isShowObjTable" [params]="multiObjTableInp" [tableFilled]="multiObjTableFilled"
-        [clearFilter]="clearMultiObjTableFilter" (onFilteringChanged)="filterMultiObjTable($event)">
+
+      <app-table-view
+        *ngIf="isShowObjTable"
+        [params]="multiObjTableInp"
+        [tableFilled]="multiObjTableFilled"
+        [clearFilter]="clearMultiObjTableFilter"
+        (onFilteringChanged)="filterMultiObjTable($event)"
+      >
       </app-table-view>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-heading collapsed" data-bs-toggle="collapse" data-bs-target="#stat-tab" aria-expanded="false">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">Statistics</b></span>
+    <div
+      class="panel-heading collapsed"
+      data-bs-toggle="collapse"
+      data-bs-target="#stat-tab"
+      aria-expanded="false"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Statistics</b></span
+      >
     </div>
     <div id="stat-tab" class="collapse">
-      <app-table-view *ngIf="isShowStatsTable" [params]="tableInput" [tableFilled]="tableFilled"
-        (onFilteringChanged)="filterTable($event)">
+      <app-table-view
+        *ngIf="isShowStatsTable"
+        [params]="tableInput"
+        [tableFilled]="tableFilled"
+        (onFilteringChanged)="filterTable($event)"
+      >
       </app-table-view>
     </div>
   </div>
 
-  <app-panel-container [panels]="customSubTabs" [containerId]="'obj-custom-sub-tab'"> </app-panel-container>
-
+  <app-panel-container
+    [panels]="customSubTabs"
+    [containerId]="'obj-custom-sub-tab'"
+  >
+  </app-panel-container>
 </div>
