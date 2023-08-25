@@ -67,7 +67,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   isStoreUserProfile = true;
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
-  lengthOfUpDownstream = 1;
+  lengthOfUpDownstream: number = 3;
   customSubTabs: { component: any; text: string }[] =
     CustomizationModule.settingsSubTabs;
   loadFromFileSubs: Subscription;
