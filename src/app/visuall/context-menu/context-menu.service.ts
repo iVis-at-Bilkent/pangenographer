@@ -197,11 +197,11 @@ export class ContextMenuService {
   }
 
   hideUpstream(event) {
-    this.hideUpDownstream(event, false);
+    this.hideUpDownstream(event, true);
   }
 
   hideDownstream(event) {
-    this.hideUpDownstream(event, true);
+    this.hideUpDownstream(event, false);
   }
 
   hideUpDownstream(event, isUp) {
