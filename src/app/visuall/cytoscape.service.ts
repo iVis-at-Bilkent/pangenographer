@@ -320,18 +320,17 @@ export class CytoscapeService {
     let cursor = "pointer";
     let isFixedSize = false;
     let show = "select";
-    let marginY = 5;
+    let marginY = 6;
     let marginX = 9;
     let marginXTwo = 6;
     let nameSizeModifier = 0.5;
-    let innerHtml = (content: string) => {
-      return `<span class="badge rounded-pill" style="background-color: black; font-size: 5px; font-weight: 1000; ">${content}</span>`;
-    };
+    let width = 8;
     this._g.cy.nodes().forEach((node) => {
       let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
-      const contentUpstream1 = document.createElement("div");
-      contentUpstream1.innerHTML = innerHtml("<");
+      const contentUpstream1 = document.createElement("img");
+      contentUpstream1.src = "assets/img/cue-left.svg";
+      contentUpstream1.width = width;
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-up-stream-1`,
         show: show,
@@ -347,8 +346,9 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Previous",
       });
-      const contentUpstreamLevel = document.createElement("div");
-      contentUpstreamLevel.innerHTML = innerHtml("<<");
+      const contentUpstreamLevel = document.createElement("img");
+      contentUpstreamLevel.src = "assets/img/cue-left-double.svg";
+      contentUpstreamLevel.width = width;
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-up-stream-level`,
         show: show,
@@ -368,8 +368,9 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Upstream",
       });
-      const contentDownstream1 = document.createElement("div");
-      contentDownstream1.innerHTML = innerHtml(">");
+      const contentDownstream1 = document.createElement("img");
+      contentDownstream1.src = "assets/img/cue-right-double.svg"
+      contentDownstream1.width = width;
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-down-stream-1`,
         show: show,
@@ -385,8 +386,9 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Next",
       });
-      const contentDownstreamLevel = document.createElement("div");
-      contentDownstreamLevel.innerHTML = innerHtml(">>");
+      const contentDownstreamLevel = document.createElement("img");
+      contentDownstreamLevel.src = "assets/img/cue-right-double.svg";
+      contentDownstreamLevel.width = width;
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-down-stream-level`,
         show: show,
