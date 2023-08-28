@@ -20,7 +20,7 @@ td {
   max-width: 100%;
   overflow-y: auto;
   line-height: 20px;
-  border: 2px solid #585c66;
+  border: 2px solid #65676b;
   border-radius: 5px;
 }
 
@@ -36,5 +36,6 @@ td {
   overflow-y: auto;
   line-height: 20px;
   background-color: #c1cade;
+  border: 2px solid #65676b;
   border-radius: 5px;
 }
