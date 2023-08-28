@@ -324,7 +324,7 @@ export class CytoscapeService {
     let marginX = 9;
     let marginXTwo = 6;
     let nameSizeModifier = 0.5;
-    let width = 8;
+    let width = 12;
     this._g.cy.nodes().forEach((node) => {
       let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
 
@@ -369,7 +369,7 @@ export class CytoscapeService {
         tooltip: "Show Upstream",
       });
       const contentDownstream1 = document.createElement("img");
-      contentDownstream1.src = "assets/img/cue-right-double.svg"
+      contentDownstream1.src = "assets/img/cue-right.svg"
       contentDownstream1.width = width;
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-down-stream-1`,
