@@ -261,40 +261,12 @@ export class CytoscapeService {
 
     const shouldRandomize = !isIncremental || wasEmpty;
     const hasNew = this.hasNewElem(elemIds, prevElems);
-    this.applyConstraints();
     if (hasNew) {
       this._g.performLayout(shouldRandomize);
     }
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
     this.addExternalTools();
-  }
-
-  applyConstraints() {
-    this._g.clearRelativePlacementConstraints();
-    this._g.cy.nodes().forEach((node) => {
-      if (node.incomers().length === 0) {
-        node.outgoers().forEach((ele) => {
-          if (ele.data().hasOwnProperty("source")) {
-            this._g.addRelativePlacementConstraint({
-              left: ele.data().source,
-              right: ele.data().target,
-              gap: 30,
-            });
-          }
-        });
-      } else if (node.outgoers().length === 0) {
-        node.incomers().forEach((ele) => {
-          if (ele.data().hasOwnProperty("source")) {
-            this._g.addRelativePlacementConstraint({
-              left: ele.data().source,
-              right: ele.data().target,
-              gap: 30,
-            });
-          }
-        });
-      }
-    });
   }
 
   addExternalTools() {

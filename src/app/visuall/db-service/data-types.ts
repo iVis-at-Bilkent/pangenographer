@@ -132,9 +132,3 @@ export enum DbResponseType {
   count = 3,
   raw = 4,
 }
-
-export interface RelativePlacementConstraint  {
-  left: string,
-  right: string,
-  gap: number,
-}
