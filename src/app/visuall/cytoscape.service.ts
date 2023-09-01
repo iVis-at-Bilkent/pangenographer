@@ -300,7 +300,14 @@ export class CytoscapeService {
     let nameSizeModifier = 0.5;
     let width = 12;
     this._g.cy.nodes().forEach((node) => {
-      let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
+      let nameSize =
+        -this.textWidthCyElement(
+          node.data("segmentName"),
+          node.pstyle("font-size").strValue,
+          node.pstyle("font-family").strValue,
+          node.pstyle("font-weight").strValue,
+          node.pstyle("font-style").strValue
+        ) * nameSizeModifier;
 
       const contentUpstream1 = document.createElement("img");
       contentUpstream1.src = "assets/img/cue-left.svg";
@@ -383,7 +390,14 @@ export class CytoscapeService {
         tooltip: "Show Downstream",
       });
       let update = () => {
-        let nameSize = -this.textWidthCyElement(node) * nameSizeModifier;
+        let nameSize =
+          -this.textWidthCyElement(
+            node.data("segmentName"),
+            node.pstyle("font-size").strValue,
+            node.pstyle("font-family").strValue,
+            node.pstyle("font-weight").strValue,
+            node.pstyle("font-style").strValue
+          ) * nameSizeModifier;
 
         node.updateCue({
           id: `node-cue-${node.data("segmentName")}-up-stream-1`,
@@ -411,13 +425,12 @@ export class CytoscapeService {
     });
   }
 
-  private textWidthCyElement(
-    ele: any,
-    text: string = ele.data("segmentName"),
-    fontSize: number = ele.pstyle("font-size").pfValue,
-    fontFamily: string = ele.pstyle("font-family").strValue,
-    fontWeight: string = ele.pstyle("font-weight").strValue,
-    fontStyle: string = ele.pstyle("font-style").strValue
+  textWidthCyElement(
+    text: string,
+    fontSize: string,
+    fontFamily: string,
+    fontWeight: string,
+    fontStyle: string
   ) {
     let context = document.createElement("canvas").getContext("2d");
     let fsize = fontSize + "px";
@@ -428,7 +441,7 @@ export class CytoscapeService {
 
   private addTooltips() {
     let widthOffset = 11;
-    let fontSize = 15;
+    let fontSize = "15";
     let fontWeight = "700";
     let fontFamily = "Inconsolata, monospace";
     this._g.cy.nodes().unbind("mouseover");
@@ -446,16 +459,16 @@ export class CytoscapeService {
             content.classList.add("node-tooltip");
             content.id = `node-tooltip-${node.data("segmentName")}`;
             content.innerHTML = this.tooltipText(node);
-            content.style.fontSize = `${fontSize}px`;
+            content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
             content.style.maxWidth = `${
               this.textWidthCyElement(
-                node,
                 content.innerHTML.split("\n")[0],
                 fontSize,
                 fontFamily,
-                fontWeight
+                fontWeight,
+                node.pstyle("font-style").strValue
               ) + widthOffset
             }px`;
             contentOuter.appendChild(content);
@@ -502,16 +515,16 @@ export class CytoscapeService {
               .source()
               .data("segmentName")}-${edge.source().data("segmentName")}`;
             content.innerHTML = this.tooltipText(edge);
-            content.style.fontSize = `${fontSize}px`;
+            content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
             content.style.maxWidth = `${
               this.textWidthCyElement(
-                edge,
                 content.innerHTML.split("\n")[0],
                 fontSize,
                 fontFamily,
-                fontWeight
+                fontWeight,
+                edge.pstyle("font-style").strValue
               ) + widthOffset
             }px`;
             if (this.additionsNeededForTooltipStyle(edge)) {

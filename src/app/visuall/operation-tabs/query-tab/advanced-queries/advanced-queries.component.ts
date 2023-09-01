@@ -37,7 +37,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   dataModelSubs: Subscription;
   dbResponse = null;
 
-  constructor(private _g: GlobalVariableService, private _dbService: DbAdapterService, private _cyService: CytoscapeService, private _fileReaderService) {
+  constructor(private _g: GlobalVariableService, private _dbService: DbAdapterService, private _cyService: CytoscapeService, private _fileReaderService: FileReaderService) {
     this.queries = ['Get neighborhood', 'Get graph of interest', 'Get common targets/regulators'];
     this.selectedIdx = -1;
   }
