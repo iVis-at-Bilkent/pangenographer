@@ -4,8 +4,9 @@ import { DbAdapterService } from '../../../db-service/db-adapter.service';
 import { CytoscapeService } from '../../../cytoscape.service';
 import { TableViewInput, property2TableData, TableData, TableDataType, TableFiltering, TableRowMeta } from '../../../../shared/table-view/table-view-types';
 import { Subject, Subscription } from 'rxjs';
-import { Neo4jEdgeDirection, GraphElem, HistoryMetaData, ElemAsQueryParam, DbResponseType } from '../../../db-service/data-types';
-import { getCyStyleFromColorAndWid, readTxtFile, isJson } from '../../../constants';
+import { Neo4jEdgeDirection, GraphElem, ElemAsQueryParam, DbResponseType } from '../../../db-service/data-types';
+import { getCyStyleFromColorAndWid, isJson } from '../../../constants';
+import { FileReaderService } from 'src/app/visuall/file-reader.service';
 
 @Component({
   selector: 'app-advanced-queries',
@@ -36,7 +37,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   dataModelSubs: Subscription;
   dbResponse = null;
 
-  constructor(private _g: GlobalVariableService, private _dbService: DbAdapterService, private _cyService: CytoscapeService) {
+  constructor(private _g: GlobalVariableService, private _dbService: DbAdapterService, private _cyService: CytoscapeService, private _fileReaderService) {
     this.queries = ['Get neighborhood', 'Get graph of interest', 'Get common targets/regulators'];
     this.selectedIdx = -1;
   }
@@ -332,7 +333,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   fileSelected() {
-    readTxtFile(this.file.nativeElement.files[0], (txt) => {
+    this._fileReaderService.readTxtFile(this.file.nativeElement.files[0], (txt) => {
       let elems: GraphElem[] = [];
       if (!isJson(txt)) {
         const arr = txt.split('\n').map(x => x.split('|'));

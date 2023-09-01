@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { GlobalVariableService } from '../../visuall/global-variable.service';
-import { readTxtFile, isJson } from '../../visuall/constants';
+import { FileReaderService } from 'src/app/visuall/file-reader.service';
+import { isJson } from '../../visuall/constants';
 import { GraphElem, ElemAsQueryParam } from '../../visuall/db-service/data-types';
 
 @Component({
@@ -21,7 +22,7 @@ export class ElemOfInterestComponent implements OnInit {
   addNodeBtnImg = 'assets/img/add-selection-cursor.svg';
   isShow = true;
   
-  constructor(private _g: GlobalVariableService) { }
+  constructor(private _g: GlobalVariableService, private _fileReaderService: FileReaderService) { }
 
   ngOnInit(): void {
   }
@@ -66,7 +67,7 @@ export class ElemOfInterestComponent implements OnInit {
   }
 
   fileSelected() {
-    readTxtFile(this.file.nativeElement.files[0], (txt) => {
+    this._fileReaderService.readTxtFile(this.file.nativeElement.files[0], (txt) => {
       let elems: GraphElem[] = [];
       if (!isJson(txt)) {
         const arr = txt.split('\n').map(x => x.split('|'));

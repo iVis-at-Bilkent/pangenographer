@@ -15,6 +15,7 @@ import {
   GroupingOptionTypes,
 } from "./user-preference";
 import { UserProfileService } from "./user-profile.service";
+import { FileReaderService } from "./file-reader.service";
 import { LouvainClustering } from "../../lib/louvain-clustering/LouvainClustering";
 import { CyExtService } from "./cy-ext.service";
 import { DbAdapterService } from "./db-service/db-adapter.service";
@@ -37,7 +38,8 @@ export class CytoscapeService {
     private _profile: UserProfileService,
     private _ngZone: NgZone,
     private _modalService: NgbModal,
-    private _dbService: DbAdapterService
+    private _dbService: DbAdapterService,
+    private _fileReaderService: FileReaderService
   ) {
     this.userPrefHelper = new UserPrefHelper(
       this,
@@ -341,7 +343,7 @@ export class CytoscapeService {
         tooltip: "Show Upstream",
       });
       const contentDownstream1 = document.createElement("img");
-      contentDownstream1.src = "assets/img/cue-right.svg"
+      contentDownstream1.src = "assets/img/cue-right.svg";
       contentDownstream1.width = width;
       node.addCue({
         id: `node-cue-${node.data("segmentName")}-down-stream-1`,
@@ -908,7 +910,7 @@ export class CytoscapeService {
   }
 
   loadFile(file: File) {
-    C.readTxtFile(file, (txt) => {
+    this._fileReaderService.readTxtFile(file, (txt) => {
       try {
         if (this._g.cy.$().length == 0) {
           this._g.expandCollapseApi.loadJson(txt, false);
@@ -926,9 +928,22 @@ export class CytoscapeService {
   }
 
   readGFAFile(file: File, cb: (any) => void) {
-    C.readGFAFile(file, (GFAdata) => {
-      cb(GFAdata);
-    });
+    let type = file.name.substring(file.name.lastIndexOf(".") + 1);
+    if (type === "gfa") {
+      this._fileReaderService.readGFAFile(file, (GFAdata) => {
+        cb(GFAdata);
+      });
+    } else if (type === "gfa2") {
+      this._fileReaderService.readGFA2File(file, (GFAdata) => {
+        cb(GFAdata);
+      });
+    } else {
+      this._g.showErrorModal(
+        "File type is not suitable",
+        type + " is not suitable!"
+      );
+      return;
+    }
   }
 
   private str2file(str: string, fileName: string) {

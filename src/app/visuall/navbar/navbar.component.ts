@@ -9,11 +9,12 @@ import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-m
 import { NavbarCustomizationService } from "../../custom/navbar-customization.service";
 import { NavbarDropdown, NavbarAction } from "./inavbar";
 import { UserProfileService } from "../user-profile.service";
-import { readTxtFile, CLUSTER_CLASS } from "../constants";
+import { CLUSTER_CLASS } from "../constants";
 import { SaveProfileModalComponent } from "../popups/save-profile-modal/save-profile-modal.component";
 import { URLLoadService } from "../load-from-url.service";
 import { GroupingOptionTypes } from "../user-preference";
 import { Subscription } from "rxjs";
+import { FileReaderService } from "../file-reader.service";
 
 @Component({
   selector: "app-navbar",
@@ -38,7 +39,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _g: GlobalVariableService,
     private _customizationService: NavbarCustomizationService,
     private _profile: UserProfileService,
-    private _urlload: URLLoadService
+    private _urlload: URLLoadService,
+    private _fileReaderService: FileReaderService
   ) {
     this.menu = [
       {
@@ -251,9 +253,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     } else if (this.isLoadFile4Graph) {
       this._cyService.loadFile(this.file.nativeElement.files[0]);
     } else {
-      readTxtFile(this.file.nativeElement.files[0], (s) => {
-        this._profile.setUserProfile(s);
-      });
+      this._fileReaderService.readTxtFile(
+        this.file.nativeElement.files[0],
+        (s) => {
+          this._profile.setUserProfile(s);
+        }
+      );
     }
   }
 
