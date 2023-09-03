@@ -43,15 +43,41 @@
             {{ item.dropdown }}
           </button>
           <div class="dropdown-menu">
-            <button
-              class="dropdown-item va-text"
-              type="button"
-              *ngFor="let act of item.actions"
-              id="{{ act.id }}"
-              (click)="triggerAct(act)"
-            >
-              {{ act.txt }}
-            </button>
+            <ng-container *ngFor="let act of item.actions">
+              <button
+                *ngIf="act.txt !== 'Samples'"
+                class="dropdown-item va-text"
+                type="button"
+                id="{{ act.id }}"
+                (click)="triggerAct(act)"
+              >
+                {{ act.txt }}
+              </button>
+              <div *ngIf="act.txt === 'Samples'" class="dropdown">
+                <button
+                  class="dropdown-item va-text dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                  (click)="preventDropdownClose($event)"
+                >
+                  {{ act.txt }}
+                </button>
+                <div class="dropdown-menu">
+                  <ng-container *ngFor="let sampleAction of act.actions">
+                    <button
+                      class="dropdown-item va-text"
+                      type="button"
+                      id="{{ sampleAction.id }}"
+                      (click)="triggerAct(sampleAction)"
+                    >
+                      {{ sampleAction.txt }}
+                    </button>
+                  </ng-container>
+                </div>
+              </div>
+            </ng-container>
           </div>
         </div>
       </li>

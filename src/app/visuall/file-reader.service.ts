@@ -39,9 +39,7 @@ export class FileReaderService {
       pannable: false,
       classes: "Segment",
     };
-    var segmentLineTabSeperated = segmentLine
-      .substring(0, segmentLine.length - 1)
-      .split(/\t/);
+    var segmentLineTabSeperated = segmentLine.split(/\t/);
     segment.data.segmentName = segmentLineTabSeperated[1];
     segment.data.id = segmentLineTabSeperated[1];
     segment.data.segmentData = segmentLineTabSeperated[2];
@@ -156,34 +154,8 @@ export class FileReaderService {
     fileReader.onload = (e) => {
       try {
         const fileContent = e.target.result;
-        const lines = (fileContent as string).split(/\n/);
-        const GFAdata = {
-          nodes: [],
-          edges: [],
-        };
 
-        let lineCount = 0;
-
-        lines.forEach((line) => {
-          lineCount++;
-          if (!line) {
-            console.log("Line " + lineCount + " is empty");
-          } else if (line[0] === "S") {
-            GFAdata.nodes.push(this.createSegmentFromGFA(line));
-          } else if (line[0].match(/(L|C|J)/)) {
-            GFAdata.edges.push(this.createLinkFromGFA(line));
-          } else if (line[0] === "H") {
-            // version of GFA file
-          } else if (line[0] === "#") {
-            // GFA file comments
-          } else {
-            console.log(
-              "tag " + line[0] + " is not implemented in line " + lineCount
-            );
-          }
-        });
-
-        cb(GFAdata);
+        cb(this.parseGFA(fileContent as string));
       } catch (error) {
         console.error("Given GFA file is not suitable.", error);
       }
@@ -197,49 +169,39 @@ export class FileReaderService {
     fileReader.readAsText(gfaFile);
   }
 
-  readGFA2File(gfaFile: File, cb: (any) => void) {
-    const fileReader = new FileReader();
-    fileReader.onload = (e) => {
-      try {
-        const fileContent = e.target.result;
-        const lines = (fileContent as string).split(/\n/);
-        const GFAdata = {
-          nodes: [],
-          edges: [],
-        };
-
-        let lineCount = 0;
-
-        lines.forEach((line) => {
-          lineCount++;
-          if (!line) {
-            console.log("Line " + lineCount + " is empty");
-          } else if (line[0] === "S") {
-            GFAdata.nodes.push(this.createSegmentFromGFA(line));
-          } else if (line[0].match(/(L|C|J)/)) {
-            GFAdata.edges.push(this.createLinkFromGFA(line));
-          } else if (line[0] === "H") {
-            // version of GFA file
-          } else if (line[0] === "#") {
-            // GFA file comments
-          } else {
-            console.log(
-              "tag " + line[0] + " is not implemented in line " + lineCount
-            );
-          }
-        });
-
-        cb(GFAdata);
-      } catch (error) {
-        console.error("Given GFA file is not suitable.", error);
-      }
-    };
-
-    fileReader.onerror = (error) => {
-      console.error("GFA File could not be read!", error);
-      fileReader.abort();
-    };
-
-    fileReader.readAsText(gfaFile);
+  readGFASample (gfaSample: string, cb: (any) => void) {
+    cb(this.parseGFA(gfaSample));
   }
+
+  parseGFA(content: string) {
+    const lines = content.split(/\n/);
+    const GFAdata = {
+      nodes: [],
+      edges: [],
+    };
+
+    let lineCount = 0;
+
+    lines.forEach((line) => {
+      lineCount++;
+      if (!line) {
+        console.log("Line " + lineCount + " is empty");
+      } else if (line[0] === "S") {
+        GFAdata.nodes.push(this.createSegmentFromGFA(line));
+      } else if (line[0].match(/(L|C|J)/)) {
+        GFAdata.edges.push(this.createLinkFromGFA(line));
+      } else if (line[0] === "H") {
+        // version of GFA file
+      } else if (line[0] === "#") {
+        // GFA file comments
+      } else {
+        console.log(
+          "tag " + line[0] + " is not implemented in line " + lineCount
+        );
+      }
+    });
+    return GFAdata;
+  }
+
+  readGFA2File(gfaFile: File, cb: (any) => void) {}
 }

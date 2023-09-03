@@ -444,6 +444,7 @@ export class CytoscapeService {
     let fontSize = "15";
     let fontWeight = "700";
     let fontFamily = "Inconsolata, monospace";
+    let fontStyle = "normal";
     this._g.cy.nodes().unbind("mouseover");
     this._g.cy.nodes().forEach((node) => {
       node.bind("mouseover", (event) => {
@@ -462,13 +463,14 @@ export class CytoscapeService {
             content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
+            content.style.fontStyle = fontStyle;
             content.style.maxWidth = `${
               this.textWidthCyElement(
                 content.innerHTML.split("\n")[0],
                 fontSize,
                 fontFamily,
                 fontWeight,
-                node.pstyle("font-style").strValue
+                fontStyle
               ) + widthOffset
             }px`;
             contentOuter.appendChild(content);
@@ -518,13 +520,14 @@ export class CytoscapeService {
             content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
+            content.style.fontStyle = fontStyle;
             content.style.maxWidth = `${
               this.textWidthCyElement(
                 content.innerHTML.split("\n")[0],
                 fontSize,
                 fontFamily,
                 fontWeight,
-                edge.pstyle("font-style").strValue
+                fontStyle
               ) + widthOffset
             }px`;
             if (this.additionsNeededForTooltipStyle(edge)) {
@@ -955,8 +958,13 @@ export class CytoscapeService {
         "File type is not suitable",
         type + " is not suitable!"
       );
-      return;
     }
+  }
+
+  readGFASample(sample: string, cb: (any) => void) {
+    this._fileReaderService.readGFASample(sample, (GFAdata) => {
+      cb(GFAdata);
+    });
   }
 
   private str2file(str: string, fileName: string) {

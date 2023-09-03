@@ -6,7 +6,6 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
-import { NavbarCustomizationService } from "../../custom/navbar-customization.service";
 import { NavbarDropdown, NavbarAction } from "./inavbar";
 import { UserProfileService } from "../user-profile.service";
 import { CLUSTER_CLASS } from "../constants";
@@ -15,6 +14,7 @@ import { URLLoadService } from "../load-from-url.service";
 import { GroupingOptionTypes } from "../user-preference";
 import { Subscription } from "rxjs";
 import { FileReaderService } from "../file-reader.service";
+import samples from "../../../../sample_gfas/gfa.json";
 
 @Component({
   selector: "app-navbar",
@@ -37,7 +37,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _cyService: CytoscapeService,
     private _modalService: NgbModal,
     private _g: GlobalVariableService,
-    private _customizationService: NavbarCustomizationService,
     private _profile: UserProfileService,
     private _urlload: URLLoadService,
     private _fileReaderService: FileReaderService
@@ -46,32 +45,39 @@ export class NavbarComponent implements OnInit, OnDestroy {
       {
         dropdown: "File",
         actions: [
-          { txt: "Load...", id: "nbi00", fn: "loadFile", isStd: true },
-          { txt: "Save", id: "nbi01", fn: "saveAsJson", isStd: true },
+          { txt: "Load...", id: "nbi00", fn: "loadFile" },
+          { txt: "Save", id: "nbi01", fn: "saveAsJson" },
           {
             txt: "Save Selected Objects",
             id: "nbi02",
             fn: "saveSelectedAsJson",
-            isStd: true,
+          },
+          {
+            txt: "Samples",
+            id: "nbi07",
+            actions: [
+              {
+                txt: "Sample 1",
+                id: "nbi07-0",
+                fn: "loadSampleFile1",
+              },
+            ],
           },
           {
             txt: "Import GFA..",
             id: "nbi04",
             fn: "loadGFAFile2Db",
-            isStd: true,
           },
-          { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng", isStd: true },
+          { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng" },
           {
             txt: "Load User Profile...",
             id: "nbi05",
             fn: "loadUserProfile",
-            isStd: true,
           },
           {
             txt: "Save User Profile...",
             id: "nbi06",
             fn: "saveUserProfile",
-            isStd: true,
           },
         ],
       },
@@ -82,31 +88,26 @@ export class NavbarComponent implements OnInit, OnDestroy {
             txt: "Add Group for Selected",
             id: "nbi10",
             fn: "addGroup4Selected",
-            isStd: true,
           },
           {
             txt: "Remove Group for Selected",
             id: "nbi11",
             fn: "removeGroup4Selected",
-            isStd: true,
           },
           {
             txt: "Remove All Groups",
             id: "nbi12",
             fn: "removeAllGroups",
-            isStd: true,
           },
           {
             txt: "Delete Selected",
             id: "nbi13",
             fn: "deleteSelected",
-            isStd: true,
           },
           {
             txt: "Query History",
             id: "nbi101",
             fn: "showHideGraphHistory",
-            isStd: true,
           },
         ],
       },
@@ -117,38 +118,32 @@ export class NavbarComponent implements OnInit, OnDestroy {
             txt: "Hide Selected",
             id: "nbi20",
             fn: "hideSelected",
-            isStd: true,
           },
           {
             txt: "Hide Unselected",
             id: "nbi21",
             fn: "hideUnselected",
-            isStd: true,
           },
-          { txt: "Show All", id: "nbi22", fn: "showAll", isStd: true },
+          { txt: "Show All", id: "nbi22", fn: "showAll" },
           {
             txt: "Collapse All Nodes",
             id: "nbi23",
             fn: "collapseAllNodes",
-            isStd: true,
           },
           {
             txt: "Expand All Nodes",
             id: "nbi24",
             fn: "expandAllNodes",
-            isStd: true,
           },
           {
             txt: "Collapse All Edges",
             id: "nbi25",
             fn: "collapseAllEdges",
-            isStd: true,
           },
           {
             txt: "Expand All Edges",
             id: "nbi26",
             fn: "expandAllEdges",
-            isStd: true,
           },
         ],
       },
@@ -159,52 +154,47 @@ export class NavbarComponent implements OnInit, OnDestroy {
             txt: "Search...",
             id: "nbi30",
             fn: "search2Highlight",
-            isStd: true,
           },
           {
             txt: "Selected",
             id: "nbi31",
             fn: "highlightSelected",
-            isStd: true,
           },
           {
             txt: "Neighbors of Selected",
             id: "nbi32",
             fn: "highlightNeighborsOfSelected",
-            isStd: true,
           },
           {
             txt: "Remove Highlights",
             id: "nbi33",
             fn: "removeHighlights",
-            isStd: true,
           },
         ],
       },
       {
         dropdown: "Layout",
         actions: [
-          { txt: "Perform Layout", id: "nbi40", fn: "doLayout", isStd: true },
+          { txt: "Perform Layout", id: "nbi40", fn: "doLayout" },
           {
             txt: "Recalculate Layout",
             id: "nbi41",
             fn: "recalculateLayout",
-            isStd: true,
           },
         ],
       },
       {
         dropdown: "Help",
         actions: [
-          { txt: "Quick Help", id: "nbi50", fn: "openQuickHelp", isStd: true },
-          { txt: "About", id: "nbi51", fn: "openAbout", isStd: true },
+          { txt: "Quick Help", id: "nbi50", fn: "openQuickHelp" },
+          { txt: "About", id: "nbi51", fn: "openAbout" },
         ],
       },
       {
         dropdown: "Data",
         actions: [
-          { txt: "Sample Data", id: "nbi60", fn: "getSampleData", isStd: true },
-          { txt: "Clear Data", id: "nbi62", fn: "clearData", isStd: true },
+          { txt: "Sample Data", id: "nbi60", fn: "getSampleData" },
+          { txt: "Clear Data", id: "nbi62", fn: "clearData" },
         ],
       },
     ];
@@ -217,28 +207,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.toolLogo = x.appInfo.icon;
       }
     });
-    this.mergeCustomMenu();
     this._urlload.init();
   }
 
   ngOnDestroy(): void {
     if (this.appDescSubs) {
       this.appDescSubs.unsubscribe();
-    }
-  }
-
-  mergeCustomMenu() {
-    let m = this._customizationService.menu;
-    // in any case, set isStd property to false
-    m.map((x) => x.actions.map((y) => (y.isStd = false)));
-
-    for (let i = 0; i < m.length; i++) {
-      let idx = this.menu.findIndex((x) => x.dropdown == m[i].dropdown);
-      if (idx == -1) {
-        this.menu.push(m[i]);
-      } else {
-        this.menu[idx].actions.push(...m[i].actions);
-      }
     }
   }
 
@@ -262,12 +236,24 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
+  sampleSelected(sample: string) {
+    this._cyService.readGFASample(sample, (GFAdata) => {
+      this._dbService.getGFAdata2ImportGFA(GFAdata);
+    });
+  }
+
   triggerAct(act: NavbarAction) {
-    if (act.isStd) {
-      this[act.fn]();
-    } else {
-      this._customizationService[act.fn]();
-    }
+    this[act.fn]();
+  }
+
+  preventDropdownClose(event: Event) {
+    event.stopPropagation();
+  }
+
+  loadSampleFile1() {
+    this.isLoadFile4Graph = true;
+    this.isLoadFileGFA = true;
+    this.sampleSelected(samples.sample_1_gfa_1);
   }
 
   loadFile() {

@@ -11,7 +11,7 @@ export interface NavbarAction {
   // used to show on navbar
   txt: string;
   // must be the name of function, function should be parameterless
-  fn: string;
-  // must be false for custom items
-  isStd: boolean;
+  fn?: string;
+  // used for custom items
+  actions?: NavbarAction[];
 }
