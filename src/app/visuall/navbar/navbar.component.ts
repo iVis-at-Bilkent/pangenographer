@@ -61,6 +61,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
                 id: "nbi07-0",
                 fn: "loadSampleFile1",
               },
+              {
+                txt: "2 Segments",
+                id: "nbi07-1",
+                fn: "loadSegments2",
+              },
+              {
+                txt: "3 Segments",
+                id: "nbi07-2",
+                fn: "loadSegments3",
+              },
+              {
+                txt: "5 Segments",
+                id: "nbi07-3",
+                fn: "loadSegments5",
+              },
             ],
           },
           {
@@ -221,7 +236,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this._cyService.readGFAFile(
         this.file.nativeElement.files[0],
         (GFAdata) => {
-          this._dbService.getGFAdata2ImportGFA(GFAdata);
+          this._dbService.getGFAdata2ImportGFA(GFAdata, () => {
+            this.getSampleData();
+          });
         }
       );
     } else if (this.isLoadFile4Graph) {
@@ -237,8 +254,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   sampleSelected(sample: string) {
+    this.prepareGFALoad();
     this._cyService.readGFASample(sample, (GFAdata) => {
-      this._dbService.getGFAdata2ImportGFA(GFAdata);
+      this._dbService.getGFAdata2ImportGFA(GFAdata, () => {
+        this.getSampleData();
+      });
     });
   }
 
@@ -250,21 +270,37 @@ export class NavbarComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
-  loadSampleFile1() {
+  prepareGFALoad() {
+    this.clearData();
     this.isLoadFile4Graph = true;
     this.isLoadFileGFA = true;
+  }
+
+  loadSampleFile1() {
     this.sampleSelected(samples.sample_1_gfa_1);
   }
 
+  loadSegments2() {
+    this.sampleSelected(samples.segments_2);
+  }
+
+  loadSegments3() {
+    this.sampleSelected(samples.segments_3);
+  }
+
+  loadSegments5() {
+    this.sampleSelected(samples.segments_5);
+  }
+
   loadFile() {
+    this.clearData();
     this.isLoadFile4Graph = true;
     this.isLoadFileGFA = false;
     this.openFileInput();
   }
 
   loadGFAFile2Db() {
-    this.isLoadFile4Graph = true;
-    this.isLoadFileGFA = true;
+    this.prepareGFALoad();
     this.openFileInput();
   }
 

@@ -174,6 +174,7 @@ export class FileReaderService {
   }
 
   parseGFA(content: string) {
+    
     const lines = content.split(/\n/);
     const GFAdata = {
       nodes: [],
@@ -181,7 +182,6 @@ export class FileReaderService {
     };
 
     let lineCount = 0;
-
     lines.forEach((line) => {
       lineCount++;
       if (!line) {

@@ -552,7 +552,7 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
-  runCypherQuery(query: string) {
+  runCypherQuery(query: string, callback?: () => void) {
     const conf = environment.dbConfig;
     const url = conf.cypherQueryUrl;
     const username = conf.username;
@@ -583,11 +583,14 @@ export class Neo4jDb implements DbService {
           return;
         }
         this._g.statusMsg.next("");
+        if (callback) {
+          callback();
+        }
       }, errFn);
   }
 
-  importGFA(GFAdata: any) {
-    this.runCypherQuery(this.GFAdata2CQL(GFAdata));
+  importGFA(GFAdata: any, cb?: () => void) {
+    this.runCypherQuery(this.GFAdata2CQL(GFAdata), cb);
   }
 
   clearData() {
@@ -906,7 +909,7 @@ export class Neo4jDb implements DbService {
   }
 
   private combinedSequenceGen(edge: any, sourceNode: any, targetNode: any) {
-    var combinedSequence = ""
+    var combinedSequence = "";
     if (edge.data.pos) {
       // containment
       var overlapNumeric = 0;
@@ -916,7 +919,7 @@ export class Neo4jDb implements DbService {
       if (!pos) {
         pos = 0;
       }
-      if (edge.data.overlap) {
+      if (edge.data.overlap && edge.data.overlap !== "*") {
         overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
       }
       combinedSequence = sourceNode.data.segmentData;
@@ -960,7 +963,7 @@ export class Neo4jDb implements DbService {
     } else {
       // link
       var overlapNumeric = 0;
-      if (edge.data.overlap) {
+      if (edge.data.overlap && edge.data.overlap !== "*") {
         overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
       }
       combinedSequence += sourceNode.data.segmentData;

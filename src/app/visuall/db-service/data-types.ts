@@ -50,7 +50,7 @@ export interface DbService {
     idFilter: (string | number)[],
     cb: (x) => void
   );
-  importGFA(GFAdata: any);
+  importGFA(GFAdata: any, cb?: () => void);
   clearData();
   getElementsUpToCertainDistance(
     nodeId: string,

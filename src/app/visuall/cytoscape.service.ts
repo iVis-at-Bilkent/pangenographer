@@ -583,7 +583,7 @@ export class CytoscapeService {
     } else {
       textData = element.data("segmentData");
     }
-    textData = this.truncateText(
+    textData = this.truncateTextTooltip(
       textData,
       this._g.cy.nodes()[0],
       6 * 330 - this._g.cy.nodes()[0].pstyle("font-size").pfValue,
@@ -777,9 +777,9 @@ export class CytoscapeService {
     nodes.removeClass("ellipsis_label");
     for (let i = 0; i < nodes.length; i++) {
       let toFit =
-        this.truncateText(nodes[i].data("segmentName"), nodes[i], -4) +
+        this.truncateTextNode(nodes[i].data("segmentName")) +
         "\n" +
-        this.truncateText(nodes[i].data("segmentData"), nodes[i], -4);
+        this.truncateTextNode(nodes[i].data("segmentData"));
       nodes[i].data("__label__", toFit);
     }
     nodes.addClass("ellipsis_label");
@@ -788,7 +788,7 @@ export class CytoscapeService {
     }, C.CY_BATCH_END_DELAY);
   }
 
-  truncateText(
+  truncateTextTooltip(
     label: string,
     ele: any,
     widthOffset?: number,
@@ -804,6 +804,14 @@ export class CytoscapeService {
     let text = label || "";
     let textWidth = ele.width() + widthOffset;
     return this.findFittedTxt(context, text, textWidth);
+  }
+
+  truncateTextNode(label: string) {
+    if (label.length > 8) {
+      return label.substring(0, 6) + "..";
+    } else {
+      return label;
+    }
   }
 
   private findFittedTxt(

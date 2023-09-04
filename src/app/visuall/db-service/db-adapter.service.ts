@@ -196,9 +196,9 @@ export class DbAdapterService {
     );
   }
 
-  getGFAdata2ImportGFA(GFAdata: any) {
+  getGFAdata2ImportGFA(GFAdata: any, cb?: () => void) {
     this._g.add2GraphHistory(`Import GFA`);
-    this._db.importGFA(GFAdata);
+    this._db.importGFA(GFAdata, cb);
   }
 
   clearData() {
