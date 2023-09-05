@@ -62,19 +62,34 @@ export class NavbarComponent implements OnInit, OnDestroy {
                 fn: "loadSampleFile1",
               },
               {
-                txt: "2 Segments",
+                txt: "Sample 2",
                 id: "nbi07-1",
-                fn: "loadSegments2",
+                fn: "loadSampleFile2",
               },
               {
-                txt: "3 Segments",
+                txt: "Sample 3",
                 id: "nbi07-2",
-                fn: "loadSegments3",
+                fn: "loadSampleFile3",
               },
               {
-                txt: "5 Segments",
+                txt: "Sample 4",
                 id: "nbi07-3",
-                fn: "loadSegments5",
+                fn: "loadSampleFile4",
+              },
+              {
+                txt: "Sample 5",
+                id: "nbi07-4",
+                fn: "loadSampleFile5",
+              },
+              {
+                txt: "Sample 6",
+                id: "nbi07-5",
+                fn: "loadSampleFile6",
+              },
+              {
+                txt: "Sample 7",
+                id: "nbi07-6",
+                fn: "loadSampleFile7",
               },
             ],
           },
@@ -280,16 +295,28 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.sampleSelected(samples.sample_1_gfa_1);
   }
 
-  loadSegments2() {
-    this.sampleSelected(samples.segments_2);
+  loadSampleFile2() {
+    this.sampleSelected(samples.sample_2_gfa_1);
   }
 
-  loadSegments3() {
-    this.sampleSelected(samples.segments_3);
+  loadSampleFile3() {
+    this.sampleSelected(samples.sample_3_gfa_1);
   }
 
-  loadSegments5() {
-    this.sampleSelected(samples.segments_5);
+  loadSampleFile4() {
+    this.sampleSelected(samples.sample_4_gfa_1);
+  }
+
+  loadSampleFile5() {
+    this.sampleSelected(samples.sample_5_gfa_1);
+  }
+
+  loadSampleFile6() {
+    this.sampleSelected(samples.sample_6_gfa_1);
+  }
+
+  loadSampleFile7() {
+    this.sampleSelected(samples.sample_7_gfa_1);
   }
 
   loadFile() {
