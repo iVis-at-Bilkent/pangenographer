@@ -21,3 +21,11 @@
   top: 0;
   margin-top: 0; 
 }
+.custom-dropdown-toggle::after {
+  display: inline-block;
+  vertical-align: middle;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid;
+  transform: rotate(-90deg);
+}
