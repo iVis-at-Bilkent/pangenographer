@@ -274,7 +274,6 @@ export class CytoscapeService {
   addExternalTools() {
     this.applyStyle4NewElements();
     this.addTooltips();
-    this.removeCues();
     this.addCues();
   }
 
@@ -313,7 +312,7 @@ export class CytoscapeService {
       contentUpstream1.src = "assets/img/cue-left.svg";
       contentUpstream1.width = width;
       node.addCue({
-        id: `node-cue-${node.data("segmentName")}-up-stream-1`,
+        id: `node-cue-${node.id()}-up-stream-1`,
         show: show,
         position: "top-left",
         marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
@@ -331,7 +330,7 @@ export class CytoscapeService {
       contentUpstreamLevel.src = "assets/img/cue-left-double.svg";
       contentUpstreamLevel.width = width;
       node.addCue({
-        id: `node-cue-${node.data("segmentName")}-up-stream-level`,
+        id: `node-cue-${node.id()}-up-stream-level`,
         show: show,
         position: "top-left",
         marginX: this._g.cy.zoom() * (marginX + nameSize),
@@ -353,7 +352,7 @@ export class CytoscapeService {
       contentDownstream1.src = "assets/img/cue-right.svg";
       contentDownstream1.width = width;
       node.addCue({
-        id: `node-cue-${node.data("segmentName")}-down-stream-1`,
+        id: `node-cue-${node.id()}-down-stream-1`,
         show: show,
         position: "top-right",
         marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
@@ -371,7 +370,7 @@ export class CytoscapeService {
       contentDownstreamLevel.src = "assets/img/cue-right-double.svg";
       contentDownstreamLevel.width = width;
       node.addCue({
-        id: `node-cue-${node.data("segmentName")}-down-stream-level`,
+        id: `node-cue-${node.id()}-down-stream-level`,
         show: show,
         position: "top-right",
         marginX: -this._g.cy.zoom() * (marginX + nameSize),
@@ -398,30 +397,29 @@ export class CytoscapeService {
             node.pstyle("font-weight").strValue,
             node.pstyle("font-style").strValue
           ) * nameSizeModifier;
-
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-up-stream-1`,
+          id: `node-cue-${node.id()}-up-stream-1`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-up-stream-level`,
+          id: `node-cue-${node.id()}-up-stream-level`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: this._g.cy.zoom() * (marginX + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-down-stream-1`,
+          id: `node-cue-${node.id()}-down-stream-1`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: -this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
         });
         node.updateCue({
-          id: `node-cue-${node.data("segmentName")}-down-stream-level`,
+          id: `node-cue-${node.id()}-down-stream-level`,
           marginY: this._g.cy.zoom() * marginY,
           marginX: -this._g.cy.zoom() * (marginX + nameSize),
         });
       };
       node.on("position", update);
-      this._g.cy.on("zoom", update);
+      this._g.cy.on("pan zoom resize", update);
     });
   }
 
@@ -451,14 +449,14 @@ export class CytoscapeService {
         let popper = event.target.popper({
           content: () => {
             let contentOuter = document.createElement("div");
-            if (!node.data("segmentName")) {
+            if (!node.id()) {
               return contentOuter;
             }
             contentOuter.classList.add("node-tooltip-outer");
-            contentOuter.id = `node-tooltip-${node.data("segmentName")}-outer`;
+            contentOuter.id = `node-tooltip-${node.id()}-outer`;
             let content = document.createElement("div");
             content.classList.add("node-tooltip");
-            content.id = `node-tooltip-${node.data("segmentName")}`;
+            content.id = `node-tooltip-${node.id()}`;
             content.innerHTML = this.tooltipText(node);
             content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;

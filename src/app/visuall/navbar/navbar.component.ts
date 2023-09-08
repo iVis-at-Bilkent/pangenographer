@@ -436,10 +436,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   clearData() {
+    this._cyService.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
     this._dbService.clearData();
-    this._cyService.removeExternalTools();
   }
 
   showHideGraphHistory() {
