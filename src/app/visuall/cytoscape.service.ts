@@ -268,28 +268,49 @@ export class CytoscapeService {
     }
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
+    this.removeExternalTools();
     this.addExternalTools();
   }
 
   addExternalTools() {
-    this.applyStyle4NewElements();
     this.addTooltips();
     this.addCues();
-  }
-
-  removeExternalTools() {
-    this.removeCues();
     this.applyStyle4NewElements();
   }
 
-  private removeCues() {
-    this._g.cy.nodes().forEach((node) => {
-      node.removeCue();
-    });
+  removeExternalTools(nodes: any = undefined) {
+    this.removeCues(nodes);
+    this.applyStyle4NewElements();
+  }
+
+  private removeCues(nodes: any = undefined) {
+    if (nodes) {
+      nodes.forEach((node) => {
+        this._g.cy.removeListener("pan", this._g.cueUpdaters[`${node.id()}`]);
+        this._g.cy.removeListener("zoom", this._g.cueUpdaters[`${node.id()}`]);
+        this._g.cy.removeListener(
+          "resize",
+          this._g.cueUpdaters[`${node.id()}`]
+        );
+        delete this._g.cueUpdaters[`${node.id()}`];
+        node.removeCue();
+      });
+    } else {
+      this._g.cy.nodes().forEach((node) => {
+        this._g.cy.removeListener("pan", this._g.cueUpdaters[`${node.id()}`]);
+        this._g.cy.removeListener("zoom", this._g.cueUpdaters[`${node.id()}`]);
+        this._g.cy.removeListener(
+          "resize",
+          this._g.cueUpdaters[`${node.id()}`]
+        );
+        delete this._g.cueUpdaters[`${node.id()}`];
+        node.removeCue();
+      });
+    }
   }
 
   private addCues() {
-    let zIndex = 1000;
+    let zIndex = 999;
     let cursor = "pointer";
     let isFixedSize = false;
     let show = "select";
@@ -326,6 +347,7 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Previous",
       });
+
       const contentUpstreamLevel = document.createElement("img");
       contentUpstreamLevel.src = "assets/img/cue-left-double.svg";
       contentUpstreamLevel.width = width;
@@ -348,6 +370,7 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Upstream",
       });
+
       const contentDownstream1 = document.createElement("img");
       contentDownstream1.src = "assets/img/cue-right.svg";
       contentDownstream1.width = width;
@@ -366,6 +389,7 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Next",
       });
+
       const contentDownstreamLevel = document.createElement("img");
       contentDownstreamLevel.src = "assets/img/cue-right-double.svg";
       contentDownstreamLevel.width = width;
@@ -388,6 +412,7 @@ export class CytoscapeService {
         cursor: cursor,
         tooltip: "Show Downstream",
       });
+
       let update = () => {
         let nameSize =
           -this.textWidthCyElement(
@@ -418,6 +443,9 @@ export class CytoscapeService {
           marginX: -this._g.cy.zoom() * (marginX + nameSize),
         });
       };
+
+      this._g.cueUpdaters[`${node.id()}`] = update;
+
       node.on("position", update);
       this._g.cy.on("pan zoom resize", update);
     });
@@ -483,7 +511,6 @@ export class CytoscapeService {
         };
 
         node.on("position", update);
-
         this._g.cy.on("pan zoom resize", update);
       });
     });
@@ -545,7 +572,6 @@ export class CytoscapeService {
         };
 
         edge.on("position", update);
-
         this._g.cy.on("pan zoom resize", update);
       });
     });
@@ -622,7 +648,7 @@ export class CytoscapeService {
       if (index2 === -1) {
         text += "</i>";
       } else {
-        text = text.slice(0, index2 + 1) + "</i>" + text.slice(index2);
+        text = text.slice(0, index2 + 1) + "</i>" + text.slice(index2 + 1);
       }
     }
     return text;
@@ -1033,8 +1059,12 @@ export class CytoscapeService {
   deleteSelected(event) {
     if (event) {
       const ele = event.target || event.cyTarget;
+      if (ele.id()[0] === "n") {
+        this.removeExternalTools([ele]);
+      }
       this._g.cy.remove(ele);
     } else {
+      this.removeExternalTools(this._g.cy.nodes(":selected"));
       this._g.cy.remove(":selected");
     }
     this._g.handleCompoundsOnHideDelete();
@@ -1049,6 +1079,7 @@ export class CytoscapeService {
           data.nodes[i].properties.segmentName ===
             this._g.cy.nodes()[j].data().segmentName
         ) {
+          this.removeExternalTools(this._g.cy.nodes()[j]);
           this._g.cy.remove(this._g.cy.nodes()[j]);
         }
       }

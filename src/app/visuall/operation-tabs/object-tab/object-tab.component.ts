@@ -375,7 +375,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         renderedValue =
           renderedValue.slice(0, index2 + 1) +
           "</i>" +
-          renderedValue.slice(index2);
+          renderedValue.slice(index2 + 1);
       }
     }
     return renderedValue;

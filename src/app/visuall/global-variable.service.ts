@@ -59,6 +59,7 @@ export class GlobalVariableService {
   appDescription = new BehaviorSubject<any>(null);
   dataModel = new BehaviorSubject<any>(null);
   enums = new BehaviorSubject<any>(null);
+  cueUpdaters = {};
 
   constructor(
     private _http: HttpClient,
