@@ -107,9 +107,9 @@
         "readCount": "number",
         "numberOfMismatchesOrGaps": "number",
         "edgeIdentifier": "string",
-        "leftOfTheContainedSeq": "string",
-        "containedSeq": "string",
-        "rightOfTheContainedSeq": "string",
+        "leftOfTheContainedSequence": "string",
+        "containedSequence": "string",
+        "rightOfTheContainedSequence": "string",
         "sequenceLength": "string"
       },
       "style": {

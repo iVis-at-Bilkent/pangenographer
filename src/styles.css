@@ -388,7 +388,6 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   background: #c1cade;
   justify-content: left;
   align-items: left;
-  color: black;
   border: 2px solid #585c66;
   border-radius: 2px;
   line-height: 20px;
@@ -400,4 +399,16 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 .edge-tooltip-outer {
   padding: 5px 0;
   margin: 0;
+}
+
+.edge-tooltip-inner-part:nth-child(3n+1) {
+  color: #e34a33;
+}
+
+.edge-tooltip-inner-part:nth-child(3n+2) {
+  color: black;
+}
+
+.edge-tooltip-inner-part:nth-child(3n) {
+  color: #c51b8a;
 }

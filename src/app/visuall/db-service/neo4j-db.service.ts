@@ -878,9 +878,9 @@ export class Neo4jDb implements DbService {
       );
       if (edge.data.hasOwnProperty("pos")) {
         edge2Create += `, pos: ${edge.data.pos}`;
-        edge2Create += `, leftOfTheContainedSeq: '${combinedSequence.leftOfTheContainedSeq}'`;
-        edge2Create += `, containedSeq: '${combinedSequence.containedSeq}'`;
-        edge2Create += `, rightOfTheContainedSeq: '${combinedSequence.rightOfTheContainedSeq}'`;
+        edge2Create += `, leftOfTheContainedSequence: '${combinedSequence.leftOfTheContainedSequence}'`;
+        edge2Create += `, containedSequence: '${combinedSequence.containedSequence}'`;
+        edge2Create += `, rightOfTheContainedSequence: '${combinedSequence.rightOfTheContainedSequence}'`;
       } else if (edge.data.hasOwnProperty("distance")) {
         edge2Create += `, sourceSequence: '${combinedSequence.sourceSequence}'`;
         edge2Create += `, distance: '${edge.data.distance}'`;
@@ -922,9 +922,9 @@ export class Neo4jDb implements DbService {
       // containment
       let overlapNumeric = 0;
       let pos = edge.data.pos;
-      let leftOfTheContainedSeq = "";
-      let containedSeq = "";
-      let rightOfTheContainedSeq = "";
+      let leftOfTheContainedSequence = "";
+      let containedSequence = "";
+      let rightOfTheContainedSequence = "";
       let sequenceLength;
       if (!pos) {
         pos = 0;
@@ -932,27 +932,31 @@ export class Neo4jDb implements DbService {
       if (edge.data.overlap && edge.data.overlap !== "*") {
         overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
       }
-      leftOfTheContainedSeq = sourceNode.data.segmentData.substr(0, pos - 1);
+      leftOfTheContainedSequence = sourceNode.data.segmentData.substr(
+        0,
+        pos - 1
+      );
       if (edge.data.sourceOrientation === "-") {
-        leftOfTheContainedSeq = this.reverseComplementSegmentData(
-          leftOfTheContainedSeq
+        leftOfTheContainedSequence = this.reverseComplementSegmentData(
+          leftOfTheContainedSequence
         );
       }
-      containedSeq = targetNode.data.segmentData;
+      containedSequence = targetNode.data.segmentData;
       if (edge.data.targetOrientation === "-") {
-        containedSeq = this.reverseComplementSegmentData(containedSeq);
+        containedSequence =
+          this.reverseComplementSegmentData(containedSequence);
       }
-      rightOfTheContainedSeq = sourceNode.data.segmentData.substr(
+      rightOfTheContainedSequence = sourceNode.data.segmentData.substr(
         pos - 1 + overlapNumeric
       );
       sequenceLength =
-        leftOfTheContainedSeq.length +
-        containedSeq.length +
-        rightOfTheContainedSeq.length;
+        leftOfTheContainedSequence.length +
+        containedSequence.length +
+        rightOfTheContainedSequence.length;
       return {
-        leftOfTheContainedSeq: leftOfTheContainedSeq,
-        containedSeq: containedSeq,
-        rightOfTheContainedSeq: rightOfTheContainedSeq,
+        leftOfTheContainedSequence: leftOfTheContainedSequence,
+        containedSequence: containedSequence,
+        rightOfTheContainedSequence: rightOfTheContainedSequence,
         sequenceLength: sequenceLength,
       };
     } else if (edge.data.distance) {
@@ -977,8 +981,8 @@ export class Neo4jDb implements DbService {
       }
       return {
         sourceSequence: sourceSequence,
-        targetSequence: targetSequence,
         distance: distance,
+        targetSequence: targetSequence,
         sequenceLength: sequenceLength,
       };
     } else {
@@ -1009,8 +1013,9 @@ export class Neo4jDb implements DbService {
       }
       targetSequenceWithoutOverlap =
         targetSequenceWithoutOverlap.substring(overlapNumeric);
-      overlapSequence = sourceNode.data.segmentData.substring(
-        sourceNode.data.segmentData.length - overlapNumeric
+      overlapSequence = targetNode.data.segmentData.substring(
+        0,
+        overlapNumeric
       );
       sequenceLength =
         sourceSequenceWithoutOverlap.length +

@@ -485,7 +485,7 @@ export class CytoscapeService {
             let content = document.createElement("div");
             content.classList.add("node-tooltip");
             content.id = `node-tooltip-${node.id()}`;
-            content.innerHTML = this.tooltipText(node);
+            content.innerHTML = this.tooltipText(node).text;
             content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
@@ -529,9 +529,6 @@ export class CytoscapeService {
         let popper = event.target.popper({
           content: () => {
             let contentOuter = document.createElement("div");
-            if (!edge.data("combinedSequence")) {
-              return contentOuter;
-            }
             contentOuter.classList.add("edge-tooltip-outer");
             contentOuter.id = `edge-tooltip-${edge
               .source()
@@ -541,26 +538,46 @@ export class CytoscapeService {
             content.id = `edge-tooltip-${edge
               .source()
               .data("segmentName")}-${edge.source().data("segmentName")}`;
-            content.innerHTML = this.tooltipText(edge);
+            let text = this.tooltipText(edge);
             content.style.fontSize = fontSize + "px";
             content.style.fontWeight = fontWeight;
             content.style.fontFamily = fontFamily;
             content.style.fontStyle = fontStyle;
             content.style.maxWidth = `${
               this.textWidthCyElement(
-                content.innerHTML.split("\n")[0],
+                text.text.split("\n")[0],
                 fontSize,
                 fontFamily,
                 fontWeight,
                 fontStyle
               ) + widthOffset
             }px`;
-            if (this.additionsNeededForTooltipStyle(edge)) {
-              content.innerHTML = this.tooltipTextAdditions(
-                edge,
-                content.innerHTML
-              );
-            }
+
+            let firstSequence = document.createElement("span");
+            firstSequence.classList.add("edge-tooltip-inner-part");
+            firstSequence.innerHTML = text.text.substring(
+              0,
+              this.edgeTooltipInnerTextSize(text.lengths.first)
+            );
+            let secondSequence = document.createElement("span");
+            secondSequence.classList.add("edge-tooltip-inner-part");
+            secondSequence.innerHTML = text.text.substring(
+              this.edgeTooltipInnerTextSize(text.lengths.first),
+              this.edgeTooltipInnerTextSize(
+                text.lengths.first + text.lengths.second
+              )
+            );
+            let thirdSequence = document.createElement("span");
+            thirdSequence.innerHTML = text.text.substring(
+              this.edgeTooltipInnerTextSize(
+                text.lengths.first + text.lengths.second
+              )
+            );
+            thirdSequence.classList.add("edge-tooltip-inner-part");
+
+            content.appendChild(firstSequence);
+            content.appendChild(secondSequence);
+            content.appendChild(thirdSequence);
             contentOuter.appendChild(content);
             document.body.appendChild(contentOuter);
             return contentOuter;
@@ -585,6 +602,10 @@ export class CytoscapeService {
     });
   }
 
+  private edgeTooltipInnerTextSize(size: number) {
+    return size > 245 ? 245 : size + Math.floor(size / 41);
+  }
+
   showUpDownstream(ele: any, length: number, isUp: boolean) {
     const callback = (data) => {
       this.loadElementsFromDatabase(data, true);
@@ -599,20 +620,86 @@ export class CytoscapeService {
   }
 
   private tooltipText(element: any) {
-    let text = "";
-    let startIndex;
-    let textData = "";
+    let textData;
+    let lengths = {
+      first: 0,
+      second: 0,
+      third: 0,
+    };
     if (element.data("sourceOrientation")) {
-      textData = element.data("combinedSequence");
+      if (element.data("distance")) {
+        //  For jumps, we take up to 15 characters before the distance,
+        //  the distance with ..({distance}).., and up to 15 characters after distance
+        textData = element.data("sourceSequence");
+        textData = textData.substring(
+          textData.length > 15 ? textData.length - 15 : 0
+        );
+        lengths.first = textData.length;
+        textData += "..(";
+        textData += element.data("distance");
+        textData += ")..";
+        lengths.second = textData.length - lengths.first;
+        let targetSequence = element.data("targetSequence");
+        targetSequence = targetSequence.substring(
+          0,
+          targetSequence.length > 15 ? 15 : targetSequence.length
+        );
+        lengths.third = targetSequence.length;
+        textData += targetSequence;
+      } else if (element.data("pos")) {
+        // For containments, we extract up to 15 characters before the pos index,
+        // the sequence starting from the pos index (contained sequence),
+        // and up to 15 characters after the pos index.
+        textData = element.data("leftOfTheContainedSequence");
+        textData = textData.substring(
+          textData.length > 15 ? textData.length - 15 : 0
+        );
+        lengths.first = textData.length;
+        textData += element.data("containedSequence");
+        lengths.second = element.data("containedSequence").length;
+        let rightOfTheContainedSequence = element.data(
+          "rightOfTheContainedSequence"
+        );
+        rightOfTheContainedSequence = rightOfTheContainedSequence.substring(
+          0,
+          rightOfTheContainedSequence.length > 15
+            ? 15
+            : rightOfTheContainedSequence.length
+        );
+        lengths.third = rightOfTheContainedSequence.length;
+        textData += rightOfTheContainedSequence;
+      } else {
+        // For containments, we extract up to 15 characters before the overlap sequence,
+        // the overlap sequence, and up to 15 characters after the overlap sequence.
+        textData = element.data("sourceSequenceWithoutOverlap");
+        textData = textData.substring(
+          textData.length > 15 ? textData.length - 15 : 0
+        );
+        lengths.first = textData.length;
+        textData += element.data("overlapSequence");
+        lengths.second = textData.length - lengths.first;
+        let targetSequence = element.data("targetSequenceWithoutOverlap");
+        targetSequence = targetSequence.substring(
+          0,
+          targetSequence.length > 15 ? 15 : targetSequence.length
+        );
+        lengths.third = targetSequence.length;
+        textData += targetSequence;
+      }
     } else {
+      // For segments
       textData = element.data("segmentData");
     }
+
     textData = this.truncateTextTooltip(
       textData,
       this._g.cy.nodes()[0],
       6 * 330 - this._g.cy.nodes()[0].pstyle("font-size").pfValue,
       8
     );
+
+    let startIndex;
+    let text = "";
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
       if (startIndex >= textData.length) {
         break;
@@ -631,27 +718,7 @@ export class CytoscapeService {
         textData.length < 40 + startIndex ? textData.length - startIndex : 40
       );
     }
-    return text;
-  }
-
-  private additionsNeededForTooltipStyle(ele: any) {
-    if (ele.data("pos") !== undefined) {
-      return true;
-    }
-  }
-
-  private tooltipTextAdditions(ele: any, text: string) {
-    if (ele.data("pos") !== undefined) {
-      let index1 = text.indexOf("[");
-      text = text.slice(0, index1) + "<i>" + text.slice(index1);
-      let index2 = text.lastIndexOf("]");
-      if (index2 === -1) {
-        text += "</i>";
-      } else {
-        text = text.slice(0, index2 + 1) + "</i>" + text.slice(index2 + 1);
-      }
-    }
-    return text;
+    return { text, lengths };
   }
 
   hasNewElem(newElemIds: string[], prevElems: any) {

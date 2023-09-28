@@ -23,8 +23,8 @@
       "kmerCount": "number",
       "edgeIdentifier": "string",
       "sourceSequenceWithoutOverlap": "string",
-      "targetSequenceWithoutOverlap": "string",
       "overlapSequence": "string",
+      "targetSequenceWithoutOverlap": "string",
       "sequenceLength": "string"
     },
     "JUMP": {
@@ -44,9 +44,9 @@
       "readCount": "number",
       "numberOfMismatchesOrGaps": "number",
       "edgeIdentifier": "string",
-      "leftOfTheContainedSeq": "string",
-      "containedSeq": "string",
-      "rightOfTheContainedSeq": "string",
+      "leftOfTheContainedSequence": "string",
+      "containedSequence": "string",
+      "rightOfTheContainedSequence": "string",
       "sequenceLength": "string"
     }
   }

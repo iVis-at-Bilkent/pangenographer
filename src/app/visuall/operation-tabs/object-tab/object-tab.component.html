@@ -21,17 +21,17 @@
         <div *ngIf="item.key === 'pos'" class="combined-sequence-container">
           <ng-container *ngFor="let innerItem of selectedItemProps">
             <span
-              *ngIf="innerItem.key === 'leftOfTheContainedSeq'"
+              *ngIf="innerItem.key === 'leftOfTheContainedSequence'"
               class="combined-sequence-container-part"
               >{{ innerItem.val }}</span
             >
             <span
-              *ngIf="innerItem.key === 'containedSeq'"
+              *ngIf="innerItem.key === 'containedSequence'"
               class="combined-sequence-container-part"
               >{{ innerItem.val }}</span
             >
             <span
-              *ngIf="innerItem.key === 'rightOfTheContainedSeq'"
+              *ngIf="innerItem.key === 'rightOfTheContainedSequence'"
               class="combined-sequence-container-part"
               >{{ innerItem.val }}</span
             >
@@ -96,9 +96,9 @@
                 item.key !== 'sourceSequenceWithoutOverlap' &&
                 item.key !== 'overlapSequence' &&
                 item.key !== 'targetSequenceWithoutOverlap' &&
-                item.key !== 'leftOfTheContainedSeq' &&
-                item.key !== 'containedSeq' &&
-                item.key !== 'rightOfTheContainedSeq' &&
+                item.key !== 'leftOfTheContainedSequence' &&
+                item.key !== 'containedSequence' &&
+                item.key !== 'rightOfTheContainedSequence' &&
                 item.key !== 'sourceSequence' &&
                 item.key !== 'targetSequence'
               "
