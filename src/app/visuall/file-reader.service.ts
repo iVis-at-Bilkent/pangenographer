@@ -22,7 +22,7 @@ export class FileReaderService {
   }
 
   createSegmentFromGFA(segmentLine: string) {
-    var segment = {
+    let segment = {
       data: {
         segmentData: "",
         segmentName: "",
@@ -39,13 +39,13 @@ export class FileReaderService {
       pannable: false,
       classes: "Segment",
     };
-    var segmentLineTabSeperated = segmentLine.split(/\t/);
+    let segmentLineTabSeperated = segmentLine.split(/\t/);
     segment.data.segmentName = segmentLineTabSeperated[1];
     segment.data.id = segmentLineTabSeperated[1];
     segment.data.segmentData = segmentLineTabSeperated[2];
     segment.data.segmentLength = segmentLineTabSeperated[2].length;
     for (let i = 3; i < segmentLineTabSeperated.length; i++) {
-      var optField = (segmentLineTabSeperated[i] as string).trim();
+      let optField = (segmentLineTabSeperated[i] as string).trim();
       if (optField.startsWith("LN")) {
         segment["data"]["segmentLength"] = Number(optField.substring(5));
       } else if (optField.startsWith("RC")) {
@@ -67,7 +67,7 @@ export class FileReaderService {
   }
 
   createLinkFromGFA(linkLine: string) {
-    var link = {
+    let link = {
       data: {},
       position: { x: 0, y: 0 },
       group: "edges",
@@ -78,7 +78,7 @@ export class FileReaderService {
       grabbable: true,
       pannable: true,
     };
-    var linkLineTabSeperated = linkLine.split(/\t/);
+    let linkLineTabSeperated = linkLine.split(/\t/);
     if (linkLineTabSeperated[0] === "L") {
       link["data"]["source"] = linkLineTabSeperated[1];
       link["data"]["sourceOrientation"] = linkLineTabSeperated[2];
@@ -86,7 +86,7 @@ export class FileReaderService {
       link["data"]["targetOrientation"] = linkLineTabSeperated[4];
 
       for (let i = 4; i < linkLineTabSeperated.length; i++) {
-        var optField = (linkLineTabSeperated[i] as string).trim();
+        let optField = (linkLineTabSeperated[i] as string).trim();
         if (optField.startsWith("MQ")) {
           link["data"]["mappingQuality"] = Number(optField.substring(5));
         } else if (optField.startsWith("NM")) {
@@ -113,7 +113,7 @@ export class FileReaderService {
       link["data"]["targetOrientation"] = linkLineTabSeperated[4];
 
       for (let i = 4; i < linkLineTabSeperated.length; i++) {
-        var optField = (linkLineTabSeperated[i] as string).trim();
+        let optField = (linkLineTabSeperated[i] as string).trim();
         if (optField.startsWith("SC")) {
           link["data"]["indirectShortcutConnections"] = Number(
             optField.substring(5)
@@ -132,7 +132,7 @@ export class FileReaderService {
       link["data"]["overlap"] = linkLineTabSeperated[6];
 
       for (let i = 4; i < linkLineTabSeperated.length; i++) {
-        var optField = (linkLineTabSeperated[i] as string).trim();
+        let optField = (linkLineTabSeperated[i] as string).trim();
         if (optField.startsWith("RC")) {
           link["data"]["readCount"] = Number(optField.substring(5));
         } else if (optField.startsWith("NM")) {

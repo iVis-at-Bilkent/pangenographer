@@ -599,9 +599,9 @@ export class CytoscapeService {
   }
 
   private tooltipText(element: any) {
-    var text = "";
-    var startIndex;
-    var textData = "";
+    let text = "";
+    let startIndex;
+    let textData = "";
     if (element.data("sourceOrientation")) {
       textData = element.data("combinedSequence");
     } else {

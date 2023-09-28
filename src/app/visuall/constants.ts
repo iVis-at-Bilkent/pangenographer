@@ -163,6 +163,7 @@ export const PROPERITY_NAMES = {
   distance: "Distance",
   indirectShortcutConnections: "Indirect shortcut connections",
   pos: "Pos",
+  sequenceLength: "Sequence length",
 };
 
 /** https://davidwalsh.name/javascript-debounce-function

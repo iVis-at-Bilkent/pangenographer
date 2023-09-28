@@ -12,17 +12,75 @@
     </div>
 
     <div id="prop-tab" class="collapse show text-center m-1">
-      <ng-container *ngFor="let item of selectedItemProps; let index = index">
+      <ng-container *ngFor="let item of selectedItemProps">
         <div
           *ngIf="item.key === 'segmentData'"
           class="segment-data-container"
           [innerHTML]="item.val"
         ></div>
+        <div *ngIf="item.key === 'pos'" class="combined-sequence-container">
+          <ng-container *ngFor="let innerItem of selectedItemProps">
+            <span
+              *ngIf="innerItem.key === 'leftOfTheContainedSeq'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+            <span
+              *ngIf="innerItem.key === 'containedSeq'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+            <span
+              *ngIf="innerItem.key === 'rightOfTheContainedSeq'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+          </ng-container>
+        </div>
         <div
-          *ngIf="item.key === 'combinedSequence'"
+          *ngIf="item.key === 'distance'"
           class="combined-sequence-container"
-          [innerHTML]="item.val"
-        ></div>
+        >
+          <ng-container *ngFor="let innerItem of selectedItemProps">
+            <span
+              *ngIf="innerItem.key === 'sourceSequence'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+            <span
+              *ngIf="innerItem.key === 'distance'"
+              class="combined-sequence-container-part"
+              >..({{ innerItem.val }})..</span
+            >
+            <span
+              *ngIf="innerItem.key === 'targetSequence'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+          </ng-container>
+        </div>
+        <div
+          *ngIf="item.key === 'overlapSequence'"
+          class="combined-sequence-container"
+        >
+          <ng-container *ngFor="let innerItem of selectedItemProps">
+            <span
+              *ngIf="innerItem.key === 'sourceSequenceWithoutOverlap'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+            <span
+              *ngIf="innerItem.key === 'overlapSequence'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+            <span
+              *ngIf="innerItem.key === 'targetSequenceWithoutOverlap'"
+              class="combined-sequence-container-part"
+              >{{ innerItem.val }}</span
+            >
+          </ng-container>
+        </div>
       </ng-container>
 
       <table class="table table-responsive table-borderless table-sm">
@@ -30,7 +88,19 @@
           <ng-container *ngFor="let item of selectedItemProps">
             <tr
               *ngIf="
-                item.key !== 'segmentData' && item.key !== 'combinedSequence'
+                item.key !== 'segmentData' &&
+                item.key !== 'combinedSequence' &&
+                item.key !== 'pos' &&
+                item.key !== 'distance' &&
+                item.key !== 'overlapSequence' &&
+                item.key !== 'sourceSequenceWithoutOverlap' &&
+                item.key !== 'overlapSequence' &&
+                item.key !== 'targetSequenceWithoutOverlap' &&
+                item.key !== 'leftOfTheContainedSeq' &&
+                item.key !== 'containedSeq' &&
+                item.key !== 'rightOfTheContainedSeq' &&
+                item.key !== 'sourceSequence' &&
+                item.key !== 'targetSequence'
               "
             >
               <td class="text-start">

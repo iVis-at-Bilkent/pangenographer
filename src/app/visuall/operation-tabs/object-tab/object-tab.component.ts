@@ -346,7 +346,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         ) {
           this.selectedItemProps.push({
             key: renderedKey,
-            val: this.objectTextAdditions(renderedKey, renderedValue),
+            val: renderedValue,
             name: PROPERITY_NAMES[renderedKey],
           });
           continue;
@@ -358,27 +358,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         );
         this.selectedItemProps.push({
           key: renderedKey,
-          val: this.objectTextAdditions(renderedKey, renderedValue),
+          val: renderedValue,
           name: PROPERITY_NAMES[renderedKey],
         });
       }
     }
-  }
-
-  private objectTextAdditions(renderedKey: string, renderedValue: string) {
-    if (renderedKey === "combinedSequence") {
-      let index1 = renderedValue.indexOf("[");
-      if (index1 !== -1) {
-        renderedValue =
-          renderedValue.slice(0, index1) + "<i>" + renderedValue.slice(index1);
-        let index2 = renderedValue.lastIndexOf("]");
-        renderedValue =
-          renderedValue.slice(0, index2 + 1) +
-          "</i>" +
-          renderedValue.slice(index2 + 1);
-      }
-    }
-    return renderedValue;
   }
 
   // get common key-value pairs for non-nested properties
