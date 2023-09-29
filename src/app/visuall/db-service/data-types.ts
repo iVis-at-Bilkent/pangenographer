@@ -50,7 +50,7 @@ export interface DbService {
     idFilter: (string | number)[],
     cb: (x) => void
   );
-  importGFA(GFAdata: any, cb?: () => void);
+  importGFA(GFAData: GFAData, cb?: () => void);
   clearData();
   getElementsUpToCertainDistance(
     nodeId: string,
@@ -77,6 +77,81 @@ export interface CyEdge {
   startNode: string | number;
   endNode: string | number;
   type: string;
+}
+
+export interface GFAData {
+  segments: GFASegment[];
+  links: GFALink[];
+  jumps: GFAJump[];
+  containments: GFAContainment[];
+}
+
+export interface GFASegment {
+  segmentData: string;
+  segmentName: string;
+  segmentLength: number;
+  id: string;
+  readCount?: number;
+  fragmentCount?: number;
+  kmerCount?: number;
+  SHA256Checksum?: string;
+  URIorLocalSystemPath?: string;
+}
+
+export interface GFALink {
+  source: string;
+  sourceOrientation: string;
+  target: string;
+  targetOrientation: string;
+  overlap: string;
+  mappingQuality?: number;
+  numberOfMismatchesOrGaps?: number;
+  readCount?: number;
+  fragmentCount?: number;
+  kmerCount?: number;
+  edgeIdentifier?: string;
+}
+
+export interface GFAJump {
+  source: string;
+  sourceOrientation: string;
+  target: string;
+  targetOrientation: string;
+  distance: string;
+  indirectShortcutConnections?: number;
+}
+
+export interface GFAContainment {
+  source: string;
+  sourceOrientation: string;
+  target: string;
+  targetOrientation: string;
+  pos: number;
+  overlap: string;
+  readCount?: number;
+  numberOfMismatchesOrGaps?: number;
+  edgeIdentifier?: string;
+}
+
+export interface GFACombinedSequenceLink {
+  sourceSequenceWithoutOverlap: string;
+  overlapSequence: string;
+  targetSequenceWithoutOverlap: string;
+  sequenceLength: number;
+}
+
+export interface GFACombinedSequenceJump {
+  sourceSequence: string;
+  distance: string;
+  targetSequence: string;
+  sequenceLength: number;
+}
+
+export interface GFACombinedSequenceContainment {
+  leftOfTheContainedSequence: string;
+  containedSequence: string;
+  rightOfTheContainedSequence: string;
+  sequenceLength: number;
 }
 
 export interface TableResponse {

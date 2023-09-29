@@ -9,6 +9,14 @@ import {
   Neo4jEdgeDirection,
   DbResponse,
   DbResponseType,
+  GFAData,
+  GFAContainment,
+  GFASegment,
+  GFAJump,
+  GFALink,
+  GFACombinedSequenceContainment,
+  GFACombinedSequenceJump,
+  GFACombinedSequenceLink,
 } from "./data-types";
 import {
   Rule,
@@ -589,8 +597,8 @@ export class Neo4jDb implements DbService {
       }, errFn);
   }
 
-  importGFA(GFAdata: any, cb?: () => void) {
-    this.runCypherQuery(this.GFAdata2CQL(GFAdata), cb);
+  importGFA(GFAData: GFAData, cb?: () => void) {
+    this.runCypherQuery(this.GFAdata2CQL(GFAData), cb);
   }
 
   clearData() {
@@ -832,84 +840,114 @@ export class Neo4jDb implements DbService {
     return cql;
   }
 
-  private GFAdata2CQL(gfaJSON: any) {
-    const curGfaJson = {
-      nodes: gfaJSON.nodes,
-      edges: gfaJSON.edges,
-    };
-    const nodeMap = new Map();
+  private GFAdata2CQL(GFAData: GFAData): string {
+    const nodeMap = {};
     let query = "CREATE\n";
-    curGfaJson.nodes.forEach((node) => {
-      let node2Create = `(n${node.data.segmentName} :Segment {segmentData: 
-        '${node.data.segmentData}', segmentName: '${node.data.segmentName}'
-        , segmentLength: ${node.data.segmentLength}`;
-      if (node.data.hasOwnProperty("readCount")) {
-        node2Create += `, readCount: ${node.data.readCount}`;
+    GFAData.segments.forEach((segment) => {
+      let node2Create = `(n${segment.segmentName} :Segment {segmentData: 
+        '${segment.segmentData}', segmentName: '${segment.segmentName}'
+        , segmentLength: ${segment.segmentLength}`;
+      if (segment.hasOwnProperty("readCount")) {
+        node2Create += `, readCount: ${segment.readCount}`;
       }
-      if (node.data.hasOwnProperty("fragmentCount")) {
-        node2Create += `, fragmentCount: ${node.data.fragmentCount}`;
+      if (segment.hasOwnProperty("fragmentCount")) {
+        node2Create += `, fragmentCount: ${segment.fragmentCount}`;
       }
-      if (node.data.hasOwnProperty("kmerCount")) {
-        node2Create += `, kmerCount: ${node.data.kmerCount}`;
+      if (segment.hasOwnProperty("kmerCount")) {
+        node2Create += `, kmerCount: ${segment.kmerCount}`;
       }
-      if (node.data.hasOwnProperty("SHA256Checksum")) {
-        node2Create += `, SHA256Checksum: '${node.data.SHA256Checksum}'`;
+      if (segment.hasOwnProperty("SHA256Checksum")) {
+        node2Create += `, SHA256Checksum: '${segment.SHA256Checksum}'`;
       }
-      if (node.data.hasOwnProperty("URIorLocalSystemPath")) {
-        node2Create += `, URIorLocalSystemPath: '${node.data.URIorLocalSystemPath}'`;
+      if (segment.hasOwnProperty("URIorLocalSystemPath")) {
+        node2Create += `, URIorLocalSystemPath: '${segment.URIorLocalSystemPath}'`;
       }
       query += node2Create + "}),\n";
-      nodeMap.set(node.data.segmentName, node);
+      nodeMap[`${segment.segmentName}`] = segment;
     });
 
     query = query.substring(0, query.length - 2) + "\nCREATE\n";
 
-    curGfaJson.edges.forEach((edge) => {
-      let edge2Create = `(n${edge.data.source})-[:${edge.classes}
-        {sourceOrientation: "${edge.data.sourceOrientation}", source: '${edge.data.source}'
-        , targetOrientation: "${edge.data.targetOrientation}", target: '${edge.data.target}'`;
-      if (edge.data.hasOwnProperty("overlap")) {
-        edge2Create += `, overlap: '${edge.data.overlap}'`;
+    GFAData.links.forEach((link) => {
+      let edge2Create = `(n${link.source})-[:LINK
+        {sourceOrientation: "${link.sourceOrientation}", source: '${link.source}'
+        , targetOrientation: "${link.targetOrientation}", target: '${link.target}'`;
+      if (link.hasOwnProperty("overlap")) {
+        edge2Create += `, overlap: '${link.overlap}'`;
       }
-      let combinedSequence = this.combinedSequenceGen(
-        edge,
-        nodeMap.get(edge.data.source),
-        nodeMap.get(edge.data.target)
-      );
-      if (edge.data.hasOwnProperty("pos")) {
-        edge2Create += `, pos: ${edge.data.pos}`;
-        edge2Create += `, leftOfTheContainedSequence: '${combinedSequence.leftOfTheContainedSequence}'`;
-        edge2Create += `, containedSequence: '${combinedSequence.containedSequence}'`;
-        edge2Create += `, rightOfTheContainedSequence: '${combinedSequence.rightOfTheContainedSequence}'`;
-      } else if (edge.data.hasOwnProperty("distance")) {
-        edge2Create += `, sourceSequence: '${combinedSequence.sourceSequence}'`;
-        edge2Create += `, distance: '${edge.data.distance}'`;
-        edge2Create += `, targetSequence: '${combinedSequence.targetSequence}'`;
-      } else {
-        edge2Create += `, sourceSequenceWithoutOverlap: '${combinedSequence.sourceSequenceWithoutOverlap}'`;
-        edge2Create += `, overlapSequence: '${combinedSequence.overlapSequence}'`;
-        edge2Create += `, targetSequenceWithoutOverlap: '${combinedSequence.targetSequenceWithoutOverlap}'`;
-      }
+      let combinedSequence: GFACombinedSequenceLink =
+        this.combinedSequenceGenLink(
+          link,
+          nodeMap[`${link.source}`],
+          nodeMap[`${link.target}`]
+        );
+      edge2Create += `, sourceSequenceWithoutOverlap: '${combinedSequence.sourceSequenceWithoutOverlap}'`;
+      edge2Create += `, overlapSequence: '${combinedSequence.overlapSequence}'`;
+      edge2Create += `, targetSequenceWithoutOverlap: '${combinedSequence.targetSequenceWithoutOverlap}'`;
       edge2Create += `, sequenceLength: '${combinedSequence.sequenceLength}'`;
-      if (edge.data.hasOwnProperty("mappingQuality")) {
-        edge2Create += `, mappingQuality: ${edge.data.mappingQuality}`;
+      if (link.hasOwnProperty("mappingQuality")) {
+        edge2Create += `, mappingQuality: ${link.mappingQuality}`;
       }
-      if (edge.data.hasOwnProperty("numberOfMismatchesOrGaps")) {
-        edge2Create += `, numberOfMismatchesOrGaps: ${edge.data.numberOfMismatchesOrGaps}`;
+      if (link.hasOwnProperty("numberOfMismatchesOrGaps")) {
+        edge2Create += `, numberOfMismatchesOrGaps: ${link.numberOfMismatchesOrGaps}`;
       }
-      if (edge.data.hasOwnProperty("readCount")) {
-        edge2Create += `, readCount: ${edge.data.readCount}`;
+      if (link.hasOwnProperty("readCount")) {
+        edge2Create += `, readCount: ${link.readCount}`;
       }
-      if (edge.data.hasOwnProperty("fragmentCount")) {
-        edge2Create += `, fragmentCount: ${edge.data.fragmentCount}`;
+      if (link.hasOwnProperty("fragmentCount")) {
+        edge2Create += `, fragmentCount: ${link.fragmentCount}`;
       }
-      if (edge.data.hasOwnProperty("kmerCount")) {
-        edge2Create += `, kmerCount: ${edge.data.kmerCount}`;
+      if (link.hasOwnProperty("kmerCount")) {
+        edge2Create += `, kmerCount: ${link.kmerCount}`;
       }
-      if (edge.data.hasOwnProperty("indirectShortcutConnections")) {
-        edge2Create += `, indirectShortcutConnections: ${edge.data.indirectShortcutConnections}`;
+      edge2Create += `}]->(n${link.target}),\n`;
+      query += edge2Create;
+    });
+
+    GFAData.jumps.forEach((jump) => {
+      let edge2Create = `(n${jump.source})-[:JUMP
+        {sourceOrientation: "${jump.sourceOrientation}", source: '${jump.source}'
+        , targetOrientation: "${jump.targetOrientation}", target: '${jump.target}'`;
+      let combinedSequence: GFACombinedSequenceJump =
+        this.combinedSequenceGenJump(
+          jump,
+          nodeMap[`${jump.source}`],
+          nodeMap[`${jump.target}`]
+        );
+      edge2Create += `, sourceSequence: '${combinedSequence.sourceSequence}'`;
+      edge2Create += `, distance: '${jump.distance}'`;
+      edge2Create += `, targetSequence: '${combinedSequence.targetSequence}'`;
+      edge2Create += `, sequenceLength: '${combinedSequence.sequenceLength}'`;
+      if (jump.hasOwnProperty("indirectShortcutConnections")) {
+        edge2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
       }
-      edge2Create += `}]->(n${edge.data.target}),\n`;
+      edge2Create += `}]->(n${jump.target}),\n`;
+      query += edge2Create;
+    });
+
+    GFAData.containments.forEach((containment) => {
+      let edge2Create = `(n${containment.source})-[:LINK
+        {sourceOrientation: "${containment.sourceOrientation}", source: '${containment.source}'
+        , targetOrientation: "${containment.targetOrientation}", target: '${containment.target}'`;
+      edge2Create += `, overlap: '${containment.overlap}'`;
+      let combinedSequence: GFACombinedSequenceContainment =
+        this.combinedSequenceGenContainment(
+          containment,
+          nodeMap[`${containment.source}`],
+          nodeMap[`${containment.target}`]
+        );
+      edge2Create += `, pos: ${containment.pos}`;
+      edge2Create += `, leftOfTheContainedSequence: '${combinedSequence.leftOfTheContainedSequence}'`;
+      edge2Create += `, containedSequence: '${combinedSequence.containedSequence}'`;
+      edge2Create += `, rightOfTheContainedSequence: '${combinedSequence.rightOfTheContainedSequence}'`;
+      edge2Create += `, sequenceLength: '${combinedSequence.sequenceLength}'`;
+      if (containment.hasOwnProperty("numberOfMismatchesOrGaps")) {
+        edge2Create += `, numberOfMismatchesOrGaps: ${containment.numberOfMismatchesOrGaps}`;
+      }
+      if (containment.hasOwnProperty("readCount")) {
+        edge2Create += `, readCount: ${containment.readCount}`;
+      }
+      edge2Create += `}]->(n${containment.target}),\n`;
       query += edge2Create;
     });
 
@@ -917,120 +955,124 @@ export class Neo4jDb implements DbService {
     return query;
   }
 
-  private combinedSequenceGen(edge: any, sourceNode: any, targetNode: any) {
-    if (edge.data.pos) {
-      // containment
-      let overlapNumeric = 0;
-      let pos = edge.data.pos;
-      let leftOfTheContainedSequence = "";
-      let containedSequence = "";
-      let rightOfTheContainedSequence = "";
-      let sequenceLength;
-      if (!pos) {
-        pos = 0;
-      }
-      if (edge.data.overlap && edge.data.overlap !== "*") {
-        overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
-      }
-      leftOfTheContainedSequence = sourceNode.data.segmentData.substr(
-        0,
-        pos - 1
-      );
-      if (edge.data.sourceOrientation === "-") {
-        leftOfTheContainedSequence = this.reverseComplementSegmentData(
-          leftOfTheContainedSequence
-        );
-      }
-      containedSequence = targetNode.data.segmentData;
-      if (edge.data.targetOrientation === "-") {
-        containedSequence =
-          this.reverseComplementSegmentData(containedSequence);
-      }
-      rightOfTheContainedSequence = sourceNode.data.segmentData.substr(
-        pos - 1 + overlapNumeric
-      );
-      sequenceLength =
-        leftOfTheContainedSequence.length +
-        containedSequence.length +
-        rightOfTheContainedSequence.length;
-      return {
-        leftOfTheContainedSequence: leftOfTheContainedSequence,
-        containedSequence: containedSequence,
-        rightOfTheContainedSequence: rightOfTheContainedSequence,
-        sequenceLength: sequenceLength,
-      };
-    } else if (edge.data.distance) {
-      // jump
-      let sourceSequence = "";
-      let targetSequence = "";
-      let distance = edge.data.distance;
-      let sequenceLength;
-      sourceSequence = sourceNode.data.segmentData;
-      if (edge.data.sourceOrientation === "-") {
-        sourceSequence = this.reverseComplementSegmentData(sourceSequence);
-      }
-      targetSequence = targetNode.data.segmentData;
-      if (edge.data.targetOrientation === "-") {
-        targetSequence = this.reverseComplementSegmentData(targetSequence);
-      }
-      if (distance === "*") {
-        sequenceLength = distance;
-      } else {
-        sequenceLength =
-          Number(distance) + sourceSequence.length + targetSequence.length;
-      }
-      return {
-        sourceSequence: sourceSequence,
-        distance: distance,
-        targetSequence: targetSequence,
-        sequenceLength: sequenceLength,
-      };
-    } else {
-      // link
-      let overlapNumeric = 0;
-      let sourceSequenceWithoutOverlap = "";
-      let targetSequenceWithoutOverlap = "";
-      let overlapSequence = "";
-      let sequenceLength;
-      if (edge.data.overlap && edge.data.overlap !== "*") {
-        overlapNumeric = Number(edge.data.overlap.match(/[0-9]+/)[0]);
-      }
-      sourceSequenceWithoutOverlap = sourceNode.data.segmentData;
-      if (edge.data.sourceOrientation === "-") {
-        sourceSequenceWithoutOverlap = this.reverseComplementSegmentData(
-          sourceSequenceWithoutOverlap
-        );
-      }
-      sourceSequenceWithoutOverlap = sourceSequenceWithoutOverlap.substring(
-        0,
-        sourceSequenceWithoutOverlap.length - overlapNumeric
-      );
-      targetSequenceWithoutOverlap = targetNode.data.segmentData;
-      if (edge.data.targetOrientation === "-") {
-        targetSequenceWithoutOverlap = this.reverseComplementSegmentData(
-          targetSequenceWithoutOverlap
-        );
-      }
-      targetSequenceWithoutOverlap =
-        targetSequenceWithoutOverlap.substring(overlapNumeric);
-      overlapSequence = targetNode.data.segmentData.substring(
-        0,
-        overlapNumeric
-      );
-      sequenceLength =
-        sourceSequenceWithoutOverlap.length +
-        overlapSequence.length +
-        targetSequenceWithoutOverlap.length;
-      return {
-        sourceSequenceWithoutOverlap: sourceSequenceWithoutOverlap,
-        targetSequenceWithoutOverlap: targetSequenceWithoutOverlap,
-        overlapSequence: overlapSequence,
-        sequenceLength: sequenceLength,
-      };
+  private combinedSequenceGenLink(
+    edge: GFALink,
+    sourceNode: GFASegment,
+    targetNode: GFASegment
+  ): GFACombinedSequenceLink {
+    let overlapNumeric = 0;
+    let sourceSequenceWithoutOverlap = "";
+    let targetSequenceWithoutOverlap = "";
+    let overlapSequence = "";
+    let sequenceLength;
+    if (edge.overlap && edge.overlap !== "*") {
+      overlapNumeric = Number(edge.overlap.match(/[0-9]+/)[0]);
     }
+    sourceSequenceWithoutOverlap = sourceNode.segmentData;
+    if (edge.sourceOrientation === "-") {
+      sourceSequenceWithoutOverlap = this.reverseComplementSegmentData(
+        sourceSequenceWithoutOverlap
+      );
+    }
+    sourceSequenceWithoutOverlap = sourceSequenceWithoutOverlap.substring(
+      0,
+      sourceSequenceWithoutOverlap.length - overlapNumeric
+    );
+    targetSequenceWithoutOverlap = targetNode.segmentData;
+    if (edge.targetOrientation === "-") {
+      targetSequenceWithoutOverlap = this.reverseComplementSegmentData(
+        targetSequenceWithoutOverlap
+      );
+    }
+    targetSequenceWithoutOverlap =
+      targetSequenceWithoutOverlap.substring(overlapNumeric);
+    overlapSequence = targetNode.segmentData.substring(0, overlapNumeric);
+    sequenceLength =
+      sourceSequenceWithoutOverlap.length +
+      overlapSequence.length +
+      targetSequenceWithoutOverlap.length;
+    return {
+      sourceSequenceWithoutOverlap: sourceSequenceWithoutOverlap,
+      overlapSequence: overlapSequence,
+      targetSequenceWithoutOverlap: targetSequenceWithoutOverlap,
+      sequenceLength: sequenceLength,
+    };
   }
 
-  private reverseComplementSegmentData(segmentData: string) {
+  private combinedSequenceGenJump(
+    edge: GFAJump,
+    sourceNode: GFASegment,
+    targetNode: GFASegment
+  ): GFACombinedSequenceJump {
+    let sourceSequence = "";
+    let targetSequence = "";
+    let distance = edge.distance;
+    let sequenceLength;
+    sourceSequence = sourceNode.segmentData;
+    if (edge.sourceOrientation === "-") {
+      sourceSequence = this.reverseComplementSegmentData(sourceSequence);
+    }
+    targetSequence = targetNode.segmentData;
+    if (edge.targetOrientation === "-") {
+      targetSequence = this.reverseComplementSegmentData(targetSequence);
+    }
+    if (distance === "*") {
+      sequenceLength = distance;
+    } else {
+      sequenceLength =
+        Number(distance) + sourceSequence.length + targetSequence.length;
+    }
+    return {
+      sourceSequence: sourceSequence,
+      distance: distance,
+      targetSequence: targetSequence,
+      sequenceLength: sequenceLength,
+    };
+  }
+
+  private combinedSequenceGenContainment(
+    edge: GFAContainment,
+    sourceNode: GFASegment,
+    targetNode: GFASegment
+  ): GFACombinedSequenceContainment {
+    let overlapNumeric = 0;
+    let pos = edge.pos;
+    let leftOfTheContainedSequence = "";
+    let containedSequence = "";
+    let rightOfTheContainedSequence = "";
+    let sequenceLength;
+    if (!pos) {
+      pos = 0;
+    }
+    if (edge.overlap && edge.overlap !== "*") {
+      overlapNumeric = Number(edge.overlap.match(/[0-9]+/)[0]);
+    }
+    leftOfTheContainedSequence = sourceNode.segmentData.substr(0, pos - 1);
+    if (edge.sourceOrientation === "-") {
+      leftOfTheContainedSequence = this.reverseComplementSegmentData(
+        leftOfTheContainedSequence
+      );
+    }
+    containedSequence = targetNode.segmentData;
+    if (edge.targetOrientation === "-") {
+      containedSequence = this.reverseComplementSegmentData(containedSequence);
+    }
+    rightOfTheContainedSequence = sourceNode.segmentData.substr(
+      pos - 1 + overlapNumeric
+    );
+    sequenceLength =
+      leftOfTheContainedSequence.length +
+      containedSequence.length +
+      rightOfTheContainedSequence.length;
+    return {
+      leftOfTheContainedSequence: leftOfTheContainedSequence,
+      containedSequence: containedSequence,
+      rightOfTheContainedSequence: rightOfTheContainedSequence,
+      sequenceLength: sequenceLength,
+    };
+  }
+
+  private reverseComplementSegmentData(segmentData: string): string {
     segmentData = segmentData.split("").reverse().join("");
     let s = "";
     for (let i = 0; i < segmentData.length; i++) {

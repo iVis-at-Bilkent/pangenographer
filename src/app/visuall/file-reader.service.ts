@@ -1,4 +1,11 @@
-import { Injectable, NgZone } from "@angular/core";
+import { Injectable } from "@angular/core";
+import {
+  GFASegment,
+  GFAJump,
+  GFAContainment,
+  GFALink,
+  GFAData,
+} from "./db-service/data-types";
 @Injectable({
   providedIn: "root",
 })
@@ -21,43 +28,32 @@ export class FileReaderService {
     fileReader.readAsText(file);
   }
 
-  createSegmentFromGFA(segmentLine: string) {
-    let segment = {
-      data: {
-        segmentData: "",
-        segmentName: "",
-        segmentLength: 0,
-        id: "",
-      },
-      position: { x: 0, y: 0 },
-      group: "nodes",
-      removed: false,
-      selected: false,
-      selectable: true,
-      locked: false,
-      grabbable: true,
-      pannable: false,
-      classes: "Segment",
-    };
+  createSegmentFromGFA(segmentLine: string): GFASegment {
     let segmentLineTabSeperated = segmentLine.split(/\t/);
-    segment.data.segmentName = segmentLineTabSeperated[1];
-    segment.data.id = segmentLineTabSeperated[1];
-    segment.data.segmentData = segmentLineTabSeperated[2];
-    segment.data.segmentLength = segmentLineTabSeperated[2].length;
+    let segment: GFASegment = {
+      segmentName: "",
+      id: "",
+      segmentData: "",
+      segmentLength: 0,
+    };
+    segment.segmentName = segmentLineTabSeperated[1];
+    segment.id = segmentLineTabSeperated[1];
+    segment.segmentData = segmentLineTabSeperated[2];
+    segment.segmentLength = segmentLineTabSeperated[2].length;
     for (let i = 3; i < segmentLineTabSeperated.length; i++) {
       let optField = (segmentLineTabSeperated[i] as string).trim();
       if (optField.startsWith("LN")) {
-        segment["data"]["segmentLength"] = Number(optField.substring(5));
+        segment.segmentLength = Number(optField.substring(5));
       } else if (optField.startsWith("RC")) {
-        segment["data"]["readCount"] = Number(optField.substring(5));
+        segment["readCount"] = Number(optField.substring(5));
       } else if (optField.startsWith("FC")) {
-        segment["data"]["fragmentCount"] = Number(optField.substring(5));
+        segment["fragmentCount"] = Number(optField.substring(5));
       } else if (optField.startsWith("KC")) {
-        segment["data"]["kmerCount"] = Number(optField.substring(5));
+        segment["kmerCount"] = Number(optField.substring(5));
       } else if (optField.startsWith("SH")) {
-        segment["data"]["SHA256Checksum"] = optField;
+        segment["SHA256Checksum"] = optField;
       } else if (optField.startsWith("UR")) {
-        segment["data"]["URIorLocalSystemPath"] = optField;
+        segment["URIorLocalSystemPath"] = optField;
       } else {
         console.log("This field is not parsed: " + optField);
       }
@@ -66,90 +62,98 @@ export class FileReaderService {
     return segment;
   }
 
-  createLinkFromGFA(linkLine: string) {
-    let link = {
-      data: {},
-      position: { x: 0, y: 0 },
-      group: "edges",
-      removed: false,
-      selected: false,
-      selectable: true,
-      locked: false,
-      grabbable: true,
-      pannable: true,
+  createJumpFromGFA(jumpLine: string): GFAJump {
+    let jumpLineTabSeperated = jumpLine.split(/\t/);
+    let jump: GFAJump = {
+      source: "",
+      sourceOrientation: "",
+      target: "",
+      targetOrientation: "",
+      distance: "",
     };
+    jump.source = jumpLineTabSeperated[1];
+    jump.sourceOrientation = jumpLineTabSeperated[2];
+    jump.target = jumpLineTabSeperated[3];
+    jump.targetOrientation = jumpLineTabSeperated[4];
+    for (let i = 4; i < jumpLineTabSeperated.length; i++) {
+      let optField = (jumpLineTabSeperated[i] as string).trim();
+      if (optField.startsWith("SC")) {
+        jump["indirectShortcutConnections"] = Number(optField.substring(5));
+      } else {
+        jump.distance = optField;
+      }
+    }
+    return jump;
+  }
+
+  createContainmentFromGFA(containmentLine: string): GFAContainment {
+    let containmentLineTabSeperated = containmentLine.split(/\t/);
+    let containment: GFAContainment = {
+      source: "",
+      sourceOrientation: "",
+      target: "",
+      targetOrientation: "",
+      pos: 0,
+      overlap: "",
+    };
+    containment.source = containmentLineTabSeperated[1];
+    containment.sourceOrientation = containmentLineTabSeperated[2];
+    containment.target = containmentLineTabSeperated[3];
+    containment.targetOrientation = containmentLineTabSeperated[4];
+    containment.pos = Number(containmentLineTabSeperated[5]);
+    containment.overlap = containmentLineTabSeperated[6];
+    for (let i = 4; i < containmentLineTabSeperated.length; i++) {
+      let optField = (containmentLineTabSeperated[i] as string).trim();
+      if (optField.startsWith("RC")) {
+        containment["readCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("NM")) {
+        containment["numberOfMismatchesOrGaps"] = Number(optField.substring(5));
+      } else if (optField.startsWith("ID")) {
+        containment["edgeIdentifier"] = optField;
+      }
+    }
+
+    return containment;
+  }
+
+  createLinkFromGFA(linkLine: string): GFALink {
     let linkLineTabSeperated = linkLine.split(/\t/);
-    if (linkLineTabSeperated[0] === "L") {
-      link["data"]["source"] = linkLineTabSeperated[1];
-      link["data"]["sourceOrientation"] = linkLineTabSeperated[2];
-      link["data"]["target"] = linkLineTabSeperated[3];
-      link["data"]["targetOrientation"] = linkLineTabSeperated[4];
+    let link: GFALink = {
+      source: "",
+      sourceOrientation: "",
+      target: "",
+      targetOrientation: "",
+      overlap: "",
+    };
 
-      for (let i = 4; i < linkLineTabSeperated.length; i++) {
-        let optField = (linkLineTabSeperated[i] as string).trim();
-        if (optField.startsWith("MQ")) {
-          link["data"]["mappingQuality"] = Number(optField.substring(5));
-        } else if (optField.startsWith("NM")) {
-          link["data"]["numberOfMismatchesOrGaps"] = Number(
-            optField.substring(5)
-          );
-        } else if (optField.startsWith("RC")) {
-          link["data"]["readCount"] = Number(optField.substring(5));
-        } else if (optField.startsWith("FC")) {
-          link["data"]["fragmentCount"] = Number(optField.substring(5));
-        } else if (optField.startsWith("KC")) {
-          link["data"]["kmerCount"] = Number(optField.substring(5));
-        } else if (optField.startsWith("ID")) {
-          link["data"]["edgeIdentifier"] = optField;
-        } else {
-          link["data"]["overlap"] = optField;
-        }
-      }
-      link["classes"] = "LINK";
-    } else if (linkLineTabSeperated[0] === "J") {
-      link["data"]["source"] = linkLineTabSeperated[1];
-      link["data"]["sourceOrientation"] = linkLineTabSeperated[2];
-      link["data"]["target"] = linkLineTabSeperated[3];
-      link["data"]["targetOrientation"] = linkLineTabSeperated[4];
+    link.source = linkLineTabSeperated[1];
+    link.sourceOrientation = linkLineTabSeperated[2];
+    link.target = linkLineTabSeperated[3];
+    link.targetOrientation = linkLineTabSeperated[4];
 
-      for (let i = 4; i < linkLineTabSeperated.length; i++) {
-        let optField = (linkLineTabSeperated[i] as string).trim();
-        if (optField.startsWith("SC")) {
-          link["data"]["indirectShortcutConnections"] = Number(
-            optField.substring(5)
-          );
-        } else {
-          link["data"]["distance"] = optField;
-        }
+    for (let i = 4; i < linkLineTabSeperated.length; i++) {
+      let optField = (linkLineTabSeperated[i] as string).trim();
+      if (optField.startsWith("MQ")) {
+        link["mappingQuality"] = Number(optField.substring(5));
+      } else if (optField.startsWith("NM")) {
+        link["numberOfMismatchesOrGaps"] = Number(optField.substring(5));
+      } else if (optField.startsWith("RC")) {
+        link["readCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("FC")) {
+        link["fragmentCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("KC")) {
+        link["kmerCount"] = Number(optField.substring(5));
+      } else if (optField.startsWith("ID")) {
+        link["edgeIdentifier"] = optField;
+      } else {
+        link.overlap = optField;
       }
-      link["classes"] = "JUMP";
-    } else if (linkLineTabSeperated[0] === "C") {
-      link["data"]["source"] = linkLineTabSeperated[1];
-      link["data"]["sourceOrientation"] = linkLineTabSeperated[2];
-      link["data"]["target"] = linkLineTabSeperated[3];
-      link["data"]["targetOrientation"] = linkLineTabSeperated[4];
-      link["data"]["pos"] = Number(linkLineTabSeperated[5]);
-      link["data"]["overlap"] = linkLineTabSeperated[6];
-
-      for (let i = 4; i < linkLineTabSeperated.length; i++) {
-        let optField = (linkLineTabSeperated[i] as string).trim();
-        if (optField.startsWith("RC")) {
-          link["data"]["readCount"] = Number(optField.substring(5));
-        } else if (optField.startsWith("NM")) {
-          link["data"]["numberOfMismatchesOrGaps"] = Number(
-            optField.substring(5)
-          );
-        } else if (optField.startsWith("ID")) {
-          link["data"]["edgeIdentifier"] = optField;
-        }
-      }
-      link["classes"] = "CONTAINMENT";
     }
 
     return link;
   }
 
-  readGFAFile(gfaFile: File, cb: (any) => void) {
+  readGFAFile(gfaFile: File, cb: (GFAData: GFAData) => void) {
     const fileReader = new FileReader();
     fileReader.onload = (e) => {
       try {
@@ -169,16 +173,17 @@ export class FileReaderService {
     fileReader.readAsText(gfaFile);
   }
 
-  readGFASample (gfaSample: string, cb: (any) => void) {
+  readGFASample(gfaSample: string, cb: (GFAData: GFAData) => void) {
     cb(this.parseGFA(gfaSample));
   }
 
-  parseGFA(content: string) {
-    
+  parseGFA(content: string): GFAData {
     const lines = content.split(/\n/);
-    const GFAdata = {
-      nodes: [],
-      edges: [],
+    let GFAdata: GFAData = {
+      segments: [],
+      links: [],
+      jumps: [],
+      containments: [],
     };
 
     let lineCount = 0;
@@ -187,9 +192,13 @@ export class FileReaderService {
       if (!line) {
         console.log("Line " + lineCount + " is empty");
       } else if (line[0] === "S") {
-        GFAdata.nodes.push(this.createSegmentFromGFA(line));
-      } else if (line[0].match(/(L|C|J)/)) {
-        GFAdata.edges.push(this.createLinkFromGFA(line));
+        GFAdata.segments.push(this.createSegmentFromGFA(line));
+      } else if (line[0] === "L") {
+        GFAdata.links.push(this.createLinkFromGFA(line));
+      } else if (line[0] === "J") {
+        GFAdata.jumps.push(this.createJumpFromGFA(line));
+      } else if (line[0] === "C") {
+        GFAdata.containments.push(this.createContainmentFromGFA(line));
       } else if (line[0] === "H") {
         // version of GFA file
       } else if (line[0] === "#") {
@@ -202,6 +211,4 @@ export class FileReaderService {
     });
     return GFAdata;
   }
-
-  readGFA2File(gfaFile: File, cb: (any) => void) {}
 }

@@ -8,6 +8,7 @@ import {
   GraphElem,
   CyEdge,
   CyNode,
+  GFAData,
 } from "./db-service/data-types";
 import { UserPrefHelper } from "./user-pref-helper";
 import {
@@ -1042,15 +1043,11 @@ export class CytoscapeService {
     });
   }
 
-  readGFAFile(file: File, cb: (any) => void) {
+  readGFAFile(file: File, cb: (GFAData: GFAData) => void) {
     let type = file.name.substring(file.name.lastIndexOf(".") + 1);
     if (type === "gfa") {
-      this._fileReaderService.readGFAFile(file, (GFAdata) => {
-        cb(GFAdata);
-      });
-    } else if (type === "gfa2") {
-      this._fileReaderService.readGFA2File(file, (GFAdata) => {
-        cb(GFAdata);
+      this._fileReaderService.readGFAFile(file, (GFAData: GFAData) => {
+        cb(GFAData);
       });
     } else {
       this._g.showErrorModal(
@@ -1060,9 +1057,9 @@ export class CytoscapeService {
     }
   }
 
-  readGFASample(sample: string, cb: (any) => void) {
-    this._fileReaderService.readGFASample(sample, (GFAdata) => {
-      cb(GFAdata);
+  readGFASample(sample: string, cb: (GFAData: GFAData) => void) {
+    this._fileReaderService.readGFASample(sample, (GFAData: GFAData) => {
+      cb(GFAData);
     });
   }
 

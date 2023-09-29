@@ -14,6 +14,7 @@ import { URLLoadService } from "../load-from-url.service";
 import { GroupingOptionTypes } from "../user-preference";
 import { Subscription } from "rxjs";
 import { FileReaderService } from "../file-reader.service";
+import { GFAData } from "../db-service/data-types";
 import samples from "../../../../sample_gfas/gfa.json";
 
 @Component({
@@ -240,7 +241,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this._urlload.init();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
     if (this.appDescSubs) {
       this.appDescSubs.unsubscribe();
     }
@@ -250,8 +251,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.isLoadFileGFA) {
       this._cyService.readGFAFile(
         this.file.nativeElement.files[0],
-        (GFAdata) => {
-          this._dbService.getGFAdata2ImportGFA(GFAdata, () => {
+        (GFAData: GFAData) => {
+          this._dbService.getGFAdata2ImportGFA(GFAData, () => {
             this.getSampleData();
           });
         }
@@ -270,8 +271,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   sampleSelected(sample: string) {
     this.prepareGFALoad();
-    this._cyService.readGFASample(sample, (GFAdata) => {
-      this._dbService.getGFAdata2ImportGFA(GFAdata, () => {
+    this._cyService.readGFASample(sample, (GFAData: GFAData) => {
+      this._dbService.getGFAdata2ImportGFA(GFAData, () => {
         this.getSampleData();
       });
     });

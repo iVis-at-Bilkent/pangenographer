@@ -7,6 +7,7 @@ import {
   Neo4jEdgeDirection,
   DbResponse,
   DbResponseType,
+  GFAData,
 } from "./data-types";
 import {
   ClassBasedRules,
@@ -196,9 +197,9 @@ export class DbAdapterService {
     );
   }
 
-  getGFAdata2ImportGFA(GFAdata: any, cb?: () => void) {
+  getGFAdata2ImportGFA(GFAData: GFAData, cb?: () => void) {
     this._g.add2GraphHistory(`Import GFA`);
-    this._db.importGFA(GFAdata, cb);
+    this._db.importGFA(GFAData, cb);
   }
 
   clearData() {
