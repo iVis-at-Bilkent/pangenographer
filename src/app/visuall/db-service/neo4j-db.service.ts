@@ -220,7 +220,31 @@ export class Neo4jDb implements DbService {
     if (f2.length > 0) {
       f += f2;
     }
-    this.runQuery(`MATCH (n)-[e]-() ${f} RETURN n,e limit 100`, callback);
+    this.runQuery(`MATCH (n)-[e]-() ${f} RETURN n,e`, callback);
+  }
+
+  getConsecutiveNodes(
+    properties: (string | number)[],
+    propertyType: string,
+    objectType: string,
+    callback: (x: GraphResponse) => any
+  ) {
+    let q = "MATCH ";
+    properties.forEach((x, i) => {
+      if (i != properties.length - 1) {
+        q += `(n${i}:${objectType} {${propertyType}: '${x}'})-[e${i}]-`;
+      } else {
+        q += `(n${i}:${objectType} {${propertyType}: '${x}'}) RETURN `;
+      }
+    });
+    properties.forEach((x, i) => {
+      if (i != properties.length - 1) {
+        q += `n${i}, e${i}, `;
+      } else {
+        q += `n${i}`;
+      }
+    });
+    this.runQuery(q, callback);
   }
 
   getFilteringResult(
@@ -841,10 +865,27 @@ export class Neo4jDb implements DbService {
   }
 
   private GFAdata2CQL(GFAData: GFAData): string {
-    const nodeMap = {};
+    let nodeMap = {};
+    let segmentsToPathMap = {}; // segmentName -> [pathName1, pathName2, ...]
+    let pathMap = {}; // pathName -> GFAPath
+
+    GFAData.paths.forEach((path) => {
+      let segmentNames = path.segmentNames.split(",");
+      segmentNames.forEach((segmentName) => {
+        segmentName = segmentName.substring(0, segmentName.length - 1);
+        if (segmentsToPathMap.hasOwnProperty(segmentName)) {
+          segmentsToPathMap[`${segmentName}`].push(path.pathName);
+        } else {
+          segmentsToPathMap[`${segmentName}`] = [];
+          segmentsToPathMap[`${segmentName}`].push(path.pathName);
+        }
+      });
+      pathMap[`${path.pathName}`] = path;
+    });
+
     let query = "CREATE\n";
     GFAData.segments.forEach((segment) => {
-      let node2Create = `(n${segment.segmentName} :Segment {segmentData: 
+      let node2Create = `(n${segment.segmentName} :SEGMENT {segmentData: 
         '${segment.segmentData}', segmentName: '${segment.segmentName}'
         , segmentLength: ${segment.segmentLength}`;
       if (segment.hasOwnProperty("readCount")) {
@@ -861,6 +902,23 @@ export class Neo4jDb implements DbService {
       }
       if (segment.hasOwnProperty("URIorLocalSystemPath")) {
         node2Create += `, URIorLocalSystemPath: '${segment.URIorLocalSystemPath}'`;
+      }
+      if (segmentsToPathMap[`${segment.segmentName}`]) {
+        node2Create += ", pathNames: [";
+        segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
+          node2Create += `'${pathName}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", pathSegmentNames: [";
+        segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
+          node2Create += `'${pathMap[`${pathName}`].segmentNames}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", pathOverlaps: [";
+        segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
+          node2Create += `'${pathMap[`${pathName}`].overlaps}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
       }
       query += node2Create + "}),\n";
       nodeMap[`${segment.segmentName}`] = segment;

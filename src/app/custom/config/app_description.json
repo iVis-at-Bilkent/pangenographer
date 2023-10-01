@@ -8,7 +8,7 @@
     "company_contact": "ivis@cs.bilkent.edu.tr"
   },
   "objects": {
-    "Segment": {
+    "SEGMENT": {
       "properties": {
         "segmentName": "string",
         "segmentData": "string",
@@ -17,10 +17,13 @@
         "fragmentCount": "number",
         "kmerCount": "number",
         "SHA256Checksum": "string",
-        "URIorLocalSystemPath": "string"
+        "URIorLocalSystemPath": "string",
+        "pathNames": "string[]",
+        "pathSegmentNames": "string[]",
+        "pathOverlaps": "string[]"
       },
       "style": {
-        "label": "segment",
+        "label": "Segment",
         "color": "black",
         "text-outline-color": "white",
         "text-outline-width": "0px",
@@ -40,8 +43,8 @@
   },
   "relations": {
     "LINK": {
-      "source": "Segment",
-      "target": "Segment",
+      "source": "SEGMENT",
+      "target": "SEGMENT",
       "isBidirectional": false,
       "properties": {
         "overlap": "string",
@@ -71,8 +74,8 @@
       }
     },
     "JUMP": {
-      "source": "Segment",
-      "target": "Segment",
+      "source": "SEGMENT",
+      "target": "SEGMENT",
       "isBidirectional": false,
       "properties": {
         "targetOrientation": "string",
@@ -96,8 +99,8 @@
       }
     },
     "CONTAINMENT": {
-      "source": "Segment",
-      "target": "Segment",
+      "source": "SEGMENT",
+      "target": "SEGMENT",
       "isBidirectional": false,
       "properties": {
         "pos": "number",

@@ -12,6 +12,7 @@ import {
   extend,
   PROPERITY_NAMES,
 } from "../../constants";
+import { DbAdapterService } from "../../db-service/db-adapter.service";
 import {
   TableViewInput,
   TableData,
@@ -33,7 +34,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   nodeClasses: Set<string>;
   edgeClasses: Set<string>;
   selectedClasses: string;
-  selectedItemProps: any[];
+  selectedItemProps: any;
   tableFilled = new Subject<boolean>();
   multiObjTableFilled = new Subject<boolean>();
   clearMultiObjTableFilter = new Subject<boolean>();
@@ -83,9 +84,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   constructor(
     private _g: GlobalVariableService,
+    private _dbService: DbAdapterService,
     private _cyService: CytoscapeService
   ) {
-    this.selectedItemProps = [];
+    this.selectedItemProps = {};
   }
 
   ngOnInit() {
@@ -182,7 +184,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       .filter("." + COLLAPSED_EDGE_CLASS);
     const selectedNodeCnt = this._g.cy.nodes(":selected").length;
     this.selectedClasses = "";
-    this.selectedItemProps.length = 0;
+    this.selectedItemProps = {};
     if (compoundEdges.length < 1 || selectedNodeCnt > 0) {
       return;
     }
@@ -290,7 +292,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   showMultiObjTable(isNeed2Filter: boolean) {
     let selected = this._g.cy.$(":selected").not("." + CLUSTER_CLASS);
     this.selectedClasses = "";
-    this.selectedItemProps.length = 0;
+    this.selectedItemProps = {};
     let hasNode = selected.filter("node").length > 0;
     if (hasNode && selected.filter("edge").length > 0) {
       return;
@@ -314,7 +316,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
 
     this.selectedClasses = classNames;
-    this.selectedItemProps.length = 0;
+    this.selectedItemProps = {};
 
     let propKeys = Object.keys(props);
     // get ordered keys if only one item is selected
@@ -344,23 +346,59 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           key.toLowerCase() === DATE_PROP_START ||
           key.toLowerCase() === DATE_PROP_END
         ) {
-          this.selectedItemProps.push({
-            key: renderedKey,
+          this.selectedItemProps[`${renderedKey}`] = {
             val: renderedValue,
             name: PROPERITY_NAMES[renderedKey],
-          });
-          continue;
+          };
+        } else {
+          renderedValue = this.getMappedProperty(
+            this.selectedClasses,
+            key,
+            renderedValue
+          );
+          this.selectedItemProps[`${renderedKey}`] = {
+            val: renderedValue,
+            name: PROPERITY_NAMES[renderedKey],
+          };
         }
-        renderedValue = this.getMappedProperty(
-          this.selectedClasses,
-          key,
-          renderedValue
-        );
-        this.selectedItemProps.push({
-          key: renderedKey,
-          val: renderedValue,
-          name: PROPERITY_NAMES[renderedKey],
-        });
+        if (renderedKey === "pathNames") {
+          this.selectedItemProps[`pathChecked`] = [];
+          for (let i = 0; i < renderedValue.length; i++) {
+            this.selectedItemProps[`pathChecked`].push(false);
+          }
+        }
+      }
+    }
+  }
+
+  getPathsSelected() {
+    let segmentNames = [];
+    this.selectedItemProps["pathChecked"].forEach((isChecked, i) => {
+      if (isChecked) {
+        this.selectedItemProps.pathSegmentNames.val[i]
+          .split(",")
+          .forEach((segmentName) => {
+            segmentNames.push(segmentName.substring(0, segmentName.length - 1));
+          });
+      }
+    });
+    if (segmentNames.length === 0) {
+      return;
+    }
+    this._dbService.getConsecutiveNodes(
+      segmentNames,
+      "segmentName",
+      "SEGMENT",
+      (x) => {
+        this._cyService.loadElementsFromDatabase(x, true);
+      }
+    );
+  }
+
+  setOtherPathsFalse(index: number): void {
+    for (let i = 0; i < this.selectedItemProps.pathChecked.length; i++) {
+      if (i !== index) {
+        this.selectedItemProps.pathChecked[i] = false;
       }
     }
   }

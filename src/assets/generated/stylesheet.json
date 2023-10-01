@@ -86,9 +86,9 @@
     }
   },
   {
-    "selector": "node.Segment",
+    "selector": "node.SEGMENT",
     "style": {
-      "label": "segment",
+      "label": "Segment",
       "color": "black",
       "text-outline-color": "white",
       "text-outline-width": "0px",

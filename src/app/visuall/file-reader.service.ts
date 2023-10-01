@@ -5,6 +5,7 @@ import {
   GFAContainment,
   GFALink,
   GFAData,
+  GFAPath,
 } from "./db-service/data-types";
 @Injectable({
   providedIn: "root",
@@ -28,7 +29,7 @@ export class FileReaderService {
     fileReader.readAsText(file);
   }
 
-  createSegmentFromGFA(segmentLine: string): GFASegment {
+  private createSegmentFromGFA(segmentLine: string): GFASegment {
     let segmentLineTabSeperated = segmentLine.split(/\t/);
     let segment: GFASegment = {
       segmentName: "",
@@ -62,7 +63,7 @@ export class FileReaderService {
     return segment;
   }
 
-  createJumpFromGFA(jumpLine: string): GFAJump {
+  private createJumpFromGFA(jumpLine: string): GFAJump {
     let jumpLineTabSeperated = jumpLine.split(/\t/);
     let jump: GFAJump = {
       source: "",
@@ -86,7 +87,7 @@ export class FileReaderService {
     return jump;
   }
 
-  createContainmentFromGFA(containmentLine: string): GFAContainment {
+  private createContainmentFromGFA(containmentLine: string): GFAContainment {
     let containmentLineTabSeperated = containmentLine.split(/\t/);
     let containment: GFAContainment = {
       source: "",
@@ -116,7 +117,7 @@ export class FileReaderService {
     return containment;
   }
 
-  createLinkFromGFA(linkLine: string): GFALink {
+  private createLinkFromGFA(linkLine: string): GFALink {
     let linkLineTabSeperated = linkLine.split(/\t/);
     let link: GFALink = {
       source: "",
@@ -153,6 +154,21 @@ export class FileReaderService {
     return link;
   }
 
+  private createPathFromGFA(pathLine: string): GFAPath {
+    let pathLineTabSeperated = pathLine.split(/\t/);
+    let path: GFAPath = {
+      pathName: "",
+      segmentNames: "",
+      overlaps: "",
+    };
+
+    path.pathName = pathLineTabSeperated[1];
+    path.segmentNames = pathLineTabSeperated[2];
+    path.overlaps = pathLineTabSeperated[3];
+
+    return path;
+  }
+
   readGFAFile(gfaFile: File, cb: (GFAData: GFAData) => void) {
     const fileReader = new FileReader();
     fileReader.onload = (e) => {
@@ -184,6 +200,7 @@ export class FileReaderService {
       links: [],
       jumps: [],
       containments: [],
+      paths: [],
     };
 
     let lineCount = 0;
@@ -199,6 +216,12 @@ export class FileReaderService {
         GFAdata.jumps.push(this.createJumpFromGFA(line));
       } else if (line[0] === "C") {
         GFAdata.containments.push(this.createContainmentFromGFA(line));
+      } else if (line[0] === "P") {
+        if (line[2].indexOf(";") === -1) {
+          GFAdata.paths.push(this.createPathFromGFA(line));
+        } else {
+          console.log("Path v1.2 is not implemented in line " + lineCount);
+        }
       } else if (line[0] === "H") {
         // version of GFA file
       } else if (line[0] === "#") {

@@ -458,7 +458,7 @@ export class CytoscapeService {
     fontFamily: string,
     fontWeight: string,
     fontStyle: string
-  ) {
+  ): number {
     let context = document.createElement("canvas").getContext("2d");
     let fsize = fontSize + "px";
     context.font =
@@ -603,7 +603,7 @@ export class CytoscapeService {
     });
   }
 
-  private edgeTooltipInnerTextSize(size: number) {
+  private edgeTooltipInnerTextSize(size: number): number {
     return size > 245 ? 245 : size + Math.floor(size / 41);
   }
 
@@ -722,7 +722,7 @@ export class CytoscapeService {
     return { text, lengths };
   }
 
-  hasNewElem(newElemIds: string[], prevElems: any) {
+  hasNewElem(newElemIds: string[], prevElems: any): boolean {
     let d = {};
 
     for (let i = 0; i < prevElems.length; i++) {
@@ -832,7 +832,7 @@ export class CytoscapeService {
     }
   }
 
-  createCyNode(node: CyNode, id) {
+  createCyNode(node: CyNode, id: string) {
     const classes = node.labels.join(" ");
     let properties = node.properties;
     properties.id = id;
@@ -840,7 +840,7 @@ export class CytoscapeService {
     return { data: properties, classes: classes };
   }
 
-  createCyEdge(edge: CyEdge, id) {
+  createCyEdge(edge: CyEdge, id: string) {
     let properties = edge.properties || {};
     properties.id = id;
     properties.source = "n" + edge.startNode;
@@ -910,7 +910,7 @@ export class CytoscapeService {
     ctx: CanvasRenderingContext2D,
     txt: string,
     wid: number
-  ) {
+  ): string {
     let len = txt.length;
     if (ctx.measureText(txt.substr(0, len)).width <= wid) {
       return txt;

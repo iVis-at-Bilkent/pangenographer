@@ -12,102 +12,275 @@
     </div>
 
     <div id="prop-tab" class="collapse show text-center m-1">
-      <ng-container *ngFor="let item of selectedItemProps">
-        <div
-          *ngIf="item.key === 'segmentData'"
-          class="segment-data-container"
-          [innerHTML]="item.val"
-        ></div>
-        <div *ngIf="item.key === 'pos'" class="combined-sequence-container">
-          <ng-container *ngFor="let innerItem of selectedItemProps">
-            <span
-              *ngIf="innerItem.key === 'leftOfTheContainedSequence'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-            <span
-              *ngIf="innerItem.key === 'containedSequence'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-            <span
-              *ngIf="innerItem.key === 'rightOfTheContainedSequence'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-          </ng-container>
-        </div>
-        <div
-          *ngIf="item.key === 'distance'"
-          class="combined-sequence-container"
+      <div *ngIf="selectedItemProps.segmentData" class="segment-data-container">
+        {{ selectedItemProps.segmentData.val }}
+      </div>
+      <div *ngIf="selectedItemProps.pos" class="combined-sequence-container">
+        <span
+          *ngIf="selectedItemProps.leftOfTheContainedSequence"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.leftOfTheContainedSequence.val }}</span
         >
-          <ng-container *ngFor="let innerItem of selectedItemProps">
-            <span
-              *ngIf="innerItem.key === 'sourceSequence'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-            <span
-              *ngIf="innerItem.key === 'distance'"
-              class="combined-sequence-container-part"
-              >..({{ innerItem.val }})..</span
-            >
-            <span
-              *ngIf="innerItem.key === 'targetSequence'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-          </ng-container>
-        </div>
-        <div
-          *ngIf="item.key === 'overlapSequence'"
-          class="combined-sequence-container"
+        <span
+          *ngIf="selectedItemProps.containedSequence"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.containedSequence.val }}</span
         >
-          <ng-container *ngFor="let innerItem of selectedItemProps">
-            <span
-              *ngIf="innerItem.key === 'sourceSequenceWithoutOverlap'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-            <span
-              *ngIf="innerItem.key === 'overlapSequence'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-            <span
-              *ngIf="innerItem.key === 'targetSequenceWithoutOverlap'"
-              class="combined-sequence-container-part"
-              >{{ innerItem.val }}</span
-            >
-          </ng-container>
-        </div>
-      </ng-container>
+        <span
+          *ngIf="selectedItemProps.rightOfTheContainedSequence"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.rightOfTheContainedSequence.val }}</span
+        >
+      </div>
+      <div
+        *ngIf="selectedItemProps.distance"
+        class="combined-sequence-container"
+      >
+        <span
+          *ngIf="selectedItemProps.sourceSequence"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.sourceSequence.val }}</span
+        >
+        <span
+          *ngIf="selectedItemProps.distance"
+          class="combined-sequence-container-part"
+          >..({{ selectedItemProps.distance.val }})..</span
+        >
+        <span
+          *ngIf="selectedItemProps.targetSequence"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.targetSequence.val }}</span
+        >
+      </div>
+      <div
+        *ngIf="selectedItemProps.overlapSequence"
+        class="combined-sequence-container"
+      >
+        <span
+          *ngIf="selectedItemProps.sourceSequenceWithoutOverlap"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.sourceSequenceWithoutOverlap.val }}</span
+        >
+        <span
+          *ngIf="selectedItemProps.overlapSequence"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.overlapSequence.val }}</span
+        >
+        <span
+          *ngIf="selectedItemProps.targetSequenceWithoutOverlap"
+          class="combined-sequence-container-part"
+          >{{ selectedItemProps.targetSequenceWithoutOverlap.val }}</span
+        >
+      </div>
 
       <table class="table table-responsive table-borderless table-sm">
         <tbody>
-          <ng-container *ngFor="let item of selectedItemProps">
-            <tr
-              *ngIf="
-                item.key !== 'segmentData' &&
-                item.key !== 'combinedSequence' &&
-                item.key !== 'pos' &&
-                item.key !== 'distance' &&
-                item.key !== 'overlapSequence' &&
-                item.key !== 'sourceSequenceWithoutOverlap' &&
-                item.key !== 'overlapSequence' &&
-                item.key !== 'targetSequenceWithoutOverlap' &&
-                item.key !== 'leftOfTheContainedSequence' &&
-                item.key !== 'containedSequence' &&
-                item.key !== 'rightOfTheContainedSequence' &&
-                item.key !== 'sourceSequence' &&
-                item.key !== 'targetSequence'
-              "
-            >
+          <tr *ngIf="selectedItemProps.segmentName">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.segmentName.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.segmentName.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.segmentLength">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.segmentLength.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.segmentLength.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.readCount">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.readCount.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.readCount.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.fragmentCount">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.fragmentCount.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.fragmentCount.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.kmerCount">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.kmerCount.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.kmerCount.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.SHA256Checksum">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.SHA256Checksum.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.SHA256Checksum.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.URIorLocalSystemPath">
+            <td class="text-start">
+              <b class="va-text">{{
+                selectedItemProps.URIorLocalSystemPath.name
+              }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.URIorLocalSystemPath.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.overlap">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.overlap.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.overlap.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.targetOrientation">
+            <td class="text-start">
+              <b class="va-text">{{
+                selectedItemProps.targetOrientation.name
+              }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.targetOrientation.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.sourceOrientation">
+            <td class="text-start">
+              <b class="va-text">{{
+                selectedItemProps.sourceOrientation.name
+              }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.sourceOrientation.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.mappingQuality">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.mappingQuality.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.mappingQuality.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.numberOfMismatchesOrGaps">
+            <td class="text-start">
+              <b class="va-text">{{
+                selectedItemProps.numberOfMismatchesOrGaps.name
+              }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.numberOfMismatchesOrGaps.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.edgeIdentifier">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.edgeIdentifier.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.edgeIdentifier.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.sequenceLength">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.sequenceLength.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.sequenceLength.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.indirectShortcutConnections">
+            <td class="text-start">
+              <b class="va-text">{{
+                selectedItemProps.indirectShortcutConnections.name
+              }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.indirectShortcutConnections.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.distance">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.distance.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.distance.val }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProps.pos">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.pos.name }}</b>
+            </td>
+            <td class="va-text text-end">{{ selectedItemProps.pos.val }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table
+        *ngIf="selectedItemProps.pathNames"
+        class="table table-responsive table-borderless table-sm"
+      >
+        <div class="path-title">
+          <span class="va-heading1 va-text-center">Paths</span>
+          <input
+            class="btn btn-sm btn-dark va-text m-2 center"
+            type="button"
+            (click)="getPathsSelected()"
+            value="Get Path(s)"
+            title="Get Path(s)"
+          />
+        </div>
+        <tbody>
+          <ng-container
+            *ngFor="let item of selectedItemProps.pathNames.val; let i = index"
+          >
+            <div class="path-container">
               <td class="text-start">
-                <b class="va-text">{{ item.name }}</b>
+                <div class="path-name">
+                  <div>
+                    <span class="text-start">
+                      <b class="va-text">Path name: </b>
+                    </span>
+                    <span class="va-text text-end">
+                      {{ selectedItemProps.pathNames.val[i] }}
+                    </span>
+                  </div>
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="selectedItemProps.pathChecked[i]"
+                    (change)="setOtherPathsFalse(i)"
+                  />
+                </div>
+                <div class="path-segment va-text">
+                  <span class="text-start">
+                    <b class="va-text">Segment names: </b>
+                  </span>
+                  <span class="va-text text-end">
+                    {{
+                      selectedItemProps.pathSegmentNames.val[i]
+                        .split(",")
+                        .join(" ")
+                    }}
+                  </span>
+                </div>
+                <div class="path-overlap va-text">
+                  <span class="text-start">
+                    <b class="va-text">Overlaps: </b>
+                  </span>
+                  <span class="va-text text-end">
+                    {{
+                      selectedItemProps.pathOverlaps.val[i].split(",").join(" ")
+                    }}
+                  </span>
+                </div>
               </td>
-              <td class="va-text text-end">{{ item.val }}</td>
-            </tr>
+            </div>
           </ng-container>
         </tbody>
       </table>

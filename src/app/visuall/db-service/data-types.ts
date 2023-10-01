@@ -50,6 +50,12 @@ export interface DbService {
     idFilter: (string | number)[],
     cb: (x) => void
   );
+  getConsecutiveNodes(
+    properties: (string | number)[],
+    propertyType: string,
+    objectType: string,
+    callback: (x: GraphResponse) => any
+  );
   importGFA(GFAData: GFAData, cb?: () => void);
   clearData();
   getElementsUpToCertainDistance(
@@ -84,6 +90,7 @@ export interface GFAData {
   links: GFALink[];
   jumps: GFAJump[];
   containments: GFAContainment[];
+  paths: GFAPath[];
 }
 
 export interface GFASegment {
@@ -131,6 +138,12 @@ export interface GFAContainment {
   readCount?: number;
   numberOfMismatchesOrGaps?: number;
   edgeIdentifier?: string;
+}
+
+export interface GFAPath {
+  pathName: string;
+  segmentNames: string;
+  overlaps: string;
 }
 
 export interface GFACombinedSequenceLink {

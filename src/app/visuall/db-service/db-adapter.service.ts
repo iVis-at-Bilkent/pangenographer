@@ -99,6 +99,19 @@ export class DbAdapterService {
     this._db.getSampleData(fn);
   }
 
+  getConsecutiveNodes(
+    properties: (string | number)[],
+    propertyType: string,
+    objectType: string,
+    callback: (x: GraphResponse) => any
+  ) {
+    let fn = (x) => {
+      callback(x);
+      this._g.add2GraphHistory("Get consecutive nodes");
+    };
+    this._db.getConsecutiveNodes(properties, propertyType, objectType, fn);
+  }
+
   getFilteringResult(
     rules: ClassBasedRules,
     filter: TableFiltering,

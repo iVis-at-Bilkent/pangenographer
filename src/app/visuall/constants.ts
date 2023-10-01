@@ -164,6 +164,9 @@ export const PROPERITY_NAMES = {
   indirectShortcutConnections: "Indirect shortcut connections",
   pos: "Pos",
   sequenceLength: "Sequence length",
+  pathNames: "Path names",
+  pathSegmentNames: "Path segment names",
+  pathOverlaps: "Path overlaps",
 };
 
 /** https://davidwalsh.name/javascript-debounce-function

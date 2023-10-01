@@ -1,6 +1,6 @@
 {
   "nodes": {
-    "Segment": {
+    "SEGMENT": {
       "segmentName": "string",
       "segmentData": "string",
       "segmentLength": "number",
@@ -8,7 +8,10 @@
       "fragmentCount": "number",
       "kmerCount": "number",
       "SHA256Checksum": "string",
-      "URIorLocalSystemPath": "string"
+      "URIorLocalSystemPath": "string",
+      "pathNames": "string[]",
+      "pathSegmentNames": "string[]",
+      "pathOverlaps": "string[]"
     }
   },
   "edges": {
