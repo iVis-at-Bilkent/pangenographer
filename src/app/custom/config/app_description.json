@@ -20,7 +20,13 @@
         "URIorLocalSystemPath": "string",
         "pathNames": "string[]",
         "pathSegmentNames": "string[]",
-        "pathOverlaps": "string[]"
+        "pathOverlaps": "string[]",
+        "walkSampleIds": "string[]",
+        "walkHapIndexes": "number[]",
+        "walkSeqIds": "string[]",
+        "walkSeqStarts": "number[]",
+        "walkSeqEnds": "number[]",
+        "walks": "string[]"
       },
       "style": {
         "label": "Segment",

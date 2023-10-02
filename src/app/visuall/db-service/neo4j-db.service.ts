@@ -220,7 +220,7 @@ export class Neo4jDb implements DbService {
     if (f2.length > 0) {
       f += f2;
     }
-    this.runQuery(`MATCH (n)-[e]-() ${f} RETURN n,e`, callback);
+    this.runQuery(`MATCH (n)-[e]-() ${f} RETURN n,e LIMIT 100`, callback);
   }
 
   getConsecutiveNodes(
@@ -865,12 +865,10 @@ export class Neo4jDb implements DbService {
   }
 
   private GFAdata2CQL(GFAData: GFAData): string {
-    let nodeMap = {};
     let segmentsToPathMap = {}; // segmentName -> [pathName1, pathName2, ...]
     let pathMap = {}; // pathName -> GFAPath
-
     GFAData.paths.forEach((path) => {
-      let segmentNames = path.segmentNames.split(",");
+      let segmentNames = path.segmentNames.split(/[;,]/);
       segmentNames.forEach((segmentName) => {
         segmentName = segmentName.substring(0, segmentName.length - 1);
         if (segmentsToPathMap.hasOwnProperty(segmentName)) {
@@ -883,6 +881,22 @@ export class Neo4jDb implements DbService {
       pathMap[`${path.pathName}`] = path;
     });
 
+    let segmentsToWalkMap = {}; // segmentName -> [sampleId1, sampleId2, ...]
+    let walkMap = {}; // sampleId -> GFAWalk
+    GFAData.walks.forEach((walk) => {
+      let segmentNames = walk.walk.substring(1).split(/[<>]/);
+      segmentNames.forEach((segmentName) => {
+        if (segmentsToWalkMap.hasOwnProperty(segmentName)) {
+          segmentsToWalkMap[`${segmentName}`].push(walk.sampleId);
+        } else {
+          segmentsToWalkMap[`${segmentName}`] = [];
+          segmentsToWalkMap[`${segmentName}`].push(walk.sampleId);
+        }
+      });
+      walkMap[`${walk.sampleId}`] = walk;
+    });
+
+    let nodeMap = {};
     let query = "CREATE\n";
     GFAData.segments.forEach((segment) => {
       let node2Create = `(n${segment.segmentName} :SEGMENT {segmentData: 
@@ -917,6 +931,38 @@ export class Neo4jDb implements DbService {
         node2Create += ", pathOverlaps: [";
         segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
           node2Create += `'${pathMap[`${pathName}`].overlaps}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+      }
+      if (segmentsToWalkMap[`${segment.segmentName}`]) {
+        node2Create += ", walkSampleIds: [";
+        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
+          node2Create += `'${sampleId}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", walkHapIndexes: [";
+        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
+          node2Create += `'${walkMap[`${sampleId}`].hapIndex}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", walkSeqIds: [";
+        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
+          node2Create += `'${walkMap[`${sampleId}`].seqId}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", walkSeqStarts: [";
+        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
+          node2Create += `'${walkMap[`${sampleId}`].seqStart}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", walkSeqEnds: [";
+        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
+          node2Create += `'${walkMap[`${sampleId}`].seqEnd}', `;
+        });
+        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+        node2Create += ", walks: [";
+        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
+          node2Create += `'${walkMap[`${sampleId}`].walk}', `;
         });
         node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
       }

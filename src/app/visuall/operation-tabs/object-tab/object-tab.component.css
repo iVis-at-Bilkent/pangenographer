@@ -48,19 +48,25 @@ td {
   color: #c51b8a;
 }
 
-.path-container {
+.path-walk-container {
   border-top: 2px solid #65676b;
+  display: flex;
+  justify-content: space-between;
 }
 
-.path-title {
-  padding-left: 1%;
+.path-walk-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.path-name {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.walk-path-item {
+  overflow-wrap: break-word;
+  overflow-y: auto;
+}
+
+.path-walk-info {
+  text-align: left;
+  display: inline-block;
+  overflow-wrap: break-word;
 }

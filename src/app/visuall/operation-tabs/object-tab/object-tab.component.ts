@@ -367,6 +367,12 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
             this.selectedItemProps[`pathChecked`].push(false);
           }
         }
+        if (renderedKey === "walkSampleIds") {
+          this.selectedItemProps[`walkChecked`] = [];
+          for (let i = 0; i < renderedValue.length; i++) {
+            this.selectedItemProps[`walkChecked`].push(false);
+          }
+        }
       }
     }
   }
@@ -376,9 +382,34 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     this.selectedItemProps["pathChecked"].forEach((isChecked, i) => {
       if (isChecked) {
         this.selectedItemProps.pathSegmentNames.val[i]
-          .split(",")
+          .split(/[;,]/)
           .forEach((segmentName) => {
             segmentNames.push(segmentName.substring(0, segmentName.length - 1));
+          });
+      }
+    });
+    if (segmentNames.length === 0) {
+      return;
+    }
+    this._dbService.getConsecutiveNodes(
+      segmentNames,
+      "segmentName",
+      "SEGMENT",
+      (x) => {
+        this._cyService.loadElementsFromDatabase(x, true);
+      }
+    );
+  }
+
+  getWalksSelected() {
+    let segmentNames = [];
+    this.selectedItemProps["walkChecked"].forEach((isChecked, i) => {
+      if (isChecked) {
+        this.selectedItemProps.walks.val[i]
+          .substring(1)
+          .split(/[<>]/)
+          .forEach((segmentName) => {
+            segmentNames.push(segmentName);
           });
       }
     });
@@ -399,6 +430,14 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.selectedItemProps.pathChecked.length; i++) {
       if (i !== index) {
         this.selectedItemProps.pathChecked[i] = false;
+      }
+    }
+  }
+
+  setOtherWalksFalse(index: number): void {
+    for (let i = 0; i < this.selectedItemProps.walkChecked.length; i++) {
+      if (i !== index) {
+        this.selectedItemProps.walkChecked[i] = false;
       }
     }
   }

@@ -91,6 +91,7 @@ export interface GFAData {
   jumps: GFAJump[];
   containments: GFAContainment[];
   paths: GFAPath[];
+  walks: GFAWalk[];
 }
 
 export interface GFASegment {
@@ -144,6 +145,15 @@ export interface GFAPath {
   pathName: string;
   segmentNames: string;
   overlaps: string;
+}
+
+export interface GFAWalk {
+  sampleId: string;
+  hapIndex: number;
+  seqId: string;
+  seqStart: number;
+  seqEnd: number;
+  walk: string;
 }
 
 export interface GFACombinedSequenceLink {

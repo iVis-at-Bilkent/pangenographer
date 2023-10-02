@@ -6,6 +6,7 @@ import {
   GFALink,
   GFAData,
   GFAPath,
+  GFAWalk,
 } from "./db-service/data-types";
 @Injectable({
   providedIn: "root",
@@ -169,6 +170,27 @@ export class FileReaderService {
     return path;
   }
 
+  private createWalkFromGFA(walkLine: string): GFAWalk {
+    let walkLineTabSeperated = walkLine.split(/\t/);
+    let walk: GFAWalk = {
+      sampleId: "",
+      hapIndex: 0,
+      seqId: "",
+      seqStart: 0,
+      seqEnd: 0,
+      walk: "",
+    };
+
+    walk.sampleId = walkLineTabSeperated[1];
+    walk.hapIndex = Number(walkLineTabSeperated[2]);
+    walk.seqId = walkLineTabSeperated[3];
+    walk.seqStart = Number(walkLineTabSeperated[4]);
+    walk.seqEnd = Number(walkLineTabSeperated[5]);
+    walk.walk = walkLineTabSeperated[6];
+
+    return walk;
+  }
+
   readGFAFile(gfaFile: File, cb: (GFAData: GFAData) => void) {
     const fileReader = new FileReader();
     fileReader.onload = (e) => {
@@ -201,6 +223,7 @@ export class FileReaderService {
       jumps: [],
       containments: [],
       paths: [],
+      walks: [],
     };
 
     let lineCount = 0;
@@ -217,11 +240,9 @@ export class FileReaderService {
       } else if (line[0] === "C") {
         GFAdata.containments.push(this.createContainmentFromGFA(line));
       } else if (line[0] === "P") {
-        if (line[2].indexOf(";") === -1) {
-          GFAdata.paths.push(this.createPathFromGFA(line));
-        } else {
-          console.log("Path v1.2 is not implemented in line " + lineCount);
-        }
+        GFAdata.paths.push(this.createPathFromGFA(line));
+      } else if (line[0] === "W") {
+        GFAdata.walks.push(this.createWalkFromGFA(line));
       } else if (line[0] === "H") {
         // version of GFA file
       } else if (line[0] === "#") {
