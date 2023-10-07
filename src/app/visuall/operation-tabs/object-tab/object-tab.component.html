@@ -75,6 +75,14 @@
 
       <table class="table table-responsive table-borderless table-sm">
         <tbody>
+          <tr *ngIf="selectedItemProps.sequenceLength">
+            <td class="text-start">
+              <b class="va-text">{{ selectedItemProps.sequenceLength.name }}</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProps.sequenceLength.val }}
+            </td>
+          </tr>
           <tr *ngIf="selectedItemProps.segmentName">
             <td class="text-start">
               <b class="va-text">{{ selectedItemProps.segmentName.name }}</b>
@@ -185,14 +193,6 @@
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.edgeIdentifier.val }}
-            </td>
-          </tr>
-          <tr *ngIf="selectedItemProps.sequenceLength">
-            <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.sequenceLength.name }}</b>
-            </td>
-            <td class="va-text text-end">
-              {{ selectedItemProps.sequenceLength.val }}
             </td>
           </tr>
           <tr *ngIf="selectedItemProps.indirectShortcutConnections">

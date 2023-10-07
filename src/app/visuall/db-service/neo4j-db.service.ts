@@ -988,7 +988,7 @@ export class Neo4jDb implements DbService {
       edge2Create += `, sourceSequenceWithoutOverlap: '${combinedSequence.sourceSequenceWithoutOverlap}'`;
       edge2Create += `, overlapSequence: '${combinedSequence.overlapSequence}'`;
       edge2Create += `, targetSequenceWithoutOverlap: '${combinedSequence.targetSequenceWithoutOverlap}'`;
-      edge2Create += `, sequenceLength: '${combinedSequence.sequenceLength}'`;
+      edge2Create += `, sequenceLength: ${combinedSequence.sequenceLength}`;
       if (link.hasOwnProperty("mappingQuality")) {
         edge2Create += `, mappingQuality: ${link.mappingQuality}`;
       }

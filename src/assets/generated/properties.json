@@ -22,6 +22,7 @@
   },
   "edges": {
     "LINK": {
+      "sequenceLength": "number",
       "overlap": "string",
       "targetOrientation": "string",
       "sourceOrientation": "string",
@@ -33,19 +34,19 @@
       "edgeIdentifier": "string",
       "sourceSequenceWithoutOverlap": "string",
       "overlapSequence": "string",
-      "targetSequenceWithoutOverlap": "string",
-      "sequenceLength": "string"
+      "targetSequenceWithoutOverlap": "string"
     },
     "JUMP": {
+      "sequenceLength": "string",
       "targetOrientation": "string",
       "sourceOrientation": "string",
       "indirectShortcutConnections": "number",
       "sourceSequence": "string",
       "distance": "string",
-      "targetSequence": "string",
-      "sequenceLength": "string"
+      "targetSequence": "string"
     },
     "CONTAINMENT": {
+      "sequenceLength": "string",
       "pos": "number",
       "overlap": "string",
       "targetOrientation": "string",
@@ -55,8 +56,7 @@
       "edgeIdentifier": "string",
       "leftOfTheContainedSequence": "string",
       "containedSequence": "string",
-      "rightOfTheContainedSequence": "string",
-      "sequenceLength": "string"
+      "rightOfTheContainedSequence": "string"
     }
   }
 }

@@ -53,6 +53,7 @@
       "target": "SEGMENT",
       "isBidirectional": false,
       "properties": {
+        "sequenceLength": "number",
         "overlap": "string",
         "targetOrientation": "string",
         "sourceOrientation": "string",
@@ -64,8 +65,7 @@
         "edgeIdentifier": "string",
         "sourceSequenceWithoutOverlap": "string",
         "overlapSequence": "string",
-        "targetSequenceWithoutOverlap": "string",
-        "sequenceLength": "string"
+        "targetSequenceWithoutOverlap": "string"
       },
       "style": {
         "label": "Link",
@@ -84,13 +84,13 @@
       "target": "SEGMENT",
       "isBidirectional": false,
       "properties": {
+        "sequenceLength": "string",
         "targetOrientation": "string",
         "sourceOrientation": "string",
         "indirectShortcutConnections": "number",
         "sourceSequence": "string",
         "distance": "string",
-        "targetSequence": "string",
-        "sequenceLength": "string"
+        "targetSequence": "string"
       },
       "style": {
         "label": "Jump",
@@ -109,6 +109,7 @@
       "target": "SEGMENT",
       "isBidirectional": false,
       "properties": {
+        "sequenceLength": "string",
         "pos": "number",
         "overlap": "string",
         "targetOrientation": "string",
@@ -118,8 +119,7 @@
         "edgeIdentifier": "string",
         "leftOfTheContainedSequence": "string",
         "containedSequence": "string",
-        "rightOfTheContainedSequence": "string",
-        "sequenceLength": "string"
+        "rightOfTheContainedSequence": "string"
       },
       "style": {
         "label": "Containment",

@@ -621,76 +621,95 @@ export class CytoscapeService {
   }
 
   private tooltipText(element: any) {
-    let textData;
-    let lengths = {
-      first: 0,
-      second: 0,
-      third: 0,
-    };
+    let textData = "";
+    let first = "";
+    let second = "";
+    let third = "";
     if (element.data("sourceOrientation")) {
       if (element.data("distance")) {
-        //  For jumps, we take up to 15 characters before the distance,
-        //  the distance with ..({distance}).., and up to 15 characters after distance
-        textData = element.data("sourceSequence");
-        textData = textData.substring(
-          textData.length > 15 ? textData.length - 15 : 0
-        );
-        lengths.first = textData.length;
-        textData += "..(";
-        textData += element.data("distance");
-        textData += ")..";
-        lengths.second = textData.length - lengths.first;
-        let targetSequence = element.data("targetSequence");
-        targetSequence = targetSequence.substring(
-          0,
-          targetSequence.length > 15 ? 15 : targetSequence.length
-        );
-        lengths.third = targetSequence.length;
-        textData += targetSequence;
+        first = element.data("sourceSequence");
+        second = "..(";
+        second += element.data("distance");
+        second += ")..";
+        third = element.data("targetSequence");
       } else if (element.data("pos")) {
-        // For containments, we extract up to 15 characters before the pos index,
-        // the sequence starting from the pos index (contained sequence),
-        // and up to 15 characters after the pos index.
-        textData = element.data("leftOfTheContainedSequence");
-        textData = textData.substring(
-          textData.length > 15 ? textData.length - 15 : 0
-        );
-        lengths.first = textData.length;
-        textData += element.data("containedSequence");
-        lengths.second = element.data("containedSequence").length;
-        let rightOfTheContainedSequence = element.data(
-          "rightOfTheContainedSequence"
-        );
-        rightOfTheContainedSequence = rightOfTheContainedSequence.substring(
-          0,
-          rightOfTheContainedSequence.length > 15
-            ? 15
-            : rightOfTheContainedSequence.length
-        );
-        lengths.third = rightOfTheContainedSequence.length;
-        textData += rightOfTheContainedSequence;
+        first = element.data("leftOfTheContainedSequence");
+        second = element.data("containedSequence");
+        third = element.data("rightOfTheContainedSequence");
       } else {
-        // For containments, we extract up to 15 characters before the overlap sequence,
-        // the overlap sequence, and up to 15 characters after the overlap sequence.
-        textData = element.data("sourceSequenceWithoutOverlap");
-        textData = textData.substring(
-          textData.length > 15 ? textData.length - 15 : 0
-        );
-        lengths.first = textData.length;
-        textData += element.data("overlapSequence");
-        lengths.second = textData.length - lengths.first;
-        let targetSequence = element.data("targetSequenceWithoutOverlap");
-        targetSequence = targetSequence.substring(
-          0,
-          targetSequence.length > 15 ? 15 : targetSequence.length
-        );
-        lengths.third = targetSequence.length;
-        textData += targetSequence;
+        first = element.data("sourceSequenceWithoutOverlap");
+        second = element.data("overlapSequence");
+        third = element.data("targetSequenceWithoutOverlap");
       }
+      if (first.length + second.length + third.length > 240) {
+        let firstThreshold = 20;
+        let secondThreshold = 200;
+        let thirdThreshold = 20;
+        let toAdd = 0;
+        if (first.length <= firstThreshold) {
+          toAdd += firstThreshold - first.length;
+          firstThreshold = first.length;
+        }
+        if (second.length <= secondThreshold) {
+          toAdd += secondThreshold - second.length;
+          secondThreshold = second.length;
+        }
+        if (third.length <= thirdThreshold) {
+          toAdd += thirdThreshold - third.length;
+          thirdThreshold = third.length;
+        }
+        if (second.length > secondThreshold) {
+          if (toAdd > second.length - secondThreshold) {
+            toAdd -= second.length - secondThreshold;
+            secondThreshold += second.length - secondThreshold;
+          } else {
+            secondThreshold += toAdd;
+            toAdd = 0;
+          }
+        }
+        if (first.length > firstThreshold) {
+          if (toAdd > first.length - firstThreshold) {
+            toAdd -= first.length - firstThreshold;
+            firstThreshold += first.length - firstThreshold;
+          } else {
+            firstThreshold += toAdd;
+            toAdd = 0;
+          }
+        }
+        if (third.length > thirdThreshold) {
+          if (toAdd > third.length - thirdThreshold) {
+            toAdd -= third.length - thirdThreshold;
+            thirdThreshold += third.length - thirdThreshold;
+          } else {
+            thirdThreshold += toAdd;
+            toAdd = 0;
+          }
+        }
+        if (first.length > firstThreshold) {
+          first = ".." + first.substring(first.length - firstThreshold + 2);
+        }
+        if (second.length > secondThreshold) {
+          second =
+            second.substring(0, Math.ceil(secondThreshold / 2) - 1) +
+            ".." +
+            second.substring(
+              second.length - Math.floor(secondThreshold / 2) + 1
+            );
+        }
+        if (third.length > thirdThreshold) {
+          third = third.substring(0, thirdThreshold - 2) + "..";
+        }
+      }
+      textData = first + second + third;
     } else {
-      // For segments
       textData = element.data("segmentData");
     }
+
+    let lengths = {
+      first: first.length,
+      second: second.length,
+      third: third.length,
+    };
 
     textData = this.truncateTextTooltip(
       textData,

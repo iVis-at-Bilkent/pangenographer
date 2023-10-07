@@ -368,8 +368,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   overflow-wrap: break-word;
   padding-left: 3px;
   padding-right: 3px;
-  opacity: 0.65;
-  background: white;
+  background: rgba(255, 255, 255, 0.5);
   justify-content: left;
   align-items: left;
   color: black;
@@ -384,8 +383,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   overflow-wrap: break-word;
   padding-left: 3px;
   padding-right: 3px;
-  opacity: 0.65;
-  background: #c1cade;
+  background: rgba(193, 202, 222, 0.5);
   justify-content: left;
   align-items: left;
   border: 2px solid #585c66;
@@ -402,7 +400,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 }
 
 .edge-tooltip-inner-part:nth-child(3n+1) {
-  color: #e34a33;
+  color: #415AD9;
 }
 
 .edge-tooltip-inner-part:nth-child(3n+2) {
@@ -410,5 +408,5 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 }
 
 .edge-tooltip-inner-part:nth-child(3n) {
-  color: #c51b8a;
+  color: #D5235F;
 }

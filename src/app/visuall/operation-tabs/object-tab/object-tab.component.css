@@ -33,19 +33,19 @@ td {
   max-width: 100%;
   overflow-y: auto;
   line-height: 20px;
-  background-color: #c1cade;
+  background-color: rgba(193, 202, 222, 0.5);
   border: 2px solid #65676b;
   border-radius: 5px;
 }
 
 .combined-sequence-container-part:nth-child(1) {
-  color: #e34a33;
+  color: #415AD9;
 }
 .combined-sequence-container-part:nth-child(2) {
   color: black;
 }
 .combined-sequence-container-part:nth-child(3) {
-  color: #c51b8a;
+  color: #D5235F;
 }
 
 .path-walk-container {
