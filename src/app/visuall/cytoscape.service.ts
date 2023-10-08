@@ -558,20 +558,20 @@ export class CytoscapeService {
             firstSequence.classList.add("edge-tooltip-inner-part");
             firstSequence.innerHTML = text.text.substring(
               0,
-              this.edgeTooltipInnerTextSize(text.lengths.first)
+              this.edgeTooltipInnerTextSize(text.lengths.firstSequence)
             );
             let secondSequence = document.createElement("span");
             secondSequence.classList.add("edge-tooltip-inner-part");
             secondSequence.innerHTML = text.text.substring(
-              this.edgeTooltipInnerTextSize(text.lengths.first),
+              this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
               this.edgeTooltipInnerTextSize(
-                text.lengths.first + text.lengths.second
+                text.lengths.firstSequence + text.lengths.secondSequence
               )
             );
             let thirdSequence = document.createElement("span");
             thirdSequence.innerHTML = text.text.substring(
               this.edgeTooltipInnerTextSize(
-                text.lengths.first + text.lengths.second
+                text.lengths.firstSequence + text.lengths.secondSequence
               )
             );
             thirdSequence.classList.add("edge-tooltip-inner-part");
@@ -620,124 +620,223 @@ export class CytoscapeService {
     );
   }
 
-  private tooltipText(element: any) {
-    let textData = "";
-    let first = "";
-    let second = "";
-    let third = "";
-    if (element.data("sourceOrientation")) {
-      if (element.data("distance")) {
-        first = element.data("sourceSequence");
-        second = "..(";
-        second += element.data("distance");
-        second += ")..";
-        third = element.data("targetSequence");
-      } else if (element.data("pos")) {
-        first = element.data("leftOfTheContainedSequence");
-        second = element.data("containedSequence");
-        third = element.data("rightOfTheContainedSequence");
+  private reverseComplementSegmentData(segmentData: string): string {
+    segmentData = segmentData.split("").reverse().join("");
+    let s = "";
+    for (let i = 0; i < segmentData.length; i++) {
+      if (segmentData[i] === "A") {
+        s += "T";
+      } else if (segmentData[i] === "T") {
+        s += "A";
+      } else if (segmentData[i] === "C") {
+        s += "G";
       } else {
-        first = element.data("sourceSequenceWithoutOverlap");
-        second = element.data("overlapSequence");
-        third = element.data("targetSequenceWithoutOverlap");
+        s += "C";
       }
-      if (first.length + second.length + third.length > 240) {
-        let firstThreshold = 20;
-        let secondThreshold = 200;
-        let thirdThreshold = 20;
-        let toAdd = 0;
-        if (first.length <= firstThreshold) {
-          toAdd += firstThreshold - first.length;
-          firstThreshold = first.length;
-        }
-        if (second.length <= secondThreshold) {
-          toAdd += secondThreshold - second.length;
-          secondThreshold = second.length;
-        }
-        if (third.length <= thirdThreshold) {
-          toAdd += thirdThreshold - third.length;
-          thirdThreshold = third.length;
-        }
-        if (second.length > secondThreshold) {
-          if (toAdd > second.length - secondThreshold) {
-            toAdd -= second.length - secondThreshold;
-            secondThreshold += second.length - secondThreshold;
-          } else {
-            secondThreshold += toAdd;
-            toAdd = 0;
-          }
-        }
-        if (first.length > firstThreshold) {
-          if (toAdd > first.length - firstThreshold) {
-            toAdd -= first.length - firstThreshold;
-            firstThreshold += first.length - firstThreshold;
-          } else {
-            firstThreshold += toAdd;
-            toAdd = 0;
-          }
-        }
-        if (third.length > thirdThreshold) {
-          if (toAdd > third.length - thirdThreshold) {
-            toAdd -= third.length - thirdThreshold;
-            thirdThreshold += third.length - thirdThreshold;
-          } else {
-            thirdThreshold += toAdd;
-            toAdd = 0;
-          }
-        }
-        if (first.length > firstThreshold) {
-          first = ".." + first.substring(first.length - firstThreshold + 2);
-        }
-        if (second.length > secondThreshold) {
-          second =
-            second.substring(0, Math.ceil(secondThreshold / 2) - 1) +
-            ".." +
-            second.substring(
-              second.length - Math.floor(secondThreshold / 2) + 1
-            );
-        }
-        if (third.length > thirdThreshold) {
-          third = third.substring(0, thirdThreshold - 2) + "..";
+    }
+    return s;
+  }
+
+  prepareCombinedSequence(element: any): {
+    firstSequence: string;
+    secondSequence: string;
+    thirdSequence: string;
+    sequenceLength: number;
+  } {
+    let firstSequence = ""; // first sequence of combined sequence
+    let secondSequence = ""; // second sequence of combined sequence
+    let thirdSequence = ""; // third sequence of combined sequence
+    let sequenceLength;
+    if (element.data("distance")) {
+      secondSequence = "..(";
+      secondSequence += element.data("distance");
+      secondSequence += ")..";
+
+      firstSequence = element.source().data("segmentData");
+      if (element.data("sourceOrientation") === "-") {
+        firstSequence = this.reverseComplementSegmentData(firstSequence);
+      }
+      thirdSequence = element.target().data("segmentData");
+      if (element.data("targetOrientation") === "-") {
+        thirdSequence = this.reverseComplementSegmentData(thirdSequence);
+      }
+      if (element.data("distance") === "*") {
+        sequenceLength = element.data("distance");
+      } else {
+        sequenceLength =
+          Number(element.data("distance")) +
+          firstSequence.length +
+          thirdSequence.length;
+      }
+    } else if (element.data("pos")) {
+      let overlapNumeric = 0;
+
+      if (element.data("overlap") && element.data("overlap") !== "*") {
+        overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
+      }
+      firstSequence = element
+        .source()
+        .data("segmentData")
+        .substring(0, element.data("pos"));
+      if (element.data("sourceOrientation") === "-") {
+        firstSequence = this.reverseComplementSegmentData(firstSequence);
+      }
+      secondSequence = element.target().data("segmentData");
+      if (element.data("targetOrientation") === "-") {
+        secondSequence = this.reverseComplementSegmentData(secondSequence);
+      }
+      thirdSequence = element
+        .source()
+        .data("segmentData")
+        .substring(element.data("pos") + overlapNumeric);
+      sequenceLength =
+        firstSequence.length + secondSequence.length + thirdSequence.length;
+    } else {
+      let overlapNumeric = 0;
+
+      if (element.data("overlap") && element.data("overlap") !== "*") {
+        overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
+      }
+      firstSequence = element.source().data("segmentData");
+      if (element.data("sourceOrientation") === "-") {
+        firstSequence = this.reverseComplementSegmentData(firstSequence);
+      }
+      thirdSequence = element.target().data("segmentData");
+      if (element.data("targetOrientation") === "-") {
+        thirdSequence = this.reverseComplementSegmentData(thirdSequence);
+      }
+      firstSequence = firstSequence.substring(
+        0,
+        firstSequence.length - overlapNumeric
+      );
+      thirdSequence = thirdSequence.substring(overlapNumeric);
+      secondSequence = element
+        .target()
+        .data("segmentData")
+        .substring(0, overlapNumeric);
+      sequenceLength =
+        firstSequence.length + secondSequence.length + thirdSequence.length;
+    }
+    return { firstSequence, secondSequence, thirdSequence, sequenceLength };
+  }
+
+  private tooltipText(element: any): {
+    text: string;
+    lengths: {
+      firstSequence: number;
+      secondSequence: number;
+      thirdSequence: number;
+    };
+  } {
+    let textData = "";
+    let text = "";
+    let firstSequence = "";
+    let secondSequence = "";
+    let thirdSequence = "";
+    if (element.data("sourceOrientation")) {
+      let firstThreshold = 20;
+      let secondThreshold = 200;
+      let thirdThreshold = 20;
+      let toAdd = 0;
+      let combinedSequence = this.prepareCombinedSequence(element);
+      firstSequence = combinedSequence.firstSequence;
+      secondSequence = combinedSequence.secondSequence;
+      thirdSequence = combinedSequence.thirdSequence;
+
+      if (firstSequence.length <= firstThreshold) {
+        toAdd += firstThreshold - firstSequence.length;
+        firstThreshold = firstSequence.length;
+      }
+      if (secondSequence.length <= secondThreshold) {
+        toAdd += secondThreshold - secondSequence.length;
+        secondThreshold = secondSequence.length;
+      }
+      if (thirdSequence.length <= thirdThreshold) {
+        toAdd += thirdThreshold - thirdSequence.length;
+        thirdThreshold = thirdSequence.length;
+      }
+      if (secondSequence.length > secondThreshold) {
+        if (toAdd > secondSequence.length - secondThreshold) {
+          toAdd -= secondSequence.length - secondThreshold;
+          secondThreshold += secondSequence.length - secondThreshold;
+        } else {
+          secondThreshold += toAdd;
+          toAdd = 0;
         }
       }
-      textData = first + second + third;
+      if (firstSequence.length > firstThreshold) {
+        if (toAdd > firstSequence.length - firstThreshold) {
+          toAdd -= firstSequence.length - firstThreshold;
+          firstThreshold += firstSequence.length - firstThreshold;
+        } else {
+          firstThreshold += toAdd;
+          toAdd = 0;
+        }
+      }
+      if (thirdSequence.length > thirdThreshold) {
+        if (toAdd > thirdSequence.length - thirdThreshold) {
+          toAdd -= thirdSequence.length - thirdThreshold;
+          thirdThreshold += thirdSequence.length - thirdThreshold;
+        } else {
+          thirdThreshold += toAdd;
+          toAdd = 0;
+        }
+      }
+
+      if (firstSequence.length > firstThreshold) {
+        firstSequence =
+          ".." +
+          firstSequence.substring(firstSequence.length - firstThreshold + 2);
+      }
+      if (secondSequence.length > secondThreshold) {
+        secondSequence =
+          secondSequence.substring(0, Math.ceil(secondThreshold / 2) - 1) +
+          ".." +
+          secondSequence.substring(
+            secondSequence.length - Math.floor(secondThreshold / 2) + 1
+          );
+      }
+      if (thirdSequence.length > thirdThreshold) {
+        thirdSequence = thirdSequence.substring(0, thirdThreshold - 2) + "..";
+      }
+
+      textData = firstSequence + secondSequence + thirdSequence;
     } else {
       textData = element.data("segmentData");
     }
-
-    let lengths = {
-      first: first.length,
-      second: second.length,
-      third: third.length,
-    };
-
-    textData = this.truncateTextTooltip(
-      textData,
-      this._g.cy.nodes()[0],
-      6 * 330 - this._g.cy.nodes()[0].pstyle("font-size").pfValue,
-      8
-    );
-
     let startIndex;
-    let text = "";
+
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
       if (startIndex >= textData.length) {
         break;
       }
       text +=
-        textData.substr(
+        textData.substring(
           startIndex,
-          textData.length < 40 + startIndex ? textData.length - startIndex : 40
+          startIndex +
+            (textData.length < 40 + startIndex
+              ? textData.length - startIndex
+              : 40)
         ) + "\n";
     }
     if (textData.length > 240) {
-      text += textData.substr(startIndex, 38) + "..";
+      text += textData.substring(startIndex, startIndex + 38) + "..";
     } else if (textData.length >= startIndex) {
-      text += textData.substr(
+      text += textData.substring(
         startIndex,
-        textData.length < 40 + startIndex ? textData.length - startIndex : 40
+        startIndex +
+          (textData.length < 40 + startIndex
+            ? textData.length - startIndex
+            : 40)
       );
     }
+
+    let lengths = {
+      firstSequence: firstSequence.length,
+      secondSequence: secondSequence.length,
+      thirdSequence: thirdSequence.length,
+    };
+
     return { text, lengths };
   }
 
@@ -897,24 +996,6 @@ export class CytoscapeService {
     setTimeout(() => {
       this._g.cy.endBatch();
     }, C.CY_BATCH_END_DELAY);
-  }
-
-  truncateTextTooltip(
-    label: string,
-    ele: any,
-    widthOffset?: number,
-    fontSizeOffset: number = 0
-  ): string {
-    let context = document.createElement("canvas").getContext("2d");
-    let fStyle = ele.pstyle("font-style").strValue;
-    let size = ele.pstyle("font-size").pfValue + fontSizeOffset + "px";
-    let family = ele.pstyle("font-family").strValue;
-    let weight = ele.pstyle("font-weight").strValue;
-
-    context.font = fStyle + " " + weight + " " + size + " " + family;
-    let text = label || "";
-    let textWidth = ele.width() + widthOffset;
-    return this.findFittedTxt(context, text, textWidth);
   }
 
   truncateTextNode(label: string) {

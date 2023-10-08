@@ -156,27 +156,6 @@ export interface GFAWalk {
   walk: string;
 }
 
-export interface GFACombinedSequenceLink {
-  sourceSequenceWithoutOverlap: string;
-  overlapSequence: string;
-  targetSequenceWithoutOverlap: string;
-  sequenceLength: number;
-}
-
-export interface GFACombinedSequenceJump {
-  sourceSequence: string;
-  distance: string;
-  targetSequence: string;
-  sequenceLength: number;
-}
-
-export interface GFACombinedSequenceContainment {
-  leftOfTheContainedSequence: string;
-  containedSequence: string;
-  rightOfTheContainedSequence: string;
-  sequenceLength: number;
-}
-
 export interface TableResponse {
   columns: string[];
   data: any[][];

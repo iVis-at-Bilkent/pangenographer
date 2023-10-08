@@ -375,6 +375,46 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         }
       }
     }
+    if (this.selectedItemProps["sourceOrientation"]) {
+      // for combined sequence
+      this._g.cy.edges(":selected").forEach((element) => {
+        let combinedSequence = this._cyService.prepareCombinedSequence(element);
+
+        if (element.data("pos")) {
+          this.selectedItemProps["leftOfTheContainedSequence"] = {
+            val: combinedSequence.firstSequence,
+          };
+          this.selectedItemProps["containedSequence"] = {
+            val: combinedSequence.secondSequence,
+          };
+          this.selectedItemProps["rightOfTheContainedSequence"] = {
+            val: combinedSequence.thirdSequence,
+          };
+        } else if (element.data("distance")) {
+          this.selectedItemProps["sourceSequence"] = {
+            val: combinedSequence.firstSequence,
+          };
+          this.selectedItemProps["targetSequence"] = {
+            val: combinedSequence.thirdSequence,
+          };
+        } else {
+          this.selectedItemProps["sourceSequenceWithoutOverlap"] = {
+            val: combinedSequence.firstSequence,
+          };
+          this.selectedItemProps["overlapSequence"] = {
+            val: combinedSequence.secondSequence,
+          };
+          this.selectedItemProps["targetSequenceWithoutOverlap"] = {
+            val: combinedSequence.thirdSequence,
+          };
+        }
+
+        this.selectedItemProps["sequenceLength"] = {
+          val: combinedSequence.sequenceLength,
+          name: PROPERITY_NAMES["sequenceLength"],
+        };
+      });
+    }
   }
 
   getPathsSelected() {

@@ -10,13 +10,6 @@ import {
   DbResponse,
   DbResponseType,
   GFAData,
-  GFAContainment,
-  GFASegment,
-  GFAJump,
-  GFALink,
-  GFACombinedSequenceContainment,
-  GFACombinedSequenceJump,
-  GFACombinedSequenceLink,
 } from "./data-types";
 import {
   Rule,
@@ -979,16 +972,6 @@ export class Neo4jDb implements DbService {
       if (link.hasOwnProperty("overlap")) {
         edge2Create += `, overlap: '${link.overlap}'`;
       }
-      let combinedSequence: GFACombinedSequenceLink =
-        this.combinedSequenceGenLink(
-          link,
-          nodeMap[`${link.source}`],
-          nodeMap[`${link.target}`]
-        );
-      edge2Create += `, sourceSequenceWithoutOverlap: '${combinedSequence.sourceSequenceWithoutOverlap}'`;
-      edge2Create += `, overlapSequence: '${combinedSequence.overlapSequence}'`;
-      edge2Create += `, targetSequenceWithoutOverlap: '${combinedSequence.targetSequenceWithoutOverlap}'`;
-      edge2Create += `, sequenceLength: ${combinedSequence.sequenceLength}`;
       if (link.hasOwnProperty("mappingQuality")) {
         edge2Create += `, mappingQuality: ${link.mappingQuality}`;
       }
@@ -1012,16 +995,7 @@ export class Neo4jDb implements DbService {
       let edge2Create = `(n${jump.source})-[:JUMP
         {sourceOrientation: "${jump.sourceOrientation}", source: '${jump.source}'
         , targetOrientation: "${jump.targetOrientation}", target: '${jump.target}'`;
-      let combinedSequence: GFACombinedSequenceJump =
-        this.combinedSequenceGenJump(
-          jump,
-          nodeMap[`${jump.source}`],
-          nodeMap[`${jump.target}`]
-        );
-      edge2Create += `, sourceSequence: '${combinedSequence.sourceSequence}'`;
       edge2Create += `, distance: '${jump.distance}'`;
-      edge2Create += `, targetSequence: '${combinedSequence.targetSequence}'`;
-      edge2Create += `, sequenceLength: '${combinedSequence.sequenceLength}'`;
       if (jump.hasOwnProperty("indirectShortcutConnections")) {
         edge2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
       }
@@ -1034,17 +1008,7 @@ export class Neo4jDb implements DbService {
         {sourceOrientation: "${containment.sourceOrientation}", source: '${containment.source}'
         , targetOrientation: "${containment.targetOrientation}", target: '${containment.target}'`;
       edge2Create += `, overlap: '${containment.overlap}'`;
-      let combinedSequence: GFACombinedSequenceContainment =
-        this.combinedSequenceGenContainment(
-          containment,
-          nodeMap[`${containment.source}`],
-          nodeMap[`${containment.target}`]
-        );
       edge2Create += `, pos: ${containment.pos}`;
-      edge2Create += `, leftOfTheContainedSequence: '${combinedSequence.leftOfTheContainedSequence}'`;
-      edge2Create += `, containedSequence: '${combinedSequence.containedSequence}'`;
-      edge2Create += `, rightOfTheContainedSequence: '${combinedSequence.rightOfTheContainedSequence}'`;
-      edge2Create += `, sequenceLength: '${combinedSequence.sequenceLength}'`;
       if (containment.hasOwnProperty("numberOfMismatchesOrGaps")) {
         edge2Create += `, numberOfMismatchesOrGaps: ${containment.numberOfMismatchesOrGaps}`;
       }
@@ -1057,140 +1021,6 @@ export class Neo4jDb implements DbService {
 
     query = query.substring(0, query.length - 2);
     return query;
-  }
-
-  private combinedSequenceGenLink(
-    edge: GFALink,
-    sourceNode: GFASegment,
-    targetNode: GFASegment
-  ): GFACombinedSequenceLink {
-    let overlapNumeric = 0;
-    let sourceSequenceWithoutOverlap = "";
-    let targetSequenceWithoutOverlap = "";
-    let overlapSequence = "";
-    let sequenceLength;
-    if (edge.overlap && edge.overlap !== "*") {
-      overlapNumeric = Number(edge.overlap.match(/[0-9]+/)[0]);
-    }
-    sourceSequenceWithoutOverlap = sourceNode.segmentData;
-    if (edge.sourceOrientation === "-") {
-      sourceSequenceWithoutOverlap = this.reverseComplementSegmentData(
-        sourceSequenceWithoutOverlap
-      );
-    }
-    sourceSequenceWithoutOverlap = sourceSequenceWithoutOverlap.substring(
-      0,
-      sourceSequenceWithoutOverlap.length - overlapNumeric
-    );
-    targetSequenceWithoutOverlap = targetNode.segmentData;
-    if (edge.targetOrientation === "-") {
-      targetSequenceWithoutOverlap = this.reverseComplementSegmentData(
-        targetSequenceWithoutOverlap
-      );
-    }
-    targetSequenceWithoutOverlap =
-      targetSequenceWithoutOverlap.substring(overlapNumeric);
-    overlapSequence = targetNode.segmentData.substring(0, overlapNumeric);
-    sequenceLength =
-      sourceSequenceWithoutOverlap.length +
-      overlapSequence.length +
-      targetSequenceWithoutOverlap.length;
-    return {
-      sourceSequenceWithoutOverlap: sourceSequenceWithoutOverlap,
-      overlapSequence: overlapSequence,
-      targetSequenceWithoutOverlap: targetSequenceWithoutOverlap,
-      sequenceLength: sequenceLength,
-    };
-  }
-
-  private combinedSequenceGenJump(
-    edge: GFAJump,
-    sourceNode: GFASegment,
-    targetNode: GFASegment
-  ): GFACombinedSequenceJump {
-    let sourceSequence = "";
-    let targetSequence = "";
-    let distance = edge.distance;
-    let sequenceLength;
-    sourceSequence = sourceNode.segmentData;
-    if (edge.sourceOrientation === "-") {
-      sourceSequence = this.reverseComplementSegmentData(sourceSequence);
-    }
-    targetSequence = targetNode.segmentData;
-    if (edge.targetOrientation === "-") {
-      targetSequence = this.reverseComplementSegmentData(targetSequence);
-    }
-    if (distance === "*") {
-      sequenceLength = distance;
-    } else {
-      sequenceLength =
-        Number(distance) + sourceSequence.length + targetSequence.length;
-    }
-    return {
-      sourceSequence: sourceSequence,
-      distance: distance,
-      targetSequence: targetSequence,
-      sequenceLength: sequenceLength,
-    };
-  }
-
-  private combinedSequenceGenContainment(
-    edge: GFAContainment,
-    sourceNode: GFASegment,
-    targetNode: GFASegment
-  ): GFACombinedSequenceContainment {
-    let overlapNumeric = 0;
-    let pos = edge.pos;
-    let leftOfTheContainedSequence = "";
-    let containedSequence = "";
-    let rightOfTheContainedSequence = "";
-    let sequenceLength;
-    if (!pos) {
-      pos = 0;
-    }
-    if (edge.overlap && edge.overlap !== "*") {
-      overlapNumeric = Number(edge.overlap.match(/[0-9]+/)[0]);
-    }
-    leftOfTheContainedSequence = sourceNode.segmentData.substr(0, pos - 1);
-    if (edge.sourceOrientation === "-") {
-      leftOfTheContainedSequence = this.reverseComplementSegmentData(
-        leftOfTheContainedSequence
-      );
-    }
-    containedSequence = targetNode.segmentData;
-    if (edge.targetOrientation === "-") {
-      containedSequence = this.reverseComplementSegmentData(containedSequence);
-    }
-    rightOfTheContainedSequence = sourceNode.segmentData.substr(
-      pos - 1 + overlapNumeric
-    );
-    sequenceLength =
-      leftOfTheContainedSequence.length +
-      containedSequence.length +
-      rightOfTheContainedSequence.length;
-    return {
-      leftOfTheContainedSequence: leftOfTheContainedSequence,
-      containedSequence: containedSequence,
-      rightOfTheContainedSequence: rightOfTheContainedSequence,
-      sequenceLength: sequenceLength,
-    };
-  }
-
-  private reverseComplementSegmentData(segmentData: string): string {
-    segmentData = segmentData.split("").reverse().join("");
-    let s = "";
-    for (let i = 0; i < segmentData.length; i++) {
-      if (segmentData[i] === "A") {
-        s += "T";
-      } else if (segmentData[i] === "T") {
-        s += "A";
-      } else if (segmentData[i] === "C") {
-        s += "G";
-      } else {
-        s += "C";
-      }
-    }
-    return s;
   }
 
   // ------------------------------------------------- end of methods for conversion to CQL -------------------------------------------------

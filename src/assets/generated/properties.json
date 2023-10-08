@@ -31,19 +31,14 @@
       "readCount": "number",
       "fragmentCount": "number",
       "kmerCount": "number",
-      "edgeIdentifier": "string",
-      "sourceSequenceWithoutOverlap": "string",
-      "overlapSequence": "string",
-      "targetSequenceWithoutOverlap": "string"
+      "edgeIdentifier": "string"
     },
     "JUMP": {
       "sequenceLength": "string",
       "targetOrientation": "string",
       "sourceOrientation": "string",
       "indirectShortcutConnections": "number",
-      "sourceSequence": "string",
-      "distance": "string",
-      "targetSequence": "string"
+      "distance": "string"
     },
     "CONTAINMENT": {
       "sequenceLength": "string",
@@ -53,10 +48,7 @@
       "sourceOrientation": "string",
       "readCount": "number",
       "numberOfMismatchesOrGaps": "number",
-      "edgeIdentifier": "string",
-      "leftOfTheContainedSequence": "string",
-      "containedSequence": "string",
-      "rightOfTheContainedSequence": "string"
+      "edgeIdentifier": "string"
     }
   }
 }
