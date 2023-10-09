@@ -19,17 +19,50 @@
         "SHA256Checksum": "string",
         "URIorLocalSystemPath": "string",
         "pathNames": "string[]",
-        "pathSegmentNames": "string[]",
-        "pathOverlaps": "string[]",
-        "walkSampleIds": "string[]",
-        "walkHapIndexes": "number[]",
-        "walkSeqIds": "string[]",
-        "walkSeqStarts": "number[]",
-        "walkSeqEnds": "number[]",
-        "walks": "string[]"
+        "walkSampleIds": "string[]"
       },
       "style": {
         "label": "Segment",
+        "color": "black",
+        "text-outline-color": "white",
+        "text-outline-width": "0px",
+        "text-align": "center",
+        "font-size": "7px",
+        "font-weight": "700",
+        "font-family": "Inconsolata, monospace",
+        "shape": "round-rectangle",
+        "background-fit": "contain",
+        "background-color": "white",
+        "border-color": "gray",
+        "border-width": "0.5px",
+        "width": "36px",
+        "height": "18px"
+      }
+    },
+    "WALKS": {
+      "properties": {},
+      "style": {
+        "label": "WALKS",
+        "color": "black",
+        "text-outline-color": "white",
+        "text-outline-width": "0px",
+        "text-align": "center",
+        "font-size": "7px",
+        "font-weight": "700",
+        "font-family": "Inconsolata, monospace",
+        "shape": "round-rectangle",
+        "background-fit": "contain",
+        "background-color": "white",
+        "border-color": "gray",
+        "border-width": "0.5px",
+        "width": "36px",
+        "height": "18px"
+      }
+    },
+    "PATHS": {
+      "properties": {},
+      "style": {
+        "label": "PATHS",
         "color": "black",
         "text-outline-color": "white",
         "text-outline-width": "0px",

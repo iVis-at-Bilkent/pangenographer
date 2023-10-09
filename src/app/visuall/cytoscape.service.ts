@@ -986,11 +986,13 @@ export class CytoscapeService {
       .not("." + C.CLUSTER_CLASS);
     nodes.removeClass("ellipsis_label");
     for (let i = 0; i < nodes.length; i++) {
-      let toFit =
-        this.truncateTextNode(nodes[i].data("segmentName")) +
-        "\n" +
-        this.truncateTextNode(nodes[i].data("segmentData"));
-      nodes[i].data("__label__", toFit);
+      if (nodes[i].hasClass("SEGMENT")) {
+        let toFit =
+          this.truncateTextNode(nodes[i].data("segmentName")) +
+          "\n" +
+          this.truncateTextNode(nodes[i].data("segmentData"));
+        nodes[i].data("__label__", toFit);
+      }
     }
     nodes.addClass("ellipsis_label");
     setTimeout(() => {

@@ -10,15 +10,10 @@
       "SHA256Checksum": "string",
       "URIorLocalSystemPath": "string",
       "pathNames": "string[]",
-      "pathSegmentNames": "string[]",
-      "pathOverlaps": "string[]",
-      "walkSampleIds": "string[]",
-      "walkHapIndexes": "number[]",
-      "walkSeqIds": "string[]",
-      "walkSeqStarts": "number[]",
-      "walkSeqEnds": "number[]",
-      "walks": "string[]"
-    }
+      "walkSampleIds": "string[]"
+    },
+    "WALKS": {},
+    "PATHS": {}
   },
   "edges": {
     "LINK": {

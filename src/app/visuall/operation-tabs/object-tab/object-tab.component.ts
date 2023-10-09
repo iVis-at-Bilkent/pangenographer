@@ -361,17 +361,65 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
             name: PROPERITY_NAMES[renderedKey],
           };
         }
+
         if (renderedKey === "pathNames") {
           this.selectedItemProps[`pathChecked`] = [];
           for (let i = 0; i < renderedValue.length; i++) {
             this.selectedItemProps[`pathChecked`].push(false);
           }
+
+          this.selectedItemProps["pathSegmentNames"] = [];
+          this.selectedItemProps["pathOverlaps"] = [];
+
+          renderedValue.forEach((pathName) => {
+            this._g.cy.nodes().forEach((element) => {
+              if (element.hasClass("PATHS")) {
+                let counter = 0;
+                element.data(`p${pathName}`).forEach((pathVal) => {
+                  if (counter === 0) {
+                    this.selectedItemProps["pathSegmentNames"].push(pathVal);
+                  } else {
+                    this.selectedItemProps["pathOverlaps"].push(pathVal);
+                  }
+                  counter++;
+                });
+              }
+            });
+          });
         }
         if (renderedKey === "walkSampleIds") {
           this.selectedItemProps[`walkChecked`] = [];
           for (let i = 0; i < renderedValue.length; i++) {
             this.selectedItemProps[`walkChecked`].push(false);
           }
+
+          this.selectedItemProps["walkHapIndexes"] = [];
+          this.selectedItemProps["walkSeqIds"] = [];
+          this.selectedItemProps["walkSeqStarts"] = [];
+          this.selectedItemProps["walkSeqEnds"] = [];
+          this.selectedItemProps["walks"] = [];
+
+          renderedValue.forEach((walkName) => {
+            this._g.cy.nodes().forEach((element) => {
+              if (element.hasClass("WALKS")) {
+                let counter = 0;
+                element.data(`w${walkName}`).forEach((walkVal) => {
+                  if (counter === 0) {
+                    this.selectedItemProps["walkHapIndexes"].push(walkVal);
+                  } else if (counter === 1) {
+                    this.selectedItemProps["walkSeqIds"].push(walkVal);
+                  } else if (counter === 2) {
+                    this.selectedItemProps["walkSeqStarts"].push(walkVal);
+                  } else if (counter === 3) {
+                    this.selectedItemProps["walkSeqEnds"].push(walkVal);
+                  } else {
+                    this.selectedItemProps["walks"].push(walkVal);
+                  }
+                  counter++;
+                });
+              }
+            });
+          });
         }
       }
     }
@@ -421,7 +469,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     let segmentNames = [];
     this.selectedItemProps["pathChecked"].forEach((isChecked, i) => {
       if (isChecked) {
-        this.selectedItemProps.pathSegmentNames.val[i]
+        this.selectedItemProps.pathSegmentNames[i]
           .split(/[;,]/)
           .forEach((segmentName) => {
             segmentNames.push(segmentName.substring(0, segmentName.length - 1));
@@ -445,7 +493,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     let segmentNames = [];
     this.selectedItemProps["walkChecked"].forEach((isChecked, i) => {
       if (isChecked) {
-        this.selectedItemProps.walks.val[i]
+        this.selectedItemProps.walks[i]
           .substring(1)
           .split(/[<>]/)
           .forEach((segmentName) => {

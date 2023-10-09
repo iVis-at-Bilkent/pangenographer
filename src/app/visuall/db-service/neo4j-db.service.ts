@@ -213,7 +213,10 @@ export class Neo4jDb implements DbService {
     if (f2.length > 0) {
       f += f2;
     }
-    this.runQuery(`MATCH (n)-[e]-() ${f} RETURN n,e LIMIT 100`, callback);
+    this.runQuery(
+      `MATCH (p:PATHS) RETURN p AS nn UNION MATCH (w:WALKS) RETURN w AS nn UNION MATCH (n1)-[e1]-() ${f} RETURN n1 AS nn LIMIT 100 UNION MATCH (n2)-[e2]-() ${f} RETURN e2 AS nn LIMIT 100`,
+      callback
+    );
   }
 
   getConsecutiveNodes(
@@ -858,8 +861,31 @@ export class Neo4jDb implements DbService {
   }
 
   private GFAdata2CQL(GFAData: GFAData): string {
+    let nodeMap = {};
+    let query = "CREATE\n";
+    let node2Create = "";
+    // creating walk node and path node
+
+    if (GFAData.paths.length) {
+      node2Create = `(nPATHS :PATHS {`;
+      GFAData.paths.forEach((path) => {
+        node2Create += `p${path.pathName}: ['${path.segmentNames}', `;
+        node2Create += `'${path.overlaps}'], `;
+      });
+      query += node2Create.substring(0, node2Create.length - 2) + "}),\n";
+    }
+    if (GFAData.walks.length) {
+      node2Create = `(nWALKS :WALKS {`;
+      GFAData.walks.forEach((walk) => {
+        node2Create += `w${walk.sampleId}: ['${walk.hapIndex}', `;
+        node2Create += `'${walk.seqId}', '${walk.seqStart}', '${walk.seqEnd}', `;
+        node2Create += `'${walk.walk}'], `;
+      });
+      query += node2Create.substring(0, node2Create.length - 2) + "}),\n";
+    }
+
     let segmentsToPathMap = {}; // segmentName -> [pathName1, pathName2, ...]
-    let pathMap = {}; // pathName -> GFAPath
+
     GFAData.paths.forEach((path) => {
       let segmentNames = path.segmentNames.split(/[;,]/);
       segmentNames.forEach((segmentName) => {
@@ -871,11 +897,10 @@ export class Neo4jDb implements DbService {
           segmentsToPathMap[`${segmentName}`].push(path.pathName);
         }
       });
-      pathMap[`${path.pathName}`] = path;
     });
 
     let segmentsToWalkMap = {}; // segmentName -> [sampleId1, sampleId2, ...]
-    let walkMap = {}; // sampleId -> GFAWalk
+
     GFAData.walks.forEach((walk) => {
       let segmentNames = walk.walk.substring(1).split(/[<>]/);
       segmentNames.forEach((segmentName) => {
@@ -886,11 +911,8 @@ export class Neo4jDb implements DbService {
           segmentsToWalkMap[`${segmentName}`].push(walk.sampleId);
         }
       });
-      walkMap[`${walk.sampleId}`] = walk;
     });
 
-    let nodeMap = {};
-    let query = "CREATE\n";
     GFAData.segments.forEach((segment) => {
       let node2Create = `(n${segment.segmentName} :SEGMENT {segmentData: 
         '${segment.segmentData}', segmentName: '${segment.segmentName}'
@@ -916,46 +938,11 @@ export class Neo4jDb implements DbService {
           node2Create += `'${pathName}', `;
         });
         node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", pathSegmentNames: [";
-        segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
-          node2Create += `'${pathMap[`${pathName}`].segmentNames}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", pathOverlaps: [";
-        segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
-          node2Create += `'${pathMap[`${pathName}`].overlaps}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
       }
       if (segmentsToWalkMap[`${segment.segmentName}`]) {
         node2Create += ", walkSampleIds: [";
         segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
           node2Create += `'${sampleId}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", walkHapIndexes: [";
-        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
-          node2Create += `'${walkMap[`${sampleId}`].hapIndex}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", walkSeqIds: [";
-        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
-          node2Create += `'${walkMap[`${sampleId}`].seqId}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", walkSeqStarts: [";
-        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
-          node2Create += `'${walkMap[`${sampleId}`].seqStart}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", walkSeqEnds: [";
-        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
-          node2Create += `'${walkMap[`${sampleId}`].seqEnd}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
-        node2Create += ", walks: [";
-        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
-          node2Create += `'${walkMap[`${sampleId}`].walk}', `;
         });
         node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
       }
