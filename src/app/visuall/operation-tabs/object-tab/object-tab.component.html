@@ -241,42 +241,46 @@
             *ngFor="let item of selectedItemProps.pathNames.val; let i = index"
           >
             <div class="path-walk-container">
-              <div class="path-walk-info">
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Path name: </b>
+              <div class="path-walk-item-begin">
+                <div class="va-text">
+                  <span>
+                    <b>Path name: </b>
                   </span>
-                  <span class="va-text text-end">
+                  <span>
                     {{ selectedItemProps.pathNames.val[i] }}
                   </span>
                 </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Segment names: </b>
-                  </span>
-                  <span class="va-text text-end">
+                <div class="path-walk-checkbox">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="selectedItemProps.pathChecked[i]"
+                    (change)="setOtherPathsFalse(i)"
+                  />
+                </div>
+              </div>
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>Segment names </b>
+                </span>
+                <div class="path-walk-text-container">
+                  <span>
                     {{
                       selectedItemProps.pathSegmentNames[i]
                         .replaceAll(";", " ")
-                        .replaceAll(";,", " ")
+                        .replaceAll(",", " ")
                     }}
                   </span>
                 </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Overlaps: </b>
-                  </span>
-                  <span class="va-text text-end">
+              </div>
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>Overlaps </b>
+                </span>
+                <div class="path-walk-text-container">
+                  <span>
                     {{ selectedItemProps.pathOverlaps[i].replaceAll(",", " ") }}
                   </span>
                 </div>
-              </div>
-              <div class="path-walk-checkbox">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="selectedItemProps.pathChecked[i]"
-                  (change)="setOtherPathsFalse(i)"
-                />
               </div>
             </div>
           </ng-container>
@@ -305,62 +309,69 @@
             "
           >
             <div class="path-walk-container">
-              <div class="path-walk-info">
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Walk sample identifier: </b>
+              <div class="path-walk-item-begin">
+                <div class="va-text">
+                  <span>
+                    <b>Walk sample identifier: </b>
                   </span>
-                  <span class="va-text text-end">
+                  <span>
                     {{ selectedItemProps.walkSampleIds.val[i] }}
                   </span>
                 </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Haplotype index: </b>
-                  </span>
-                  <span class="va-text text-end">
-                    {{ selectedItemProps.walkHapIndexes[i] }}
-                  </span>
-                </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Sequence identifier: </b>
-                  </span>
-                  <span class="va-text text-end">
-                    {{ selectedItemProps.walkSeqIds[i] }}
-                  </span>
-                </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Start position: </b>
-                  </span>
-                  <span class="va-text text-end">
-                    {{ selectedItemProps.walkSeqStarts[i] }}
-                  </span>
-                </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">End position: </b>
-                  </span>
-                  <span class="va-text text-end">
-                    {{ selectedItemProps.walkSeqEnds[i] }}
-                  </span>
-                </div>
-                <div class="walk-path-item">
-                  <span class="text-start">
-                    <b class="va-text">Walk: </b>
-                  </span>
-                  <span class="va-text text-end">
-                    {{ selectedItemProps.walks[i] }}
-                  </span>
+                <div class="path-walk-checkbox">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="selectedItemProps.walkChecked[i]"
+                    (change)="setOtherWalksFalse(i)"
+                  />
                 </div>
               </div>
-              <div class="path-walk-checkbox">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="selectedItemProps.walkChecked[i]"
-                  (change)="setOtherWalksFalse(i)"
-                />
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>Haplotype index: </b>
+                </span>
+                <span>
+                  {{ selectedItemProps.walkHapIndexes[i] }}
+                </span>
+              </div>
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>Sequence identifier: </b>
+                </span>
+                <span>
+                  {{ selectedItemProps.walkSeqIds[i] }}
+                </span>
+              </div>
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>Start position: </b>
+                </span>
+                <span>
+                  {{ selectedItemProps.walkSeqStarts[i] }}
+                </span>
+              </div>
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>End position: </b>
+                </span>
+                <span>
+                  {{ selectedItemProps.walkSeqEnds[i] }}
+                </span>
+              </div>
+              <div class="path-walk-item va-text">
+                <span>
+                  <b>Walk </b>
+                </span>
+                <div class="path-walk-text-container">
+                  <span>
+                    {{
+                      selectedItemProps.walks[i]
+                        .replaceAll("\<", " \< ")
+                        .replaceAll("\>", " \> ")
+                        .substring(1)
+                    }}
+                  </span>
+                </div>
               </div>
             </div>
           </ng-container>

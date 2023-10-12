@@ -50,8 +50,10 @@ td {
 
 .path-walk-container {
   border-top: 2px solid #65676b;
+  text-align: left;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  max-width: 100%;
 }
 
 .path-walk-title {
@@ -60,13 +62,24 @@ td {
   justify-content: space-between;
 }
 
-.walk-path-item {
-  overflow-wrap: break-word;
-  overflow-y: auto;
+.path-walk-item {
 }
 
-.path-walk-info {
-  text-align: left;
-  display: inline-block;
+.path-walk-item-begin {
+  display: flex;
+  justify-content: space-between;
+  max-width: 100%;
+}
+
+.path-walk-text-container {
+  padding: 1% 1.5% 1.5% 1.5%;
+  max-height: 200px;
   overflow-wrap: break-word;
+  text-align: left;
+  font-family: Inconsolata, monospace;
+  max-width: 100%;
+  overflow-y: auto;
+  line-height: 20px;
+  border: 2px solid #65676b;
+  border-radius: 5px;
 }
