@@ -193,7 +193,11 @@ export class ContextMenuService {
     if (!ele) {
       return;
     }
-    this._cyService.showUpDownstream(ele, this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(), isUp);
+    this._cyService.showUpDownstream(
+      ele,
+      this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
+      isUp
+    );
   }
 
   hideUpstream(event) {

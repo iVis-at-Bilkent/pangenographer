@@ -1,7 +1,19 @@
-<a class="btn btn-sm btn-outline-dark filter-node-class d-inline-flex justify-content-center va-text"
-    *ngFor="let nc of nodeClasses" href="#" role="button" [ngClass]="{'filter-class-disabled': !(showNodeClass[nc])}"
-    (click)="filterElesByClass(nc, true)">{{nc}}</a>
-<br *ngIf="nodeClasses.size > 0 && edgeClasses.size > 0">
-<a class="filter-edge-class d-inline-flex justify-content-center va-text" *ngFor="let ec of edgeClasses" href="#"
-    role="button" (click)="filterElesByClass(ec, false)"
-    [ngClass]="{'filter-class-disabled': !(showEdgeClass[ec])}">{{ec}}<br></a>
+<a
+  class="btn btn-sm btn-outline-dark filter-node-class d-inline-flex justify-content-center va-text"
+  *ngFor="let nc of nodeClasses"
+  href="#"
+  role="button"
+  [ngClass]="{ 'filter-class-disabled': !showNodeClass[nc] }"
+  (click)="filterElesByClass(nc, true)"
+  >{{ nc }}</a
+>
+<br *ngIf="nodeClasses.size > 0 && edgeClasses.size > 0" />
+<a
+  class="filter-edge-class d-inline-flex justify-content-center va-text"
+  *ngFor="let ec of edgeClasses"
+  href="#"
+  role="button"
+  (click)="filterElesByClass(ec, false)"
+  [ngClass]="{ 'filter-class-disabled': !showEdgeClass[ec] }"
+  >{{ ec }}<br
+/></a>

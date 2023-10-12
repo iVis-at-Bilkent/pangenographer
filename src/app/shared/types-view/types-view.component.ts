@@ -1,18 +1,28 @@
-import { Component, OnInit, Output, EventEmitter, Input, OnDestroy } from '@angular/core';
-import { GlobalVariableService } from '../../visuall/global-variable.service';
-import { Subscription } from 'rxjs';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  OnDestroy,
+} from "@angular/core";
+import { GlobalVariableService } from "../../visuall/global-variable.service";
+import { Subscription } from "rxjs";
+import { TYPES_NOT_TO_SHOW } from "src/app/visuall/constants";
 @Component({
-  selector: 'app-types-view',
-  templateUrl: './types-view.component.html',
-  styleUrls: ['./types-view.component.css']
+  selector: "app-types-view",
+  templateUrl: "./types-view.component.html",
+  styleUrls: ["./types-view.component.css"],
 })
 export class TypesViewComponent implements OnInit, OnDestroy {
-
   nodeClasses: Set<string>;
   showNodeClass = {};
   edgeClasses: Set<string>;
   showEdgeClass = {};
-  @Output() onFilterByType = new EventEmitter<{ className: string, willBeShowed: boolean }>();
+  @Output() onFilterByType = new EventEmitter<{
+    className: string;
+    willBeShowed: boolean;
+  }>();
   @Input() classList: string[];
   dataModelSubs: Subscription;
 
@@ -22,17 +32,23 @@ export class TypesViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataModelSubs = this._g.dataModel.subscribe(x => {
+    this.dataModelSubs = this._g.dataModel.subscribe((x) => {
       if (x) {
         for (const key in x.nodes) {
-          if (!this.classList || this.classList.includes(key)) {
+          if (
+            (!this.classList || this.classList.includes(key)) &&
+            !TYPES_NOT_TO_SHOW.includes(key)
+          ) {
             this.nodeClasses.add(key);
             this.showNodeClass[key] = true;
           }
         }
 
         for (const key in x.edges) {
-          if (!this.classList || this.classList.includes(key)) {
+          if (
+            (!this.classList || this.classList.includes(key)) &&
+            !TYPES_NOT_TO_SHOW.includes(key)
+          ) {
             this.edgeClasses.add(key);
             this.showEdgeClass[key] = true;
           }
@@ -50,7 +66,10 @@ export class TypesViewComponent implements OnInit, OnDestroy {
       this.showEdgeClass[className] = !this.showEdgeClass[className];
       willBeShowed = this.showEdgeClass[className];
     }
-    this.onFilterByType.next({ className: className, willBeShowed: willBeShowed });
+    this.onFilterByType.next({
+      className: className,
+      willBeShowed: willBeShowed,
+    });
   }
 
   ngOnDestroy(): void {
@@ -58,5 +77,4 @@ export class TypesViewComponent implements OnInit, OnDestroy {
       this.dataModelSubs.unsubscribe();
     }
   }
-
 }

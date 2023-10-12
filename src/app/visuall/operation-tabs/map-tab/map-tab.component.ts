@@ -8,6 +8,7 @@ import { DbAdapterService } from "../../db-service/db-adapter.service";
 import { CytoscapeService } from "../../cytoscape.service";
 import { GlobalVariableService } from "../../global-variable.service";
 import { TimebarService } from "../../timebar.service";
+import { TYPES_NOT_TO_SHOW } from "../../constants";
 import {
   ClassOption,
   Rule,
@@ -124,14 +125,18 @@ export class MapTabComponent implements OnInit, OnDestroy {
           return;
         }
         for (const key in x2.nodes) {
-          this.classOptions.push({ text: key, isDisabled: false });
-          if (this.selectedClassProps.length == 0) {
-            this.selectedClassProps = Object.keys(x2.nodes[key]);
+          if (!TYPES_NOT_TO_SHOW.includes(key)) {
+            this.classOptions.push({ text: key, isDisabled: false });
+            if (this.selectedClassProps.length == 0) {
+              this.selectedClassProps = Object.keys(x2.nodes[key]);
+            }
           }
         }
 
         for (const key in x2.edges) {
-          this.classOptions.push({ text: key, isDisabled: false });
+          if (!TYPES_NOT_TO_SHOW.includes(key)) {
+            this.classOptions.push({ text: key, isDisabled: false });
+          }
         }
 
         this.setCurrRulesFromLocalStorage();

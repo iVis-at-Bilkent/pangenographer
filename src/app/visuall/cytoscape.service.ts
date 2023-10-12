@@ -249,6 +249,10 @@ export class CytoscapeService {
     // elements might already exist but hidden, so show them
     this._g.viewUtils.show(this._g.cy.$(elemIds.map((x) => "#" + x).join(",")));
 
+    C.TYPES_NOT_TO_SHOW.forEach((type) => {
+      this._g.viewUtils.hide(this._g.cy.$("." + type));
+    });
+
     this._g.applyClassFiltering();
 
     if (isIncremental && !wasEmpty) {
@@ -984,6 +988,9 @@ export class CytoscapeService {
       .nodes()
       .not(":parent")
       .not("." + C.CLUSTER_CLASS);
+    C.TYPES_NOT_TO_SHOW.forEach((type) => {
+      nodes = nodes.not("." + type);
+    });
     nodes.removeClass("ellipsis_label");
     for (let i = 0; i < nodes.length; i++) {
       if (nodes[i].hasClass("SEGMENT")) {
@@ -1006,38 +1013,6 @@ export class CytoscapeService {
     } else {
       return label;
     }
-  }
-
-  private findFittedTxt(
-    ctx: CanvasRenderingContext2D,
-    txt: string,
-    wid: number
-  ): string {
-    let len = txt.length;
-    if (ctx.measureText(txt.substr(0, len)).width <= wid) {
-      return txt;
-    }
-    let maxIdx = len - 1;
-    let minIdx = 1;
-
-    // binary search through possible interval
-    while (true) {
-      let doesFit = ctx.measureText(txt.substr(0, len) + "..").width <= wid;
-      if (
-        doesFit &&
-        ctx.measureText(txt.substr(0, len + 1) + "..").width >= wid
-      ) {
-        break;
-      }
-      if (doesFit) {
-        minIdx = len;
-        len = Math.ceil((len + maxIdx) / 2);
-      } else {
-        maxIdx = len;
-        len = Math.floor((len + minIdx) / 2);
-      }
-    }
-    return txt.substr(0, len) + "..";
   }
 
   bindHighlightOnHoverListeners() {

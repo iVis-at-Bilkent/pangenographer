@@ -1,107 +1,207 @@
 <div class="panel-group">
   <div class="panel">
-    <div class="panel-heading" data-bs-toggle="collapse" data-bs-target="#filter-class" aria-expanded="true">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">Filter by Node/Edge Type</b></span>
+    <div
+      class="panel-heading"
+      data-bs-toggle="collapse"
+      data-bs-target="#filter-class"
+      aria-expanded="true"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Filter by Node/Edge Type</b></span
+      >
     </div>
     <div id="filter-class" class="collapse show text-center m-1">
-      <app-types-view (onFilterByType)="filterElesByClass($event)"></app-types-view>
+      <app-types-view
+        (onFilterByType)="filterElesByClass($event)"
+      ></app-types-view>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-heading collapsed" data-bs-toggle="collapse" data-bs-target="#rule-elements"
-      aria-expanded="false">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">Query by Rule</b></span>
+    <div
+      class="panel-heading collapsed"
+      data-bs-toggle="collapse"
+      data-bs-target="#rule-elements"
+      aria-expanded="false"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Query by Rule</b></span
+      >
     </div>
     <div id="rule-elements" class="collapse">
-
       <div class="d-flex flex-wrap justify-content-center">
         <!-- current rules -->
-        <div *ngFor="let r of currRules; let i = index;" class="rounded va-text m-1 p-1"
-          [style.border]="r.isEditing ? '2px solid #888888':'2px solid #dee2e6'">
+        <div
+          *ngFor="let r of currRules; let i = index"
+          class="rounded va-text m-1 p-1"
+          [style.border]="
+            r.isEditing ? '2px solid #888888' : '2px solid #dee2e6'
+          "
+        >
           <div class="text-center">
-            <span (click)="editRule(i)" class="pointer">{{r.name}}</span>&nbsp;
-            <img src="assets/img/close.svg" class="pointer" (click)="deleteRule(i)" title="Delete query rule">
+            <span (click)="editRule(i)" class="pointer">{{ r.name }}</span
+            >&nbsp;
+            <img
+              src="assets/img/close.svg"
+              class="pointer"
+              (click)="deleteRule(i)"
+              title="Delete query rule"
+            />
           </div>
         </div>
-        <div class="rounded va-text m-1 p-1" [style.border]="isAddingNewRule ? '2px solid #888888':'2px solid #dee2e6'">
+        <div
+          class="rounded va-text m-1 p-1"
+          [style.border]="
+            isAddingNewRule ? '2px solid #888888' : '2px solid #dee2e6'
+          "
+        >
           <div title="New rule" class="text-center" (click)="newRuleClick()">
-            <b class="pointer">new</b>&nbsp;<img src="assets/img/add.svg">
+            <b class="pointer">new</b>&nbsp;<img src="assets/img/add.svg" />
           </div>
         </div>
       </div>
 
       <div class="form-inline m-2 justify-content-center">
-        <input autoSizeInput [includeBorders]="true" [extraWidth]="3" type="text" title="Name"
+        <input
+          autoSizeInput
+          [includeBorders]="true"
+          [extraWidth]="3"
+          type="text"
+          title="Name"
           [(ngModel)]="currRuleName"
-          class="tight-select filter-form form-control std-inp-hei name-inp m-1 va-small-text">
-        <select class="form-select tight-select filter-form va-small-text rule-class" [disabled]="isClassTypeLocked"
-          [(ngModel)]="selectedClass" (change)="changeSelectedClass()">
-          <option [disabled]="opt.isDisabled" *ngFor="let opt of classOptions" class="rule-class-opt"
-            [value]="opt.text">{{opt.text}}
+          class="tight-select filter-form form-control std-inp-hei name-inp m-1 va-small-text"
+        />
+        <select
+          class="form-select tight-select filter-form va-small-text rule-class"
+          [disabled]="isClassTypeLocked"
+          [(ngModel)]="selectedClass"
+          (change)="changeSelectedClass()"
+        >
+          <option
+            [disabled]="opt.isDisabled"
+            *ngFor="let opt of classOptions"
+            class="rule-class-opt"
+            [value]="opt.text"
+          >
+            {{ opt.text }}
           </option>
         </select>
       </div>
 
       <div class="form-inline justify-content-center">
         <span class="va-text">
-          Get <b *ngIf="selectedClass">{{selectedClass}}</b> where:&nbsp;
+          Get <b *ngIf="selectedClass">{{ selectedClass }}</b> where:&nbsp;
         </span>
 
-        <app-rule-dropdown *ngIf="!queryRule || !queryRule.rules" (btnClicked)="initRules($event)"
-          [isShowConditionBtn]="true"></app-rule-dropdown>
+        <app-rule-dropdown
+          *ngIf="!queryRule || !queryRule.rules"
+          (btnClicked)="initRules($event)"
+          [isShowConditionBtn]="true"
+        ></app-rule-dropdown>
       </div>
 
       <div *ngIf="queryRule && queryRule.rules">
-        <app-rule-tree [root]="queryRule.rules" [editedRuleNode]="editedRuleNode"
-          (onOperatorAdded)="newOperator($event)" (onRuleRequested)="showPropertyRule($event)"
-          (onEmpty)="queryRuleDeleted()"> </app-rule-tree>
+        <app-rule-tree
+          [root]="queryRule.rules"
+          [editedRuleNode]="editedRuleNode"
+          (onOperatorAdded)="newOperator($event)"
+          (onRuleRequested)="showPropertyRule($event)"
+          (onEmpty)="queryRuleDeleted()"
+        >
+        </app-rule-tree>
 
         <!-- rule input -->
         <div *ngIf="isShowPropertyRule">
-          <app-property-rule (onRuleReady)="addRule2QueryRules($event)" [propertyChanged]="currProperties"
-            [loadRule]="editingPropertyRule" [isStrict]="true">
+          <app-property-rule
+            (onRuleReady)="addRule2QueryRules($event)"
+            [propertyChanged]="currProperties"
+            [loadRule]="editingPropertyRule"
+            [isStrict]="true"
+          >
           </app-property-rule>
         </div>
       </div>
 
       <div class="text-center borderless mx-1 my-3">
-
-        <div class="d-flex flex-wrap align-items-center justify-content-center m-1" *ngIf="queryRule">
+        <div
+          class="d-flex flex-wrap align-items-center justify-content-center m-1"
+          *ngIf="queryRule"
+        >
           <div class="form-check m-1">
-            <input type="checkbox" class="form-check-input cb-filter cb-is-on-db" [(ngModel)]="isQueryOnDb" />
+            <input
+              type="checkbox"
+              class="form-check-input cb-filter cb-is-on-db"
+              [(ngModel)]="isQueryOnDb"
+            />
             <label class="form-label va-text">Database</label>
           </div>
           <div class="form-check m-1">
-            <input type="checkbox" class="form-check-input cb-filter cb-is-load-graph"
-              [(ngModel)]="tableInput.isLoadGraph" [disabled]="!isQueryOnDb" />
+            <input
+              type="checkbox"
+              class="form-check-input cb-filter cb-is-load-graph"
+              [(ngModel)]="tableInput.isLoadGraph"
+              [disabled]="!isQueryOnDb"
+            />
             <label class="form-label va-text">Graph</label>
           </div>
           <div class="form-check m-1">
-            <input type="checkbox" class="form-check-input cb-filter cb-is-merge-graph"
-              [(ngModel)]="tableInput.isMergeGraph" [disabled]="!isQueryOnDb" />
+            <input
+              type="checkbox"
+              class="form-check-input cb-filter cb-is-merge-graph"
+              [(ngModel)]="tableInput.isMergeGraph"
+              [disabled]="!isQueryOnDb"
+            />
             <label class="form-label va-text">Merge</label>
           </div>
         </div>
 
-        <div class="d-flex flex-wrap align-items-center justify-content-center m-1"
-          *ngIf="queryRule && queryRule.rules && queryRule.rules.r && (!queryRule.rules.r.ruleOperator || (queryRule.rules.r.ruleOperator && queryRule.rules.children.length > 0) )">
-          <input class="btn btn-sm btn-dark va-text m-1" type="button" [value]="changeBtnTxt"
-            (click)="addOrUpdateRule()">
-          <input class="btn btn-sm btn-dark va-text m-1" type="button" value="Execute" (click)="runQuery()">
+        <div
+          class="d-flex flex-wrap align-items-center justify-content-center m-1"
+          *ngIf="
+            queryRule &&
+            queryRule.rules &&
+            queryRule.rules.r &&
+            (!queryRule.rules.r.ruleOperator ||
+              (queryRule.rules.r.ruleOperator &&
+                queryRule.rules.children.length > 0))
+          "
+        >
+          <input
+            class="btn btn-sm btn-dark va-text m-1"
+            type="button"
+            [value]="changeBtnTxt"
+            (click)="addOrUpdateRule()"
+          />
+          <input
+            class="btn btn-sm btn-dark va-text m-1"
+            type="button"
+            value="Execute"
+            (click)="runQuery()"
+          />
         </div>
-
       </div>
-      <app-table-view [params]="tableInput" [tableFilled]="tableFilled" [clearFilter]="clearTableFilter"
-        (onDataForQueryResult)="getDataForQueryResult($event)" (onFilteringChanged)="filterTable($event)">
+      <app-table-view
+        [params]="tableInput"
+        [tableFilled]="tableFilled"
+        [clearFilter]="clearTableFilter"
+        (onDataForQueryResult)="getDataForQueryResult($event)"
+        (onFilteringChanged)="filterTable($event)"
+      >
       </app-table-view>
     </div>
   </div>
 
   <div class="panel">
-    <div class="panel-heading collapsed" (click)="groupTabCliked()" data-bs-toggle="collapse" data-bs-target="#group"
-      aria-expanded="true">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">Group Nodes</b></span>
+    <div
+      class="panel-heading collapsed"
+      (click)="groupTabCliked()"
+      data-bs-toggle="collapse"
+      data-bs-target="#group"
+      aria-expanded="true"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Group Nodes</b></span
+      >
     </div>
 
     <div id="group" class="collapse">
@@ -110,9 +210,15 @@
   </div>
 
   <div class="panel">
-    <div class="panel-heading collapsed" data-bs-toggle="collapse" data-bs-target="#graph-theoretic-measures"
-      aria-expanded="true">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">Calculate Theoretic Property</b></span>
+    <div
+      class="panel-heading collapsed"
+      data-bs-toggle="collapse"
+      data-bs-target="#graph-theoretic-measures"
+      aria-expanded="true"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Calculate Theoretic Property</b></span
+      >
     </div>
 
     <div id="graph-theoretic-measures" class="collapse">
@@ -120,6 +226,9 @@
     </div>
   </div>
 
-  <app-panel-container [panels]="customSubTabs" [containerId]="'map-custom-sub-tab'"> </app-panel-container>
-
+  <app-panel-container
+    [panels]="customSubTabs"
+    [containerId]="'map-custom-sub-tab'"
+  >
+  </app-panel-container>
 </div>

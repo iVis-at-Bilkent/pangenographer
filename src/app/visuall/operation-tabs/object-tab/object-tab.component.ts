@@ -11,6 +11,7 @@ import {
   CLUSTER_CLASS,
   extend,
   PROPERITY_NAMES,
+  TYPES_NOT_TO_SHOW,
 } from "../../constants";
 import { DbAdapterService } from "../../db-service/db-adapter.service";
 import {
@@ -652,6 +653,15 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     for (let i = 0; i < elems.length; i++) {
       let curr = elems[i];
       let c = curr.classes();
+      let pass = false;
+      TYPES_NOT_TO_SHOW.forEach((type) => {
+        if (c.includes(type)) {
+          pass = true;
+        }
+      });
+      if (pass) {
+        continue;
+      }
       let isSelected = curr.selected();
       let isVisible = curr.visible();
       for (let j = 0; j < c.length; j++) {

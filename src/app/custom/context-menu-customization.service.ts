@@ -4,7 +4,7 @@ import { DbAdapterService } from "../visuall/db-service/db-adapter.service";
 import { GlobalVariableService } from "../visuall/global-variable.service";
 import { ContextMenuItem } from "../visuall/context-menu/icontext-menu";
 import { DbQueryMeta, HistoryMetaData } from "../visuall/db-service/data-types";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root",
@@ -174,23 +174,22 @@ export class ContextMenuCustomizationService {
         next: (response: any) => {
           const url = response.Poster;
           if (url && url != "" && url != "N/A") {
-            this._http
-              .get(url, { responseType: 'blob' })
-              .subscribe({
-                next: () => {
-                  e.style({ "background-image": url });
-                }, error: (e) => {
-                  this._g.showErrorModal(
-                    "Use Title Poster",
-                    "Poster(s) does not exist!"
-                  );
-                }
-              })
-
+            this._http.get(url, { responseType: "blob" }).subscribe({
+              next: () => {
+                e.style({ "background-image": url });
+              },
+              error: (e) => {
+                this._g.showErrorModal(
+                  "Use Title Poster",
+                  "Poster(s) does not exist!"
+                );
+              },
+            });
           }
-        }, error: (err) => {
+        },
+        error: (err) => {
           this._g.showErrorModal("Background Image", err);
-        }
+        },
       });
   }
 }

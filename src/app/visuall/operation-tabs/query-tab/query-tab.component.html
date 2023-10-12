@@ -1,7 +1,14 @@
 <div class="panel-group">
   <div class="panel">
-    <div class="panel-heading" data-bs-toggle="collapse" data-bs-target="#advanced-query-tab" aria-expanded="true">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">General Queries</b></span>
+    <div
+      class="panel-heading"
+      data-bs-toggle="collapse"
+      data-bs-target="#advanced-query-tab"
+      aria-expanded="true"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">General Queries</b></span
+      >
     </div>
 
     <div id="advanced-query-tab" class="show collapse text-center m-1">
@@ -10,19 +17,30 @@
   </div>
 
   <div class="panel">
-    <div class="panel-heading collapsed" data-bs-toggle="collapse" data-bs-target="#custom-query-tab"
-      aria-expanded="true">
-      <span class="panel-title accordion-toggle"><b class="va-heading2">Custom Queries</b></span>
+    <div
+      class="panel-heading collapsed"
+      data-bs-toggle="collapse"
+      data-bs-target="#custom-query-tab"
+      aria-expanded="true"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Custom Queries</b></span
+      >
     </div>
 
     <div id="custom-query-tab" class="collapse text-center m-1">
       <div>
         <div class="va-text">
           <div class="d-flex align-items-center justify-content-center">
-            <select class="form-select tight-select filter-form va-small-text query-select" [(ngModel)]="selectedQuery"
-              (change)="changeQuery($event)">
+            <select
+              class="form-select tight-select filter-form va-small-text query-select"
+              [(ngModel)]="selectedQuery"
+              (change)="changeQuery($event)"
+            >
               <option value="">Choose a query</option>
-              <option *ngFor="let p of queries" [value]="p.text">{{p.text}}</option>
+              <option *ngFor="let p of queries" [value]="p.text">
+                {{ p.text }}
+              </option>
             </select>
           </div>
         </div>
@@ -36,5 +54,9 @@
     </div>
   </div>
 
-  <app-panel-container [panels]="customSubTabs" [containerId]="'database-custom-sub-tab'"> </app-panel-container>
+  <app-panel-container
+    [panels]="customSubTabs"
+    [containerId]="'database-custom-sub-tab'"
+  >
+  </app-panel-container>
 </div>
