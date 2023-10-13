@@ -26,14 +26,17 @@
       "readCount": "number",
       "fragmentCount": "number",
       "kmerCount": "number",
-      "edgeIdentifier": "string"
+      "edgeIdentifier": "string",
+      "pathNames": "string[]",
+      "walkSampleIds": "string[]"
     },
     "JUMP": {
       "sequenceLength": "string",
       "targetOrientation": "string",
       "sourceOrientation": "string",
       "indirectShortcutConnections": "number",
-      "distance": "string"
+      "distance": "string",
+      "pathNames": "string[]"
     },
     "CONTAINMENT": {
       "sequenceLength": "string",

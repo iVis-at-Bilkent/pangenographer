@@ -194,7 +194,7 @@ export class GlobalVariableService {
     return new Set<string>(this.cy.elements().map((x) => x.id()));
   }
 
-  highlightElems(elems) {
+  highlightElements(elems) {
     this.viewUtils.highlight(elems, this.userPrefs.currHighlightIdx.getValue());
   }
 

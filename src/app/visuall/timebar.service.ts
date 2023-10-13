@@ -1,17 +1,16 @@
-import { Injectable } from '@angular/core';
-import { GlobalVariableService } from './global-variable.service';
-import AppDescription from '../custom/config/app_description.json';
-import { TimebarMetric } from './operation-tabs/map-tab/query-types';
-import { Timebar } from '../../lib/timebar/Timebar';
-import { BehaviorSubject } from 'rxjs';
-import { MergedElemIndicatorTypes } from './user-preference';
-import { COLLAPSED_EDGE_CLASS, COLLAPSED_NODE_CLASS } from './constants';
+import { Injectable } from "@angular/core";
+import { GlobalVariableService } from "./global-variable.service";
+import AppDescription from "../custom/config/app_description.json";
+import { TimebarMetric } from "./operation-tabs/map-tab/query-types";
+import { Timebar } from "../../lib/timebar/Timebar";
+import { BehaviorSubject } from "rxjs";
+import { MergedElemIndicatorTypes } from "./user-preference";
+import { COLLAPSED_EDGE_CLASS, COLLAPSED_NODE_CLASS } from "./constants";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class TimebarService {
-
   shownMetrics = new BehaviorSubject<TimebarMetric[]>(null);
   isRandomizedLayout = false;
   private _timebarExt: Timebar;
@@ -22,7 +21,7 @@ export class TimebarService {
   hideCompoundsFn: (elems) => void;
   showCollapsedFn: (collapsedNodes, collapsedEdges) => void;
 
-  constructor(private _g: GlobalVariableService) { }
+  constructor(private _g: GlobalVariableService) {}
 
   coverVisibleRange() {
     if (!this._timebarExt) {
@@ -74,7 +73,7 @@ export class TimebarService {
       this.init();
     }
     if (this._timebarExt) {
-      this._timebarExt.setSetting('isEnabled', isActive);
+      this._timebarExt.setSetting("isEnabled", isActive);
       if (isActive) {
         this.rangeListenerSetterFn();
       }
@@ -85,7 +84,7 @@ export class TimebarService {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('isHideDisconnectedNodesOnAnim', val);
+    this._timebarExt.setSetting("isHideDisconnectedNodesOnAnim", val);
   }
 
   changePeriod(v: number) {
@@ -93,42 +92,42 @@ export class TimebarService {
       return;
     }
     this._playingPeriod = v;
-    this._timebarExt.setSetting('playingPeriod', v);
+    this._timebarExt.setSetting("playingPeriod", v);
   }
 
   changeStep(v: number) {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('playingStep', v);
+    this._timebarExt.setSetting("playingStep", v);
   }
 
   changeZoomStep(v: number) {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('zoomingStep', v);
+    this._timebarExt.setSetting("zoomingStep", v);
   }
 
   changeGraphInclusionType(i: number) {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('graphInclusionType', i);
+    this._timebarExt.setSetting("graphInclusionType", i);
   }
 
   changeStatsInclusionType(i: number) {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('statsInclusionType', i);
+    this._timebarExt.setSetting("statsInclusionType", i);
   }
 
   setIsMaintainGraphRange(v: boolean) {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('isMaintainGraphRange', v);
+    this._timebarExt.setSetting("isMaintainGraphRange", v);
   }
   // ----------------------------------------- end of timebar settings  -----------------------------------------
 
@@ -136,14 +135,14 @@ export class TimebarService {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setEventListener('statsRangeChanged', f);
+    this._timebarExt.setEventListener("statsRangeChanged", f);
   }
 
   onGraphChanged(f) {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setEventListener('graphRangeChanged', f);
+    this._timebarExt.setEventListener("graphRangeChanged", f);
   }
 
   playTiming(callback: (isShowPlay: boolean) => void) {
@@ -171,16 +170,16 @@ export class TimebarService {
     if (!this._timebarExt) {
       return;
     }
-    this._timebarExt.setSetting('isIgnoreElemChanges', isIgnore);
+    this._timebarExt.setSetting("isIgnoreElemChanges", isIgnore);
   }
 
   // this function should show only the provided elements, hide the remaining, then should make layout
   private shownOnlyElems(elems) {
-    this._timebarExt.setSetting('isIgnoreElemChanges', true);
+    this._timebarExt.setSetting("isIgnoreElemChanges", true);
     const hiddenCollapsed = this._g.cy.collection();
     for (let i = 0; i < elems.length; i++) {
-      const collapsedChildren = elems[i].data('collapsedChildren');
-      const collapsedEdges = elems[i].data('collapsedEdges');
+      const collapsedChildren = elems[i].data("collapsedChildren");
+      const collapsedEdges = elems[i].data("collapsedEdges");
       if (collapsedChildren) {
         hiddenCollapsed.merge(collapsedChildren);
       }
@@ -189,23 +188,26 @@ export class TimebarService {
       }
     }
     elems = elems.union(hiddenCollapsed);
-    const alreadyVisibleNodes = this._g.cy.nodes(':visible');
+    const alreadyVisibleNodes = this._g.cy.nodes(":visible");
     if (alreadyVisibleNodes.length > 0) {
-      const nodes2Show = elems.nodes(':inside').difference(alreadyVisibleNodes);
+      const nodes2Show = elems.nodes(":inside").difference(alreadyVisibleNodes);
       this._g.layoutUtils.placeNewNodes(nodes2Show);
     }
-    const alreadyVisible = this._g.cy.$(':visible');
+    const alreadyVisible = this._g.cy.$(":visible");
     const elems2show = elems.difference(alreadyVisible);
     const elems2hide = alreadyVisible.difference(elems);
     this._g.viewUtils.show(elems);
-    this.showCollapsedFn(elems.filter('.' + COLLAPSED_NODE_CLASS), elems.filter('.' + COLLAPSED_EDGE_CLASS));
+    this.showCollapsedFn(
+      elems.filter("." + COLLAPSED_NODE_CLASS),
+      elems.filter("." + COLLAPSED_EDGE_CLASS)
+    );
     const remaining4Hide = this._g.cy.elements().difference(elems);
     // hide only non-compound nodes and edges
     this._g.viewUtils.hide(remaining4Hide);
     this.hideCompoundsFn(remaining4Hide);
 
     const isChanged = this.hasElemsChanged(this._prevElems, elems);
-    this._timebarExt.setSetting('isIgnoreElemChanges', false);
+    this._timebarExt.setSetting("isIgnoreElemChanges", false);
     this._prevElems = elems;
     if (!isChanged) {
       return;
@@ -234,21 +236,25 @@ export class TimebarService {
   }
 
   // only `elems2show` will be shown. Highlight elements to be shown "new" (previously hidden),
-  // unhighlight elemenets to be hidden 
+  // unhighlight elemenets to be hidden
   private handleHighlight(elems2show, elems2hide) {
-    if ((elems2show.length < 1 && elems2hide.length < 1) || this._g.isLoadFromExpandCollapse) {
+    if (
+      (elems2show.length < 1 && elems2hide.length < 1) ||
+      this._g.isLoadFromExpandCollapse
+    ) {
       return;
     }
     const newElemIndicator = this._g.userPrefs.mergedElemIndicator.getValue();
     if (newElemIndicator == MergedElemIndicatorTypes.none) {
       return;
     }
-    const isHighlightOnlyLatest = this._g.userPrefs.isOnlyHighlight4LatestQuery.getValue();
+    const isHighlightOnlyLatest =
+      this._g.userPrefs.isOnlyHighlight4LatestQuery.getValue();
 
     if (isHighlightOnlyLatest) {
       if (newElemIndicator == MergedElemIndicatorTypes.highlight) {
         this._g.viewUtils.removeHighlights();
-        this._g.highlightElems(elems2show);
+        this._g.highlightElements(elems2show);
       } else if (newElemIndicator == MergedElemIndicatorTypes.selection) {
         this._g.cy.$().unselect();
         elems2show.select();
@@ -256,7 +262,7 @@ export class TimebarService {
     } else {
       if (newElemIndicator == MergedElemIndicatorTypes.highlight) {
         this._g.viewUtils.removeHighlights(elems2hide);
-        this._g.highlightElems(elems2show);
+        this._g.highlightElements(elems2show);
       } else if (newElemIndicator == MergedElemIndicatorTypes.selection) {
         elems2hide.unselect();
         elems2show.select();
@@ -294,19 +300,20 @@ export class TimebarService {
   private init() {
     const m = AppDescription.timebarDataMapping; // mapping for timebar
     const s = this.getUserPrefs(); // settings for timebar
-    const e = { // events (functions to be called in extension)
+    const e = {
+      // events (functions to be called in extension)
       maintainFiltering: (elems) => {
         return this._g.filterByClass(elems);
       },
       showOnlyElems: this.shownOnlyElems.bind(this),
-      chartRendered: () => { },
+      chartRendered: () => {},
       onMouseOverChart: (ids) => {
         if (!ids) {
           return;
         }
         this._g.viewUtils.removeHighlights();
         for (let i = 0; i < ids.length; i++) {
-          this._g.highlightElems(this._g.cy.$id(ids[i]));
+          this._g.highlightElements(this._g.cy.$id(ids[i]));
         }
       },
       onMouseOutChart: (ids) => {
@@ -316,20 +323,28 @@ export class TimebarService {
         this._g.viewUtils.removeHighlights();
       },
     };
-    s['events'] = e;
-    s['defaultBeginDate'] = this._g.userPrefsFromFiles.dbQueryTimeRange.start.getValue();
-    s['defaultEndDate'] = this._g.userPrefsFromFiles.dbQueryTimeRange.end.getValue();
-    s['graphRangeRatio'] = AppDescription.appPreferences.timebar.graphRangeRatio;
-    const htmlElems = { chartElemId: 'chart_div', controllerElemId: 'filter_div' };
+    s["events"] = e;
+    s["defaultBeginDate"] =
+      this._g.userPrefsFromFiles.dbQueryTimeRange.start.getValue();
+    s["defaultEndDate"] =
+      this._g.userPrefsFromFiles.dbQueryTimeRange.end.getValue();
+    s["graphRangeRatio"] =
+      AppDescription.appPreferences.timebar.graphRangeRatio;
+    const htmlElems = {
+      chartElemId: "chart_div",
+      controllerElemId: "filter_div",
+    };
     this._timebarExt = this._g.cy.timebar(m, htmlElems, s);
-    this.shownMetrics.subscribe(x => { this._timebarExt.setStats(x); });
+    this.shownMetrics.subscribe((x) => {
+      this._timebarExt.setStats(x);
+    });
   }
 
   private getUserPrefs(): any {
     const prefs = this._g.userPrefs.timebar;
     const r = {};
     for (const key of Object.keys(prefs)) {
-      r[key] = prefs[key].getValue()
+      r[key] = prefs[key].getValue();
     }
     return r;
   }

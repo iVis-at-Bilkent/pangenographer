@@ -1,45 +1,50 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GlobalVariableService } from '../global-variable.service';
-import { GraphHistoryItem } from '../db-service/data-types';
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { GlobalVariableService } from "../global-variable.service";
+import { GraphHistoryItem } from "../db-service/data-types";
+import { Subscription } from "rxjs";
 
 @Component({
-  selector: 'app-graph-history',
-  templateUrl: './graph-history.component.html',
-  styleUrls: ['./graph-history.component.css']
+  selector: "app-graph-history",
+  templateUrl: "./graph-history.component.html",
+  styleUrls: ["./graph-history.component.css"],
 })
 export class GraphHistoryComponent implements OnInit, OnDestroy {
-
   isShow: boolean = false;
   imgSrc: string = null;
   graphHistory: GraphHistoryItem[];
   position = { x: -130, y: 0 };
-  currSize: { width: number, height: number } = { width: 375, height: 600 };
+  currSize: { width: number; height: number } = { width: 375, height: 600 };
   activeItemIdx = 0;
   subs: Subscription[] = [];
 
-  constructor(private _g: GlobalVariableService) { }
+  constructor(private _g: GlobalVariableService) {}
 
   ngOnInit(): void {
     this.graphHistory = this._g.graphHistory;
-    this.subs.push(this._g.showHideGraphHistory.subscribe(x => {
-      this.isShow = x;
-      if (x) {
+    this.subs.push(
+      this._g.showHideGraphHistory.subscribe((x) => {
+        this.isShow = x;
+        if (x) {
+          this.graphHistory = this._g.graphHistory;
+        }
+      })
+    );
+    this.subs.push(
+      this._g.addNewGraphHistoryItem.subscribe((x) => {
+        if (x) {
+          this.activeItemIdx = this._g.graphHistory.length - 1;
+        }
+      })
+    );
+    this.subs.push(
+      this._g.userPrefs.queryHistoryLimit.subscribe((x) => {
+        while (this._g.graphHistory.length > x) {
+          this._g.graphHistory.splice(0, 1);
+          this.activeItemIdx = this.activeItemIdx - 1;
+        }
         this.graphHistory = this._g.graphHistory;
-      }
-    }));
-    this.subs.push(this._g.addNewGraphHistoryItem.subscribe(x => {
-      if (x) {
-        this.activeItemIdx = this._g.graphHistory.length - 1;
-      }
-    }));
-    this.subs.push(this._g.userPrefs.queryHistoryLimit.subscribe(x => {
-      while (this._g.graphHistory.length > x) {
-        this._g.graphHistory.splice(0, 1);
-        this.activeItemIdx = this.activeItemIdx - 1;
-      }
-      this.graphHistory = this._g.graphHistory;
-    }));
+      })
+    );
   }
 
   ngOnDestroy(): void {

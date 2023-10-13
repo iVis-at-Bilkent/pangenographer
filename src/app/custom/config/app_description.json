@@ -89,7 +89,9 @@
         "readCount": "number",
         "fragmentCount": "number",
         "kmerCount": "number",
-        "edgeIdentifier": "string"
+        "edgeIdentifier": "string",
+        "pathNames": "string[]",
+        "walkSampleIds": "string[]"
       },
       "style": {
         "label": "Link",
@@ -112,7 +114,8 @@
         "targetOrientation": "string",
         "sourceOrientation": "string",
         "indirectShortcutConnections": "number",
-        "distance": "string"
+        "distance": "string",
+        "pathNames": "string[]"
       },
       "style": {
         "label": "Jump",

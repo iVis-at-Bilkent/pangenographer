@@ -40,7 +40,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   multiObjTableFilled = new Subject<boolean>();
   clearMultiObjTableFilter = new Subject<boolean>();
   isShowStatsTable: boolean = false;
-  isShowObjTable = false;
+  isShowObjTable: boolean = false;
+  highlightedPathWalk: string = "";
   customSubTabs: { component: any; text: string }[] =
     CustomizationModule.objSubTabs;
 
@@ -60,6 +61,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
   };
+
   multiObjTableInp: TableViewInput = {
     columns: ["Type"],
     isHide0: true,
@@ -77,6 +79,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
   };
+
   private NODE_TYPE = "_NODE_";
   private EDGE_TYPE = "_EDGE_";
   shownElemsSubs: Subscription;
@@ -592,6 +595,37 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
 
     return [commonProps, commonClassNames];
+  }
+
+  hightlightHoveredPath(pathName: string) {
+    this.highlightedPathWalk = pathName;
+    this._g.cy.elements().forEach((element) => {
+      if (element.data("pathNames")) {
+        element.data("pathNames").forEach((pathVal) => {
+          if (pathVal.includes(pathName)) {
+            this._g.highlightElements(element);
+          }
+        });
+      }
+    });
+  }
+
+  hightlightHoveredWalk(walkName: string) {
+    this.highlightedPathWalk = walkName;
+    this._g.cy.elements().forEach((element) => {
+      if (element.data("walkSampleIds")) {
+        element.data("walkSampleIds").forEach((walkVal) => {
+          if (walkVal.includes(walkName)) {
+            this._g.highlightElements(element);
+          }
+        });
+      }
+    });
+  }
+
+  removeHighlightHoveredPathWalk() {
+    this.highlightedPathWalk = "";
+    this._g.viewUtils.removeHighlights();
   }
 
   countKeyValuePairs(data, superObj) {

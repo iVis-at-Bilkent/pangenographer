@@ -83,3 +83,8 @@ td {
   border: 2px solid #65676b;
   border-radius: 5px;
 }
+
+.isHoveredPathWalk {
+  font-weight: 700;
+  font-size: 12px;
+}

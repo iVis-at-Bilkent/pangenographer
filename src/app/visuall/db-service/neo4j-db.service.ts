@@ -974,6 +974,46 @@ export class Neo4jDb implements DbService {
       if (link.hasOwnProperty("kmerCount")) {
         edge2Create += `, kmerCount: ${link.kmerCount}`;
       }
+      if (
+        segmentsToPathMap[`${link.source}`] &&
+        segmentsToPathMap[`${link.target}`]
+      ) {
+        let paths2Edge = "";
+        segmentsToPathMap[`${link.source}`].forEach((pathName1) => {
+          segmentsToPathMap[`${link.target}`].forEach((pathName2) => {
+            if (pathName1 === pathName2) {
+              if (paths2Edge.length === 0) {
+                paths2Edge += ", pathNames: [";
+              }
+              paths2Edge += `'${pathName1}', `;
+            }
+          });
+        });
+        if (paths2Edge.length) {
+          edge2Create += paths2Edge;
+          edge2Create = edge2Create.substring(0, edge2Create.length - 2) + "]";
+        }
+      }
+      if (
+        segmentsToWalkMap[`${link.source}`] &&
+        segmentsToWalkMap[`${link.target}`]
+      ) {
+        let walks2Edge = "";
+        segmentsToWalkMap[`${link.source}`].forEach((sampleId1) => {
+          segmentsToWalkMap[`${link.target}`].forEach((sampleId2) => {
+            if (sampleId1 === sampleId2) {
+              if (walks2Edge.length === 0) {
+                walks2Edge += ", walkSampleIds: [";
+              }
+              walks2Edge += `'${sampleId1}', `;
+            }
+          });
+        });
+        if (walks2Edge.length > 0) {
+          edge2Create += walks2Edge;
+          edge2Create = edge2Create.substring(0, edge2Create.length - 2) + "]";
+        }
+      }
       edge2Create += `}]->(n${link.target}),\n`;
       query += edge2Create;
     });
@@ -985,6 +1025,26 @@ export class Neo4jDb implements DbService {
       edge2Create += `, distance: '${jump.distance}'`;
       if (jump.hasOwnProperty("indirectShortcutConnections")) {
         edge2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
+      }
+      if (
+        segmentsToPathMap[`${jump.source}`] &&
+        segmentsToPathMap[`${jump.target}`]
+      ) {
+        let paths2Edge = "";
+        segmentsToPathMap[`${jump.source}`].forEach((pathName1) => {
+          segmentsToPathMap[`${jump.target}`].forEach((pathName2) => {
+            if (pathName1 === pathName2) {
+              if (paths2Edge.length === 0) {
+                paths2Edge += ", pathNames: [";
+              }
+              paths2Edge += `'${pathName1}', `;
+            }
+          });
+        });
+        if (paths2Edge.length > 0) {
+          edge2Create += paths2Edge;
+          edge2Create = edge2Create.substring(0, edge2Create.length - 2) + "]";
+        }
       }
       edge2Create += `}]->(n${jump.target}),\n`;
       query += edge2Create;

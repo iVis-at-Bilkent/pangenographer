@@ -530,77 +530,81 @@ export class CytoscapeService {
 
     this._g.cy.edges().unbind("mouseover");
     this._g.cy.edges().forEach((edge) => {
-      edge.bind("mouseover", (event) => {
-        let popper = event.target.popper({
-          content: () => {
-            let contentOuter = document.createElement("div");
-            contentOuter.classList.add("edge-tooltip-outer");
-            contentOuter.id = `edge-tooltip-${edge
-              .source()
-              .data("segmentName")}-${edge.source().data("segmentName")}-outer`;
-            let content = document.createElement("div");
-            content.classList.add("edge-tooltip");
-            content.id = `edge-tooltip-${edge
-              .source()
-              .data("segmentName")}-${edge.source().data("segmentName")}`;
-            let text = this.tooltipText(edge);
-            content.style.fontSize = fontSize + "px";
-            content.style.fontWeight = fontWeight;
-            content.style.fontFamily = fontFamily;
-            content.style.fontStyle = fontStyle;
-            content.style.maxWidth = `${
-              this.textWidthCyElement(
-                text.text.split("\n")[0],
-                fontSize,
-                fontFamily,
-                fontWeight,
-                fontStyle
-              ) + widthOffset
-            }px`;
+      if (!edge.hasClass(C.COLLAPSED_EDGE_CLASS)) {
+        edge.bind("mouseover", (event) => {
+          let popper = event.target.popper({
+            content: () => {
+              let contentOuter = document.createElement("div");
+              contentOuter.classList.add("edge-tooltip-outer");
+              contentOuter.id = `edge-tooltip-${edge
+                .source()
+                .data("segmentName")}-${edge
+                .source()
+                .data("segmentName")}-outer`;
+              let content = document.createElement("div");
+              content.classList.add("edge-tooltip");
+              content.id = `edge-tooltip-${edge
+                .source()
+                .data("segmentName")}-${edge.source().data("segmentName")}`;
+              let text = this.tooltipText(edge);
+              content.style.fontSize = fontSize + "px";
+              content.style.fontWeight = fontWeight;
+              content.style.fontFamily = fontFamily;
+              content.style.fontStyle = fontStyle;
+              content.style.maxWidth = `${
+                this.textWidthCyElement(
+                  text.text.split("\n")[0],
+                  fontSize,
+                  fontFamily,
+                  fontWeight,
+                  fontStyle
+                ) + widthOffset
+              }px`;
 
-            let firstSequence = document.createElement("span");
-            firstSequence.classList.add("edge-tooltip-inner-part");
-            firstSequence.innerHTML = text.text.substring(
-              0,
-              this.edgeTooltipInnerTextSize(text.lengths.firstSequence)
-            );
-            let secondSequence = document.createElement("span");
-            secondSequence.classList.add("edge-tooltip-inner-part");
-            secondSequence.innerHTML = text.text.substring(
-              this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
-              this.edgeTooltipInnerTextSize(
-                text.lengths.firstSequence + text.lengths.secondSequence
-              )
-            );
-            let thirdSequence = document.createElement("span");
-            thirdSequence.innerHTML = text.text.substring(
-              this.edgeTooltipInnerTextSize(
-                text.lengths.firstSequence + text.lengths.secondSequence
-              )
-            );
-            thirdSequence.classList.add("edge-tooltip-inner-part");
+              let firstSequence = document.createElement("span");
+              firstSequence.classList.add("edge-tooltip-inner-part");
+              firstSequence.innerHTML = text.text.substring(
+                0,
+                this.edgeTooltipInnerTextSize(text.lengths.firstSequence)
+              );
+              let secondSequence = document.createElement("span");
+              secondSequence.classList.add("edge-tooltip-inner-part");
+              secondSequence.innerHTML = text.text.substring(
+                this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
+                this.edgeTooltipInnerTextSize(
+                  text.lengths.firstSequence + text.lengths.secondSequence
+                )
+              );
+              let thirdSequence = document.createElement("span");
+              thirdSequence.innerHTML = text.text.substring(
+                this.edgeTooltipInnerTextSize(
+                  text.lengths.firstSequence + text.lengths.secondSequence
+                )
+              );
+              thirdSequence.classList.add("edge-tooltip-inner-part");
 
-            content.appendChild(firstSequence);
-            content.appendChild(secondSequence);
-            content.appendChild(thirdSequence);
-            contentOuter.appendChild(content);
-            document.body.appendChild(contentOuter);
-            return contentOuter;
-          },
+              content.appendChild(firstSequence);
+              content.appendChild(secondSequence);
+              content.appendChild(thirdSequence);
+              contentOuter.appendChild(content);
+              document.body.appendChild(contentOuter);
+              return contentOuter;
+            },
+          });
+          event.target.popperRefObj = popper;
+          let update = () => {
+            popper.update();
+          };
+
+          edge.on("position", update);
+          this._g.cy.on("pan zoom resize", update);
         });
-        event.target.popperRefObj = popper;
-        let update = () => {
-          popper.update();
-        };
-
-        edge.on("position", update);
-        this._g.cy.on("pan zoom resize", update);
-      });
+      }
     });
 
     this._g.cy.edges().unbind("mouseout");
     this._g.cy.edges().bind("mouseout", (event) => {
-      if (event.target.popper) {
+      if (event.target.popper && event.target.popperRefObj) {
         event.target.popperRefObj.state.elements.popper.remove();
         event.target.popperRefObj.destroy();
       }
@@ -950,7 +954,7 @@ export class CytoscapeService {
       ele2highlight.select();
       this._g.isSwitch2ObjTabOnSelect = true;
     } else if (newElemIndicator == MergedElemIndicatorTypes.highlight) {
-      this._g.highlightElems(ele2highlight);
+      this._g.highlightElements(ele2highlight);
     }
   }
 
@@ -1059,13 +1063,13 @@ export class CytoscapeService {
     if (selected.length < 1) {
       return;
     }
-    this._g.highlightElems(selected);
+    this._g.highlightElements(selected);
   }
 
   staticHighlightNeighbors() {
     let selected = this._g.cy.$(":selected");
     let neighbors = selected.neighborhood();
-    this._g.highlightElems(selected.union(neighbors));
+    this._g.highlightElements(selected.union(neighbors));
   }
 
   removeHighlights() {

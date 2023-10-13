@@ -314,7 +314,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
       newElemIndicator == MergedElemIndicatorTypes.highlight ||
       newElemIndicator == MergedElemIndicatorTypes.none
     ) {
-      this._g.highlightElems(satisfyingElems);
+      this._g.highlightElements(satisfyingElems);
     } else if (newElemIndicator == MergedElemIndicatorTypes.selection) {
       this._g.isSwitch2ObjTabOnSelect = false;
       satisfyingElems.select();
