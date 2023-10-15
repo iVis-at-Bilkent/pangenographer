@@ -38,14 +38,8 @@ td {
   border-radius: 5px;
 }
 
-.combined-sequence-container-part:nth-child(1) {
-  color: #415AD9;
-}
-.combined-sequence-container-part:nth-child(2) {
+.combined-sequence-container-part {
   color: black;
-}
-.combined-sequence-container-part:nth-child(3) {
-  color: #D5235F;
 }
 
 .path-walk-container {
@@ -85,6 +79,5 @@ td {
 }
 
 .isHoveredPathWalk {
-  font-weight: 700;
-  font-size: 12px;
+  font-size: 14px;
 }

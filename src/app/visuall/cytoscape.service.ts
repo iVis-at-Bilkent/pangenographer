@@ -567,14 +567,49 @@ export class CytoscapeService {
                 0,
                 this.edgeTooltipInnerTextSize(text.lengths.firstSequence)
               );
-              let secondSequence = document.createElement("span");
-              secondSequence.classList.add("edge-tooltip-inner-part");
-              secondSequence.innerHTML = text.text.substring(
-                this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
-                this.edgeTooltipInnerTextSize(
-                  text.lengths.firstSequence + text.lengths.secondSequence
-                )
-              );
+              content.appendChild(firstSequence);
+
+              if (edge.data("overlap")) {
+                let overlapIdentifier = edge
+                  .data("overlap")
+                  .split(/[0-9]+/)
+                  .slice(1);
+                let overlapNumerics = edge.data("overlap").split(/[MIDNSHPX=]/);
+                overlapNumerics.pop();
+                let currentIndex = 0;
+
+                overlapIdentifier.forEach((overlapIdentifier, index) => {
+                  let secondSequence = document.createElement("span");
+                  secondSequence.classList.add(
+                    `edge-CIGAR-${
+                      overlapIdentifier === "=" ? "Eq" : overlapIdentifier
+                    }`
+                  );
+                  secondSequence.innerHTML = text.text.substring(
+                    this.edgeTooltipInnerTextSize(
+                      text.lengths.firstSequence + currentIndex
+                    ),
+                    this.edgeTooltipInnerTextSize(
+                      text.lengths.firstSequence +
+                        currentIndex +
+                        Number(overlapNumerics[index])
+                    )
+                  );
+                  currentIndex += Number(overlapNumerics[index]);
+                  content.appendChild(secondSequence);
+                });
+              } else {
+                let secondSequence = document.createElement("span");
+                secondSequence.classList.add("edge-CIGAR-M");
+                secondSequence.innerHTML = text.text.substring(
+                  this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
+                  this.edgeTooltipInnerTextSize(
+                    text.lengths.firstSequence + text.lengths.secondSequence
+                  )
+                );
+                content.appendChild(secondSequence);
+              }
+
               let thirdSequence = document.createElement("span");
               thirdSequence.innerHTML = text.text.substring(
                 this.edgeTooltipInnerTextSize(
@@ -583,8 +618,6 @@ export class CytoscapeService {
               );
               thirdSequence.classList.add("edge-tooltip-inner-part");
 
-              content.appendChild(firstSequence);
-              content.appendChild(secondSequence);
               content.appendChild(thirdSequence);
               contentOuter.appendChild(content);
               document.body.appendChild(contentOuter);
@@ -677,33 +710,35 @@ export class CytoscapeService {
           thirdSequence.length;
       }
     } else if (element.data("pos")) {
-      let overlapNumeric = 0;
-
-      if (element.data("overlap") && element.data("overlap") !== "*") {
-        overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
-      }
-      firstSequence = element
-        .source()
-        .data("segmentData")
-        .substring(0, element.data("pos"));
+      let container = element.source().data("segmentData");
       if (element.data("sourceOrientation") === "-") {
-        firstSequence = this.reverseComplementSegmentData(firstSequence);
+        container = this.reverseComplementSegmentData(container);
       }
+      firstSequence = container.substring(0, element.data("pos"));
+
       secondSequence = element.target().data("segmentData");
       if (element.data("targetOrientation") === "-") {
         secondSequence = this.reverseComplementSegmentData(secondSequence);
       }
-      thirdSequence = element
-        .source()
-        .data("segmentData")
-        .substring(element.data("pos") + overlapNumeric);
+
+      thirdSequence = container.substring(
+        element.data("pos") + secondSequence.length
+      );
+
       sequenceLength =
         firstSequence.length + secondSequence.length + thirdSequence.length;
     } else {
-      let overlapNumeric = 0;
-
-      if (element.data("overlap") && element.data("overlap") !== "*") {
-        overlapNumeric = Number(element.data("overlap").match(/[0-9]+/)[0]);
+      let overlapNumerics;
+      let overlapIdentifiers;
+      let overlapLengthSource = 0;
+      let overlapLengthTarget = 0;
+      if (element.data("overlap") !== "*") {
+        overlapNumerics = element.data("overlap").split(/[MIDNSHPX=]/);
+        overlapIdentifiers = element
+          .data("overlap")
+          .split(/[0-9]+/)
+          .slice(1);
+        overlapNumerics.pop();
       }
       firstSequence = element.source().data("segmentData");
       if (element.data("sourceOrientation") === "-") {
@@ -713,15 +748,80 @@ export class CytoscapeService {
       if (element.data("targetOrientation") === "-") {
         thirdSequence = this.reverseComplementSegmentData(thirdSequence);
       }
+
+      secondSequence = "";
+      if (element.data("overlap") !== "*") {
+        overlapIdentifiers.forEach((overlapIdentifier, index) => {
+          if (
+            C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
+            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+          ) {
+            overlapLengthTarget += Number(overlapNumerics[index]);
+          } else if (
+            C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
+            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+          ) {
+            overlapLengthSource += Number(overlapNumerics[index]);
+          } else if (
+            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
+            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+          ) {
+            overlapLengthSource += Number(overlapNumerics[index]);
+            overlapLengthTarget += Number(overlapNumerics[index]);
+          }
+        });
+
+        let currentOverlapLengthSource = 0;
+        let currentOverlapLengthTarget = 0;
+        overlapIdentifiers.forEach((overlapIdentifier, index) => {
+          if (
+            C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
+            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+          ) {
+            secondSequence += thirdSequence.substring(
+              currentOverlapLengthTarget,
+              currentOverlapLengthTarget + Number(overlapNumerics[index])
+            );
+            currentOverlapLengthTarget += Number(overlapNumerics[index]);
+          } else if (
+            C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
+            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+          ) {
+            secondSequence += firstSequence.substring(
+              firstSequence.length -
+                overlapLengthSource +
+                currentOverlapLengthSource,
+              firstSequence.length -
+                overlapLengthSource +
+                currentOverlapLengthSource +
+                Number(overlapNumerics[index])
+            );
+            currentOverlapLengthSource += Number(overlapNumerics[index]);
+          } else if (
+            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
+            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+          ) {
+            secondSequence += thirdSequence.substring(
+              currentOverlapLengthTarget,
+              currentOverlapLengthTarget + Number(overlapNumerics[index])
+            );
+            currentOverlapLengthTarget += Number(overlapNumerics[index]);
+            currentOverlapLengthSource += Number(overlapNumerics[index]);
+          } else {
+            for (let i = 0; i < Number(overlapNumerics[index]); i++) {
+              secondSequence += "_";
+            }
+          }
+        });
+      }
+
       firstSequence = firstSequence.substring(
         0,
-        firstSequence.length - overlapNumeric
+        firstSequence.length -
+          (element.data("overlap") === "*" ? 0 : overlapLengthSource)
       );
-      thirdSequence = thirdSequence.substring(overlapNumeric);
-      secondSequence = element
-        .target()
-        .data("segmentData")
-        .substring(0, overlapNumeric);
+      thirdSequence = thirdSequence.substring(overlapLengthTarget);
+
       sequenceLength =
         firstSequence.length + secondSequence.length + thirdSequence.length;
     }
@@ -763,6 +863,7 @@ export class CytoscapeService {
         toAdd += thirdThreshold - thirdSequence.length;
         thirdThreshold = thirdSequence.length;
       }
+
       if (secondSequence.length > secondThreshold) {
         if (toAdd > secondSequence.length - secondThreshold) {
           toAdd -= secondSequence.length - secondThreshold;

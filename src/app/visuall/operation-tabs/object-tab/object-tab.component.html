@@ -23,7 +23,7 @@
         >
         <span
           *ngIf="selectedItemProps.containedSequence"
-          class="combined-sequence-container-part"
+          class="edge-CIGAR-M"
           >{{ selectedItemProps.containedSequence.val }}</span
         >
         <span
@@ -41,9 +41,7 @@
           class="combined-sequence-container-part"
           >{{ selectedItemProps.sourceSequence.val }}</span
         >
-        <span
-          *ngIf="selectedItemProps.distance"
-          class="combined-sequence-container-part"
+        <span *ngIf="selectedItemProps.distance" class="edge-CIGAR-M"
           >..({{ selectedItemProps.distance.val }})..</span
         >
         <span
@@ -61,11 +59,43 @@
           class="combined-sequence-container-part"
           >{{ selectedItemProps.sourceSequenceWithoutOverlap.val }}</span
         >
-        <span
-          *ngIf="selectedItemProps.overlapSequence"
-          class="combined-sequence-container-part"
-          >{{ selectedItemProps.overlapSequence.val }}</span
+
+        <ng-container
+          *ngFor="
+            let overlapIdentifier of selectedItemProps.overlap
+              .overlapIdentifiers;
+            let i = index
+          "
         >
+          <span *ngIf="overlapIdentifier === 'M'" class="edge-CIGAR-M">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'I'" class="edge-CIGAR-I">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'D'" class="edge-CIGAR-D">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'N'" class="edge-CIGAR-N">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'S'" class="edge-CIGAR-S">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'H'" class="edge-CIGAR-H">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'P'" class="edge-CIGAR-P">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === '='" class="edge-CIGAR-Eq">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+          <span *ngIf="overlapIdentifier === 'X'" class="edge-CIGAR-X">{{
+            prepareCIGARForIndex(i)
+          }}</span>
+        </ng-container>
+
         <span
           *ngIf="selectedItemProps.targetSequenceWithoutOverlap"
           class="combined-sequence-container-part"
@@ -77,7 +107,7 @@
         <tbody>
           <tr *ngIf="selectedItemProps.sequenceLength">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.sequenceLength.name }}</b>
+              <b class="va-text">Sequence Length</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.sequenceLength.val }}
@@ -85,7 +115,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.segmentName">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.segmentName.name }}</b>
+              <b class="va-text">Segment Name</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.segmentName.val }}
@@ -93,7 +123,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.segmentLength">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.segmentLength.name }}</b>
+              <b class="va-text">Segment Length</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.segmentLength.val }}
@@ -101,7 +131,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.readCount">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.readCount.name }}</b>
+              <b class="va-text">Read count</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.readCount.val }}
@@ -109,7 +139,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.fragmentCount">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.fragmentCount.name }}</b>
+              <b class="va-text">Fragment count</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.fragmentCount.val }}
@@ -117,7 +147,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.kmerCount">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.kmerCount.name }}</b>
+              <b class="va-text">K-mer count</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.kmerCount.val }}
@@ -125,7 +155,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.SHA256Checksum">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.SHA256Checksum.name }}</b>
+              <b class="va-text">SHA-256 checksum</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.SHA256Checksum.val }}
@@ -133,9 +163,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.URIorLocalSystemPath">
             <td class="text-start">
-              <b class="va-text">{{
-                selectedItemProps.URIorLocalSystemPath.name
-              }}</b>
+              <b class="va-text">URI or local file-system path</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.URIorLocalSystemPath.val }}
@@ -143,7 +171,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.overlap">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.overlap.name }}</b>
+              <b class="va-text">Overlap</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.overlap.val }}
@@ -151,9 +179,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.targetOrientation">
             <td class="text-start">
-              <b class="va-text">{{
-                selectedItemProps.targetOrientation.name
-              }}</b>
+              <b class="va-text">Target orientation</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.targetOrientation.val }}
@@ -161,9 +187,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.sourceOrientation">
             <td class="text-start">
-              <b class="va-text">{{
-                selectedItemProps.sourceOrientation.name
-              }}</b>
+              <b class="va-text">Source orientation</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.sourceOrientation.val }}
@@ -171,7 +195,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.mappingQuality">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.mappingQuality.name }}</b>
+              <b class="va-text">Mapping quality</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.mappingQuality.val }}
@@ -179,9 +203,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.numberOfMismatchesOrGaps">
             <td class="text-start">
-              <b class="va-text">{{
-                selectedItemProps.numberOfMismatchesOrGaps.name
-              }}</b>
+              <b class="va-text">Number of mismatches/gap</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.numberOfMismatchesOrGaps.val }}
@@ -189,7 +211,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.edgeIdentifier">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.edgeIdentifier.name }}</b>
+              <b class="va-text">Edge identifier</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.edgeIdentifier.val }}
@@ -197,9 +219,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.indirectShortcutConnections">
             <td class="text-start">
-              <b class="va-text">{{
-                selectedItemProps.indirectShortcutConnections.name
-              }}</b>
+              <b class="va-text">Indirect shortcut connections</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.indirectShortcutConnections.val }}
@@ -207,7 +227,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.distance">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.distance.name }}</b>
+              <b class="va-text">Distance</b>
             </td>
             <td class="va-text text-end">
               {{ selectedItemProps.distance.val }}
@@ -215,7 +235,7 @@
           </tr>
           <tr *ngIf="selectedItemProps.pos">
             <td class="text-start">
-              <b class="va-text">{{ selectedItemProps.pos.name }}</b>
+              <b class="va-text">Pos</b>
             </td>
             <td class="va-text text-end">{{ selectedItemProps.pos.val }}</td>
           </tr>

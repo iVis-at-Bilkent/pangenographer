@@ -399,14 +399,42 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   margin: 0;
 }
 
-.edge-tooltip-inner-part:nth-child(3n+1) {
-  color: #415AD9;
-}
-
-.edge-tooltip-inner-part:nth-child(3n+2) {
+.edge-tooltip-inner-part {
   color: black;
 }
 
-.edge-tooltip-inner-part:nth-child(3n) {
-  color: #D5235F;
+.edge-CIGAR-M {
+  color: #0099ff;
+}
+
+.edge-CIGAR-I {
+  color: #6600ff;
+}
+
+.edge-CIGAR-D {
+  color: #cc00cc;
+}
+
+.edge-CIGAR-N {
+  color: #cc0000;
+}
+
+.edge-CIGAR-S {
+  color: #ff9900;
+}
+
+.edge-CIGAR-H {
+  color: #009900;
+}
+
+.edge-CIGAR-P {
+  color: #00ffff;
+}
+
+.edge-CIGAR-Eq {
+  color: #996633;
+}
+
+.edge-CIGAR-X {
+  color: #999966;
 }

@@ -1051,7 +1051,7 @@ export class Neo4jDb implements DbService {
     });
 
     GFAData.containments.forEach((containment) => {
-      let edge2Create = `(n${containment.source})-[:LINK
+      let edge2Create = `(n${containment.source})-[:CONTAINMENT
         {sourceOrientation: "${containment.sourceOrientation}", source: '${containment.source}'
         , targetOrientation: "${containment.targetOrientation}", target: '${containment.target}'`;
       edge2Create += `, overlap: '${containment.overlap}'`;

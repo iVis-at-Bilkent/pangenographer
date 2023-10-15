@@ -2,15 +2,12 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { GlobalVariableService } from "../../global-variable.service";
 import {
   getPropNamesFromObj,
-  DATE_PROP_END,
-  DATE_PROP_START,
   findTypeOfAttribute,
   debounce,
   COLLAPSED_EDGE_CLASS,
   OBJ_INFO_UPDATE_DELAY,
   CLUSTER_CLASS,
   extend,
-  PROPERITY_NAMES,
   TYPES_NOT_TO_SHOW,
 } from "../../constants";
 import { DbAdapterService } from "../../db-service/db-adapter.service";
@@ -346,30 +343,20 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         }
       }
       if (renderedValue !== undefined) {
-        if (
-          key.toLowerCase() === DATE_PROP_START ||
-          key.toLowerCase() === DATE_PROP_END
-        ) {
-          this.selectedItemProps[`${renderedKey}`] = {
-            val: renderedValue,
-            name: PROPERITY_NAMES[renderedKey],
-          };
-        } else {
-          renderedValue = this.getMappedProperty(
-            this.selectedClasses,
-            key,
-            renderedValue
-          );
-          this.selectedItemProps[`${renderedKey}`] = {
-            val: renderedValue,
-            name: PROPERITY_NAMES[renderedKey],
-          };
-        }
+        renderedValue = this.getMappedProperty(
+          this.selectedClasses,
+          key,
+          renderedValue
+        );
 
         if (renderedKey === "pathNames") {
-          this.selectedItemProps[`pathChecked`] = [];
+          this.selectedItemProps[`${renderedKey}`] = {
+            val: renderedValue,
+          };
+          this.selectedItemProps["pathChecked"] = [];
+
           for (let i = 0; i < renderedValue.length; i++) {
-            this.selectedItemProps[`pathChecked`].push(false);
+            this.selectedItemProps["pathChecked"].push(false);
           }
 
           this.selectedItemProps["pathSegmentNames"] = [];
@@ -390,9 +377,12 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
               }
             });
           });
-        }
-        if (renderedKey === "walkSampleIds") {
+        } else if (renderedKey === "walkSampleIds") {
+          this.selectedItemProps[`${renderedKey}`] = {
+            val: renderedValue,
+          };
           this.selectedItemProps[`walkChecked`] = [];
+
           for (let i = 0; i < renderedValue.length; i++) {
             this.selectedItemProps[`walkChecked`].push(false);
           }
@@ -424,9 +414,24 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
               }
             });
           });
+        } else if (renderedKey === "overlap") {
+          let overlapNumerics = renderedValue.split(/[MIDNSHPX=]/);
+          overlapNumerics.pop();
+
+          this.selectedItemProps[`${renderedKey}`] = {
+            val: renderedValue,
+            overlapIdentifiers: renderedValue.split(/[0-9]+/).slice(1),
+            overlapNumerics: overlapNumerics,
+            currentIndex: 0,
+          };
+        } else {
+          this.selectedItemProps[`${renderedKey}`] = {
+            val: renderedValue,
+          };
         }
       }
     }
+
     if (this.selectedItemProps["sourceOrientation"]) {
       // for combined sequence
       this._g.cy.edges(":selected").forEach((element) => {
@@ -463,10 +468,27 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
         this.selectedItemProps["sequenceLength"] = {
           val: combinedSequence.sequenceLength,
-          name: PROPERITY_NAMES["sequenceLength"],
         };
       });
     }
+  }
+
+  prepareCIGARForIndex(index: number): string {
+    if (
+      this.selectedItemProps.overlap.currentIndex >=
+      this.selectedItemProps.overlapSequence.val.length
+    ) {
+      this.selectedItemProps.overlap.currentIndex = 0;
+    }
+    let s = this.selectedItemProps.overlapSequence.val.substring(
+      this.selectedItemProps.overlap.currentIndex,
+      this.selectedItemProps.overlap.currentIndex +
+        Number(this.selectedItemProps.overlap.overlapNumerics[index])
+    );
+    this.selectedItemProps.overlap.currentIndex += Number(
+      this.selectedItemProps.overlap.overlapNumerics[index]
+    );
+    return s;
   }
 
   getPathsSelected() {

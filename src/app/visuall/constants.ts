@@ -57,6 +57,10 @@ export const NUMBER_OPERATORS = {
   "one of": "One of",
 };
 
+export const TARGET_CIGAR_SKIP_OPS = ["D", "N", "P", "H"];
+
+export const SOURCE_CIGAR_SKIP_OPS = ["I", "S", "H", "P"];
+
 export const DATETIME_OPERATORS = {
   "=": "=",
   "\u2260": "<>",
@@ -130,7 +134,6 @@ export const MONTHS = [
   "December",
 ];
 
-
 export const TYPES_NOT_TO_SHOW = ["PATHS", "WALKS"];
 
 export const SHORT_MONTHS = [
@@ -147,27 +150,6 @@ export const SHORT_MONTHS = [
   "Nov",
   "Dec",
 ];
-
-export const PROPERITY_NAMES = {
-  segmentName: "Name",
-  segmentData: "Data",
-  segmentLength: "Length",
-  readCount: "Read count",
-  fragmentCount: "Fragment count",
-  kmerCount: "K-mer count",
-  SHA256Checksum: "SHA-256 checksum",
-  URIorLocalSystemPath: "URI or local file-system path",
-  overlap: "Overlap",
-  targetOrientation: "Target orientation",
-  sourceOrientation: "Source orientation",
-  mappingQuality: "Mapping quality",
-  numberOfMismatchesOrGaps: "Number of mismatches/gaps",
-  edgeIdentifier: "Edge identifier",
-  distance: "Distance",
-  indirectShortcutConnections: "Indirect shortcut connections",
-  pos: "Pos",
-  sequenceLength: "Sequence length",
-};
 
 /** https://davidwalsh.name/javascript-debounce-function
  * Returns a function, that, as long as it continues to be invoked, will not
