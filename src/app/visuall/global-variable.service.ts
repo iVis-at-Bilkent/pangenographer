@@ -606,11 +606,18 @@ export class GlobalVariableService {
       })
       .update();
 
-    function arrowShape(orientation: string) {
-      if (orientation === "+") {
-        return "none";
+    function arrowShape(orientation: string, isTarget: boolean) {
+      if (isTarget) {
+        if (orientation === "+") {
+          return "triangle";
+        }
+        return "triangle-tee";
+      } else {
+        if (orientation === "+") {
+          return "none";
+        }
+        return "tee";
       }
-      return "tee";
     }
 
     this.cy
@@ -618,10 +625,10 @@ export class GlobalVariableService {
       .selector("edge.LINK")
       .style({
         "target-arrow-shape": function (e) {
-          return arrowShape(e.data("targetOrientation"));
+          return arrowShape(e.data("targetOrientation"), true);
         },
         "source-arrow-shape": function (e) {
-          return arrowShape(e.data("sourceOrientation"));
+          return arrowShape(e.data("sourceOrientation"), false);
         },
       })
       .update();
@@ -631,10 +638,10 @@ export class GlobalVariableService {
       .selector("edge.JUMP")
       .style({
         "target-arrow-shape": function (e) {
-          return arrowShape(e.data("targetOrientation"));
+          return arrowShape(e.data("targetOrientation"), true);
         },
         "source-arrow-shape": function (e) {
-          return arrowShape(e.data("sourceOrientation"));
+          return arrowShape(e.data("sourceOrientation"), false);
         },
       })
       .update();
@@ -644,10 +651,10 @@ export class GlobalVariableService {
       .selector("edge.CONTAINMENT")
       .style({
         "target-arrow-shape": function (e) {
-          return arrowShape(e.data("targetOrientation"));
+          return arrowShape(e.data("targetOrientation"), true);
         },
         "source-arrow-shape": function (e) {
-          return arrowShape(e.data("sourceOrientation"));
+          return arrowShape(e.data("sourceOrientation"), false);
         },
       })
       .update();
