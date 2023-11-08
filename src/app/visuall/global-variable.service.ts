@@ -243,7 +243,7 @@ export class GlobalVariableService {
   }
 
   getLabels4Elems(
-    elemIds: string[] | number[],
+    elemIds: string[],
     isNode: boolean = true,
     objDatas: GraphElem[] = null
   ): string {
@@ -251,7 +251,7 @@ export class GlobalVariableService {
   }
 
   getLabels4ElemsAsArray(
-    elemIds: string[] | number[],
+    elemIds: string[],
     isNode: boolean = true,
     objDatas: GraphElem[] = null
   ): string[] {
@@ -276,7 +276,7 @@ export class GlobalVariableService {
     for (let i = 0; i < cyIds.length; i++) {
       let cName = "";
       if (!objDatas) {
-        cName = this.cy.$("#" + cyIds[i]).className()[0];
+        cName = this.cy.elements(`[id = "${cyIds[i]}"]`).className()[0];
       } else {
         cName = objDatas[i].classes.split(" ")[0];
       }
@@ -287,7 +287,7 @@ export class GlobalVariableService {
       } else {
         let propName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
         if (!objDatas) {
-          labels.push(this.cy.$("#" + cyIds[i]).data(propName));
+          labels.push(this.cy.elements(`[id = "${cyIds[i]}"]`).data(propName));
         } else {
           const currData = objDatas[i].data;
           let l = currData[propName];

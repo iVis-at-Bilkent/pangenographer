@@ -5,10 +5,9 @@
 export const environment = {
   production: false,
   dbConfig: {
-    getSampleUrl: 'http://ivis.cs.bilkent.edu.tr:2000/db/data/transaction/commit',
-    cypherQueryUrl: 'http://ivis.cs.bilkent.edu.tr:2000/db/data/cypher',
+    getSampleUrl: 'http://ivis.cs.bilkent.edu.tr:2000/db/neo4j/tx/commit',
     username: 'neo4j',
-    password: '123'
+    password: '12345678'
   }
 };
 

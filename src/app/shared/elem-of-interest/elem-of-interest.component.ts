@@ -30,9 +30,9 @@ export class ElemOfInterestComponent implements OnInit {
   selectedNodeClicked(i: number) {
     this._g.isSwitch2ObjTabOnSelect = false;
     this.clickedNodeIdx = i;
-    const idSelector = '#n' + this.selectedNodes[i].dbId;
+    const idSelector = 'n' + this.selectedNodes[i].dbId;
     this._g.cy.$().unselect();
-    this._g.cy.$(idSelector).select();
+    this._g.cy.elements(`[id = "${idSelector}"]`).select();
     this._g.isSwitch2ObjTabOnSelect = true;
   }
 

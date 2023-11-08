@@ -74,7 +74,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   @Input() clearFilter = new Subject<boolean>();
   @Output() onFilteringChanged = new EventEmitter<TableFiltering>();
   @Output() onDataForQueryResult = new EventEmitter<{
-    dbIds: number[] | string[];
+    dbIds: string[];
     tableIdx: number[];
   }>();
 
@@ -220,9 +220,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
     if (this.params.isUseCySelector4Highlight) {
       this.highlighterFn({ target: null, type: EV_MOUSE_ON, cySelector: id });
     } else {
-      let target = this._g.cy.$("#n" + id);
+      let target = this._g.cy.elements(`[id = "n${id}"]`);
       if (!this.params.isNodeData) {
-        target = this._g.cy.$("#e" + id);
+        target = this._g.cy.edges(`[id = "e${id}"]`);
       }
       this.highlighterFn({ target: target, type: EV_MOUSE_ON });
     }
@@ -238,9 +238,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
     if (this.params.isUseCySelector4Highlight) {
       this.highlighterFn({ target: null, type: EV_MOUSE_OFF, cySelector: id });
     } else {
-      let target = this._g.cy.$("#n" + id);
+      let target = this._g.cy.elements(`[id = "n${id}"]`);
       if (!this.params.isNodeData) {
-        target = this._g.cy.$("#e" + id);
+        target =  this._g.cy.edges(`[id = "e${id}"]`);
       }
       this.highlighterFn({ target: target, type: EV_MOUSE_OFF });
     }
@@ -315,7 +315,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     // index 0 keeps database IDs
     let dbIds = this.params.results
       .filter((_, i) => this.checkedIdx[i])
-      .map((x) => x[0].val) as number[];
+      .map((x) => x[0].val) as string[];
     let idxes = [];
     for (let i in this.checkedIdx) {
       idxes.push(Number(i) + 1);

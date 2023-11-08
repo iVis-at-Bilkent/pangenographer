@@ -95,8 +95,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   removeSelected(i: number) {
     if (i == this.clickedNodeIdx) {
       this.clickedNodeIdx = -1;
-      const idSelector = '#n' + this.selectedNodes[i].dbId;
-      this._g.cy.$(idSelector).unselect();
+      const idSelector = 'n' + this.selectedNodes[i].dbId;
+      this._g.cy.$id(idSelector).unselect();
     } else if (i < this.clickedNodeIdx) {
       this.clickedNodeIdx--;
     }
@@ -169,10 +169,10 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   private filterDbResponse(x, filter: TableFiltering, idFilter: (string | number)[]) {
     const r = { columns: x.columns, data: [[null, null, null, null, null, null, null, null]] };
     const idxNodes = x.columns.indexOf('nodes');
-    const idxNodeId = x.columns.indexOf('nodeId');
+    const idxNodeId = x.columns.indexOf('nodeElementId');
     const idxNodeClass = x.columns.indexOf('nodeClass');
     const idxEdges = x.columns.indexOf('edges');
-    const idxEdgeId = x.columns.indexOf('edgeId');
+    const idxEdgeId = x.columns.indexOf('edgeElementId');
     const idxEdgeClass = x.columns.indexOf('edgeClass');
     const idxEdgeSrcTgt = x.columns.indexOf('edgeSourceTargets');
     const idxTotalCnt = x.columns.indexOf('totalNodeCount');
@@ -193,10 +193,10 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
     const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
 
-    let tempNodes: { node: any, cls: string, id: string | number }[] = [];
+    let tempNodes: { node: any, cls: string, elementId: string }[] = [];
     const srcNodeIds = this.selectedNodes.map(x => x.dbId);
     if (idFilter) {
-      tempNodes = nodes.map((_, i) => { return { node: nodes[i], cls: nodeClass[i], id: nodeId[i] } })
+      tempNodes = nodes.map((_, i) => { return { node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] } })
         .filter((_, i) => { return idFilter.includes(nodeId[i]) || srcNodeIds.findIndex(x => x == nodeId[i]) > -1; });
     }
     else if (filter) {
@@ -204,11 +204,11 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
         const vals = Object.values(nodes[i]).join('');
         // always include source nodes
         if (srcNodeIds.includes(nodeId[i]) || (isIgnoreCase && vals.toLowerCase().includes(filter.txt.toLowerCase())) || (!isIgnoreCase && vals.includes(filter.txt))) {
-          tempNodes.push({ node: nodes[i], cls: nodeClass[i], id: nodeId[i] });
+          tempNodes.push({ node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] });
         }
       }
     } else {
-      tempNodes = nodes.map((_, i) => { return { node: nodes[i], cls: nodeClass[i], id: nodeId[i] } })
+      tempNodes = nodes.map((_, i) => { return { node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] } })
     }
 
     // order by
@@ -222,7 +222,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     }
     const skip = filter && filter.skip ? filter.skip : 0;
     for (let i = 0; i < srcNodeIds.length; i++) {
-      const idx = tempNodes.findIndex(x => x.id == srcNodeIds[i]);
+      const idx = tempNodes.findIndex(x => x.elementId == srcNodeIds[i]);
       // move src node to the beginning
       if (idx > -1) {
         const tmp = tempNodes[idx];
@@ -237,14 +237,14 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     tempNodes = tempNodes.slice(skip, skip + this._g.userPrefs.dataPageSize.getValue());
     r.data[0][idxNodes] = tempNodes.map(x => x.node);
     r.data[0][idxNodeClass] = tempNodes.map(x => x.cls);
-    r.data[0][idxNodeId] = tempNodes.map(x => x.id);
+    r.data[0][idxNodeId] = tempNodes.map(x => x.elementId);
     return r;
   }
 
   // fill table from graph response
   private fillTable(data, isRefreshColumns = true, isClientSidePagination = true) {
     const idxNodes = data.columns.indexOf('nodes');
-    const idxNodeId = data.columns.indexOf('nodeId');
+    const idxNodeId = data.columns.indexOf('nodeElementId');
     const idxNodeClass = data.columns.indexOf('nodeClass');
     const idxTotalCnt = data.columns.indexOf('totalNodeCount');
     const nodes = data.data[0][idxNodes];
@@ -296,8 +296,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   private highlightSeedNodes() {
-    const dbIds = this.selectedNodes.map(x => x.dbId);
-    const seedNodes = this._g.cy.nodes(dbIds.map(x => '#n' + x).join());
+    const dbIds = new Set(this.selectedNodes.map(x => x.dbId));
+    const seedNodes = this._g.cy.nodes().filter(node => dbIds.has(node.id().substring(1)));
     // add a new higlight style
     if (this._g.userPrefs.highlightStyles.length < 2) {
       const cyStyle = getCyStyleFromColorAndWid('#0b9bcd', 4.5);
@@ -313,11 +313,11 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
   private highlightTargetRegulators(data) {
     const idxTargetRegulator = data.columns.indexOf('targetRegulatorNodeIds');
-    const dbIds = data.data[0][idxTargetRegulator];
-    if (!dbIds || dbIds.length < 1) {
+    const dbIds = new Set(data.data[0][idxTargetRegulator]);
+    if (!dbIds || dbIds.size < 1) {
       return;
     }
-    const cyNodes = this._g.cy.nodes(dbIds.map(x => '#n' + x).join());
+    const cyNodes = this._g.cy.nodes().filter(node => dbIds.has(node.id().substring(1)));
 
     // add a new higlight style
     if (this._g.userPrefs.highlightStyles.length < 3) {
@@ -383,9 +383,9 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   selectedNodeClicked(i: number) {
     this._g.isSwitch2ObjTabOnSelect = false;
     this.clickedNodeIdx = i;
-    const idSelector = '#n' + this.selectedNodes[i].dbId;
+    const idSelector = 'n' + this.selectedNodes[i].dbId;
     this._g.cy.$().unselect();
-    this._g.cy.$(idSelector).select();
+    this._g.cy.elements(`[id = "${idSelector}"]`).select();
     this._g.isSwitch2ObjTabOnSelect = true;
   }
 
@@ -401,10 +401,10 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
   prepareElems4Cy(data) {
     const idxNodes = data.columns.indexOf('nodes');
-    const idxNodeId = data.columns.indexOf('nodeId');
+    const idxNodeId = data.columns.indexOf('nodeElementId');
     const idxNodeClass = data.columns.indexOf('nodeClass');
     const idxEdges = data.columns.indexOf('edges');
-    const idxEdgeId = data.columns.indexOf('edgeId');
+    const idxEdgeId = data.columns.indexOf('edgeElementId');
     const idxEdgeClass = data.columns.indexOf('edgeClass');
     const idxEdgeSrcTgt = data.columns.indexOf('edgeSourceTargets');
 
@@ -419,7 +419,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     const cyData = { nodes: [], edges: [] };
     const nodeIdsDict = {};
     for (let i = 0; i < nodes.length; i++) {
-      cyData.nodes.push({ id: nodeId[i], labels: [nodeClass[i]], properties: nodes[i] });
+      cyData.nodes.push({ elementId: nodeId[i], labels: [nodeClass[i]], properties: nodes[i] });
       nodeIdsDict[nodeId[i]] = true;
     }
 
@@ -427,10 +427,10 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       const srcId = edgeSrcTgt[i][0];
       const tgtId = edgeSrcTgt[i][1];
       // check if src and target exist in cy or current data.
-      const isSrcLoaded = this.tableInput.isMergeGraph ? this._g.cy.$('#n' + srcId).length > 0 : false;
-      const isTgtLoaded = this.tableInput.isMergeGraph ? this._g.cy.$('#n' + tgtId).length > 0 : false;
+      const isSrcLoaded = this.tableInput.isMergeGraph ? this._g.cy.elements(`[id = "n${srcId}"]`).length > 0 : false;
+      const isTgtLoaded = this.tableInput.isMergeGraph ? this._g.cy.elements(`[id = "n${tgtId}"]`).length > 0 : false;
       if ((nodeIdsDict[srcId] || isSrcLoaded) && (nodeIdsDict[tgtId] || isTgtLoaded)) {
-        cyData.edges.push({ properties: edges[i], startNode: srcId, endNode: tgtId, id: edgeId[i], type: edgeClass[i] });
+        cyData.edges.push({ properties: edges[i], startNodeElementId: srcId, endNodeElementId: tgtId, elementId: edgeId[i], type: edgeClass[i] });
       }
     }
 

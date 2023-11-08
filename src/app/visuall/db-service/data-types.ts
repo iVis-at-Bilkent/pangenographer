@@ -72,16 +72,16 @@ export interface GraphResponse {
 }
 
 export interface CyNode {
-  id: string;
+  elementId: string;
   labels: string[];
   properties?: any;
 }
 
 export interface CyEdge {
-  id: string;
+  elementId: string;
   properties?: any;
-  startNode: string | number;
-  endNode: string | number;
+  startNodeElementId: string;
+  endNodeElementId: string;
   type: string;
 }
 

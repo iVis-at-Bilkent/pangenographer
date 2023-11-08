@@ -33,11 +33,10 @@ export class GroupCustomizationService {
     if (this._g.userPrefs.groupingOption.getValue() == GroupingOptionTypes.compound) {
       // add parent nodes
       for (let id of directorIds) {
-        let name = this._g.cy.$('#' + id).data().name;
         // for each director, generate a compound node
         this._cyService.addParentNode(id);
         // add the director to the compound node
-        this._g.cy.$('#' + id).move({ parent: 'c' + id });
+        this._g.cy.elements(`[id = "${id}"]`).move({ parent: 'c' + id });
       }
 
       // assign nodes to parents
@@ -45,7 +44,7 @@ export class GroupCustomizationService {
         // if a movie has less than 2 directors add, those movies to the cluster of director
         if (v['length'] < 2) {
           // add movies to the compound node
-          this._g.cy.$('#' + k).move({ parent: 'c' + v[0] });
+          this._g.cy.elements(`[id = "${k}"]`).move({ parent: 'c' + v[0] });
         }
       }
     } else {

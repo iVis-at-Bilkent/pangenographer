@@ -29,7 +29,7 @@ export class DbAdapterService {
   }
 
   getNeighbors(
-    elemId: string[] | number[],
+    elemId: string[],
     callback: (x: GraphResponse) => any,
     historyMeta?: HistoryMetaData,
     queryMeta?: DbQueryMeta
@@ -54,7 +54,7 @@ export class DbAdapterService {
   }
 
   getElems(
-    ids: string[] | number[],
+    ids: string[],
     callback: (x: GraphResponse) => any,
     queryMeta: DbQueryMeta,
     historyMeta?: HistoryMetaData

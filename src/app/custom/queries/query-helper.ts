@@ -1,10 +1,14 @@
-import { TableFiltering } from '../../shared/table-view/table-view-types';
+import { TableFiltering } from "../../shared/table-view/table-view-types";
 
-export function getQueryCondition4TxtFilter(filter: TableFiltering, cols: string[], isIgnoreCase: boolean): string {
+export function getQueryCondition4TxtFilter(
+  filter: TableFiltering,
+  cols: string[],
+  isIgnoreCase: boolean
+): string {
   if (filter == null || filter.txt.length < 1) {
-    return '';
+    return "";
   }
-  let s = '';
+  let s = "";
 
   for (let i = 0; i < cols.length; i++) {
     if (isIgnoreCase) {
@@ -14,41 +18,53 @@ export function getQueryCondition4TxtFilter(filter: TableFiltering, cols: string
     }
   }
   s = s.slice(0, -3);
-  s = 'AND (' + s + ')';
+  s = "AND (" + s + ")";
   return s;
 }
 
-
-export function getOrderByExpression4Query(filter: TableFiltering, orderBy: string, orderDirection: string, ui2Db: any) {
-  if (filter != null && filter.orderDirection.length > 0 && filter.orderBy.length > 0) {
+export function getOrderByExpression4Query(
+  filter: TableFiltering,
+  orderBy: string,
+  orderDirection: string,
+  ui2Db: any
+) {
+  if (
+    filter != null &&
+    filter.orderDirection.length > 0 &&
+    filter.orderBy.length > 0
+  ) {
     orderBy = ui2Db[filter.orderBy];
     orderDirection = filter.orderDirection;
   }
-  return orderBy + ' ' + orderDirection;
+  return orderBy + " " + orderDirection;
 }
 
-export function buildIdFilter(ids: string[] | number[], hasEnd = false, isEdgeQuery = false): string {
+export function buildIdFilter(
+  ids: string[] | number[],
+  hasEnd = false,
+  isEdgeQuery = false
+): string {
   if (ids === undefined) {
-    return '';
+    return "";
   }
-  let varName = 'n';
+  let varName = "n";
   if (isEdgeQuery) {
-    varName = 'e';
+    varName = "e";
   }
-  let cql = '';
+  let cql = "";
   if (ids.length > 0) {
-    cql = '(';
+    cql = "(";
   }
   for (let i = 0; i < ids.length; i++) {
-    cql += `ID(${varName})=${ids[i]} OR `
+    cql += `ElementId(${varName})='${ids[i]}' OR `;
   }
 
   if (ids.length > 0) {
     cql = cql.slice(0, -4);
 
-    cql += ')';
+    cql += ")";
     if (hasEnd) {
-      cql += ' AND ';
+      cql += " AND ";
     }
   }
   return cql;

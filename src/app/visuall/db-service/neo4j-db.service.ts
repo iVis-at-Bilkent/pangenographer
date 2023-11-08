@@ -43,10 +43,9 @@ export class Neo4jDb implements DbService {
     const requestType = responseType == DbResponseType.graph ? "graph" : "row";
     this._g.setLoadingStatus(true);
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
-    let q = `CALL apoc.cypher.runTimeboxed("${query}", {}, ${timeout}) YIELD value RETURN value`;
-    if (!isTimeboxed) {
-      q = query;
-    }
+    const q = isTimeboxed
+      ? `CALL apoc.cypher.run("${query}", null ) YIELD value RETURN value`
+      : query;
     console.log(q);
     this._g.statusMsg.next("Executing database query...");
     const requestBody = {
@@ -59,20 +58,23 @@ export class Neo4jDb implements DbService {
       ],
     };
     let isTimeout = true;
+    let timeoutId;
     if (isTimeboxed) {
-      setTimeout(() => {
-        if (isTimeout) {
-          this._g.showErrorModal(
-            "Database Timeout",
-            "Your query took too long! <br> Consider adjusting timeout setting."
-          );
-        }
+      timeoutId = setTimeout(() => {
+        isTimeout = true;
+        this._g.showErrorModal(
+          "Database Timeout",
+          "Your query took too long! <br> Consider adjusting timeout setting."
+        );
       }, timeout);
     }
 
     const errFn = (err) => {
+      if (isTimeout) {
+        clearTimeout(timeoutId); // Clear the timeout if the request has already timed out
+      }
       isTimeout = false;
-      // It means our user-defined stored procedure intentionally throws exception to signal timeout
+      // Handle errors
       if (err.message.includes("Timeout occurred! It takes longer than")) {
         this._g.statusMsg.next("");
         this._g.showErrorModal(
@@ -80,7 +82,7 @@ export class Neo4jDb implements DbService {
           "Your query took too long!  <br> Consider adjusting timeout setting."
         );
       } else {
-        this._g.statusMsg.next("Database query execution raised error!");
+        this._g.statusMsg.next("Database query execution raised an error!");
         this._g.showErrorModal("Database Query Execution Error", err.message);
       }
       this._g.setLoadingStatus(false);
@@ -94,6 +96,9 @@ export class Neo4jDb implements DbService {
         },
       })
       .subscribe((x) => {
+        if (isTimeout) {
+          clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
+        }
         isTimeout = false;
         this._g.setLoadingStatus(false);
         if (x["errors"] && x["errors"].length > 0) {
@@ -214,7 +219,7 @@ export class Neo4jDb implements DbService {
       f += f2;
     }
     this.runQuery(
-      `MATCH (p:PATHS) RETURN p AS nn UNION MATCH (w:WALKS) RETURN w AS nn UNION MATCH (n1)-[e1]-() ${f} RETURN n1 AS nn LIMIT 100 UNION MATCH (n2)-[e2]-() ${f} RETURN e2 AS nn LIMIT 100`,
+      `MATCH (p:PATHS) RETURN p AS nn UNION MATCH (w:WALKS) RETURN w AS nn UNION MATCH (n1)-[e1]-() ${f} RETURN n1 AS nn LIMIT 150 UNION MATCH (n2)-[e2]-() ${f} RETURN e2 AS nn LIMIT 150`,
       callback
     );
   }
@@ -287,10 +292,12 @@ export class Neo4jDb implements DbService {
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
-      idf = `[${idFilter.join()}]`;
+      idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
     }
     this.runQuery(
-      `CALL graphOfInterest([${dbIds.join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
+      `CALL graphOfInterest([${dbIds
+        .map((element) => `'${element}'`)
+        .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
       ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
       cb,
       type,
@@ -330,11 +337,13 @@ export class Neo4jDb implements DbService {
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
-      idf = `[${idFilter.join()}]`;
+      idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
     }
     if (type == DbResponseType.count) {
       this.runQuery(
-        `CALL commonStreamCount([${dbIds.join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase},
+        `CALL commonStreamCount([${dbIds
+          .map((element) => `'${element}'`)
+          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase},
        ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
         cb,
         type,
@@ -342,7 +351,9 @@ export class Neo4jDb implements DbService {
       );
     } else if (type == DbResponseType.table) {
       this.runQuery(
-        `CALL commonStream([${dbIds.join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currPage},
+        `CALL commonStream([${dbIds
+          .map((element) => `'${element}'`)
+          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currPage},
        '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
         cb,
         type,
@@ -380,12 +391,14 @@ export class Neo4jDb implements DbService {
     }
     let idf = "null";
     if (idFilter) {
-      idf = `[${idFilter.join()}]`;
+      idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
     }
     const inclusionType = this._g.userPrefs.objectInclusionType.getValue();
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     this.runQuery(
-      `CALL neighborhood([${dbIds.join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
+      `CALL neighborhood([${dbIds
+        .map((element) => `'${element}'`)
+        .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
       ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
       cb,
       DbResponseType.table,
@@ -504,7 +517,7 @@ export class Neo4jDb implements DbService {
       const cols = Object.keys(obj[0].row[0]);
       const data = obj.map((x) => Object.values(x.row[0]));
       // put id to first
-      const idxId = cols.indexOf("ID(x)");
+      const idxId = cols.indexOf("ElementId(x)");
       if (idxId > -1) {
         const tmp = cols[idxId];
         cols[idxId] = cols[0];
@@ -533,7 +546,7 @@ export class Neo4jDb implements DbService {
     if (isTimeboxed) {
       const obj = response.results[0].data[0].row[0];
       const r: DbResponse = {
-        tableData: { columns: ["ID(x)", "x"], data: [] },
+        tableData: { columns: ["elementId(x)", "x"], data: [] },
         graphData: { nodes: [], edges: [] },
         count: obj.count,
       };
@@ -541,7 +554,11 @@ export class Neo4jDb implements DbService {
       if (obj.nodeIds) {
         r.tableData.data = obj.nodeIds.map((x, i) => [x, obj.nodes[i]]);
         r.graphData.nodes = obj.nodeIds.map((x, i) => {
-          return { properties: obj.nodes[i], labels: obj.nodeTypes[i], id: x };
+          return {
+            properties: obj.nodes[i],
+            labels: obj.nodeTypes[i],
+            elementId: x,
+          };
         });
       } else {
         r.tableData.data = obj.edgeIds.map((x, i) => [x, obj.edges[i]]);
@@ -550,7 +567,7 @@ export class Neo4jDb implements DbService {
             return {
               properties: obj.srcNodes[i],
               labels: obj.srcNodeTypes[i],
-              id: x,
+              elementId: x,
             };
           })
         );
@@ -559,7 +576,7 @@ export class Neo4jDb implements DbService {
             return {
               properties: obj.tgtNodes[i],
               labels: obj.tgtNodeTypes[i],
-              id: x,
+              elementId: x,
             };
           })
         );
@@ -567,9 +584,9 @@ export class Neo4jDb implements DbService {
           return {
             properties: obj.edges[i],
             type: obj.edgeTypes[i],
-            id: x,
-            startNode: obj.srcNodeIds[i],
-            endNode: obj.tgtNodeIds[i],
+            elementId: x,
+            startNodeElementId: obj.srcNodeIds[i],
+            endNodeElementId: obj.tgtNodeIds[i],
           };
         });
       }
@@ -580,19 +597,19 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
-  runCypherQuery(query: string, callback?: () => void) {
+  runQuery2(query: string, callback?: () => void) {
     const conf = environment.dbConfig;
-    const url = conf.cypherQueryUrl;
+    const url = conf.getSampleUrl;
     const username = conf.username;
     const password = conf.password;
     this._g.setLoadingStatus(true);
     console.log(query);
     this._g.statusMsg.next("Executing database query...");
     const requestBody = {
-      query: query,
+      statements: [{ statement: query, parameters: null }],
     };
     const errFn = (err) => {
-      this._g.statusMsg.next("Database query execution raised error!");
+      this._g.statusMsg.next("Database query execution raised an error!");
       this._g.showErrorModal("Database Query Execution Error", err.message);
       this._g.setLoadingStatus(false);
     };
@@ -618,11 +635,11 @@ export class Neo4jDb implements DbService {
   }
 
   importGFA(GFAData: GFAData, cb?: () => void) {
-    this.runCypherQuery(this.GFAdata2CQL(GFAData), cb);
+    this.runQuery2(this.GFAdata2CQL(GFAData), cb);
   }
 
   clearData() {
-    this.runCypherQuery("MATCH (n) DETACH DELETE n");
+    this.runQuery2("MATCH (n) DETACH DELETE n");
   }
 
   // ------------------------------------------------- methods for conversion to CQL -------------------------------------------------
@@ -817,12 +834,12 @@ export class Neo4jDb implements DbService {
         orderExp = `WITH x ORDER BY x.${filter.orderBy} ${filter.orderDirection}`;
       }
       if (isEdge) {
-        return `${orderExp} RETURN collect(ID(x))${r} as edgeIds, collect(type(x))${r} as edgeTypes, collect(x)${r} as edges, 
-        collect(ID(startNode(x)))${r} as srcNodeIds, collect(labels(startNode(x)))${r} as srcNodeTypes, collect(startNode(x))${r} as srcNodes,
-        collect(ID(endNode(x)))${r} as tgtNodeIds, collect(labels(endNode(x)))${r} as tgtNodeTypes, collect(endNode(x))${r} as tgtNodes,
+        return `${orderExp} RETURN collect(ElementId(x))${r} as edgeIds, collect(type(x))${r} as edgeTypes, collect(x)${r} as edges, 
+        collect(ElementId(startNode(x)))${r} as srcNodeIds, collect(labels(startNode(x)))${r} as srcNodeTypes, collect(startNode(x))${r} as srcNodes,
+        collect(ElementId(endNode(x)))${r} as tgtNodeIds, collect(labels(endNode(x)))${r} as tgtNodeTypes, collect(endNode(x))${r} as tgtNodes,
         size(collect(x)) as count`;
       }
-      return `${orderExp} RETURN collect(ID(x))${r} as nodeIds, collect(labels(x))${r} as nodeTypes, collect(x)${r} as nodes, size(collect(x)) as count`;
+      return `${orderExp} RETURN collect(ElementId(x))${r} as nodeIds, collect(labels(x))${r} as nodeTypes, collect(x)${r} as nodes, size(collect(x)) as count`;
     } else if (type == DbResponseType.count) {
       return `RETURN COUNT(x)`;
     }
@@ -846,7 +863,7 @@ export class Neo4jDb implements DbService {
       cql = "(";
     }
     for (let i = 0; i < ids.length; i++) {
-      cql += `ID(${varName})=${ids[i]} OR `;
+      cql += `ElementId(${varName})='${ids[i]}' OR `;
     }
 
     if (ids.length > 0) {
@@ -954,8 +971,8 @@ export class Neo4jDb implements DbService {
 
     GFAData.links.forEach((link) => {
       let edge2Create = `(n${link.source})-[:LINK
-        {sourceOrientation: "${link.sourceOrientation}", source: '${link.source}'
-        , targetOrientation: "${link.targetOrientation}", target: '${link.target}'`;
+        {sourceOrientation: '${link.sourceOrientation}', source: '${link.source}'
+        , targetOrientation: '${link.targetOrientation}', target: '${link.target}'`;
       if (link.hasOwnProperty("overlap")) {
         edge2Create += `, overlap: '${link.overlap}'`;
       }
@@ -1020,8 +1037,8 @@ export class Neo4jDb implements DbService {
 
     GFAData.jumps.forEach((jump) => {
       let edge2Create = `(n${jump.source})-[:JUMP
-        {sourceOrientation: "${jump.sourceOrientation}", source: '${jump.source}'
-        , targetOrientation: "${jump.targetOrientation}", target: '${jump.target}'`;
+        {sourceOrientation: '${jump.sourceOrientation}', source: '${jump.source}'
+        , targetOrientation: '${jump.targetOrientation}', target: '${jump.target}'`;
       edge2Create += `, distance: '${jump.distance}'`;
       if (jump.hasOwnProperty("indirectShortcutConnections")) {
         edge2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
@@ -1052,8 +1069,8 @@ export class Neo4jDb implements DbService {
 
     GFAData.containments.forEach((containment) => {
       let edge2Create = `(n${containment.source})-[:CONTAINMENT
-        {sourceOrientation: "${containment.sourceOrientation}", source: '${containment.source}'
-        , targetOrientation: "${containment.targetOrientation}", target: '${containment.target}'`;
+        {sourceOrientation: '${containment.sourceOrientation}', source: '${containment.source}'
+        , targetOrientation: '${containment.targetOrientation}', target: '${containment.target}'`;
       edge2Create += `, overlap: '${containment.overlap}'`;
       edge2Create += `, pos: ${containment.pos}`;
       if (containment.hasOwnProperty("numberOfMismatchesOrGaps")) {

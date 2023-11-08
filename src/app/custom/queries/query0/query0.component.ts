@@ -8,7 +8,7 @@ import { buildIdFilter, getOrderByExpression4Query, getQueryCondition4TxtFilter 
 import { DbResponseType, GraphResponse } from 'src/app/visuall/db-service/data-types';
 
 export interface ActorCountData {
-  id: number;
+  id: string;
   Actor: string;
   Count: number;
 }
@@ -77,7 +77,7 @@ export class Query0Component implements OnInit {
     WITH n, SIZE(COLLECT(r)) as degree
     WHERE degree >= ${this.movieCnt} ${txtCondition}
     WITH n, degree ORDER BY ${orderExpr}
-    RETURN collect(ID(n))${r} as id, collect(n.primary_name)${r} as Actor, collect(degree)${r} as Count, size(collect(ID(n))) as totalDataCount`;
+    RETURN collect(ElementId(n))${r} as id, collect(n.primary_name)${r} as Actor, collect(degree)${r} as Count, size(collect(ElementId(n))) as totalDataCount`;
     this._dbService.runQuery(cql, cb, DbResponseType.table);
   }
 
@@ -214,13 +214,13 @@ export class Query0Component implements OnInit {
     }
     // add a node if an edge starts with that
     for (let i = 0; i < x.edges.length; i++) {
-      if (nodeIdDict[x.edges[i].startNode]) {
-        nodeIdDict[x.edges[i].endNode] = true;
+      if (nodeIdDict[x.edges[i].startNodeElementId]) {
+        nodeIdDict[x.edges[i].endNodeElementId] = true;
       }
     }
 
     for (let i = 0; i < x.nodes.length; i++) {
-      if (nodeIdDict[x.nodes[i].id]) {
+      if (nodeIdDict[x.nodes[i].elementId]) {
         r.nodes.push(x.nodes[i]);
       }
     }
