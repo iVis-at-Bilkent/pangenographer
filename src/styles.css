@@ -404,31 +404,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 }
 
 .edge-CIGAR-M {
-  color: #0099ff;
-}
-
-.edge-CIGAR-I {
-  color: #6600ff;
-}
-
-.edge-CIGAR-D {
-  color: #cc00cc;
-}
-
-.edge-CIGAR-N {
-  color: #cc0000;
-}
-
-.edge-CIGAR-S {
-  color: #ff9900;
-}
-
-.edge-CIGAR-H {
-  color: #009900;
-}
-
-.edge-CIGAR-P {
-  color: #00ffff;
+  color: #0099ff; /* #00ffff */
 }
 
 .edge-CIGAR-Eq {
@@ -437,4 +413,24 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 
 .edge-CIGAR-X {
   color: #999966;
+}
+
+.edge-CIGAR-I {
+  color: #009900;
+}
+
+.edge-CIGAR-D {
+  color: #cc0000;
+}
+
+.edge-CIGAR-N {
+  color: #ff9900;
+}
+
+.edge-CIGAR-S {
+  color: #cc00cc;
+}
+
+.edge-CIGAR-H {
+  color: #6600ff;
 }

@@ -57,10 +57,6 @@ export const NUMBER_OPERATORS = {
   "one of": "One of",
 };
 
-export const TARGET_CIGAR_SKIP_OPS = ["D", "N", "P", "H"];
-
-export const SOURCE_CIGAR_SKIP_OPS = ["I", "S", "H", "P"];
-
 export const DATETIME_OPERATORS = {
   "=": "=",
   "\u2260": "<>",

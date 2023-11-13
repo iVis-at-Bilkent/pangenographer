@@ -415,13 +415,9 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
             });
           });
         } else if (renderedKey === "overlap") {
-          let overlapNumerics = renderedValue.split(/[MIDNSHPX=]/);
-          overlapNumerics.pop();
-
           this.selectedItemProps[`${renderedKey}`] = {
             val: renderedValue,
             overlapIdentifiers: renderedValue.split(/[0-9]+/).slice(1),
-            overlapNumerics: overlapNumerics,
             currentIndex: 0,
           };
         } else {
@@ -464,6 +460,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           this.selectedItemProps["targetSequenceWithoutOverlap"] = {
             val: combinedSequence.thirdSequence,
           };
+          this.selectedItemProps["overlap"]["overlapNumerics"] = combinedSequence.overlapNumerics;
         }
 
         this.selectedItemProps["sequenceLength"] = {

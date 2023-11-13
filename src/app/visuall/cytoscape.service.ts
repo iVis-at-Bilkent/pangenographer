@@ -580,8 +580,7 @@ export class CytoscapeService {
                   .split(/[0-9]+/)
                   .slice(1);
 
-                let overlapNumerics = edge.data("overlap").split(/[MIDNSHPX=]/);
-                overlapNumerics.pop();
+                let overlapNumerics = text.lengths.overlapNumerics;
 
                 let currentIndex = 0;
 
@@ -602,7 +601,7 @@ export class CytoscapeService {
                       this.edgeTooltipInnerTextSize(
                         text.lengths.firstSequence +
                           currentIndex +
-                          Number(overlapNumerics[index])
+                          overlapNumerics[index]
                       ),
                       this.edgeTooltipInnerTextSize(
                         text.lengths.secondSequence + text.lengths.firstSequence
@@ -610,7 +609,7 @@ export class CytoscapeService {
                     )
                   );
 
-                  currentIndex += Number(overlapNumerics[index]);
+                  currentIndex += overlapNumerics[index];
                   content.appendChild(secondSequence);
                 });
               } else {
@@ -700,11 +699,13 @@ export class CytoscapeService {
     secondSequence: string;
     thirdSequence: string;
     sequenceLength: number;
+    overlapNumerics: number[];
   } {
     let firstSequence = ""; // first sequence of combined sequence
     let secondSequence = ""; // second sequence of combined sequence
     let thirdSequence = ""; // third sequence of combined sequence
     let sequenceLength;
+    let overlapNumerics = [];
 
     if (element.data("distance")) {
       secondSequence = "..(";
@@ -752,18 +753,18 @@ export class CytoscapeService {
       sequenceLength =
         firstSequence.length + secondSequence.length + thirdSequence.length;
     } else {
-      let overlapNumerics;
+      let overlapNumericsData;
       let overlapIdentifiers;
       let overlapLengthSource = 0;
       let overlapLengthTarget = 0;
 
       if (element.data("overlap") !== "*") {
-        overlapNumerics = element.data("overlap").split(/[MIDNSHPX=]/);
+        overlapNumericsData = element.data("overlap").split(/[MIDNSHPX=]/);
         overlapIdentifiers = element
           .data("overlap")
           .split(/[0-9]+/)
           .slice(1);
-        overlapNumerics.pop();
+        overlapNumericsData.pop();
       }
       firstSequence = element.source().data("segmentData");
       if (element.data("sourceOrientation") === "-") {
@@ -777,42 +778,55 @@ export class CytoscapeService {
       secondSequence = "";
       if (element.data("overlap") !== "*") {
         overlapIdentifiers.forEach((overlapIdentifier, index) => {
-          if (
-            C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
-            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
-          ) {
-            overlapLengthTarget += Number(overlapNumerics[index]);
+          if (overlapIdentifier === "I") {
+            overlapLengthTarget += Number(overlapNumericsData[index]);
           } else if (
-            C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
-            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+            overlapIdentifier === "D" ||
+            overlapIdentifier === "N" ||
+            overlapIdentifier === "H"
           ) {
-            overlapLengthSource += Number(overlapNumerics[index]);
+            overlapLengthSource += Number(overlapNumericsData[index]);
           } else if (
-            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
-            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+            overlapIdentifier === "M" ||
+            overlapIdentifier === "=" ||
+            overlapIdentifier === "X" ||
+            overlapIdentifier === "S"
           ) {
-            overlapLengthSource += Number(overlapNumerics[index]);
-            overlapLengthTarget += Number(overlapNumerics[index]);
+            overlapLengthSource += Number(overlapNumericsData[index]);
+            overlapLengthTarget += Number(overlapNumericsData[index]);
+          } else {
+            console.log(
+              "Unknown overlap identifier: " +
+                overlapIdentifier +
+                " in " +
+                element.data("overlap") +
+                " of " +
+                element.id() +
+                " in " +
+                element.data("source") +
+                " to " +
+                element.data("target")
+            );
+            console.log("It may not be displayed correctly.");
           }
         });
 
-        let currentOverlapLengthSource = 0;
+        let currentOverlapLengthSource = -1;
         let currentOverlapLengthTarget = 0;
 
         overlapIdentifiers.forEach((overlapIdentifier, index) => {
-          if (
-            C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
-            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
-          ) {
+          if (overlapIdentifier === "I") {
             secondSequence += thirdSequence.substring(
               currentOverlapLengthTarget,
-              currentOverlapLengthTarget + Number(overlapNumerics[index])
+              currentOverlapLengthTarget + Number(overlapNumericsData[index])
             );
 
-            currentOverlapLengthTarget += Number(overlapNumerics[index]);
+            overlapNumerics.push(Number(overlapNumericsData[index]));
+            currentOverlapLengthTarget += Number(overlapNumericsData[index]);
           } else if (
-            C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
-            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+            overlapIdentifier === "D" ||
+            overlapIdentifier === "N" ||
+            overlapIdentifier === "H"
           ) {
             secondSequence += firstSequence.substring(
               firstSequence.length -
@@ -821,25 +835,64 @@ export class CytoscapeService {
               firstSequence.length -
                 overlapLengthSource +
                 currentOverlapLengthSource +
-                Number(overlapNumerics[index])
+                Number(overlapNumericsData[index])
             );
 
-            currentOverlapLengthSource += Number(overlapNumerics[index]);
+            overlapNumerics.push(Number(overlapNumericsData[index]));
+            currentOverlapLengthSource += Number(overlapNumericsData[index]);
           } else if (
-            !C.SOURCE_CIGAR_SKIP_OPS.includes(overlapIdentifier) &&
-            !C.TARGET_CIGAR_SKIP_OPS.includes(overlapIdentifier)
+            overlapIdentifier === "=" ||
+            overlapIdentifier === "S" ||
+            overlapIdentifier === "M" ||
+            overlapIdentifier === "X"
           ) {
-            secondSequence += thirdSequence.substring(
+            let sourceMatch = firstSequence.substring(
+              firstSequence.length -
+                overlapLengthSource +
+                currentOverlapLengthSource,
+              firstSequence.length -
+                overlapLengthSource +
+                currentOverlapLengthSource +
+                Number(overlapNumericsData[index])
+            );
+            let targetMatch = thirdSequence.substring(
               currentOverlapLengthTarget,
-              currentOverlapLengthTarget + Number(overlapNumerics[index])
+              currentOverlapLengthTarget + Number(overlapNumericsData[index])
             );
 
-            currentOverlapLengthTarget += Number(overlapNumerics[index]);
-            currentOverlapLengthSource += Number(overlapNumerics[index]);
-          } else {
-            for (let i = 0; i < Number(overlapNumerics[index]); i++) {
-              secondSequence += "_";
+            let matches = true;
+            if (
+              overlapIdentifier === "X" ||
+              overlapIdentifier === "S" ||
+              (overlapIdentifier === "M" && targetMatch !== sourceMatch)
+            ) {
+              matches = false;
             }
+
+            if (matches) {
+              secondSequence += sourceMatch;
+              overlapNumerics.push(sourceMatch.length);
+            } else {
+              secondSequence += "[" + sourceMatch + "|" + targetMatch + "]";
+              overlapNumerics.push(3 + sourceMatch.length + targetMatch.length);
+            }
+
+            currentOverlapLengthTarget += Number(overlapNumericsData[index]);
+            currentOverlapLengthSource += Number(overlapNumericsData[index]);
+          } else {
+            console.log(
+              "Unknown overlap identifier: " +
+                overlapIdentifier +
+                " in " +
+                element.data("overlap") +
+                " of " +
+                element.id() +
+                " in " +
+                element.data("source") +
+                " to " +
+                element.data("target")
+            );
+            console.log("It may not be displayed correctly.");
           }
         });
       }
@@ -854,7 +907,13 @@ export class CytoscapeService {
       sequenceLength =
         firstSequence.length + secondSequence.length + thirdSequence.length;
     }
-    return { firstSequence, secondSequence, thirdSequence, sequenceLength };
+    return {
+      firstSequence,
+      secondSequence,
+      thirdSequence,
+      sequenceLength,
+      overlapNumerics,
+    };
   }
 
   private tooltipText(element: any): {
@@ -863,6 +922,7 @@ export class CytoscapeService {
       firstSequence: number;
       secondSequence: number;
       thirdSequence: number;
+      overlapNumerics: number[];
     };
   } {
     let textData = "";
@@ -870,6 +930,7 @@ export class CytoscapeService {
     let firstSequence = "";
     let secondSequence = "";
     let thirdSequence = "";
+    let overlapNumerics = [];
 
     if (element.data("sourceOrientation")) {
       let firstThreshold = 20;
@@ -880,6 +941,7 @@ export class CytoscapeService {
       firstSequence = combinedSequence.firstSequence;
       secondSequence = combinedSequence.secondSequence;
       thirdSequence = combinedSequence.thirdSequence;
+      overlapNumerics = combinedSequence.overlapNumerics;
 
       if (firstSequence.length <= firstThreshold) {
         toAdd += firstThreshold - firstSequence.length;
@@ -976,6 +1038,7 @@ export class CytoscapeService {
       firstSequence: firstSequence.length,
       secondSequence: secondSequence.length,
       thirdSequence: thirdSequence.length,
+      overlapNumerics: overlapNumerics,
     };
     return { text, lengths };
   }
@@ -1735,7 +1798,7 @@ export class CytoscapeService {
         // for each director, generate a compound node
         this.addParentNode(id);
         // add the director to the compound node
-        this._g.cy.elements(`[id = "${id}"]`).move({ parent: 'c' + id });
+        this._g.cy.elements(`[id = "${id}"]`).move({ parent: "c" + id });
       }
 
       // assign nodes to parents
@@ -1743,7 +1806,7 @@ export class CytoscapeService {
         // if a movie has less than 2 directors add, those movies to the cluster of director
         if (v["length"] < 2) {
           // add movies to the compound node
-          this._g.cy.elements(`[id = "${k}"]`).move({ parent: 'c' + v[0] });
+          this._g.cy.elements(`[id = "${k}"]`).move({ parent: "c" + v[0] });
         }
       }
     } else {
