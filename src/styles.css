@@ -403,16 +403,11 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   color: black;
 }
 
-.edge-CIGAR-M {
-  color: #0099ff; /* #00ffff */
-}
+/* 6600ff 00ffff 999966 cc00cc*/
 
-.edge-CIGAR-Eq {
-  color: #996633;
-}
-
-.edge-CIGAR-X {
-  color: #999966;
+.edge-CIGAR-M-Eq-X {
+  color: #0099ff;
+  
 }
 
 .edge-CIGAR-I {
@@ -427,10 +422,6 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   color: #ff9900;
 }
 
-.edge-CIGAR-S {
-  color: #cc00cc;
-}
-
-.edge-CIGAR-H {
-  color: #6600ff;
+.edge-CIGAR-S-H {
+  color: #996633;
 }

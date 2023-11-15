@@ -67,9 +67,15 @@
             let i = index
           "
         >
-          <span *ngIf="overlapIdentifier === 'M'" class="edge-CIGAR-M">{{
-            prepareCIGARForIndex(i)
-          }}</span>
+          <span
+            *ngIf="
+              overlapIdentifier === 'M' ||
+              overlapIdentifier === '=' ||
+              overlapIdentifier === 'X'
+            "
+            class="edge-CIGAR-M-Eq-X"
+            >{{ prepareCIGARForIndex(i) }}</span
+          >
           <span *ngIf="overlapIdentifier === 'I'" class="edge-CIGAR-I">{{
             prepareCIGARForIndex(i)
           }}</span>
@@ -79,21 +85,11 @@
           <span *ngIf="overlapIdentifier === 'N'" class="edge-CIGAR-N">{{
             prepareCIGARForIndex(i)
           }}</span>
-          <span *ngIf="overlapIdentifier === 'S'" class="edge-CIGAR-S">{{
-            prepareCIGARForIndex(i)
-          }}</span>
-          <span *ngIf="overlapIdentifier === 'H'" class="edge-CIGAR-H">{{
-            prepareCIGARForIndex(i)
-          }}</span>
-          <span *ngIf="overlapIdentifier === 'P'" class="edge-CIGAR-P">{{
-            prepareCIGARForIndex(i)
-          }}</span>
-          <span *ngIf="overlapIdentifier === '='" class="edge-CIGAR-Eq">{{
-            prepareCIGARForIndex(i)
-          }}</span>
-          <span *ngIf="overlapIdentifier === 'X'" class="edge-CIGAR-X">{{
-            prepareCIGARForIndex(i)
-          }}</span>
+          <span
+            *ngIf="overlapIdentifier === 'S' || overlapIdentifier === 'H'"
+            class="edge-CIGAR-S-H"
+            >{{ prepareCIGARForIndex(i) }}</span
+          >
         </ng-container>
 
         <span

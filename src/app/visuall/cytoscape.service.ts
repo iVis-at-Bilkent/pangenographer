@@ -584,14 +584,27 @@ export class CytoscapeService {
 
                 let currentIndex = 0;
 
+                let classLists = (overlapIdentifier) => {
+                  if (overlapIdentifier === "I") {
+                    return "edge-CIGAR-I";
+                  } else if (overlapIdentifier === "N") {
+                    return "edge-CIGAR-N";
+                  } else if (overlapIdentifier === "D") {
+                    return "edge-CIGAR-D";
+                  } else if (
+                    overlapIdentifier === "S" ||
+                    overlapIdentifier === "H"
+                  ) {
+                    return "edge-CIGAR-S-H";
+                  } else {
+                    return "edge-CIGAR-M-Eq-X";
+                  }
+                };
+
                 overlapIdentifier.forEach((overlapIdentifier, index) => {
                   let secondSequence = document.createElement("span");
 
-                  secondSequence.classList.add(
-                    `edge-CIGAR-${
-                      overlapIdentifier === "=" ? "Eq" : overlapIdentifier
-                    }`
-                  );
+                  secondSequence.classList.add(classLists(overlapIdentifier));
 
                   secondSequence.innerHTML = text.text.substring(
                     this.edgeTooltipInnerTextSize(
@@ -614,7 +627,7 @@ export class CytoscapeService {
                 });
               } else {
                 let secondSequence = document.createElement("span");
-                secondSequence.classList.add("edge-CIGAR-M");
+                secondSequence.classList.add("edge-CIGAR-M-Eq-X");
                 secondSequence.innerHTML = text.text.substring(
                   this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
                   this.edgeTooltipInnerTextSize(
