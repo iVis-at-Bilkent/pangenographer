@@ -28,6 +28,8 @@ export class UserPrefHelper {
 
       const up = this._g.userPrefs;
       const upT = this._g.userPrefs.timebar;
+      const upP = this._g.userPrefs.pangenographer;
+
       const tb = this._timebarService;
 
       up.isAutoIncrementalLayoutOnChange.subscribe((x) => {
@@ -82,6 +84,10 @@ export class UserPrefHelper {
       });
       upT.statsInclusionType.subscribe((x) => {
         tb.changeStatsInclusionType(x);
+      });
+
+      upP.isColorInZeroOutZero.subscribe(() => {
+        this._g.changeColorInZeroOutZero();
       });
     });
   }

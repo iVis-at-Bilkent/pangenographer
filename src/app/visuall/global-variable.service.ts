@@ -60,6 +60,15 @@ export class GlobalVariableService {
   dataModel = new BehaviorSubject<any>(null);
   enums = new BehaviorSubject<any>(null);
   cueUpdaters = {};
+  constraints: {
+    relativePlacementConstraints: any[];
+    fixedNodeConstraints: any[];
+  } = {
+    relativePlacementConstraints: [],
+    fixedNodeConstraints: [],
+  };
+  sourceNodes: any[];
+  targetNodes: any[];
 
   constructor(
     private _http: HttpClient,
@@ -333,6 +342,137 @@ export class GlobalVariableService {
       tilingPaddingHorizontal: p,
       idealEdgeLength: 30,
       clusters: null, // cise argument
+      relativePlacementConstraint:
+        this.constraints.relativePlacementConstraints,
+      fixedNodeConstraint: this.constraints.fixedNodeConstraints,
+    };
+  }
+
+  changeColorInZeroOutZero() {
+    this.cy.startBatch();
+
+    if (this.sourceNodes) {
+      this.sourceNodes.forEach((x) => {
+        x.style("border-color", "gray");
+        x.style("border-width", "0.5");
+      });
+    }
+    if (this.targetNodes) {
+      this.targetNodes.forEach((x) => {
+        x.style("border-color", "gray");
+        x.style("border-width", "0.5");
+      });
+    }
+
+    this.sourceNodes = [];
+    this.targetNodes = [];
+
+    this.cy.nodes(":visible").forEach((x) => {
+      if (x.incomers().length === 0) {
+        this.sourceNodes.push(x);
+        if (this.userPrefs.pangenographer.isColorInZeroOutZero.getValue()) {
+          x.style("border-color", "blue");
+          x.style("border-width", "2");
+        }
+      } else if (x.outgoers().length === 0) {
+        this.targetNodes.push(x);
+        if (this.userPrefs.pangenographer.isColorInZeroOutZero.getValue()) {
+          x.style("border-color", "red");
+          x.style("border-width", "2");
+        }
+      }
+    });
+
+    setTimeout(() => {
+      this.cy.endBatch();
+    }, CY_BATCH_END_DELAY);
+  }
+
+  prepareConstraints() {
+    this.removeConstraints();
+    this.changeColorInZeroOutZero();
+    let longestPath = -1;
+    let constLen = 45;
+
+    let sourceShortests = {};
+    let targetShortests = {};
+
+    if (this.sourceNodes.length && this.targetNodes.length) {
+      this.sourceNodes.forEach((source) => {
+        let dijkstra = this.cy.elements().dijkstra({
+          root: source,
+          directed: true,
+        });
+        this.targetNodes.forEach((target) => {
+          let dist = dijkstra.distanceTo(target);
+          sourceShortests[source] = Math.min(
+            sourceShortests[source] || Infinity,
+            dist
+          );
+          targetShortests[target] = Math.min(
+            targetShortests[target] || Infinity,
+            dist
+          );
+        });
+      });
+    }
+
+    for (const key in sourceShortests) {
+      longestPath = Math.max(longestPath, sourceShortests[key]);
+    }
+    for (const key in targetShortests) {
+      longestPath = Math.max(longestPath, targetShortests[key]);
+    }
+
+    for (let i = 0; i <= longestPath; i++) {
+      this.cy.add({
+        group: "nodes",
+        data: { id: "PSEUDOSOURCENODE" + i },
+        position: { x: i * constLen, y: 0 },
+      });
+
+      this.cy.add({
+        group: "nodes",
+        data: { id: "PSEUDOTARGETNODE" + i },
+        position: { x: (longestPath * 2 - i) * constLen, y: 0 },
+      });
+
+      this.constraints.fixedNodeConstraints.push({
+        nodeId: "PSEUDOSOURCENODE" + i,
+        position: { x: i * constLen, y: 0 },
+      });
+
+      this.constraints.fixedNodeConstraints.push({
+        nodeId: "PSEUDOTARGETNODE" + i,
+        position: { x: (longestPath * 2 - i) * constLen, y: 0 },
+      });
+    }
+
+    if (this.sourceNodes.length && this.targetNodes.length) {
+      this.sourceNodes.forEach((n) => {
+        this.constraints.relativePlacementConstraints.push({
+          left: n.id(),
+          right: "PSEUDOSOURCENODE" + (longestPath - sourceShortests[n] + 1),
+          gap: 0,
+        });
+      });
+      this.targetNodes.forEach((n) => {
+        this.constraints.relativePlacementConstraints.push({
+          left: "PSEUDOTARGETNODE" + (longestPath - targetShortests[n] + 1),
+          right: n.id(),
+          gap: 0,
+        });
+      });
+    }
+  }
+
+  removeConstraints() {
+    this.cy.remove("node[id^='PSEUDOSOURCENODE']");
+    this.cy.remove("node[id^='PSEUDOTARGETNODE']");
+
+    this.constraints = {
+      relativePlacementConstraints: [],
+      fixedNodeConstraints: [],
     };
   }
 
@@ -460,12 +600,15 @@ export class GlobalVariableService {
     if (
       this.userPrefs.groupingOption.getValue() != GroupingOptionTypes.clusterId
     ) {
+      this.prepareConstraints();
       this.layout = this.getFcoseOptions();
     }
     this.layout.animationDuration = animationDuration;
     this.layout.tile = this.userPrefs.isTileDisconnectedOnLayout.getValue();
     this.switchLayoutRandomization(isRandomize);
     this.runLayout();
+    this.removeConstraints();
+    this.cy.fit();
   }
 
   private getCiseOptions() {

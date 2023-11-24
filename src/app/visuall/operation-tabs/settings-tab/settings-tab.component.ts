@@ -31,6 +31,7 @@ import { CustomizationModule } from "src/app/custom/customization.module";
 })
 export class SettingsTabComponent implements OnInit, OnDestroy {
   generalBoolSettings: BoolSetting[];
+  pangenographerBoolSettings: BoolSetting[];
   timebarBoolSettings: BoolSetting[];
   highlightWidth: number;
   highlightColor: string;
@@ -88,6 +89,14 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.pangenographerBoolSettings = [
+      {
+        text: "Color in/out-degree zero nodes",
+        isEnable: true,
+        path2userPref: "pangenographer.isColorInZeroOutZero",
+      },
+    ];
+
     this.generalBoolSettings = [
       {
         text: "Perform layout on changes",
@@ -177,7 +186,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     // reference variables for shorter text
     const up = this._g.userPrefs;
     const up_t = this._g.userPrefs.timebar;
-    const up_p = this._g.userPrefs.pangenograph;
+    const up_p = this._g.userPrefs.pangenographer;
 
     this.generalBoolSettings[0].isEnable =
       up.isAutoIncrementalLayoutOnChange.getValue();
@@ -227,6 +236,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.queryResultPagination = up.queryResultPagination.getValue();
 
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
+    this.pangenographerBoolSettings[0].isEnable = up_p.isColorInZeroOutZero.getValue();
 
     this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
     this.timebarBoolSettings[1].isEnable =
@@ -286,17 +296,12 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   settingChanged(val: any, userPref: string) {
-    console.log(val);
-    console.log(userPref);
     let path = userPref.split(".");
-    console.log(path);
     let obj = this._g.userPrefs[path[0]];
-    console.log(obj);
     for (let i = 1; i < path.length; i++) {
       obj = obj[path[i]];
     }
     obj.next(val);
-    console.log(obj);
     this._profile.saveUserPrefs();
   }
 
@@ -353,7 +358,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
       length = MIN_LENGTH_OF_UP_DOWN_STREAM;
     }
-    this._g.userPrefs.pangenograph.lengthOfUpDownstream.next(length);
+    this._g.userPrefs.pangenographer.lengthOfUpDownstream.next(length);
     this.lengthOfUpDownstream = length;
   }
 
@@ -443,8 +448,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   resetPangenographSettings() {
     this.transferSubjectValues(
-      this._g.userPrefsFromFiles.pangenograph,
-      this._g.userPrefs.pangenograph
+      this._g.userPrefsFromFiles.pangenographer,
+      this._g.userPrefs.pangenographer
     );
     this.fillUIFromMemory();
   }

@@ -210,8 +210,9 @@
     "objectInclusionType": 0,
     "queryResultPagination": "Client",
     "tilingPadding": 4,
-    "pangenograph": {
-      "lengthOfUpDownstream": 3
+    "pangenographer": {
+      "lengthOfUpDownstream": 3,
+      "isColorInZeroOutZero": false
     },
     "timebar": {
       "isEnabled": false,

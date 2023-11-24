@@ -41,9 +41,10 @@ export interface UserPref {
   selectionColor: BehaviorSubject<string>;
   selectionWidth: BehaviorSubject<number>;
   tilingPadding: BehaviorSubject<number>;
-  //  PanGenomeGraph Settings
-  pangenograph: {
+  //  PanGenoGrapher Settings
+  pangenographer: {
     lengthOfUpDownstream: BehaviorSubject<number>;
+    isColorInZeroOutZero: BehaviorSubject<boolean>;
   };
 
   timebar: {

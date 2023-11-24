@@ -370,7 +370,7 @@ export class CytoscapeService {
         onCueClicked: (ele: any) => {
           this.showUpDownstream(
             ele,
-            this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
+            this._g.userPrefs.pangenographer.lengthOfUpDownstream.getValue(),
             true
           );
         },
@@ -412,7 +412,7 @@ export class CytoscapeService {
         onCueClicked: (ele: any) => {
           this.showUpDownstream(
             ele,
-            this._g.userPrefs.pangenograph.lengthOfUpDownstream.getValue(),
+            this._g.userPrefs.pangenographer.lengthOfUpDownstream.getValue(),
             false
           );
         },
