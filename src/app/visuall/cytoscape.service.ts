@@ -824,7 +824,7 @@ export class CytoscapeService {
           }
         });
 
-        let currentOverlapLengthSource = -1;
+        let currentOverlapLengthSource = 0;
         let currentOverlapLengthTarget = 0;
 
         overlapIdentifiers.forEach((overlapIdentifier, index) => {
