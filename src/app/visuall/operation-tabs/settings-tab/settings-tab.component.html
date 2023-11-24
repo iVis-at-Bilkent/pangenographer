@@ -10,32 +10,6 @@
     >
   </div>
   <div id="pangenograph-settings" class="collapse show">
-    <div>
-      <div>
-        <label class="va-text">Length of up/downstream</label>
-        <div class="form-inline mx-1">
-          <input
-            type="number"
-            max="10"
-            min="1"
-            step="any"
-            (change)="onlengthOfUpDownstreamSelected($event)"
-            [(ngModel)]="lengthOfUpDownstream"
-            class="form-control std-inp-hei va-small-text ms-1 w5-5"
-            placeholder="Length of up/downstream"
-          />
-        </div>
-      </div>
-      <div>
-        <input
-          class="btn btn-sm btn-dark va-text m-2 center"
-          type="button"
-          (click)="resetPangenographSettings()"
-          value="Default"
-          title="Reset to Default"
-        />
-      </div>
-    </div>
     <div
       class="va-text"
       *ngFor="let setting of pangenographerBoolSettings; let i = index"
@@ -53,6 +27,30 @@
         }}</label>
       </div>
     </div>
+    <div>
+      <label class="va-text">Length of up/downstream</label>
+      <div class="form-inline mx-1">
+        <input
+          type="number"
+          max="10"
+          min="1"
+          step="any"
+          (change)="onlengthOfUpDownstreamSelected($event)"
+          [(ngModel)]="lengthOfUpDownstream"
+          class="form-control std-inp-hei va-small-text ms-1 w5-5"
+          placeholder="Length of up/downstream"
+        />
+      </div>
+    </div>
+  </div>
+  <div>
+    <input
+      class="btn btn-sm btn-dark va-text m-2 center"
+      type="button"
+      (click)="resetPangenographSettings()"
+      value="Default"
+      title="Reset to Default"
+    />
   </div>
 </div>
 
