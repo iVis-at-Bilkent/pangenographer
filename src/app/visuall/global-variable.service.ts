@@ -392,7 +392,7 @@ export class GlobalVariableService {
     this.removeConstraints();
     this.changeColorInZeroOutZero();
     let longestPath = -1;
-    let constLen = 45;
+    let halfOfIdealEdgeLength = 45;
 
     let sourceShortests = {};
     let targetShortests = {};
@@ -405,12 +405,12 @@ export class GlobalVariableService {
         });
         this.targetNodes.forEach((target) => {
           let dist = dijkstra.distanceTo(target);
-          sourceShortests[source] = Math.min(
-            sourceShortests[source] || Infinity,
+          sourceShortests[source.id()] = Math.min(
+            sourceShortests[source.id()] || Infinity,
             dist
           );
-          targetShortests[target] = Math.min(
-            targetShortests[target] || Infinity,
+          targetShortests[target.id()] = Math.min(
+            targetShortests[target.id()] || Infinity,
             dist
           );
         });
@@ -428,23 +428,23 @@ export class GlobalVariableService {
       this.cy.add({
         group: "nodes",
         data: { id: "PSEUDOSOURCENODE" + i },
-        position: { x: i * constLen, y: 0 },
+        position: { x: i * halfOfIdealEdgeLength, y: 0 },
       });
 
       this.cy.add({
         group: "nodes",
         data: { id: "PSEUDOTARGETNODE" + i },
-        position: { x: (longestPath * 2 - i) * constLen, y: 0 },
+        position: { x: (longestPath * 2 - i) * halfOfIdealEdgeLength, y: 0 },
       });
 
       this.constraints.fixedNodeConstraints.push({
         nodeId: "PSEUDOSOURCENODE" + i,
-        position: { x: i * constLen, y: 0 },
+        position: { x: i * halfOfIdealEdgeLength, y: 0 },
       });
 
       this.constraints.fixedNodeConstraints.push({
         nodeId: "PSEUDOTARGETNODE" + i,
-        position: { x: (longestPath * 2 - i) * constLen, y: 0 },
+        position: { x: (longestPath * 2 - i) * halfOfIdealEdgeLength, y: 0 },
       });
     }
 
@@ -452,13 +452,15 @@ export class GlobalVariableService {
       this.sourceNodes.forEach((n) => {
         this.constraints.relativePlacementConstraints.push({
           left: n.id(),
-          right: "PSEUDOSOURCENODE" + (longestPath - sourceShortests[n] + 1),
+          right:
+            "PSEUDOSOURCENODE" + (longestPath - sourceShortests[n.id()] + 1),
           gap: 0,
         });
       });
       this.targetNodes.forEach((n) => {
         this.constraints.relativePlacementConstraints.push({
-          left: "PSEUDOTARGETNODE" + (longestPath - targetShortests[n] + 1),
+          left:
+            "PSEUDOTARGETNODE" + (longestPath - targetShortests[n.id()] + 1),
           right: n.id(),
           gap: 0,
         });
