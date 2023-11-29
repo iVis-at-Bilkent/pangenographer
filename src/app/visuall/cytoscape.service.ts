@@ -254,10 +254,7 @@ export class CytoscapeService {
       this._g.cy.elements().filter((element) => elemIdSet.has(element.id()))
     );
 
-    C.TYPES_NOT_TO_SHOW.forEach((type) => {
-      this._g.viewUtils.hide(this._g.cy.$("." + type));
-    });
-
+    this._g.hideTypesNotToShow();
     this._g.applyClassFiltering();
 
     if (isIncremental && !wasEmpty) {
@@ -1211,6 +1208,8 @@ export class CytoscapeService {
           "\n" +
           this.truncateTextNode(nodes[i].data("segmentData"));
         nodes[i].data("__label__", toFit);
+      } else {
+        nodes[i].data("__label__", "");
       }
     }
     nodes.addClass("ellipsis_label");
@@ -1578,6 +1577,7 @@ export class CytoscapeService {
       const prevVisible = this._g.cy.$(":visible");
       this._g.viewUtils.show(this._g.cy.$());
       this._g.applyClassFiltering();
+      this._g.hideTypesNotToShow();
       this._timebarService.coverVisibleRange();
       this.showCollapsed(null, null);
       const currVisible = this._g.cy.$(":visible");

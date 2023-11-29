@@ -13,6 +13,7 @@ import {
   CY_BATCH_END_DELAY,
   EXPAND_COLLAPSE_FAST_OPT,
   HIGHLIGHT_OPACITY,
+  TYPES_NOT_TO_SHOW,
 } from "./constants";
 import { GraphHistoryItem, GraphElem } from "./db-service/data-types";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
@@ -67,8 +68,15 @@ export class GlobalVariableService {
     relativePlacementConstraints: [],
     fixedNodeConstraints: [],
   };
-  sourceNodes: any[];
-  targetNodes: any[];
+  zeroIncomerAndOutgoerNodes: {
+    source: any[];
+    target: any[];
+    sourceAndTarget: any[];
+  } = {
+    source: [],
+    target: [],
+    sourceAndTarget: [],
+  };
 
   constructor(
     private _http: HttpClient,
@@ -129,8 +137,8 @@ export class GlobalVariableService {
     }
   }
 
-  runLayout() {
-    const elems4layout = this.cy.elements().not(":hidden, :transparent");
+  runLayout(callback?: Function) {
+    const elems4layout = this.cy.elements().not(":hidden, :transparent"); // also try this
     if (elems4layout.length < 1) {
       return;
     }
@@ -140,12 +148,17 @@ export class GlobalVariableService {
       this.statusMsg.next("Performing layout...");
     }
     this.setLoadingStatus(true);
+    let layout;
     if (this.layout.clusters && this.layout.clusters.length > 0) {
       this.removeDeletedClusters();
-      elems4layout.layout(this.getCiseOptions()).run();
+      layout = elems4layout.layout(this.getCiseOptions());
     } else {
-      elems4layout.layout(this.layout).run();
+      layout = elems4layout.layout(this.layout);
     }
+    layout.promiseOn("layoutstop", () => {
+      callback();
+    });
+    layout.run();
     this.statusMsg.next("Rendering graph...");
   }
 
@@ -183,6 +196,12 @@ export class GlobalVariableService {
     }
 
     this.handleCompoundsOnHideDelete();
+  }
+
+  hideTypesNotToShow() {
+    TYPES_NOT_TO_SHOW.forEach((type) => {
+      this.viewUtils.hide(this.cy.$("." + type));
+    });
   }
 
   filterByClass(elems) {
@@ -351,31 +370,34 @@ export class GlobalVariableService {
   changeColorInZeroOutZero() {
     this.cy.startBatch();
 
-    if (this.sourceNodes) {
-      this.sourceNodes.forEach((x) => {
+    if (this.zeroIncomerAndOutgoerNodes.source) {
+      this.zeroIncomerAndOutgoerNodes.source.forEach((x) => {
         x.style("border-color", "gray");
         x.style("border-width", "0.5");
       });
     }
-    if (this.targetNodes) {
-      this.targetNodes.forEach((x) => {
+    if (this.zeroIncomerAndOutgoerNodes.target) {
+      this.zeroIncomerAndOutgoerNodes.target.forEach((x) => {
         x.style("border-color", "gray");
         x.style("border-width", "0.5");
       });
     }
 
-    this.sourceNodes = [];
-    this.targetNodes = [];
+    this.zeroIncomerAndOutgoerNodes = {
+      source: [],
+      target: [],
+      sourceAndTarget: [],
+    };
 
     this.cy.nodes(":visible").forEach((x) => {
-      if (x.incomers().length === 0) {
-        this.sourceNodes.push(x);
+      if (x.incomers().length === 0 && x.outgoers().length > 0) {
+        this.zeroIncomerAndOutgoerNodes.source.push(x);
         if (this.userPrefs.pangenographer.isColorInZeroOutZero.getValue()) {
           x.style("border-color", "blue");
           x.style("border-width", "2");
         }
-      } else if (x.outgoers().length === 0) {
-        this.targetNodes.push(x);
+      } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
+        this.zeroIncomerAndOutgoerNodes.target.push(x);
         if (this.userPrefs.pangenographer.isColorInZeroOutZero.getValue()) {
           x.style("border-color", "red");
           x.style("border-width", "2");
@@ -397,13 +419,16 @@ export class GlobalVariableService {
     let sourceShortests = {};
     let targetShortests = {};
 
-    if (this.sourceNodes.length && this.targetNodes.length) {
-      this.sourceNodes.forEach((source) => {
+    if (
+      this.zeroIncomerAndOutgoerNodes.source.length &&
+      this.zeroIncomerAndOutgoerNodes.source.length
+    ) {
+      this.zeroIncomerAndOutgoerNodes.source.forEach((source) => {
         let dijkstra = this.cy.elements().dijkstra({
           root: source,
           directed: true,
         });
-        this.targetNodes.forEach((target) => {
+        this.zeroIncomerAndOutgoerNodes.target.forEach((target) => {
           let dist = dijkstra.distanceTo(target);
           sourceShortests[source.id()] = Math.min(
             sourceShortests[source.id()] || Infinity,
@@ -448,21 +473,22 @@ export class GlobalVariableService {
       });
     }
 
-    if (this.sourceNodes.length && this.targetNodes.length) {
-      this.sourceNodes.forEach((n) => {
+    if (
+      this.zeroIncomerAndOutgoerNodes.source.length &&
+      this.zeroIncomerAndOutgoerNodes.target.length
+    ) {
+      this.zeroIncomerAndOutgoerNodes.source.forEach((n) => {
         this.constraints.relativePlacementConstraints.push({
           left: n.id(),
           right:
             "PSEUDOSOURCENODE" + (longestPath - sourceShortests[n.id()] + 1),
-          gap: 0,
         });
       });
-      this.targetNodes.forEach((n) => {
+      this.zeroIncomerAndOutgoerNodes.target.forEach((n) => {
         this.constraints.relativePlacementConstraints.push({
           left:
             "PSEUDOTARGETNODE" + (longestPath - targetShortests[n.id()] + 1),
           right: n.id(),
-          gap: 0,
         });
       });
     }
@@ -476,6 +502,7 @@ export class GlobalVariableService {
       relativePlacementConstraints: [],
       fixedNodeConstraints: [],
     };
+    this.cy.fit();
   }
 
   // delete/expand compounds if they don't have any visible elements
@@ -608,9 +635,9 @@ export class GlobalVariableService {
     this.layout.animationDuration = animationDuration;
     this.layout.tile = this.userPrefs.isTileDisconnectedOnLayout.getValue();
     this.switchLayoutRandomization(isRandomize);
-    this.runLayout();
-    this.removeConstraints();
-    this.cy.fit();
+    this.runLayout(() => {
+      this.removeConstraints();
+    });
   }
 
   private getCiseOptions() {
