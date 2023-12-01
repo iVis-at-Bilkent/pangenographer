@@ -159,6 +159,7 @@ export class GlobalVariableService {
       callback();
     });
     layout.run();
+    console.log(layout)
     this.statusMsg.next("Rendering graph...");
   }
 
@@ -414,7 +415,7 @@ export class GlobalVariableService {
     this.removeConstraints();
     this.changeColorInZeroOutZero();
     let longestPath = -1;
-    let halfOfIdealEdgeLength = 45;
+    
 
     let sourceShortests = {};
     let targetShortests = {};
@@ -449,6 +450,8 @@ export class GlobalVariableService {
       longestPath = Math.max(longestPath, targetShortests[key]);
     }
 
+    let halfOfIdealEdgeLength = Math.max(50 - Math.floor(Math.sqrt(longestPath)*3 + 1), 10);
+
     for (let i = 0; i <= longestPath; i++) {
       this.cy.add({
         group: "nodes",
@@ -482,6 +485,7 @@ export class GlobalVariableService {
           left: n.id(),
           right:
             "PSEUDOSOURCENODE" + (longestPath - sourceShortests[n.id()] + 1),
+          gap: halfOfIdealEdgeLength * 2,
         });
       });
       this.zeroIncomerAndOutgoerNodes.target.forEach((n) => {
@@ -489,6 +493,7 @@ export class GlobalVariableService {
           left:
             "PSEUDOTARGETNODE" + (longestPath - targetShortests[n.id()] + 1),
           right: n.id(),
+          gap: halfOfIdealEdgeLength * 2,
         });
       });
     }
