@@ -1,24 +1,24 @@
-import { Injectable } from "@angular/core";
-import { UserPref, GroupingOptionTypes } from "./user-preference";
-import { BehaviorSubject } from "rxjs";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { BehaviorSubject } from "rxjs";
 import appPref from "../../assets/appPref.json";
+import { CyStyleCustomizationService } from "../custom/cy-style-customization.service";
 import {
-  isPrimitiveType,
-  debounce,
-  LAYOUT_ANIM_DUR,
+  CLUSTER_CLASS,
   COLLAPSED_EDGE_CLASS,
   COLLAPSED_NODE_CLASS,
-  CLUSTER_CLASS,
   CY_BATCH_END_DELAY,
   EXPAND_COLLAPSE_FAST_OPT,
   HIGHLIGHT_OPACITY,
+  LAYOUT_ANIM_DUR,
   TYPES_NOT_TO_SHOW,
+  debounce,
+  isPrimitiveType,
 } from "./constants";
-import { GraphHistoryItem, GraphElem } from "./db-service/data-types";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { GraphElem, GraphHistoryItem } from "./db-service/data-types";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
-import { CyStyleCustomizationService } from "../custom/cy-style-customization.service";
+import { GroupingOptionTypes, UserPref } from "./user-preference";
 
 @Injectable({
   providedIn: "root",
@@ -375,7 +375,7 @@ export class GlobalVariableService {
       this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
     ) {
       this.zeroIncomerAndOutgoerNodes.source.forEach((x) => {
-        this.viewUtils.unhighlight(x);
+        this.viewUtils.removeHighlights();
       });
     }
     if (
@@ -383,7 +383,7 @@ export class GlobalVariableService {
       this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
     ) {
       this.zeroIncomerAndOutgoerNodes.target.forEach((x) => {
-        this.viewUtils.unhighlight(x);
+        this.viewUtils.removeHighlights();
       });
     }
 

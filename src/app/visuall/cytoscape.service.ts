@@ -1,27 +1,27 @@
 import { Injectable, NgZone } from "@angular/core";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import cytoscape from "cytoscape";
+import { LouvainClustering } from "../../lib/louvain-clustering/LouvainClustering";
 import * as C from "./constants";
-import { GlobalVariableService } from "./global-variable.service";
-import { TimebarService } from "./timebar.service";
+import { CyExtService } from "./cy-ext.service";
 import {
-  GraphResponse,
-  GraphElem,
   CyEdge,
   CyNode,
   GFAData,
+  GraphElem,
+  GraphResponse,
 } from "./db-service/data-types";
+import { DbAdapterService } from "./db-service/db-adapter.service";
+import { FileReaderService } from "./file-reader.service";
+import { GlobalVariableService } from "./global-variable.service";
+import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
+import { TimebarService } from "./timebar.service";
 import { UserPrefHelper } from "./user-pref-helper";
 import {
-  MergedElemIndicatorTypes,
   GroupingOptionTypes,
+  MergedElemIndicatorTypes,
 } from "./user-preference";
 import { UserProfileService } from "./user-profile.service";
-import { FileReaderService } from "./file-reader.service";
-import { LouvainClustering } from "../../lib/louvain-clustering/LouvainClustering";
-import { CyExtService } from "./cy-ext.service";
-import { DbAdapterService } from "./db-service/db-adapter.service";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
 @Injectable({
   providedIn: "root",
 })
