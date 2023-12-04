@@ -44,7 +44,7 @@ export interface UserPref {
   //  PanGenoGrapher Settings
   pangenographer: {
     lengthOfUpDownstream: BehaviorSubject<number>;
-    isColorInZeroOutZero: BehaviorSubject<boolean>;
+    isHighlightInZeroOutZero: BehaviorSubject<boolean>;
   };
 
   timebar: {

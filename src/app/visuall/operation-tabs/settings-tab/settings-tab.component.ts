@@ -91,9 +91,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.pangenographerBoolSettings = [
       {
-        text: "Color in/out-degree zero nodes",
+        text: "Highlight in/out-degree zero nodes",
         isEnable: true,
-        path2userPref: "pangenographer.isColorInZeroOutZero",
+        path2userPref: "pangenographer.isHighlightInZeroOutZero",
       },
     ];
 
@@ -236,7 +236,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.queryResultPagination = up.queryResultPagination.getValue();
 
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
-    this.pangenographerBoolSettings[0].isEnable = up_p.isColorInZeroOutZero.getValue();
+    this.pangenographerBoolSettings[0].isEnable = up_p.isHighlightInZeroOutZero.getValue();
 
     this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
     this.timebarBoolSettings[1].isEnable =

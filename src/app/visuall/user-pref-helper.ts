@@ -86,8 +86,8 @@ export class UserPrefHelper {
         tb.changeStatsInclusionType(x);
       });
 
-      upP.isColorInZeroOutZero.subscribe(() => {
-        this._g.changeColorInZeroOutZero();
+      upP.isHighlightInZeroOutZero.subscribe(() => {
+        this._g.changeHighlightInZeroOutZero();
       });
     });
   }

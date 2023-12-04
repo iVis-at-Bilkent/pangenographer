@@ -159,7 +159,6 @@ export class GlobalVariableService {
       callback();
     });
     layout.run();
-    console.log(layout)
     this.statusMsg.next("Rendering graph...");
   }
 
@@ -368,19 +367,23 @@ export class GlobalVariableService {
     };
   }
 
-  changeColorInZeroOutZero() {
+  changeHighlightInZeroOutZero() {
     this.cy.startBatch();
 
-    if (this.zeroIncomerAndOutgoerNodes.source) {
+    if (
+      this.zeroIncomerAndOutgoerNodes.source &&
+      this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
+    ) {
       this.zeroIncomerAndOutgoerNodes.source.forEach((x) => {
-        x.style("border-color", "gray");
-        x.style("border-width", "0.5");
+        this.viewUtils.unhighlight(x);
       });
     }
-    if (this.zeroIncomerAndOutgoerNodes.target) {
+    if (
+      this.zeroIncomerAndOutgoerNodes.target &&
+      this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
+    ) {
       this.zeroIncomerAndOutgoerNodes.target.forEach((x) => {
-        x.style("border-color", "gray");
-        x.style("border-width", "0.5");
+        this.viewUtils.unhighlight(x);
       });
     }
 
@@ -393,15 +396,13 @@ export class GlobalVariableService {
     this.cy.nodes(":visible").forEach((x) => {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
-        if (this.userPrefs.pangenographer.isColorInZeroOutZero.getValue()) {
-          x.style("border-color", "blue");
-          x.style("border-width", "2");
+        if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
+          this.viewUtils.highlight(x, 2);
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
-        if (this.userPrefs.pangenographer.isColorInZeroOutZero.getValue()) {
-          x.style("border-color", "red");
-          x.style("border-width", "2");
+        if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
+          this.viewUtils.highlight(x, 3);
         }
       }
     });
@@ -413,9 +414,8 @@ export class GlobalVariableService {
 
   prepareConstraints() {
     this.removeConstraints();
-    this.changeColorInZeroOutZero();
+    this.changeHighlightInZeroOutZero();
     let longestPath = -1;
-    
 
     let sourceShortests = {};
     let targetShortests = {};
@@ -450,7 +450,10 @@ export class GlobalVariableService {
       longestPath = Math.max(longestPath, targetShortests[key]);
     }
 
-    let halfOfIdealEdgeLength = Math.max(50 - Math.floor(Math.sqrt(longestPath)*3 + 1), 10);
+    let halfOfIdealEdgeLength = Math.max(
+      50 - Math.floor(Math.sqrt(longestPath) * 3 + 1),
+      10
+    );
 
     for (let i = 0; i <= longestPath; i++) {
       this.cy.add({

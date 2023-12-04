@@ -212,7 +212,7 @@
     "tilingPadding": 4,
     "pangenographer": {
       "lengthOfUpDownstream": 3,
-      "isColorInZeroOutZero": false
+      "isHighlightInZeroOutZero": false
     },
     "timebar": {
       "isEnabled": false,
