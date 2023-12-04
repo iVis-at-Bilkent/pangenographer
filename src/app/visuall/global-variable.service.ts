@@ -375,7 +375,8 @@ export class GlobalVariableService {
       this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
     ) {
       this.zeroIncomerAndOutgoerNodes.source.forEach((x) => {
-        this.viewUtils.removeHighlights();
+        x.style("border-color", "gray");
+        x.style("border-width", "0.5");
       });
     }
     if (
@@ -383,7 +384,8 @@ export class GlobalVariableService {
       this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
     ) {
       this.zeroIncomerAndOutgoerNodes.target.forEach((x) => {
-        this.viewUtils.removeHighlights();
+        x.style("border-color", "gray");
+        x.style("border-width", "0.5");
       });
     }
 
@@ -397,12 +399,14 @@ export class GlobalVariableService {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
         if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
-          this.viewUtils.highlight(x, 2);
+          x.style("border-color", "blue");
+          x.style("border-width", "2");
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
         if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
-          this.viewUtils.highlight(x, 3);
+          x.style("border-color", "red");
+          x.style("border-width", "2");
         }
       }
     });
