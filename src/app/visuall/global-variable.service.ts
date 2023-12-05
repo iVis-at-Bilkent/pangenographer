@@ -359,7 +359,7 @@ export class GlobalVariableService {
       tilingPaddingVertical: p,
       // Represents the amount of the horizontal space to put between the zero degree members during the tiling operation(can also be a function)
       tilingPaddingHorizontal: p,
-      idealEdgeLength: 30,
+      idealEdgeLength: 50,
       clusters: null, // cise argument
       relativePlacementConstraint:
         this.constraints.relativePlacementConstraints,
@@ -370,22 +370,14 @@ export class GlobalVariableService {
   changeHighlightInZeroOutZero() {
     this.cy.startBatch();
 
-    if (
-      this.zeroIncomerAndOutgoerNodes.source &&
-      this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
-    ) {
+    if (this.zeroIncomerAndOutgoerNodes.source) {
       this.zeroIncomerAndOutgoerNodes.source.forEach((x) => {
-        x.style("border-color", "gray");
-        x.style("border-width", "0.5");
+        this.viewUtils.removeHighlights(x);
       });
     }
-    if (
-      this.zeroIncomerAndOutgoerNodes.target &&
-      this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()
-    ) {
+    if (this.zeroIncomerAndOutgoerNodes.target) {
       this.zeroIncomerAndOutgoerNodes.target.forEach((x) => {
-        x.style("border-color", "gray");
-        x.style("border-width", "0.5");
+        this.viewUtils.removeHighlights(x);
       });
     }
 
@@ -399,14 +391,12 @@ export class GlobalVariableService {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
         if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
-          x.style("border-color", "blue");
-          x.style("border-width", "2");
+          this.viewUtils.highlight(x, 3);
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
         if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
-          x.style("border-color", "red");
-          x.style("border-width", "2");
+          this.viewUtils.highlight(x, 4);
         }
       }
     });
@@ -454,22 +444,21 @@ export class GlobalVariableService {
       longestPath = Math.max(longestPath, targetShortests[key]);
     }
 
-    let halfOfIdealEdgeLength = Math.max(
-      50 - Math.floor(Math.sqrt(longestPath) * 3 + 1),
-      10
-    );
+    let halfOfIdealEdgeLength = 43;
 
     for (let i = 0; i <= longestPath; i++) {
       this.cy.add({
         group: "nodes",
         data: { id: "PSEUDOSOURCENODE" + i },
         position: { x: i * halfOfIdealEdgeLength, y: 0 },
+        classes: "PSEUDO",
       });
 
       this.cy.add({
         group: "nodes",
         data: { id: "PSEUDOTARGETNODE" + i },
         position: { x: (longestPath * 2 - i) * halfOfIdealEdgeLength, y: 0 },
+        classes: "PSEUDO",
       });
 
       this.constraints.fixedNodeConstraints.push({
@@ -482,6 +471,13 @@ export class GlobalVariableService {
         position: { x: (longestPath * 2 - i) * halfOfIdealEdgeLength, y: 0 },
       });
     }
+
+    this.cy
+      .filter(".PSEUDO")
+      .nodes()
+      .forEach((n) => {
+        n.style("background-color", "white");
+      });
 
     if (
       this.zeroIncomerAndOutgoerNodes.source.length &&

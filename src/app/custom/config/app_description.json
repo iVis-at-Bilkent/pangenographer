@@ -196,6 +196,14 @@
       {
         "wid": 3,
         "color": "#04f06a"
+      },
+      {
+        "wid": 5,
+        "color": "#0000ff"
+      },
+      {
+        "wid": 5,
+        "color": "#ff0000"
       }
     ],
     "currHighlightIdx": 0,

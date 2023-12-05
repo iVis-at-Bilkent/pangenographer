@@ -130,7 +130,7 @@ export const MONTHS = [
   "December",
 ];
 
-export const TYPES_NOT_TO_SHOW = ["PATHS", "WALKS"];
+export const TYPES_NOT_TO_SHOW = ["PATHS", "WALKS", "PSEUDO"];
 
 export const SHORT_MONTHS = [
   "Jan",
