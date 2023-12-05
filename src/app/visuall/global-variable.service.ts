@@ -477,6 +477,8 @@ export class GlobalVariableService {
       .nodes()
       .forEach((n) => {
         n.style("background-color", "white");
+        n.style("width", longestPath + "px");
+        n.style("height", longestPath + "px");
       });
 
     if (
