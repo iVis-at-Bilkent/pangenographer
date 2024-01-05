@@ -248,18 +248,18 @@
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
             (click)="getPathsSelected()"
-            value="Get Path(s)"
-            title="Get Path(s)"
+            value="Get Path"
+            title="Get Path"
           />
         </div>
         <tbody>
           <ng-container
             *ngFor="let item of selectedItemProps.pathNames.val; let i = index"
           >
-            <div class="path-walk-container">
+            <div class="path-walk-container va-text">
               <div class="path-walk-item-begin">
                 <div
-                  class="va-text"
+                  class="path-walk-name"
                   (mouseover)="
                     hightlightHoveredPath(selectedItemProps.pathNames.val[i])
                   "
@@ -269,25 +269,21 @@
                       selectedItemProps.pathNames.val[i] === highlightedPathWalk
                   }"
                 >
-                  <span>
-                    <b>Path name: </b>
-                  </span>
-                  <span>
+                  <span
+                    ><b>Path name: </b>
                     {{ selectedItemProps.pathNames.val[i] }}
                   </span>
                 </div>
-                <div class="path-walk-checkbox">
+                <div>
                   <input
                     type="checkbox"
                     [(ngModel)]="selectedItemProps.pathChecked[i]"
                     (change)="setOtherPathsFalse(i)"
+                    title="Select path"
                   />
                 </div>
               </div>
-              <div class="path-walk-item va-text">
-                <span>
-                  <b>Segment names </b>
-                </span>
+              <div>
                 <div class="path-walk-text-container">
                   <span>
                     {{
@@ -298,7 +294,7 @@
                   </span>
                 </div>
               </div>
-              <div class="path-walk-item va-text">
+              <div>
                 <span>
                   <b>Overlaps </b>
                 </span>
@@ -323,8 +319,8 @@
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
             (click)="getWalksSelected()"
-            value="Get Walk(s)"
-            title="Get Walk(s)"
+            value="Get Walk"
+            title="Get Walk"
           />
         </div>
         <tbody>
@@ -334,10 +330,10 @@
               let i = index
             "
           >
-            <div class="path-walk-container">
+            <div class="path-walk-container va-text">
               <div class="path-walk-item-begin">
                 <div
-                  class="va-text"
+                  class="path-walk-name"
                   (mouseover)="
                     hightlightHoveredWalk(
                       selectedItemProps.walkSampleIds.val[i]
@@ -350,54 +346,45 @@
                       highlightedPathWalk
                   }"
                 >
-                  <span>
-                    <b>Walk sample identifier: </b>
-                  </span>
-                  <span>
+                  <span
+                    ><b>Walk sample identifier: </b>
                     {{ selectedItemProps.walkSampleIds.val[i] }}
                   </span>
                 </div>
-                <div class="path-walk-checkbox">
+                <div>
                   <input
                     type="checkbox"
                     [(ngModel)]="selectedItemProps.walkChecked[i]"
                     (change)="setOtherWalksFalse(i)"
+                    title="Select walk"
                   />
                 </div>
               </div>
-              <div class="path-walk-item va-text">
-                <span>
-                  <b>Haplotype index: </b>
-                </span>
-                <span>
+              <div>
+                <span
+                  ><b>Haplotype index: </b>
                   {{ selectedItemProps.walkHapIndexes[i] }}
                 </span>
               </div>
-              <div class="path-walk-item va-text">
-                <span>
-                  <b>Sequence identifier: </b>
-                </span>
-                <span>
+              <div>
+                <span
+                  ><b>Sequence identifier: </b>
                   {{ selectedItemProps.walkSeqIds[i] }}
                 </span>
               </div>
-              <div class="path-walk-item va-text">
-                <span>
-                  <b>Start position: </b>
-                </span>
-                <span>
+              <div>
+                <span
+                  ><b>Start position: </b>
                   {{ selectedItemProps.walkSeqStarts[i] }}
                 </span>
               </div>
-              <div class="path-walk-item va-text">
-                <span>
-                  <b>End position: </b>
-                </span>
-                <span>
+              <div>
+                <span
+                  ><b>End position: </b>
                   {{ selectedItemProps.walkSeqEnds[i] }}
                 </span>
               </div>
-              <div class="path-walk-item va-text">
+              <div>
                 <span>
                   <b>Walk </b>
                 </span>
@@ -433,7 +420,6 @@
       class="panel-heading collapsed"
       data-bs-toggle="collapse"
       data-bs-target="#stat-tab"
-      aria-expanded="false"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">Statistics</b></span

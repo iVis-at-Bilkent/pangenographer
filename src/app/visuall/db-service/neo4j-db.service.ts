@@ -1,25 +1,25 @@
-import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { environment } from "src/environments/environment";
+import { TableFiltering } from "../../shared/table-view/table-view-types";
+import { GENERIC_TYPE, LONG_MAX, LONG_MIN } from "../constants";
 import { GlobalVariableService } from "../global-variable.service";
 import {
-  GraphResponse,
-  TableResponse,
-  DbService,
-  DbQueryMeta,
-  Neo4jEdgeDirection,
-  DbResponse,
-  DbResponseType,
-  GFAData,
-} from "./data-types";
-import {
-  Rule,
   ClassBasedRules,
+  Rule,
   RuleNode,
 } from "../operation-tabs/map-tab/query-types";
-import { GENERIC_TYPE, LONG_MAX, LONG_MIN } from "../constants";
-import { TableFiltering } from "../../shared/table-view/table-view-types";
 import { TimebarGraphInclusionTypes } from "../user-preference";
-import { environment } from "src/environments/environment";
+import {
+  DbQueryMeta,
+  DbResponse,
+  DbResponseType,
+  DbService,
+  GFAData,
+  GraphResponse,
+  Neo4jEdgeDirection,
+  TableResponse,
+} from "./data-types";
 
 @Injectable({
   providedIn: "root",
@@ -877,6 +877,43 @@ export class Neo4jDb implements DbService {
     return cql;
   }
 
+  private propertyName2CQL(propertyName: string): string {
+    propertyName = propertyName.replace(/\./g, "$DOT$");
+    propertyName = propertyName.replace(/-/g, "$HYPHEN$");
+    propertyName = propertyName.replace(/\+/g, "$PLUS$");
+    propertyName = propertyName.replace(/\(/g, "$LP$");
+    propertyName = propertyName.replace(/\)/g, "$RP$");
+    propertyName = propertyName.replace(/\[/g, "$LB$");
+    propertyName = propertyName.replace(/]/g, "$RB$");
+    propertyName = propertyName.replace(/\{/g, "$LC$");
+    propertyName = propertyName.replace(/}/g, "$RC$");
+    propertyName = propertyName.replace(/ /g, "$SPACE$");
+    propertyName = propertyName.replace(/:/g, "$COLON$");
+    propertyName = propertyName.replace(/,/g, "$COMMA$");
+    propertyName = propertyName.replace(/\//g, "$SLASH$");
+    propertyName = propertyName.replace(/\\/g, "$BSLASH$");
+    propertyName = propertyName.replace(/'/g, "$SQ$");
+    propertyName = propertyName.replace(/"/g, "$DQ$");
+    propertyName = propertyName.replace(/\?/g, "$Q$");
+    propertyName = propertyName.replace(/!/g, "$E$");
+    propertyName = propertyName.replace(/;/g, "$SC$");
+    propertyName = propertyName.replace(/=/g, "$EQ$");
+    propertyName = propertyName.replace(/</g, "$LT$");
+    propertyName = propertyName.replace(/>/g, "$GT$");
+    propertyName = propertyName.replace(/&/g, "$AND$");
+    propertyName = propertyName.replace(/\|/g, "$OR$");
+    propertyName = propertyName.replace(/%/g, "$PER$");
+    propertyName = propertyName.replace(/@/g, "$AT$");
+    propertyName = propertyName.replace(/#/g, "$HASH$");
+    propertyName = propertyName.replace(/\^/g, "$CARET$");
+    propertyName = propertyName.replace(/\*/g, "$STAR$");
+    propertyName = propertyName.replace(/~/g, "$TILDE$");
+    propertyName = propertyName.replace(/`/g, "$BT$");
+    propertyName = propertyName.replace(/´/g, "$AC$");
+
+    return propertyName;
+  }
+
   private GFAdata2CQL(GFAData: GFAData): string {
     let nodeMap = {};
     let query = "CREATE\n";
@@ -886,7 +923,9 @@ export class Neo4jDb implements DbService {
     if (GFAData.paths.length) {
       node2Create = `(nPATHS :PATHS {`;
       GFAData.paths.forEach((path) => {
-        node2Create += `p${path.pathName}: ['${path.segmentNames}', `;
+        node2Create += `p${this.propertyName2CQL(path.pathName)}: ['${
+          path.segmentNames
+        }', `;
         node2Create += `'${path.overlaps}'], `;
       });
       query += node2Create.substring(0, node2Create.length - 2) + "}),\n";
@@ -894,7 +933,9 @@ export class Neo4jDb implements DbService {
     if (GFAData.walks.length) {
       node2Create = `(nWALKS :WALKS {`;
       GFAData.walks.forEach((walk) => {
-        node2Create += `w${walk.sampleId}: ['${walk.hapIndex}', `;
+        node2Create += `w${this.propertyName2CQL(walk.sampleId)}: ['${
+          walk.hapIndex
+        }', `;
         node2Create += `'${walk.seqId}', '${walk.seqStart}', '${walk.seqEnd}', `;
         node2Create += `'${walk.walk}'], `;
       });
@@ -905,6 +946,7 @@ export class Neo4jDb implements DbService {
 
     GFAData.paths.forEach((path) => {
       let segmentNames = path.segmentNames.split(/[;,]/);
+      path.pathName = this.propertyName2CQL(path.pathName);
       segmentNames.forEach((segmentName) => {
         segmentName = segmentName.substring(0, segmentName.length - 1);
         if (segmentsToPathMap.hasOwnProperty(segmentName)) {
@@ -920,6 +962,7 @@ export class Neo4jDb implements DbService {
 
     GFAData.walks.forEach((walk) => {
       let segmentNames = walk.walk.substring(1).split(/[<>]/);
+      walk.sampleId = this.propertyName2CQL(walk.sampleId);
       segmentNames.forEach((segmentName) => {
         if (segmentsToWalkMap.hasOwnProperty(segmentName)) {
           segmentsToWalkMap[`${segmentName}`].push(walk.sampleId);
@@ -931,6 +974,7 @@ export class Neo4jDb implements DbService {
     });
 
     GFAData.segments.forEach((segment) => {
+      segment.segmentName = this.propertyName2CQL(segment.segmentName);
       let node2Create = `(n${segment.segmentName} :SEGMENT {segmentData: 
         '${segment.segmentData}', segmentName: '${segment.segmentName}'
         , segmentLength: ${segment.segmentLength}`;
@@ -970,6 +1014,8 @@ export class Neo4jDb implements DbService {
     query = query.substring(0, query.length - 2) + "\nCREATE\n";
 
     GFAData.links.forEach((link) => {
+      link.source = this.propertyName2CQL(link.source);
+      link.target = this.propertyName2CQL(link.target);
       let edge2Create = `(n${link.source})-[:LINK
         {sourceOrientation: '${link.sourceOrientation}', source: '${link.source}'
         , targetOrientation: '${link.targetOrientation}', target: '${link.target}'`;
@@ -1036,6 +1082,8 @@ export class Neo4jDb implements DbService {
     });
 
     GFAData.jumps.forEach((jump) => {
+      jump.source = this.propertyName2CQL(jump.source);
+      jump.target = this.propertyName2CQL(jump.target);
       let edge2Create = `(n${jump.source})-[:JUMP
         {sourceOrientation: '${jump.sourceOrientation}', source: '${jump.source}'
         , targetOrientation: '${jump.targetOrientation}', target: '${jump.target}'`;
@@ -1068,6 +1116,8 @@ export class Neo4jDb implements DbService {
     });
 
     GFAData.containments.forEach((containment) => {
+      containment.source = this.propertyName2CQL(containment.source);
+      containment.target = this.propertyName2CQL(containment.target);
       let edge2Create = `(n${containment.source})-[:CONTAINMENT
         {sourceOrientation: '${containment.sourceOrientation}', source: '${containment.source}'
         , targetOrientation: '${containment.targetOrientation}', target: '${containment.target}'`;

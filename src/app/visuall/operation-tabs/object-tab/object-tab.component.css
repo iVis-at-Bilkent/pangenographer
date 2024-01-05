@@ -16,7 +16,6 @@ td {
   text-align: left;
   font-family: Inconsolata, monospace;
   font-weight: 700;
-  max-width: 100%;
   overflow-y: auto;
   line-height: 20px;
   border: 2px solid #65676b;
@@ -30,7 +29,6 @@ td {
   text-align: left;
   font-family: Inconsolata, monospace;
   font-weight: 700;
-  max-width: 100%;
   overflow-y: auto;
   line-height: 20px;
   background-color: rgba(193, 202, 222, 0.5);
@@ -47,7 +45,6 @@ td {
   text-align: left;
   display: flex;
   flex-direction: column;
-  max-width: 100%;
 }
 
 .path-walk-title {
@@ -56,28 +53,25 @@ td {
   justify-content: space-between;
 }
 
-.path-walk-item {
+.path-walk-name {
+  word-break: break-all;
 }
 
 .path-walk-item-begin {
   display: flex;
   justify-content: space-between;
-  max-width: 100%;
 }
 
 .path-walk-text-container {
-  padding: 1% 1.5% 1.5% 1.5%;
+  padding: 1% 0% 1.5% 0%;
   max-height: 200px;
   overflow-wrap: break-word;
   text-align: left;
   font-family: Inconsolata, monospace;
-  max-width: 100%;
   overflow-y: auto;
   line-height: 20px;
-  border: 2px solid #65676b;
-  border-radius: 5px;
 }
 
 .isHoveredPathWalk {
-  font-size: 14px;
+  background-color: rgba(255, 255, 0, 0.2);
 }
