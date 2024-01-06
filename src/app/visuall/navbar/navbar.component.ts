@@ -1,21 +1,22 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { DbAdapterService } from "../db-service/db-adapter.service";
-import { GlobalVariableService } from "../global-variable.service";
-import { CytoscapeService } from "../cytoscape.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
+import { Subscription } from "rxjs";
+import samples from "../../../../sample_gfas/gfa.json";
+import { CLUSTER_CLASS } from "../constants";
+import { CytoscapeService } from "../cytoscape.service";
+import { GFAData } from "../db-service/data-types";
+import { DbAdapterService } from "../db-service/db-adapter.service";
+import { ExternalToolService } from "../external-tool.service";
+import { FileReaderService } from "../file-reader.service";
+import { GlobalVariableService } from "../global-variable.service";
+import { URLLoadService } from "../load-from-url.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
-import { NavbarDropdown, NavbarAction } from "./inavbar";
-import { UserProfileService } from "../user-profile.service";
-import { CLUSTER_CLASS } from "../constants";
+import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
 import { SaveProfileModalComponent } from "../popups/save-profile-modal/save-profile-modal.component";
-import { URLLoadService } from "../load-from-url.service";
 import { GroupingOptionTypes } from "../user-preference";
-import { Subscription } from "rxjs";
-import { FileReaderService } from "../file-reader.service";
-import { GFAData } from "../db-service/data-types";
-import samples from "../../../../sample_gfas/gfa.json";
+import { UserProfileService } from "../user-profile.service";
+import { NavbarAction, NavbarDropdown } from "./inavbar";
 
 @Component({
   selector: "app-navbar",
@@ -40,7 +41,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _g: GlobalVariableService,
     private _profile: UserProfileService,
     private _urlload: URLLoadService,
-    private _fileReaderService: FileReaderService
+    private _fileReaderService: FileReaderService,
+    private _ExternalToolService: ExternalToolService
   ) {
     this.menu = [
       {
@@ -437,7 +439,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   clearData() {
-    this._cyService.removeExternalTools();
+    this._ExternalToolService.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
     this._dbService.clearData();

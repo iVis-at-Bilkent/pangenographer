@@ -1,27 +1,28 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { GlobalVariableService } from "../../global-variable.service";
+import { Subject, Subscription } from "rxjs";
+import { CustomizationModule } from "../../../custom/customization.module";
 import {
-  getPropNamesFromObj,
-  findTypeOfAttribute,
-  debounce,
-  COLLAPSED_EDGE_CLASS,
-  OBJ_INFO_UPDATE_DELAY,
-  CLUSTER_CLASS,
-  extend,
-  TYPES_NOT_TO_SHOW,
-} from "../../constants";
-import { DbAdapterService } from "../../db-service/db-adapter.service";
-import {
-  TableViewInput,
   TableData,
   TableDataType,
   TableFiltering,
-  property2TableData,
+  TableViewInput,
   filterTableDatas,
+  property2TableData,
 } from "../../../shared/table-view/table-view-types";
-import { Subject, Subscription } from "rxjs";
+import {
+  CLUSTER_CLASS,
+  COLLAPSED_EDGE_CLASS,
+  OBJ_INFO_UPDATE_DELAY,
+  TYPES_NOT_TO_SHOW,
+  debounce,
+  extend,
+  findTypeOfAttribute,
+  getPropNamesFromObj,
+} from "../../constants";
 import { CytoscapeService } from "../../cytoscape.service";
-import { CustomizationModule } from "../../../custom/customization.module";
+import { DbAdapterService } from "../../db-service/db-adapter.service";
+import { GlobalVariableService } from "../../global-variable.service";
+import { SequenceDataService } from "../../sequence-data.service";
 
 @Component({
   selector: "app-object-tab",
@@ -86,7 +87,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   constructor(
     private _g: GlobalVariableService,
     private _dbService: DbAdapterService,
-    private _cyService: CytoscapeService
+    private _cyService: CytoscapeService,
+    private _SequenceDataService: SequenceDataService
   ) {
     this.selectedItemProps = {};
   }
@@ -431,7 +433,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     if (this.selectedItemProps["sourceOrientation"]) {
       // for combined sequence
       this._g.cy.edges(":selected").forEach((element) => {
-        let combinedSequence = this._cyService.prepareCombinedSequence(element);
+        let combinedSequence =
+          this._SequenceDataService.prepareCombinedSequence(element);
 
         if (element.data("pos")) {
           this.selectedItemProps["leftOfTheContainedSequence"] = {
@@ -460,7 +463,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           this.selectedItemProps["targetSequenceWithoutOverlap"] = {
             val: combinedSequence.thirdSequence,
           };
-          this.selectedItemProps["overlap"]["overlapNumerics"] = combinedSequence.overlapNumerics;
+          this.selectedItemProps["overlap"]["overlapNumerics"] =
+            combinedSequence.overlapNumerics;
         }
 
         this.selectedItemProps["sequenceLength"] = {

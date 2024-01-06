@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
 import {
-  GFASegment,
-  GFAJump,
   GFAContainment,
-  GFALink,
   GFAData,
+  GFAJump,
+  GFALink,
   GFAPath,
+  GFASegment,
   GFAWalk,
 } from "./db-service/data-types";
 @Injectable({
@@ -31,7 +31,9 @@ export class FileReaderService {
   }
 
   private createSegmentFromGFA(segmentLine: string): GFASegment {
-    let segmentLineTabSeperated = segmentLine.split(/\t/);
+    let segmentLineTabSeperated = segmentLine
+      .split(/\t/)
+      .map((part) => part.trim());
     let segment: GFASegment = {
       segmentName: "",
       id: "",
@@ -65,7 +67,7 @@ export class FileReaderService {
   }
 
   private createJumpFromGFA(jumpLine: string): GFAJump {
-    let jumpLineTabSeperated = jumpLine.split(/\t/);
+    let jumpLineTabSeperated = jumpLine.split(/\t/).map((part) => part.trim());
     let jump: GFAJump = {
       source: "",
       sourceOrientation: "",
@@ -89,7 +91,9 @@ export class FileReaderService {
   }
 
   private createContainmentFromGFA(containmentLine: string): GFAContainment {
-    let containmentLineTabSeperated = containmentLine.split(/\t/);
+    let containmentLineTabSeperated = containmentLine
+      .split(/\t/)
+      .map((part) => part.trim());
     let containment: GFAContainment = {
       source: "",
       sourceOrientation: "",
@@ -119,7 +123,7 @@ export class FileReaderService {
   }
 
   private createLinkFromGFA(linkLine: string): GFALink {
-    let linkLineTabSeperated = linkLine.split(/\t/);
+    let linkLineTabSeperated = linkLine.split(/\t/).map((part) => part.trim());
     let link: GFALink = {
       source: "",
       sourceOrientation: "",
@@ -156,7 +160,7 @@ export class FileReaderService {
   }
 
   private createPathFromGFA(pathLine: string): GFAPath {
-    let pathLineTabSeperated = pathLine.split(/\t/);
+    let pathLineTabSeperated = pathLine.split(/\t/).map((part) => part.trim());
     let path: GFAPath = {
       pathName: "",
       segmentNames: "",
@@ -171,7 +175,7 @@ export class FileReaderService {
   }
 
   private createWalkFromGFA(walkLine: string): GFAWalk {
-    let walkLineTabSeperated = walkLine.split(/\t/);
+    let walkLineTabSeperated = walkLine.split(/\t/).map((part) => part.trim());
     let walk: GFAWalk = {
       sampleId: "",
       hapIndex: 0,
