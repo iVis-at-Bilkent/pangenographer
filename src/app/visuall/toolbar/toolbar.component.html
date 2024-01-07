@@ -16,6 +16,7 @@
             class="toolbar-element"
             [title]="i.title"
             (click)="triggerAct(i)"
+            title="menu item"
           />
           <input
             *ngIf="!i.isRegular"
@@ -24,6 +25,7 @@
             type="text"
             [(ngModel)]="searchTxt"
             (keydown.enter)="highlightSearch()"
+            placeholder="Search"
           />
         </div>
       </ng-container>
@@ -65,6 +67,7 @@
         class="toolbar-element"
         [ngClass]="{ disabled: !isLimitDbQueries2range }"
         src="/assets/img/width.svg"
+        title="width"
       />
     </div>
     &nbsp;

@@ -2,36 +2,42 @@
 <div class="modal-header">
   <div class="modal-title va-heading1 text-center">Quick Help</div>
   <div>
-    <button #closeBtn type="button" class="btn-close" data-dismiss="modal" aria-label="Close"
-      (click)="activeModal.dismiss('Cross click')">
-      
-    </button>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
   </div>
 </div>
 <div class="modal-body text-center">
   <div class="va-text">
     <b>File > Import GFA:</b> To import a GFA file to the database
-    <br>
+    <br />
     <b>Data > Clear Data:</b> To clear the database
-    <br>
-    <b>Map > Query by Rule:</b> To query the database with segments/links of interest
-    <br>
+    <br />
+    <b>Map > Query by Rule:</b> To query the database with segments/links of
+    interest
+    <br />
     <b>Click:</b> To inspect object properties
-    <br>
-    <b>Click segment:</b> To enable visual cues for expanding the view with up/downstream
-    <br>
+    <br />
+    <b>Click segment:</b> To enable visual cues for expanding the view with
+    up/downstream
+    <br />
     <b>Right-click:</b> Context menu for associated object
-    <br>
+    <br />
     <b>Shift + drag:</b> Box selection (select touched nodes and included edges)
-    <br>
+    <br />
     <b>Shift + click:</b> Add/remove an element to/from the current selection
-    <br>
+    <br />
   </div>
   <div class="va-heading1">Tips</div>
   <div class="va-text">
-    <b>Settings > Emphasize on hover:</b> To focus on a node (edge) and its neighbors (source/target) on mouse
-    over
-    <br>
+    <b>Settings > Emphasize on hover:</b> To focus on a node (edge) and its
+    neighbors (source/target) on mouse over
+    <br />
     <b>Select multiple objects:</b> To see their attributes as a table
   </div>
 </div>

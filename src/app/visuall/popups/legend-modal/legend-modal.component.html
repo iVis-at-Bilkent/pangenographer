@@ -1,6 +1,6 @@
 <!-- Modal about -->
 <div class="modal-header">
-  <div class="modal-title va-heading1 text-center">About</div>
+  <div class="modal-title va-heading1 text-center">Legend</div>
   <div>
     <button
       #closeBtn
@@ -14,18 +14,12 @@
 </div>
 <div class="modal-body text-center">
   <div class="va-text">
-    <span [innerHTML]="toolName"></span> version
-    <span>{{ softwareVersion }}</span>
-    <p *ngIf="buildTime">Last update: {{ buildTime }}</p>
-    <div class="m-3">
+    <div class="legend-container">
       <img
-        [src]="toolLogo"
-        height="120"
-        class="d-inline-block align-top"
+        src="assets/img/toolbar/legend.svg"
+        class="d-inline-block align-top legend-svg"
         alt="Logo"
       />
     </div>
-    <div>{{ companyName }}</div>
-    <div>{{ companyContact }}</div>
   </div>
 </div>
