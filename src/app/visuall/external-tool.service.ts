@@ -268,8 +268,8 @@ export class ExternalToolService {
     let fontFamily = "Inconsolata, monospace";
     let fontStyle = "normal";
     this._g.cy.nodes().unbind("mouseover");
-    this._g.cy.nodes().forEach((node) => {
-      node.bind("mouseover", (event) => {
+    this._g.cy.nodes().forEach((node: any) => {
+      node.bind("mouseover", (event: any) => {
         let popper = event.target.popper({
           content: () => {
             let contentOuter = document.createElement("div");
@@ -320,9 +320,9 @@ export class ExternalToolService {
     });
 
     this._g.cy.edges().unbind("mouseover");
-    this._g.cy.edges().forEach((edge) => {
+    this._g.cy.edges().forEach((edge: any) => {
       if (!edge.hasClass(COLLAPSED_EDGE_CLASS)) {
-        edge.bind("mouseover", (event) => {
+        edge.bind("mouseover", (event: any) => {
           let popper = event.target.popper({
             content: () => {
               let contentOuter = document.createElement("div");

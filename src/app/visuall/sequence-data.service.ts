@@ -84,6 +84,7 @@ export class SequenceDataService {
       let overlapIdentifiers: string[];
       let overlapLengthSource = 0;
       let overlapLengthTarget = 0;
+      let secondSequenceRealLength = 0;
 
       firstSequence = element.source().data("segmentData");
       if (element.data("sourceOrientation") === "-") {
@@ -103,6 +104,9 @@ export class SequenceDataService {
             return Number(num);
           });
         overlapNumericsData.pop();
+        overlapNumericsData.forEach((num: number) => {
+          secondSequenceRealLength += num;
+        });
         overlapIdentifiers = element
           .data("overlap")
           .split(/[0-9]+/)
@@ -238,7 +242,7 @@ export class SequenceDataService {
       thirdSequence = thirdSequence.substring(overlapLengthTarget);
 
       sequenceLength =
-        firstSequence.length + secondSequence.length + thirdSequence.length;
+        firstSequence.length + secondSequenceRealLength + thirdSequence.length;
     }
 
     return {

@@ -234,17 +234,6 @@ export function isClose(a1: number, a2: number, margin = 1000) {
   return Math.abs(a1 - a2) < margin;
 }
 
-export function findTypeOfAttribute(attribute, nodeProps, edgeProps): string {
-  for (const nodeClass in nodeProps) {
-    if (nodeProps[nodeClass].hasOwnProperty(attribute))
-      return nodeProps[nodeClass][attribute];
-  }
-  for (const edgeClass in edgeProps) {
-    if (edgeProps[edgeClass].hasOwnProperty(attribute))
-      return edgeProps[edgeClass][attribute];
-  }
-}
-
 export function expandCollapseCuePosition(node) {
   const zoom = node._private.cy.zoom();
   let smallness = 1 - node.renderedWidth() / node._private.cy.width();

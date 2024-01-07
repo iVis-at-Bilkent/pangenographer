@@ -16,7 +16,6 @@ import {
   TYPES_NOT_TO_SHOW,
   debounce,
   extend,
-  findTypeOfAttribute,
   getPropNamesFromObj,
 } from "../../constants";
 import { CytoscapeService } from "../../cytoscape.service";
@@ -181,6 +180,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     this.renderObjectProps(props, classNames, selectedNonMeta.length);
   }
 
+  findTypeOfAttribute(key: string): string {
+    const properties = this._g.dataModel.getValue();
+    for (const nodeClass in properties.nodes) {
+      if (properties.nodes[nodeClass].hasOwnProperty(key))
+        return properties.nodes[nodeClass][key];
+    }
+    for (const edgeClass in properties.edges) {
+      if (properties.edges[edgeClass].hasOwnProperty(key))
+        return properties.edges[edgeClass][key];
+    }
+  }
+
   showCompoundEdgeProps(isNeed2Filter: boolean) {
     const compoundEdges = this._g.cy
       .edges(":selected")
@@ -313,30 +324,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     );
   }
 
-  renderObjectProps(props, classNames, selectedCount) {
+  renderObjectProps(props: any, classNames: any, selectedCount: number) {
     if (classNames && classNames.length > 0) {
       classNames = classNames.join(" & ");
     }
 
     this.selectedClasses = classNames;
     this.selectedItemProps = {};
+    let propKeys: string[];
+    let pathNode = this._g.cy.nodes(".PATHS")[0];
+    let walkNode = this._g.cy.nodes(".WALKS")[0];
 
-    let propKeys = Object.keys(props);
     // get ordered keys if only one item is selected
     if (selectedCount === 1) {
       propKeys = this.orderPropertyKeysIf1Selected(classNames) || propKeys;
+    } else {
+      propKeys = Object.keys(props);
     }
-    const properties = this._g.dataModel.getValue();
+
     for (const key of propKeys) {
       // Replace - and _ with space
       let renderedKey = key.replace(/[_\-]/g, " ");
       let renderedValue = props[key];
 
-      const attributeType = findTypeOfAttribute(
-        key,
-        properties.nodes,
-        properties.edges
-      );
+      const attributeType = this.findTypeOfAttribute(key);
       if (attributeType === "datetime") {
         if (typeof renderedValue !== "undefined") {
           renderedValue = new Date(renderedValue).toLocaleString();
@@ -344,6 +355,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           renderedValue = "";
         }
       }
+
       if (renderedValue !== undefined) {
         renderedValue = this.getMappedProperty(
           this.selectedClasses,
@@ -356,27 +368,22 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
             val: renderedValue,
           };
           this.selectedItemProps["pathChecked"] = [];
+          this.selectedItemProps["pathSegmentNames"] = [];
+          this.selectedItemProps["pathOverlaps"] = [];
 
           for (let i = 0; i < renderedValue.length; i++) {
             this.selectedItemProps["pathChecked"].push(false);
           }
 
-          this.selectedItemProps["pathSegmentNames"] = [];
-          this.selectedItemProps["pathOverlaps"] = [];
-
-          renderedValue.forEach((pathName) => {
-            this._g.cy.nodes().forEach((element) => {
-              if (element.hasClass("PATHS")) {
-                let counter = 0;
-                element.data(`p${pathName}`).forEach((pathVal) => {
-                  if (counter === 0) {
-                    this.selectedItemProps["pathSegmentNames"].push(pathVal);
-                  } else {
-                    this.selectedItemProps["pathOverlaps"].push(pathVal);
-                  }
-                  counter++;
-                });
+          renderedValue.forEach((pathName: string) => {
+            let counter = 0;
+            pathNode.data(`p${pathName}`).forEach((pathVal: string) => {
+              if (counter === 0) {
+                this.selectedItemProps["pathSegmentNames"].push(pathVal);
+              } else {
+                this.selectedItemProps["pathOverlaps"].push(pathVal);
               }
+              counter++;
             });
           });
         } else if (renderedKey === "walkSampleIds") {
@@ -384,36 +391,31 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
             val: renderedValue,
           };
           this.selectedItemProps[`walkChecked`] = [];
-
-          for (let i = 0; i < renderedValue.length; i++) {
-            this.selectedItemProps[`walkChecked`].push(false);
-          }
-
           this.selectedItemProps["walkHapIndexes"] = [];
           this.selectedItemProps["walkSeqIds"] = [];
           this.selectedItemProps["walkSeqStarts"] = [];
           this.selectedItemProps["walkSeqEnds"] = [];
           this.selectedItemProps["walks"] = [];
 
-          renderedValue.forEach((walkName) => {
-            this._g.cy.nodes().forEach((element) => {
-              if (element.hasClass("WALKS")) {
-                let counter = 0;
-                element.data(`w${walkName}`).forEach((walkVal) => {
-                  if (counter === 0) {
-                    this.selectedItemProps["walkHapIndexes"].push(walkVal);
-                  } else if (counter === 1) {
-                    this.selectedItemProps["walkSeqIds"].push(walkVal);
-                  } else if (counter === 2) {
-                    this.selectedItemProps["walkSeqStarts"].push(walkVal);
-                  } else if (counter === 3) {
-                    this.selectedItemProps["walkSeqEnds"].push(walkVal);
-                  } else {
-                    this.selectedItemProps["walks"].push(walkVal);
-                  }
-                  counter++;
-                });
+          for (let i = 0; i < renderedValue.length; i++) {
+            this.selectedItemProps[`walkChecked`].push(false);
+          }
+
+          renderedValue.forEach((walkName: string) => {
+            let counter = 0;
+            walkNode.data(`w${walkName}`).forEach((walkVal: string) => {
+              if (counter === 0) {
+                this.selectedItemProps["walkHapIndexes"].push(walkVal);
+              } else if (counter === 1) {
+                this.selectedItemProps["walkSeqIds"].push(walkVal);
+              } else if (counter === 2) {
+                this.selectedItemProps["walkSeqStarts"].push(walkVal);
+              } else if (counter === 3) {
+                this.selectedItemProps["walkSeqEnds"].push(walkVal);
+              } else {
+                this.selectedItemProps["walks"].push(walkVal);
               }
+              counter++;
             });
           });
         } else if (renderedKey === "overlap") {
@@ -430,9 +432,9 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
     }
 
+    // for combined sequence if an edge is selected
     if (this.selectedItemProps["sourceOrientation"]) {
-      // for combined sequence
-      this._g.cy.edges(":selected").forEach((element) => {
+      this._g.cy.edges(":selected").forEach((element: any) => {
         let combinedSequence =
           this._SequenceDataService.prepareCombinedSequence(element);
 
