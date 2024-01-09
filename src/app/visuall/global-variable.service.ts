@@ -479,7 +479,7 @@ export class GlobalVariableService {
     this.cy
       .filter(".PSEUDO")
       .nodes()
-      .forEach((n) => {
+      .forEach((n: any) => {
         n.style("background-color", "white");
         n.style("width", longestPath + "px");
         n.style("height", longestPath + "px");

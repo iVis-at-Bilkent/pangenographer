@@ -14,7 +14,6 @@ import { getPropNamesFromObj } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GlobalVariableService } from "../global-variable.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
-import { LegendModalComponent } from "../popups/legend-modal/legend-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
 import { UserProfileService } from "../user-profile.service";
@@ -170,13 +169,6 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/quick-help.svg",
             title: "Quick Help",
             fn: "openQuickHelp",
-            isStd: true,
-            isRegular: true,
-          },
-          {
-            imgSrc: "assets/img/toolbar/about.svg",
-            title: "Legend",
-            fn: "openLegend",
             isStd: true,
             isRegular: true,
           },
@@ -345,10 +337,6 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openAbout() {
     this.modalService.open(AboutModalComponent);
-  }
-
-  openLegend() {
-    this.modalService.open(LegendModalComponent);
   }
 
   showHideGraphHistory() {

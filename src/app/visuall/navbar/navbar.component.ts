@@ -11,6 +11,7 @@ import { FileReaderService } from "../file-reader.service";
 import { GlobalVariableService } from "../global-variable.service";
 import { URLLoadService } from "../load-from-url.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
+import { LegendModalComponent } from "../popups/legend-modal/legend-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
 import { SaveProfileModalComponent } from "../popups/save-profile-modal/save-profile-modal.component";
@@ -221,6 +222,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         actions: [
           { txt: "Quick Help", id: "nbi50", fn: "openQuickHelp" },
           { txt: "About", id: "nbi51", fn: "openAbout" },
+          { txt: "Legend", id: "nbi52", fn: "openLegend" },
         ],
       },
       {
@@ -413,6 +415,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   openAbout() {
     this._modalService.open(AboutModalComponent);
+  }
+
+  openLegend() {
+    this._modalService.open(LegendModalComponent, { size: "lg" });
   }
 
   collapseAllEdges() {
