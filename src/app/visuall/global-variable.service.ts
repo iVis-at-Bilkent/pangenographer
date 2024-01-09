@@ -198,6 +198,23 @@ export class GlobalVariableService {
     this.handleCompoundsOnHideDelete();
   }
 
+  removeHighlights(eles?: any) {
+    eles = eles || this.cy.elements();
+    if (this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()) {
+      eles.forEach((ele: any) => {
+        if (
+          this.zeroIncomerAndOutgoerNodes.source.indexOf(ele) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.target.indexOf(ele) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(ele) < 0
+        ) {
+          this.viewUtils.removeHighlights(ele);
+        }
+      });
+    } else {
+      this.viewUtils.removeHighlights(eles);
+    }
+  }
+
   hideTypesNotToShow() {
     TYPES_NOT_TO_SHOW.forEach((type) => {
       this.viewUtils.hide(this.cy.$("." + type));

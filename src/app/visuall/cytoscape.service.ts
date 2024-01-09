@@ -388,7 +388,7 @@ export class CytoscapeService {
 
     if (this._g.userPrefs.isOnlyHighlight4LatestQuery.getValue()) {
       if (newElemIndicator == MergedElemIndicatorTypes.highlight) {
-        this._g.viewUtils.removeHighlights();
+        this._g.removeHighlights();
       }
       if (newElemIndicator == MergedElemIndicatorTypes.selection) {
         this._g.cy.$().unselect();
@@ -525,7 +525,7 @@ export class CytoscapeService {
   }
 
   removeHighlights() {
-    this._g.viewUtils.removeHighlights();
+    this._g.removeHighlights();
     this._g.viewUtils.removeHighlights(this._g.filterRemovedElems(() => true));
     this.removePopperFn();
   }

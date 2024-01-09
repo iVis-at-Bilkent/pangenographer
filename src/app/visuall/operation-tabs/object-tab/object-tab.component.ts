@@ -650,7 +650,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   removeHighlightHoveredPathWalk() {
     this.highlightedPathWalk = "";
-    this._g.viewUtils.removeHighlights();
+    this._g.removeHighlights();
   }
 
   countKeyValuePairs(data, superObj) {
