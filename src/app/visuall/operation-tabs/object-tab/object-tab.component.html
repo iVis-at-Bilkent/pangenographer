@@ -23,7 +23,7 @@
         >
         <span
           *ngIf="selectedItemProps.containedSequence"
-          class="edge-CIGAR-M"
+          class="edge-CIGAR-M-Eq-X"
           >{{ selectedItemProps.containedSequence.val }}</span
         >
         <span
@@ -41,7 +41,7 @@
           class="combined-sequence-container-part"
           >{{ selectedItemProps.sourceSequence.val }}</span
         >
-        <span *ngIf="selectedItemProps.distance" class="edge-CIGAR-M"
+        <span *ngIf="selectedItemProps.distance" class="edge-CIGAR-M-Eq-X"
           >..({{ selectedItemProps.distance.val }})..</span
         >
         <span

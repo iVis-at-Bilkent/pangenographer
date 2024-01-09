@@ -360,7 +360,7 @@ export class ExternalToolService {
               );
               content.appendChild(firstSequence);
 
-              if (edge.data("overlap")) {
+              if (edge.data("overlap") && !edge.data("pos")) {
                 let overlapIdentifier = edge
                   .data("overlap")
                   .split(/[0-9]+/)
@@ -569,7 +569,7 @@ export class ExternalToolService {
       textData = element.data("segmentData");
     }
 
-    let startIndex;
+    let startIndex: number;
 
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
       if (startIndex >= textData.length) {
