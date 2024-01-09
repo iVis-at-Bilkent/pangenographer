@@ -285,7 +285,7 @@ export class CytoscapeService {
   }
 
   showUpDownstream(ele: any, length: number, isUp: boolean) {
-    const callback = (data) => {
+    const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true);
     };
     this._g.layout.clusters = null;
@@ -295,6 +295,8 @@ export class CytoscapeService {
       callback,
       isUp
     );
+    // update cue for the selected node to prevent misplacement of cue
+    this._g.cueUpdaters[`${ele.id()}`]();
   }
 
   hasNewElem(newElemIds: string[], prevElems: any): boolean {

@@ -387,15 +387,19 @@ export class GlobalVariableService {
       sourceAndTarget: [],
     };
 
-    this.cy.nodes(":visible").forEach((x) => {
+    this.cy.nodes(":visible").forEach((x: any) => {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
-        if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
+        if (
+          this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()
+        ) {
           this.viewUtils.highlight(x, 3);
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
-        if (this.userPrefs.pangenographer.isHighlightInZeroOutZero.getValue()) {
+        if (
+          this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()
+        ) {
           this.viewUtils.highlight(x, 4);
         }
       }

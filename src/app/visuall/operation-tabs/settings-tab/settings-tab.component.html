@@ -12,17 +12,17 @@
   <div id="pangenograph-settings" class="collapse show">
     <div
       class="va-text"
-      *ngFor="let setting of pangenographerBoolSettings; let i = index"
+      *ngFor="let setting of pangenomegrapherBoolSettings; let i = index"
     >
       <div class="form-check form-check-inline">
         <input
           class="form-check-input"
           type="checkbox"
           [(ngModel)]="setting.isEnable"
-          [id]="'pangenographerBool' + i"
+          [id]="'pangenomegrapherBool' + i"
           (change)="settingChanged(setting.isEnable, setting.path2userPref)"
         />
-        <label class="form-check-label" [for]="'pangenographerBool' + i">{{
+        <label class="form-check-label" [for]="'pangenomegrapherBool' + i">{{
           setting.text
         }}</label>
       </div>

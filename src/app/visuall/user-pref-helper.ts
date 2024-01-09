@@ -28,7 +28,7 @@ export class UserPrefHelper {
 
       const up = this._g.userPrefs;
       const upT = this._g.userPrefs.timebar;
-      const upP = this._g.userPrefs.pangenographer;
+      const upP = this._g.userPrefs.pangenomegrapher;
 
       const tb = this._timebarService;
 

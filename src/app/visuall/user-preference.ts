@@ -41,8 +41,8 @@ export interface UserPref {
   selectionColor: BehaviorSubject<string>;
   selectionWidth: BehaviorSubject<number>;
   tilingPadding: BehaviorSubject<number>;
-  //  PanGenoGrapher Settings
-  pangenographer: {
+  //  PanGenomeGrapher Settings
+  pangenomegrapher: {
     lengthOfUpDownstream: BehaviorSubject<number>;
     isHighlightInZeroOutZero: BehaviorSubject<boolean>;
   };

@@ -1,6 +1,6 @@
-# PanGenoGrapher - visual analyzer for pan genomes via graphs
+# PanGenomeGrapher - visual analyzer for pan genomes via graphs
 
-PanGenoGrapher is a web-based tool for analyzing PanGenome graphs visually. The tool is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
+PanGenomeGrapher is a web-based tool for analyzing PanGenome graphs visually. The tool is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
 
 A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/).
 ![image](https://github.com/iVis-at-Bilkent/pangenographer/assets/3874988/49608774-9b00-4f7d-a710-d434209d7dda)
@@ -26,4 +26,4 @@ For database, it uses the free and openly available Neo4j movie database. It can
 
 ## About
 
-PanGenoGrapher is a collaborative project by [i-Vis Research Lab](http://www.cs.bilkent.edu.tr/~ivis/) and [Alkan Lab](https://www.alkanlab.org/) at Bilkent University.
+PanGenomeGrapher is a collaborative project by [i-Vis Research Lab](http://www.cs.bilkent.edu.tr/~ivis/) and [Alkan Lab](https://www.alkanlab.org/) at Bilkent University.

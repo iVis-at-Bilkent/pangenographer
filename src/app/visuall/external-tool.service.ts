@@ -99,7 +99,7 @@ export class ExternalToolService {
           nameSize,
           marginY,
           showUpDownstream,
-          this._g.userPrefs.pangenographer.lengthOfUpDownstream.getValue(),
+          this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.getValue(),
           true,
           contentUpstreamLevel,
           "Show Upstream"
@@ -139,7 +139,7 @@ export class ExternalToolService {
           nameSize,
           marginY,
           showUpDownstream,
-          this._g.userPrefs.pangenographer.lengthOfUpDownstream.getValue(),
+          this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.getValue(),
           false,
           contentDownstreamLevel,
           "Show Downstream"
