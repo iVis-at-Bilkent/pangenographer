@@ -1,8 +1,9 @@
-# PanGenomeGrapher - visual analyzer for pan genomes via graphs
+# PanGenomeGrapher (PG2) - visual analyzer for pan genomes via graphs
 
-PanGenomeGrapher is a web-based tool for analyzing PanGenome graphs visually. The tool is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
+PanGenomeGrapher is a web-based tool for analyzing pan-genome graphs visually. The tool is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
 
-A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/).
+A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/). Below is a sample screenshot from PG2.
+
 ![image](https://github.com/iVis-at-Bilkent/pangenographer/assets/3874988/49608774-9b00-4f7d-a710-d434209d7dda)
 
 ## Credits
@@ -22,8 +23,10 @@ Third-party libraries:
 [Angular](https://angular.io/),
 [Google Charts](https://developers.google.com/chart/) and npm dependencies inside package.json file.
 
-For database, it uses the free and openly available Neo4j movie database. It can be installed using `:play movies` on **Neo4j Browser**.
+For the database, it uses the free and openly available Neo4j movie database. It can be installed using `:play movies` on **Neo4j Browser**.
 
-## About
+## Team
 
-PanGenomeGrapher is a collaborative project by [i-Vis Research Lab](http://www.cs.bilkent.edu.tr/~ivis/) and [Alkan Lab](https://www.alkanlab.org/) at Bilkent University.
+[Gorkem Kadir Solun](https://github.com/gorkemsolun), [Ugur Dogrusoz](https://github.com/ugurdogrusoz), [Zulal Bingol](https://github.com/zulal-b) and [Can Alkan](https://github.com/calkan)
+
+PG2 is a collaborative project by [i-Vis Research Lab](http://www.cs.bilkent.edu.tr/~ivis/) and [Alkan Lab](https://www.alkanlab.org/) at Bilkent University.
