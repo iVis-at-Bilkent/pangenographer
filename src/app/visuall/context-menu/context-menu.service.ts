@@ -1,12 +1,12 @@
 import { Injectable } from "@angular/core";
 import cytoscape from "cytoscape";
 import * as contextMenus from "cytoscape-context-menus";
-import { CytoscapeService } from "../cytoscape.service";
-import { GlobalVariableService } from "../global-variable.service";
-import { DbAdapterService } from "../db-service/db-adapter.service";
-import { ContextMenuItem } from "./icontext-menu";
 import { ContextMenuCustomizationService } from "../../custom/context-menu-customization.service";
-import { COLLAPSED_EDGE_CLASS, CLUSTER_CLASS } from "./../constants";
+import { CytoscapeService } from "../cytoscape.service";
+import { DbAdapterService } from "../db-service/db-adapter.service";
+import { GlobalVariableService } from "../global-variable.service";
+import { CLUSTER_CLASS, COLLAPSED_EDGE_CLASS } from "./../constants";
+import { ContextMenuItem } from "./icontext-menu";
 
 @Injectable({
   providedIn: "root",
@@ -138,7 +138,7 @@ export class ContextMenuService {
     });
   }
 
-  deleteElem(event) {
+  deleteElem(event: any) {
     this._cyService.deleteSelected(event);
   }
 
@@ -150,7 +150,7 @@ export class ContextMenuService {
     this._g.performLayout(false, true);
   }
 
-  selectAllThisType(event) {
+  selectAllThisType(event: any) {
     const ele = event.target || event.cyTarget;
     if (!ele) {
       return;
@@ -164,7 +164,7 @@ export class ContextMenuService {
     }
   }
 
-  collapseEdges(event) {
+  collapseEdges(event: any) {
     const ele = event.target || event.cyTarget;
     if (!ele) {
       return;
@@ -172,7 +172,7 @@ export class ContextMenuService {
     this._cyService.collapseMultiEdges(ele.parallelEdges());
   }
 
-  expandEdge(event) {
+  expandEdge(event: any) {
     const ele = event.target || event.cyTarget;
     if (!ele) {
       return;
@@ -180,15 +180,15 @@ export class ContextMenuService {
     this._cyService.expandMultiEdges(ele);
   }
 
-  showUpstream(event) {
+  showUpstream(event: any) {
     this.showUpDownstream(event, true);
   }
 
-  showDownstream(event) {
+  showDownstream(event: any) {
     this.showUpDownstream(event, false);
   }
 
-  showUpDownstream(event, isUp: boolean) {
+  showUpDownstream(event: any, isUp: boolean) {
     const ele = event.target || event.cyTarget;
     if (!ele) {
       return;
@@ -200,20 +200,20 @@ export class ContextMenuService {
     );
   }
 
-  hideUpstream(event) {
+  hideUpstream(event: any) {
     this.hideUpDownstream(event, true);
   }
 
-  hideDownstream(event) {
+  hideDownstream(event: any) {
     this.hideUpDownstream(event, false);
   }
 
-  hideUpDownstream(event, isUp) {
+  hideUpDownstream(event: any, isUp: boolean) {
     const ele = event.target || event.cyTarget;
     if (!ele) {
       return;
     }
-    const callback = (data) => {
+    const callback = (data: any) => {
       this._cyService.deleteElements(data, ele.data().segmentName);
     };
     this._g.layout.clusters = null;

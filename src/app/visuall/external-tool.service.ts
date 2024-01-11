@@ -12,10 +12,12 @@ export class ExternalToolService {
   ) {}
 
   addExternalTools(
-    showUpDownstream: (ele: any, length: number, up: boolean) => void
+    showUpDownstream: (ele: any, length: number, up: boolean) => void,
+    nodes: any = undefined,
+    edges: any = undefined
   ) {
-    this.addTooltips();
-    this.addCues(showUpDownstream);
+    this.addTooltips(nodes, edges);
+    this.addCues(showUpDownstream, nodes);
   }
 
   removeExternalTools(nodes: any = undefined) {
@@ -49,14 +51,20 @@ export class ExternalToolService {
   }
 
   private addCues(
-    showUpDownstream: (ele: any, length: number, up: boolean) => void
+    showUpDownstream: (ele: any, length: number, up: boolean) => void,
+    nodes: any = undefined
   ) {
+    if (!nodes) {
+      nodes = this._g.cy.nodes();
+    }
+
     let marginY = 6;
     let marginX = 9;
     let marginXTwo = 6;
     let nameSizeModifier = 0.5;
     let width = 12;
-    this._g.cy.nodes().forEach((node: any) => {
+
+    nodes.forEach((node: any) => {
       let nameSize =
         -this.textWidthCyElement(
           node.data("segmentName"),
@@ -261,182 +269,54 @@ export class ExternalToolService {
     };
   }
 
-  private addTooltips() {
+  addTooltips(
+    nodes: any = undefined,
+    edges: any = undefined,
+    isNode: boolean = true,
+    isEdge: boolean = true
+  ) {
     let widthOffset = 11;
     let fontSize = "15";
     let fontWeight = "700";
     let fontFamily = "Inconsolata, monospace";
     let fontStyle = "normal";
-    this._g.cy.nodes().unbind("mouseover");
-    this._g.cy.nodes().forEach((node: any) => {
-      node.bind("mouseover", (event: any) => {
-        let popper = event.target.popper({
-          content: () => {
-            let contentOuter = document.createElement("div");
-            if (!node.id()) {
-              return contentOuter;
-            }
-            contentOuter.classList.add("node-tooltip-outer");
-            contentOuter.id = `node-tooltip-${node.id()}-outer`;
-            let content = document.createElement("div");
-            content.classList.add("node-tooltip");
-            content.id = `node-tooltip-${node.id()}`;
-            content.innerHTML = this.tooltipText(node).text;
-            content.style.fontSize = fontSize + "px";
-            content.style.fontWeight = fontWeight;
-            content.style.fontFamily = fontFamily;
-            content.style.fontStyle = fontStyle;
-            content.style.maxWidth = `${
-              this.textWidthCyElement(
-                content.innerHTML.split("\n")[0],
-                fontSize,
-                fontFamily,
-                fontWeight,
-                fontStyle
-              ) + widthOffset
-            }px`;
-            contentOuter.appendChild(content);
-            document.body.appendChild(contentOuter);
 
-            return contentOuter;
-          },
-        });
-        event.target.popperRefObj = popper;
-        let update = () => {
-          popper.update();
-        };
-
-        node.on("position", update);
-        this._g.cy.on("pan zoom resize", update);
-      });
-    });
-
-    this._g.cy.nodes().unbind("mouseout");
-    this._g.cy.nodes().bind("mouseout", (event) => {
-      if (event.target.popper) {
-        event.target.popperRefObj.state.elements.popper.remove();
-        event.target.popperRefObj.destroy();
+    if (isNode) {
+      if (!nodes) {
+        nodes = this._g.cy.nodes();
       }
-    });
 
-    this._g.cy.edges().unbind("mouseover");
-    this._g.cy.edges().forEach((edge: any) => {
-      if (!edge.hasClass(COLLAPSED_EDGE_CLASS)) {
-        edge.bind("mouseover", (event: any) => {
+      nodes.unbind("mouseover");
+      nodes.forEach((node: any) => {
+        node.bind("mouseover", (event: any) => {
           let popper = event.target.popper({
             content: () => {
               let contentOuter = document.createElement("div");
-              contentOuter.classList.add("edge-tooltip-outer");
-              contentOuter.id = `edge-tooltip-${edge
-                .source()
-                .data("segmentName")}-${edge
-                .source()
-                .data("segmentName")}-outer`;
+              if (!node.id()) {
+                return contentOuter;
+              }
+              contentOuter.classList.add("node-tooltip-outer");
+              contentOuter.id = `node-tooltip-${node.id()}-outer`;
               let content = document.createElement("div");
-              content.classList.add("edge-tooltip");
-              content.id = `edge-tooltip-${edge
-                .source()
-                .data("segmentName")}-${edge.source().data("segmentName")}`;
-              let text = this.tooltipText(edge);
+              content.classList.add("node-tooltip");
+              content.id = `node-tooltip-${node.id()}`;
+              content.innerHTML = this.tooltipText(node).text;
               content.style.fontSize = fontSize + "px";
               content.style.fontWeight = fontWeight;
               content.style.fontFamily = fontFamily;
               content.style.fontStyle = fontStyle;
               content.style.maxWidth = `${
                 this.textWidthCyElement(
-                  text.text.split("\n")[0],
+                  content.innerHTML.split("\n")[0],
                   fontSize,
                   fontFamily,
                   fontWeight,
                   fontStyle
                 ) + widthOffset
               }px`;
-
-              let firstSequence = document.createElement("span");
-              firstSequence.classList.add("edge-tooltip-inner-part");
-              firstSequence.innerHTML = text.text.substring(
-                0,
-                this.edgeTooltipInnerTextSize(text.lengths.firstSequence)
-              );
-              content.appendChild(firstSequence);
-
-              if (edge.data("overlap") && !edge.data("pos")) {
-                let overlapIdentifier = edge
-                  .data("overlap")
-                  .split(/[0-9]+/)
-                  .slice(1);
-
-                let overlapNumerics = text.lengths.overlapNumerics;
-
-                let currentIndex = 0;
-
-                let classLists = (overlapIdentifier: string) => {
-                  if (overlapIdentifier === "I") {
-                    return "edge-CIGAR-I";
-                  } else if (overlapIdentifier === "N") {
-                    return "edge-CIGAR-N";
-                  } else if (overlapIdentifier === "D") {
-                    return "edge-CIGAR-D";
-                  } else if (
-                    overlapIdentifier === "S" ||
-                    overlapIdentifier === "H"
-                  ) {
-                    return "edge-CIGAR-S-H";
-                  } else {
-                    return "edge-CIGAR-M-Eq-X";
-                  }
-                };
-
-                overlapIdentifier.forEach(
-                  (overlapId: string, index: number) => {
-                    let secondSequence = document.createElement("span");
-
-                    secondSequence.classList.add(classLists(overlapId));
-
-                    secondSequence.innerHTML = text.text.substring(
-                      this.edgeTooltipInnerTextSize(
-                        text.lengths.firstSequence + currentIndex
-                      ),
-                      Math.min(
-                        this.edgeTooltipInnerTextSize(
-                          text.lengths.firstSequence +
-                            currentIndex +
-                            overlapNumerics[index]
-                        ),
-                        this.edgeTooltipInnerTextSize(
-                          text.lengths.secondSequence +
-                            text.lengths.firstSequence
-                        )
-                      )
-                    );
-
-                    currentIndex += overlapNumerics[index];
-                    content.appendChild(secondSequence);
-                  }
-                );
-              } else {
-                let secondSequence = document.createElement("span");
-                secondSequence.classList.add("edge-CIGAR-M-Eq-X");
-                secondSequence.innerHTML = text.text.substring(
-                  this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
-                  this.edgeTooltipInnerTextSize(
-                    text.lengths.firstSequence + text.lengths.secondSequence
-                  )
-                );
-                content.appendChild(secondSequence);
-              }
-
-              let thirdSequence = document.createElement("span");
-              thirdSequence.innerHTML = text.text.substring(
-                this.edgeTooltipInnerTextSize(
-                  text.lengths.firstSequence + text.lengths.secondSequence
-                )
-              );
-              thirdSequence.classList.add("edge-tooltip-inner-part");
-
-              content.appendChild(thirdSequence);
               contentOuter.appendChild(content);
               document.body.appendChild(contentOuter);
+
               return contentOuter;
             },
           });
@@ -445,19 +325,166 @@ export class ExternalToolService {
             popper.update();
           };
 
-          edge.on("position", update);
+          node.on("position", update);
           this._g.cy.on("pan zoom resize", update);
         });
-      }
-    });
+      });
 
-    this._g.cy.edges().unbind("mouseout");
-    this._g.cy.edges().bind("mouseout", (event) => {
-      if (event.target.popper && event.target.popperRefObj) {
-        event.target.popperRefObj.state.elements.popper.remove();
-        event.target.popperRefObj.destroy();
+      nodes.unbind("mouseout");
+      nodes.bind("mouseout", (event: any) => {
+        if (event.target.popper) {
+          event.target.popperRefObj.state.elements.popper.remove();
+          event.target.popperRefObj.destroy();
+        }
+      });
+    }
+
+    if (isEdge) {
+      if (!edges) {
+        edges = this._g.cy.edges();
       }
-    });
+
+      edges.unbind("mouseover");
+      edges.forEach((edge: any) => {
+        if (!edge.hasClass(COLLAPSED_EDGE_CLASS)) {
+          edge.bind("mouseover", (event: any) => {
+            let popper = event.target.popper({
+              content: () => {
+                let contentOuter = document.createElement("div");
+                contentOuter.classList.add("edge-tooltip-outer");
+                contentOuter.id = `edge-tooltip-${edge
+                  .source()
+                  .data("segmentName")}-${edge
+                  .source()
+                  .data("segmentName")}-outer`;
+
+                let content = document.createElement("div");
+                content.classList.add("edge-tooltip");
+                content.id = `edge-tooltip-${edge
+                  .source()
+                  .data("segmentName")}-${edge.source().data("segmentName")}`;
+
+                let text = this.tooltipText(edge);
+                content.style.fontSize = fontSize + "px";
+                content.style.fontWeight = fontWeight;
+                content.style.fontFamily = fontFamily;
+                content.style.fontStyle = fontStyle;
+                content.style.maxWidth = `${
+                  this.textWidthCyElement(
+                    text.text.split("\n")[0],
+                    fontSize,
+                    fontFamily,
+                    fontWeight,
+                    fontStyle
+                  ) + widthOffset
+                }px`;
+
+                let firstSequence = document.createElement("span");
+                firstSequence.classList.add("edge-tooltip-inner-part");
+                firstSequence.innerHTML = text.text.substring(
+                  0,
+                  this.edgeTooltipInnerTextSize(text.lengths.firstSequence)
+                );
+
+                content.appendChild(firstSequence);
+
+                if (edge.data("overlap") && !edge.data("pos")) {
+                  let overlapIdentifier = edge
+                    .data("overlap")
+                    .split(/[0-9]+/)
+                    .slice(1);
+                  let overlapNumerics = text.lengths.overlapNumerics;
+                  let currentIndex = 0;
+
+                  let classLists = (overlapIdentifier: string) => {
+                    if (overlapIdentifier === "I") {
+                      return "edge-CIGAR-I";
+                    } else if (overlapIdentifier === "N") {
+                      return "edge-CIGAR-N";
+                    } else if (overlapIdentifier === "D") {
+                      return "edge-CIGAR-D";
+                    } else if (
+                      overlapIdentifier === "S" ||
+                      overlapIdentifier === "H"
+                    ) {
+                      return "edge-CIGAR-S-H";
+                    } else {
+                      return "edge-CIGAR-M-Eq-X";
+                    }
+                  };
+
+                  overlapIdentifier.forEach(
+                    (overlapId: string, index: number) => {
+                      let secondSequence = document.createElement("span");
+                      secondSequence.classList.add(classLists(overlapId));
+                      secondSequence.innerHTML = text.text.substring(
+                        this.edgeTooltipInnerTextSize(
+                          text.lengths.firstSequence + currentIndex
+                        ),
+                        Math.min(
+                          this.edgeTooltipInnerTextSize(
+                            text.lengths.firstSequence +
+                              currentIndex +
+                              overlapNumerics[index]
+                          ),
+                          this.edgeTooltipInnerTextSize(
+                            text.lengths.secondSequence +
+                              text.lengths.firstSequence
+                          )
+                        )
+                      );
+
+                      currentIndex += overlapNumerics[index];
+
+                      content.appendChild(secondSequence);
+                    }
+                  );
+                } else {
+                  let secondSequence = document.createElement("span");
+                  secondSequence.classList.add("edge-CIGAR-M-Eq-X");
+                  secondSequence.innerHTML = text.text.substring(
+                    this.edgeTooltipInnerTextSize(text.lengths.firstSequence),
+                    this.edgeTooltipInnerTextSize(
+                      text.lengths.firstSequence + text.lengths.secondSequence
+                    )
+                  );
+
+                  content.appendChild(secondSequence);
+                }
+
+                let thirdSequence = document.createElement("span");
+                thirdSequence.innerHTML = text.text.substring(
+                  this.edgeTooltipInnerTextSize(
+                    text.lengths.firstSequence + text.lengths.secondSequence
+                  )
+                );
+                thirdSequence.classList.add("edge-tooltip-inner-part");
+
+                content.appendChild(thirdSequence);
+                contentOuter.appendChild(content);
+                document.body.appendChild(contentOuter);
+                return contentOuter;
+              },
+            });
+            event.target.popperRefObj = popper;
+            let update = () => {
+              popper.update();
+            };
+
+            edge.on("position", update);
+            this._g.cy.on("pan zoom resize", update);
+          });
+        }
+      });
+
+      edges.unbind("mouseout");
+      edges.bind("mouseout", (event: any) => {
+        if (event.target.popper && event.target.popperRefObj) {
+          event.target.popperRefObj.state.elements.popper.remove();
+          event.target.popperRefObj.destroy();
+        }
+      });
+    }
   }
 
   private edgeTooltipInnerTextSize(size: number): number {

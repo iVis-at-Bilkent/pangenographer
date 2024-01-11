@@ -42,7 +42,7 @@ export class CytoscapeService {
     private _modalService: NgbModal,
     private _dbService: DbAdapterService,
     private _fileReaderService: FileReaderService,
-    private _ExternalToolService: ExternalToolService
+    private _externalToolService: ExternalToolService
   ) {
     this.userPrefHelper = new UserPrefHelper(
       this,
@@ -55,7 +55,7 @@ export class CytoscapeService {
     this._timebarService.showCollapsedFn = this.showCollapsed.bind(this);
   }
 
-  initCy(containerElem) {
+  initCy(containerElem: HTMLElement) {
     this._cyExtService.registerExtensions();
 
     this._g.layout = this._g.getFcoseOptions();
@@ -159,13 +159,13 @@ export class CytoscapeService {
       .style()
       .selector("node.graphTheoreticDisplay")
       .style({
-        width: (e) => {
+        width: (e: any) => {
           let b = avgSize + 20;
           let a = Math.max(5, avgSize - 20);
           let x = e.data("__graphTheoreticProp");
           return ((b - a) * x) / maxVal + a + "px";
         },
-        height: (e) => {
+        height: (e: any) => {
           let b = avgSize + 20;
           let a = Math.max(5, avgSize - 20);
           let x = e.data("__graphTheoreticProp");
@@ -191,7 +191,6 @@ export class CytoscapeService {
     const nodes = data.nodes;
     const edges = data.edges;
 
-    let current = this._g.cy.nodes(":visible");
     let elemIds: string[] = [];
     let cyNodes = [];
     for (let i = 0; i < nodes.length; i++) {
@@ -248,17 +247,20 @@ export class CytoscapeService {
     }
     let compoundEdgeIds2 = this._g.cy
       .edges("." + C.COLLAPSED_EDGE_CLASS)
-      .map((x) => x.id());
+      .map((x: any) => x.id());
     elemIds.push(...C.arrayDiff(compoundEdgeIds, compoundEdgeIds2));
     // elements might already exist but hidden, so show them
     const elemIdSet = new Set(elemIds);
     this._g.viewUtils.show(
-      this._g.cy.elements().filter((element) => elemIdSet.has(element.id()))
+      this._g.cy
+        .elements()
+        .filter((element: any) => elemIdSet.has(element.id()))
     );
 
     this._g.hideTypesNotToShow();
     this._g.applyClassFiltering();
 
+    let current = this._g.cy.nodes(":visible");
     if (isIncremental && !wasEmpty) {
       let collection = this._g.cy.collection();
       for (let i = 0; i < cyNodes.length; i++) {
@@ -275,10 +277,12 @@ export class CytoscapeService {
     if (hasNew) {
       this._g.performLayout(shouldRandomize);
     }
+
     this.highlightElems(isIncremental, elemIds);
     this._g.isLoadFromDB = true;
-    this._ExternalToolService.removeExternalTools();
-    this._ExternalToolService.addExternalTools(
+
+    this._externalToolService.removeExternalTools();
+    this._externalToolService.addExternalTools(
       this.showUpDownstream.bind(this)
     );
     this.applyStyle4NewElements();
@@ -287,7 +291,7 @@ export class CytoscapeService {
   showUpDownstream(ele: any, length: number, isUp: boolean) {
     const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true);
-      this._g.cy.panBy({ x: 0.00001, y: 0.00001 });
+      this._g.cy.panBy({ x: 0.000001, y: 0.000001 });
     };
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
@@ -354,7 +358,12 @@ export class CytoscapeService {
       edges2expand = this._g.cy.edges("." + C.COLLAPSED_EDGE_CLASS);
     }
     edges2expand = edges2expand.not("." + C.META_EDGE_CLASS);
-    this._g.expandCollapseApi.expandEdges(edges2expand);
+    this._externalToolService.addTooltips(
+      undefined,
+      this._g.expandCollapseApi.expandEdges(edges2expand).edges,
+      false,
+      true
+    );
     this._g.isLoadFromExpandCollapse = true;
   }
 
@@ -563,7 +572,7 @@ export class CytoscapeService {
       try {
         if (this._g.cy.$().length == 0) {
           this._g.expandCollapseApi.loadJson(txt, false);
-          this._ExternalToolService.addExternalTools(this.showUpDownstream);
+          this._externalToolService.addExternalTools(this.showUpDownstream);
         } else {
           const modal = this._modalService.open(
             LoadGraphFromFileModalComponent
@@ -657,11 +666,11 @@ export class CytoscapeService {
     if (event) {
       const ele = event.target || event.cyTarget;
       if (ele.id()[0] === "n") {
-        this._ExternalToolService.removeExternalTools([ele]);
+        this._externalToolService.removeExternalTools([ele]);
       }
       this._g.cy.remove(ele);
     } else {
-      this._ExternalToolService.removeExternalTools(
+      this._externalToolService.removeExternalTools(
         this._g.cy.nodes(":selected")
       );
       this._g.cy.remove(":selected");
@@ -678,7 +687,7 @@ export class CytoscapeService {
           data.nodes[i].properties.segmentName ===
             this._g.cy.nodes()[j].data().segmentName
         ) {
-          this._ExternalToolService.removeExternalTools(this._g.cy.nodes()[j]);
+          this._externalToolService.removeExternalTools(this._g.cy.nodes()[j]);
           this._g.cy.remove(this._g.cy.nodes()[j]);
         }
       }
