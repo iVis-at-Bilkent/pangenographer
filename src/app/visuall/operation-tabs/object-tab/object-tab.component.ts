@@ -559,6 +559,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  pathWalkNameTransform(name: string): string {
+    return this._cyService.pathWalkNameTransform(name);
+  }
+
   // get common key-value pairs for non-nested properties
   getCommonObjectProps(eleList) {
     let superObj = {};

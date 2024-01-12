@@ -41,7 +41,7 @@ export class GlobalVariableService {
   };
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
-  setLoadingStatus: (boolean) => void;
+  setLoadingStatus: (boolean: boolean) => void;
   userPrefs: UserPref = {} as UserPref;
   userPrefsFromFiles: UserPref = {} as UserPref;
   shownElemsChanged = new BehaviorSubject<boolean>(true);
@@ -533,7 +533,9 @@ export class GlobalVariableService {
       relativePlacementConstraints: [],
       fixedNodeConstraints: [],
     };
-    this.cy.fit();
+    setTimeout(() => {
+      this.cy.fit();
+    }, CY_BATCH_END_DELAY);
   }
 
   // delete/expand compounds if they don't have any visible elements

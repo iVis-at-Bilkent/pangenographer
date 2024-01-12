@@ -271,7 +271,9 @@
                 >
                   <span
                     ><b>Path name: </b>
-                    {{ selectedItemProps.pathNames.val[i] }}
+                    {{
+                      pathWalkNameTransform(selectedItemProps.pathNames.val[i])
+                    }}
                   </span>
                 </div>
                 <div>
@@ -348,7 +350,11 @@
                 >
                   <span
                     ><b>Walk sample identifier: </b>
-                    {{ selectedItemProps.walkSampleIds.val[i] }}
+                    {{
+                      pathWalkNameTransform(
+                        selectedItemProps.walkSampleIds.val[i]
+                      )
+                    }}
                   </span>
                 </div>
                 <div>

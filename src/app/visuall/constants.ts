@@ -79,6 +79,7 @@ export const TEXT_OPERATORS = {
   "ends with": "Ends with",
   "one of": "One of",
 };
+
 export const LIST_OPERATORS = {
   in: "In",
 };
@@ -147,6 +148,9 @@ export const SHORT_MONTHS = [
   "Dec",
 ];
 
+export const PATH_WALK_NAME_DISALLOWED_REGEX =
+  /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
+
 /** https://davidwalsh.name/javascript-debounce-function
  * Returns a function, that, as long as it continues to be invoked, will not
  * be triggered. The function will be called after it stops being called for
@@ -158,12 +162,12 @@ export const SHORT_MONTHS = [
  * @param  {} preConditionFn=null if function returns false, ignore this call
  */
 export function debounce(
-  func,
+  func: Function,
   wait: number,
   immediate: boolean = false,
   preConditionFn = null
 ) {
-  let timeout;
+  let timeout: any;
   return function () {
     if (preConditionFn && !preConditionFn()) {
       return;
@@ -183,7 +187,7 @@ export function debounce(
 
 // calls fn2 at the beginning of frequent calls to fn1
 export function debounce2(fn1: Function, wait: number, fn2: Function) {
-  let timeout;
+  let timeout: any;
   let isInit = true;
   return function () {
     const context = this,

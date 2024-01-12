@@ -2,7 +2,12 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { TableFiltering } from "../../shared/table-view/table-view-types";
-import { GENERIC_TYPE, LONG_MAX, LONG_MIN } from "../constants";
+import {
+  GENERIC_TYPE,
+  LONG_MAX,
+  LONG_MIN,
+  PATH_WALK_NAME_DISALLOWED_REGEX,
+} from "../constants";
 import { GlobalVariableService } from "../global-variable.service";
 import {
   ClassBasedRules,
@@ -878,40 +883,9 @@ export class Neo4jDb implements DbService {
   }
 
   private propertyName2CQL(propertyName: string): string {
-    propertyName = propertyName.replace(/\./g, "$DOT$");
-    propertyName = propertyName.replace(/-/g, "$HYPHEN$");
-    propertyName = propertyName.replace(/\+/g, "$PLUS$");
-    propertyName = propertyName.replace(/\(/g, "$LP$");
-    propertyName = propertyName.replace(/\)/g, "$RP$");
-    propertyName = propertyName.replace(/\[/g, "$LB$");
-    propertyName = propertyName.replace(/]/g, "$RB$");
-    propertyName = propertyName.replace(/\{/g, "$LC$");
-    propertyName = propertyName.replace(/}/g, "$RC$");
-    propertyName = propertyName.replace(/ /g, "$SPACE$");
-    propertyName = propertyName.replace(/:/g, "$COLON$");
-    propertyName = propertyName.replace(/,/g, "$COMMA$");
-    propertyName = propertyName.replace(/\//g, "$SLASH$");
-    propertyName = propertyName.replace(/\\/g, "$BSLASH$");
-    propertyName = propertyName.replace(/'/g, "$SQ$");
-    propertyName = propertyName.replace(/"/g, "$DQ$");
-    propertyName = propertyName.replace(/\?/g, "$Q$");
-    propertyName = propertyName.replace(/!/g, "$E$");
-    propertyName = propertyName.replace(/;/g, "$SC$");
-    propertyName = propertyName.replace(/=/g, "$EQ$");
-    propertyName = propertyName.replace(/</g, "$LT$");
-    propertyName = propertyName.replace(/>/g, "$GT$");
-    propertyName = propertyName.replace(/&/g, "$AND$");
-    propertyName = propertyName.replace(/\|/g, "$OR$");
-    propertyName = propertyName.replace(/%/g, "$PER$");
-    propertyName = propertyName.replace(/@/g, "$AT$");
-    propertyName = propertyName.replace(/#/g, "$HASH$");
-    propertyName = propertyName.replace(/\^/g, "$CARET$");
-    propertyName = propertyName.replace(/\*/g, "$STAR$");
-    propertyName = propertyName.replace(/~/g, "$TILDE$");
-    propertyName = propertyName.replace(/`/g, "$BT$");
-    propertyName = propertyName.replace(/´/g, "$AC$");
-
-    return propertyName;
+    return propertyName.replace(PATH_WALK_NAME_DISALLOWED_REGEX, (match) => {
+      return `$$$${match.charCodeAt(0)}$$$`;
+    });
   }
 
   private GFAdata2CQL(GFAData: GFAData): string {

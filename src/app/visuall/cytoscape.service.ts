@@ -184,10 +184,15 @@ export class CytoscapeService {
   }
 
   loadElementsFromDatabase(data: GraphResponse, isIncremental: boolean) {
+    if (!isIncremental) {
+      this._g.cy.panBy({ x: 2000, y: 2000 }); // Remove the flash effect
+    }
+
     if (!data || !data.nodes || !data.edges) {
       this._g.showErrorModal("Empty Graph", "Empty response from database!");
       return;
     }
+
     const nodes = data.nodes;
     const edges = data.edges;
 
@@ -1238,5 +1243,11 @@ export class CytoscapeService {
       this._g.layout.clusters = null;
       this._g.performLayout(false);
     }
+  }
+
+  pathWalkNameTransform(name: string): string {
+    return name.replace(/\$\$\$(\d+)\$\$\$/g, (match, charCode) => {
+      return String.fromCharCode(Number(charCode));
+    });
   }
 }
