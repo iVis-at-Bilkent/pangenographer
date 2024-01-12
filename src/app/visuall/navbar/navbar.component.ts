@@ -221,8 +221,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
         dropdown: "Help",
         actions: [
           { txt: "Quick Help", id: "nbi50", fn: "openQuickHelp" },
-          { txt: "About", id: "nbi51", fn: "openAbout" },
           { txt: "Legend", id: "nbi52", fn: "openLegend" },
+          { txt: "About", id: "nbi51", fn: "openAbout" },
         ],
       },
       {
