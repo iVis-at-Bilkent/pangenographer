@@ -1,10 +1,9 @@
-import { Injectable } from '@angular/core';
-import { ToolbarDiv } from '../visuall/toolbar/itoolbar';
-import { GlobalVariableService } from '../visuall/global-variable.service';
-
+import { Injectable } from "@angular/core";
+import { GlobalVariableService } from "../visuall/global-variable.service";
+import { ToolbarDiv } from "../visuall/toolbar/itoolbar";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 /** Custom menu items and action functions for the items should be added to this class.
  * You might need to import other services but you should only edit this file.

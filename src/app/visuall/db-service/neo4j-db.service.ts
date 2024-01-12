@@ -63,7 +63,7 @@ export class Neo4jDb implements DbService {
       ],
     };
     let isTimeout = true;
-    let timeoutId;
+    let timeoutId: any = null;
     if (isTimeboxed) {
       timeoutId = setTimeout(() => {
         isTimeout = true;
@@ -121,6 +121,7 @@ export class Neo4jDb implements DbService {
         } else if (responseType == DbResponseType.generic) {
           callback(this.extractGenericData(x, isTimeboxed));
         }
+        this._g.refreshCues();
       }, errFn);
   }
 
@@ -223,10 +224,16 @@ export class Neo4jDb implements DbService {
     if (f2.length > 0) {
       f += f2;
     }
-    this.runQuery(
-      `MATCH (p:PATHS) RETURN p AS nn UNION MATCH (w:WALKS) RETURN w AS nn UNION MATCH (n1)-[e1]-() ${f} RETURN n1 AS nn LIMIT 150 UNION MATCH (n2)-[e2]-() ${f} RETURN e2 AS nn LIMIT 150`,
-      callback
-    );
+    const query = `
+      MATCH (p:PATHS) RETURN p AS nn
+      UNION
+      MATCH (w:WALKS) RETURN w AS nn
+      UNION
+      MATCH (n1)-[e1]-() ${f} RETURN n1 AS nn LIMIT 150
+      UNION
+      MATCH (n2)-[e2]-() ${f} RETURN e2 AS nn LIMIT 150
+    `;
+    this.runQuery(query, callback);
   }
 
   getConsecutiveNodes(
@@ -273,7 +280,7 @@ export class Neo4jDb implements DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
@@ -299,6 +306,7 @@ export class Neo4jDb implements DbService {
     if (idFilter) {
       idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
     }
+
     this.runQuery(
       `CALL graphOfInterest([${dbIds
         .map((element) => `'${element}'`)
@@ -434,6 +442,9 @@ export class Neo4jDb implements DbService {
     }
     s = s.slice(0, -1);
     s += "}";
+    if (s.length == 1) {
+      s = "{}";
+    }
     return s;
   }
 

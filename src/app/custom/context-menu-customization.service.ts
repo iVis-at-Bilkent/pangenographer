@@ -1,10 +1,10 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { ContextMenuItem } from "../visuall/context-menu/icontext-menu";
 import { CytoscapeService } from "../visuall/cytoscape.service";
+import { DbQueryMeta, HistoryMetaData } from "../visuall/db-service/data-types";
 import { DbAdapterService } from "../visuall/db-service/db-adapter.service";
 import { GlobalVariableService } from "../visuall/global-variable.service";
-import { ContextMenuItem } from "../visuall/context-menu/icontext-menu";
-import { DbQueryMeta, HistoryMetaData } from "../visuall/db-service/data-types";
-import { HttpClient } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root",

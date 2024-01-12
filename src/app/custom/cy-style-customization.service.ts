@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
 export class CyStyleCustomizationService {
-
-  constructor() { }
+  constructor() {}
 
   // The developer can inject their own styles
   // Below given a code sample
@@ -15,7 +14,5 @@ export class CyStyleCustomizationService {
   //     return e.data('primary_name') + ' - ' + e.data('birth_year');
   //   },
   //     }).update();
-  public addCustomStyles(cy) {
-
-  }
+  public addCustomStyles(cy) {}
 }

@@ -923,4 +923,8 @@ export class GlobalVariableService {
     }
     return Object.keys(classDict).length > 1;
   }
+
+  refreshCues() {
+    this.cy.panBy({ x: 0.000001, y: 0.000001 });
+  }
 }

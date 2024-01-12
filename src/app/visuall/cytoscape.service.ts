@@ -296,7 +296,6 @@ export class CytoscapeService {
   showUpDownstream(ele: any, length: number, isUp: boolean) {
     const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true);
-      this._g.cy.panBy({ x: 0.000001, y: 0.000001 });
     };
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
