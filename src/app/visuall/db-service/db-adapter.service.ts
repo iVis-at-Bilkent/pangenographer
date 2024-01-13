@@ -1,21 +1,21 @@
 import { Injectable } from "@angular/core";
-import {
-  DbService,
-  GraphResponse,
-  HistoryMetaData,
-  DbQueryMeta,
-  Neo4jEdgeDirection,
-  DbResponse,
-  DbResponseType,
-  GFAData,
-} from "./data-types";
+import { CustomizationModule } from "../../custom/customization.module";
+import { TableFiltering } from "../../shared/table-view/table-view-types";
+import { GlobalVariableService } from "../global-variable.service";
 import {
   ClassBasedRules,
   rule2str2,
 } from "../operation-tabs/map-tab/query-types";
-import { TableFiltering } from "../../shared/table-view/table-view-types";
-import { GlobalVariableService } from "../global-variable.service";
-import { CustomizationModule } from "../../custom/customization.module";
+import {
+  DbQueryMeta,
+  DbResponse,
+  DbResponseType,
+  DbService,
+  GFAData,
+  GraphResponse,
+  HistoryMetaData,
+  Neo4jEdgeDirection,
+} from "./data-types";
 
 @Injectable({
   providedIn: "root",
@@ -46,7 +46,7 @@ export class DbAdapterService {
     if (historyMeta && historyMeta.customTxt) {
       txt = historyMeta.customTxt;
     }
-    let fn = (x) => {
+    let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory(txt + s);
     };
@@ -92,11 +92,19 @@ export class DbAdapterService {
   }
 
   getSampleData(callback: (x: GraphResponse) => any) {
-    let fn = (x) => {
+    let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory("Get sample data");
     };
     this._db.getSampleData(fn);
+  }
+
+  getPathWalkData(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get path walk data");
+    };
+    this._db.getPathWalkData(fn);
   }
 
   getConsecutiveNodes(
@@ -105,7 +113,7 @@ export class DbAdapterService {
     objectType: string,
     callback: (x: GraphResponse) => any
   ) {
-    let fn = (x) => {
+    let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory("Get consecutive nodes");
     };
@@ -121,7 +129,7 @@ export class DbAdapterService {
     callback: (x: DbResponse) => any
   ) {
     let s = "Get " + rule2str2(rules);
-    let fn = (x) => {
+    let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory(s);
     };
@@ -136,7 +144,7 @@ export class DbAdapterService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   ) {
     let fn = cb;
     if (type == DbResponseType.table) {
@@ -165,7 +173,7 @@ export class DbAdapterService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   ) {
     let fn = cb;
     if (type == DbResponseType.table) {
@@ -193,9 +201,9 @@ export class DbAdapterService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   ) {
-    let fn = (x) => {
+    let fn = (x: any) => {
       cb(x);
       this._g.add2GraphHistory(`Common target/regulator`);
     };

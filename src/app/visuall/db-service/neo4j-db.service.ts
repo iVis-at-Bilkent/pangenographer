@@ -224,14 +224,15 @@ export class Neo4jDb implements DbService {
     if (f2.length > 0) {
       f += f2;
     }
+    const query = `MATCH (n)-[e]-() ${f} RETURN n,e limit 150`;
+    this.runQuery(query, callback);
+  }
+
+  getPathWalkData(callback: (x: GraphResponse) => any) {
     const query = `
       MATCH (p:PATHS) RETURN p AS nn
       UNION
       MATCH (w:WALKS) RETURN w AS nn
-      UNION
-      MATCH (n1)-[e1]-() ${f} RETURN n1 AS nn LIMIT 150
-      UNION
-      MATCH (n2)-[e2]-() ${f} RETURN e2 AS nn LIMIT 150
     `;
     this.runQuery(query, callback);
   }

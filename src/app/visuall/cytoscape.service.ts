@@ -262,7 +262,18 @@ export class CytoscapeService {
         .filter((element: any) => elemIdSet.has(element.id()))
     );
 
-    this._g.hideTypesNotToShow();
+    if (!isIncremental) {
+      this._dbService.getPathWalkData((data) => {
+        let pathsWalks = [];
+        for (let i = 0; i < data.nodes.length; i++) {
+          let cyNodeId = "n" + data.nodes[i].elementId;
+          pathsWalks.push(this.createCyNode(data.nodes[i], cyNodeId));
+        }
+        this._g.cy.add(pathsWalks);
+        this._g.hideTypesNotToShow();
+      });
+    }
+
     this._g.applyClassFiltering();
 
     let current = this._g.cy.nodes(":visible");

@@ -1,5 +1,5 @@
-import { ClassBasedRules } from "../operation-tabs/map-tab/query-types";
 import { TableFiltering } from "../../shared/table-view/table-view-types";
+import { ClassBasedRules } from "../operation-tabs/map-tab/query-types";
 
 export interface DbService {
   getNeighbors(
@@ -64,6 +64,7 @@ export interface DbService {
     callback: (x: GraphResponse) => any,
     isUp: boolean
   );
+  getPathWalkData(callback: (x: GraphResponse) => any);
 }
 
 export interface GraphResponse {
