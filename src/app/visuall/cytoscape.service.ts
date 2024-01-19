@@ -294,7 +294,10 @@ export class CytoscapeService {
       this._g.performLayout(shouldRandomize);
     }
 
-    this.highlightElems(isIncremental, elemIds);
+    if (isIncremental) {
+      this.highlightElems(elemIds);
+    }
+
     this._g.isLoadFromDB = true;
 
     this._externalToolService.removeExternalTools();
@@ -400,10 +403,7 @@ export class CytoscapeService {
     return collapsedEdgeIds;
   }
 
-  highlightElems(isIncremental: boolean, elemIds: string[]) {
-    if (!isIncremental) {
-      return;
-    }
+  highlightElems(elemIds: string[]) {
     // remove all existing hightlights before hightlighting new elements
     const newElemIndicator = this._g.userPrefs.mergedElemIndicator.getValue();
     if (newElemIndicator == MergedElemIndicatorTypes.none) {
@@ -418,6 +418,7 @@ export class CytoscapeService {
         this._g.cy.$().unselect();
       }
     }
+    
     let ele2highlight = this._g.cy.collection();
     const cnt = elemIds.length;
     for (let i = 0; i < cnt; i++) {

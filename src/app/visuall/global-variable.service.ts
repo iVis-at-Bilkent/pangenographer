@@ -127,7 +127,7 @@ export class GlobalVariableService {
     }, this.showErr.bind(this));
   }
 
-  private showErr(e) {
+  private showErr(e: any) {
     this.showErrorModal("Internet Error", e);
   }
 
@@ -215,13 +215,35 @@ export class GlobalVariableService {
     }
   }
 
+  highlightElements(eles: any) {
+    if (this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()) {
+      eles.forEach((ele: any) => {
+        if (
+          this.zeroIncomerAndOutgoerNodes.source.indexOf(ele) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.target.indexOf(ele) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(ele) < 0
+        ) {
+          this.viewUtils.highlight(
+            ele,
+            this.userPrefs.currHighlightIdx.getValue()
+          );
+        }
+      });
+    } else {
+      this.viewUtils.highlight(
+        eles,
+        this.userPrefs.currHighlightIdx.getValue()
+      );
+    }
+  }
+
   hideTypesNotToShow() {
     TYPES_NOT_TO_SHOW.forEach((type) => {
       this.viewUtils.hide(this.cy.$("." + type));
     });
   }
 
-  filterByClass(elems) {
+  filterByClass(elems: any) {
     let hiddenSelector = "";
     for (let i of this.hiddenClasses) {
       hiddenSelector += "." + i + ",";
@@ -236,11 +258,7 @@ export class GlobalVariableService {
   }
 
   getGraphElemSet() {
-    return new Set<string>(this.cy.elements().map((x) => x.id()));
-  }
-
-  highlightElements(elems) {
-    this.viewUtils.highlight(elems, this.userPrefs.currHighlightIdx.getValue());
+    return new Set<string>(this.cy.elements().map((x: any) => x.id()));
   }
 
   updateSelectionCyStyle() {

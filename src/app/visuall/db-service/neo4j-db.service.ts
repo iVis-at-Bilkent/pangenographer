@@ -74,7 +74,7 @@ export class Neo4jDb implements DbService {
       }, timeout);
     }
 
-    const errFn = (err) => {
+    const errFn = (err: any) => {
       if (isTimeout) {
         clearTimeout(timeoutId); // Clear the timeout if the request has already timed out
       }

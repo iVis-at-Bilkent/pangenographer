@@ -84,7 +84,7 @@ export class DbAdapterService {
     callback: (x: GraphResponse) => any,
     isUp: boolean
   ) {
-    let fn = (x) => {
+    let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory("Show up/downstream");
     };
