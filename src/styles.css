@@ -424,3 +424,20 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
 .edge-CIGAR-S-H {
   color: #996633;
 }
+
+.table-tooltip {
+  position: absolute;
+  z-index: 1000;
+  padding: 4px 3px 4px 5px;
+  max-height: 350px;
+  max-width: 300px;
+  overflow-wrap: break-word;
+  text-align: left;
+  font-family: Inconsolata, monospace;
+  font-weight: 700;
+  overflow-y: auto;
+  line-height: 20px;
+  border: 2px solid #65676b;
+  border-radius: 5px;
+  background-color: #ffffff;
+}

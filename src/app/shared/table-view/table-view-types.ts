@@ -1,5 +1,9 @@
 export enum TableDataType {
-  string = 0, number = 1, datetime = 2, enum = 3
+  string = 0,
+  number = 1,
+  datetime = 2,
+  enum = 3,
+  data = 4,
 }
 
 export interface TableData {
@@ -33,7 +37,7 @@ export interface TableViewInput {
 export interface TableFiltering {
   txt: string;
   orderBy: string;
-  orderDirection: 'asc' | 'desc' | '';
+  orderDirection: "asc" | "desc" | "";
   skip?: number;
 }
 
@@ -42,39 +46,57 @@ export interface TableRowMeta {
   tableIdx: number[];
 }
 
-export function property2TableData(properties, enumMapping, propName: string, propVal: any, className: string, isEdge: boolean): TableData {
-  let t = '';
+export function property2TableData(
+  properties: any,
+  enumMapping: any,
+  propName: string,
+  propVal: any,
+  className: string,
+  isEdge: boolean
+): TableData {
+  let type = "";
+
   if (isEdge) {
-    t = properties.edges[className][propName];
+    type = properties.edges[className][propName];
   } else {
-    t = properties.nodes[className][propName];
+    type = properties.nodes[className][propName];
   }
-  if (t === undefined || t == null) {
+
+  if (type === undefined || type == null) {
     return { val: propVal, type: TableDataType.string };
-  } else if (t.startsWith('enum')) {
+  } else if (type.startsWith("enum")) {
     const mapping = enumMapping[className][propName][propVal];
     if (mapping) {
       return { val: mapping, type: TableDataType.enum };
     }
     return { val: propVal, type: TableDataType.string };
-  } else if (t == 'string') {
-    return { val: propVal, type: TableDataType.string };
-  } else if (t == 'list') {
-    if (typeof propVal === 'string') {
+  } else if (type == "string") {
+    if (propName === "segmentData") {
+      return { val: propVal, type: TableDataType.data };
+    } else {
+      return { val: propVal, type: TableDataType.string };
+    }
+  } else if (type == "list") {
+    if (typeof propVal === "string") {
       return { val: propVal, type: TableDataType.string };
     }
     return { val: propVal.join(), type: TableDataType.string };
-  } else if (t == 'datetime') {
+  } else if (type == "datetime") {
     return { val: propVal, type: TableDataType.datetime };
-  } else if (t == 'float' || t == 'int') {
+  } else if (type == "float" || type == "int") {
     return { val: propVal, type: TableDataType.number };
   } else {
-    return { val: 'see rawData2TableData function', type: TableDataType.string };
+    return {
+      val: "see rawData2TableData function",
+      type: TableDataType.string,
+    };
   }
 }
 
-export function getClassNameFromProperties(properties, propNames: string[]): string {
-
+export function getClassNameFromProperties(
+  properties: any,
+  propNames: string[]
+): string {
   for (let nodeClass in properties.nodes) {
     if (isSubset(Object.keys(properties.nodes[nodeClass]), propNames)) {
       return nodeClass;
@@ -86,11 +108,15 @@ export function getClassNameFromProperties(properties, propNames: string[]): str
       return edgeClass;
     }
   }
-  console.log('could not find class from')
+  console.log("could not find class from");
   return null;
 }
 
-export function filterTableDatas(filter: TableFiltering, inp: TableViewInput, isIgnoreCaseInText: boolean) {
+export function filterTableDatas(
+  filter: TableFiltering,
+  inp: TableViewInput,
+  isIgnoreCaseInText: boolean
+) {
   let idxHide = [];
   // filter by text
   for (let i = 0; i < inp.results.length; i++) {
@@ -99,12 +125,12 @@ export function filterTableDatas(filter: TableFiltering, inp: TableViewInput, is
     for (let j = 1; j < inp.results[i].length; j++) {
       let curr = inp.results[i][j].val;
       if (isIgnoreCaseInText) {
-        if ((curr + '').toLowerCase().includes(filter.txt.toLowerCase())) {
+        if ((curr + "").toLowerCase().includes(filter.txt.toLowerCase())) {
           isMatch = true;
           break;
         }
       } else {
-        if ((curr + '').includes(filter.txt)) {
+        if ((curr + "").includes(filter.txt)) {
           isMatch = true;
           break;
         }
@@ -119,15 +145,23 @@ export function filterTableDatas(filter: TableFiltering, inp: TableViewInput, is
 
   // order by
   if (filter.orderDirection.length > 0) {
-    let i = inp.columns.findIndex(x => x == filter.orderBy);
+    let i = inp.columns.findIndex((x) => x == filter.orderBy);
     if (i < 0) {
-      console.error('i < 0 !');
+      console.error("i < 0 !");
     }
     i++; // first column is for ID or for highlight
-    if (filter.orderDirection == 'asc') {
-      inp.results = inp.results.sort((a, b) => { if (a[i].val > b[i].val) return 1; if (b[i].val > a[i].val) return -1; return 0 });
+    if (filter.orderDirection == "asc") {
+      inp.results = inp.results.sort((a, b) => {
+        if (a[i].val > b[i].val) return 1;
+        if (b[i].val > a[i].val) return -1;
+        return 0;
+      });
     } else {
-      inp.results = inp.results.sort((a, b) => { if (a[i].val < b[i].val) return 1; if (b[i].val < a[i].val) return -1; return 0 });
+      inp.results = inp.results.sort((a, b) => {
+        if (a[i].val < b[i].val) return 1;
+        if (b[i].val < a[i].val) return -1;
+        return 0;
+      });
     }
   }
   let skip = filter.skip ?? 0;

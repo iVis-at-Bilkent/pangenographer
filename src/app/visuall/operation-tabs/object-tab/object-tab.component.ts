@@ -223,26 +223,26 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   private fillMultiObjTable(
-    elems,
+    elems: any,
     isNode: boolean,
     idMappingForHighlight: any,
     isNeed2Filter: boolean
   ) {
     this.multiObjTableInp.isNodeData = isNode;
-    let elemTypesArr = elems.map((x) => x.classes()[0]);
+    let elemTypesArr = elems.map((x: any) => x.classes()[0]);
     let elemTypes = {};
     for (let i = 0; i < elemTypesArr.length; i++) {
       elemTypes[elemTypesArr[i]] = true;
     }
     const properties = this._g.dataModel.getValue();
     let definedProperties = {};
-    for (let edgeType in elemTypes) {
+    for (let type in elemTypes) {
       if (isNode) {
-        for (let j in properties.nodes[edgeType]) {
+        for (let j in properties.nodes[type]) {
           definedProperties[j] = true;
         }
       } else {
-        for (let j in properties.edges[edgeType]) {
+        for (let j in properties.edges[type]) {
           definedProperties[j] = true;
         }
       }
@@ -269,16 +269,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         { type: TableDataType.string, val: className },
       ];
       for (let j in definedProperties) {
-        row.push(
-          property2TableData(
-            properties,
-            enumMapping,
-            j,
-            elems[i].data(j) ?? "",
-            className,
-            !isNode
-          )
-        );
+        if (elems[i].data(j)) {
+          row.push(
+            property2TableData(
+              properties,
+              enumMapping,
+              j,
+              elems[i].data(j) ?? "",
+              className,
+              !isNode
+            )
+          );
+        }
       }
       this.multiObjTableInp.results.push(row);
       this.multiObjTableInp.classNames.push(className);
@@ -756,7 +758,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     this.isShowStatsTable = elems.length > 0;
   }
 
-  private setStatStrFromObj(stat, classSet: Set<string>) {
+  private setStatStrFromObj(stat: any, classSet: Set<string>) {
     this.tableInput.results = [];
     this.tableInput.classNames = [];
     for (let c of classSet) {
@@ -836,6 +838,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       this.multiObjTableInp,
       this._g.userPrefs.isIgnoreCaseInText.getValue()
     );
-    setTimeout(() => this.multiObjTableFilled.next(true), 100);
+    setTimeout(() => {
+      this.multiObjTableFilled.next(true);
+    }, 100);
   }
 }

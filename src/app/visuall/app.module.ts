@@ -1,41 +1,40 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { RouterModule } from '@angular/router';
-import { APP_BASE_HREF } from '@angular/common';
-
-import { AppComponent } from './app.component';
-import { NavbarComponent } from './navbar/navbar.component';
-import { ToolbarComponent } from './toolbar/toolbar.component';
-import { TimebarComponent } from './timebar/timebar.component';
-import { OperationTabsComponent } from './operation-tabs/operation-tabs.component';
-import { HttpClientModule } from '@angular/common/http';
-import { CytoscapeComponent } from './cytoscape/cytoscape.component';
-import { SaveAsPngModalComponent } from './popups/save-as-png-modal/save-as-png-modal.component';
-import { QuickHelpModalComponent } from './popups/quick-help-modal/quick-help-modal.component';
-import { AboutModalComponent } from './popups/about-modal/about-modal.component';
-import { ObjectTabComponent } from './operation-tabs/object-tab/object-tab.component';
-import { MapTabComponent } from './operation-tabs/map-tab/map-tab.component';
-import { SettingsTabComponent } from './operation-tabs/settings-tab/settings-tab.component';
-import { QueryTabComponent } from './operation-tabs/query-tab/query-tab.component';
-import { GroupTabComponent } from './operation-tabs/map-tab/group-tab/group-tab.component';
-import { TimebarMetricEditorComponent } from './operation-tabs/settings-tab/timebar-metric-editor/timebar-metric-editor.component';
-import { ColorPickerComponent } from './color-picker/color-picker.component';
-import { AutoSizeInputModule } from 'ngx-autosize-input';
-import { PropertyRuleComponent } from './property-rule/property-rule.component';
-import { ErrorModalComponent } from './popups/error-modal/error-modal.component';
-import { AngularDraggableModule } from 'angular2-draggable';
-import { GraphTheoreticPropertiesTabComponent } from './operation-tabs/map-tab/graph-theoretic-properties-tab/graph-theoretic-properties-tab.component';
-import { GraphHistoryComponent } from './graph-history/graph-history.component';
-import { SaveProfileModalComponent } from './popups/save-profile-modal/save-profile-modal.component';
-import { AdvancedQueriesComponent } from './operation-tabs/query-tab/advanced-queries/advanced-queries.component';
-import { RuleTreeComponent } from './rule-tree/rule-tree.component';
-import { RuleDropdownComponent } from './rule-dropdown/rule-dropdown.component';
-import { SharedModule } from '../shared/shared.module';
-import { CustomizationModule } from '../custom/customization.module';
-import { PanelContainerComponent } from './panel-container/panel-container.component';
-import { LoadGraphFromFileModalComponent } from './popups/load-graph-from-file-modal/load-graph-from-file-modal.component';
+import { APP_BASE_HREF } from "@angular/common";
+import { HttpClientModule } from "@angular/common/http";
+import { NgModule } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { RouterModule } from "@angular/router";
+import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { AngularDraggableModule } from "angular2-draggable";
+import { AutoSizeInputModule } from "ngx-autosize-input";
+import { CustomizationModule } from "../custom/customization.module";
+import { SharedModule } from "../shared/shared.module";
+import { AppComponent } from "./app.component";
+import { ColorPickerComponent } from "./color-picker/color-picker.component";
+import { CytoscapeComponent } from "./cytoscape/cytoscape.component";
+import { GraphHistoryComponent } from "./graph-history/graph-history.component";
+import { NavbarComponent } from "./navbar/navbar.component";
+import { GraphTheoreticPropertiesTabComponent } from "./operation-tabs/map-tab/graph-theoretic-properties-tab/graph-theoretic-properties-tab.component";
+import { GroupTabComponent } from "./operation-tabs/map-tab/group-tab/group-tab.component";
+import { MapTabComponent } from "./operation-tabs/map-tab/map-tab.component";
+import { ObjectTabComponent } from "./operation-tabs/object-tab/object-tab.component";
+import { OperationTabsComponent } from "./operation-tabs/operation-tabs.component";
+import { AdvancedQueriesComponent } from "./operation-tabs/query-tab/advanced-queries/advanced-queries.component";
+import { QueryTabComponent } from "./operation-tabs/query-tab/query-tab.component";
+import { SettingsTabComponent } from "./operation-tabs/settings-tab/settings-tab.component";
+import { TimebarMetricEditorComponent } from "./operation-tabs/settings-tab/timebar-metric-editor/timebar-metric-editor.component";
+import { PanelContainerComponent } from "./panel-container/panel-container.component";
+import { AboutModalComponent } from "./popups/about-modal/about-modal.component";
+import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
+import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
+import { QuickHelpModalComponent } from "./popups/quick-help-modal/quick-help-modal.component";
+import { SaveAsPngModalComponent } from "./popups/save-as-png-modal/save-as-png-modal.component";
+import { SaveProfileModalComponent } from "./popups/save-profile-modal/save-profile-modal.component";
+import { PropertyRuleComponent } from "./property-rule/property-rule.component";
+import { RuleDropdownComponent } from "./rule-dropdown/rule-dropdown.component";
+import { RuleTreeComponent } from "./rule-tree/rule-tree.component";
+import { TimebarComponent } from "./timebar/timebar.component";
+import { ToolbarComponent } from "./toolbar/toolbar.component";
 
 @NgModule({
   declarations: [
@@ -79,6 +78,11 @@ import { LoadGraphFromFileModalComponent } from './popups/load-graph-from-file-m
   ],
   providers: [{ provide: APP_BASE_HREF, useValue: "/" }],
   bootstrap: [AppComponent],
-  entryComponents: [SaveAsPngModalComponent, QuickHelpModalComponent, AboutModalComponent, ErrorModalComponent]
+  entryComponents: [
+    SaveAsPngModalComponent,
+    QuickHelpModalComponent,
+    AboutModalComponent,
+    ErrorModalComponent,
+  ],
 })
-export class AppModule { }
+export class AppModule {}

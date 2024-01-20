@@ -1,26 +1,26 @@
 import {
   Component,
-  OnInit,
-  OnDestroy,
-  Input,
-  Output,
   EventEmitter,
-  ViewChild,
+  Input,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  Output,
   Pipe,
   PipeTransform,
-  NgZone,
+  ViewChild,
 } from "@angular/core";
-import { GlobalVariableService } from "../../visuall/global-variable.service";
-import { CytoscapeService } from "../../visuall/cytoscape.service";
-import { EV_MOUSE_ON, EV_MOUSE_OFF, debounce } from "../../visuall/constants";
-import {
-  TableViewInput,
-  TableFiltering,
-  getClassNameFromProperties,
-} from "./table-view-types";
 import { IPosition } from "angular2-draggable";
 import { Subject, Subscription } from "rxjs";
+import { EV_MOUSE_OFF, EV_MOUSE_ON, debounce } from "../../visuall/constants";
+import { CytoscapeService } from "../../visuall/cytoscape.service";
 import { GraphElem } from "../../visuall/db-service/data-types";
+import { GlobalVariableService } from "../../visuall/global-variable.service";
+import {
+  TableFiltering,
+  TableViewInput,
+  getClassNameFromProperties,
+} from "./table-view-types";
 
 @Pipe({ name: "replace" })
 export class ReplacePipe implements PipeTransform {
@@ -240,7 +240,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     } else {
       let target = this._g.cy.elements(`[id = "n${id}"]`);
       if (!this.params.isNodeData) {
-        target =  this._g.cy.edges(`[id = "e${id}"]`);
+        target = this._g.cy.edges(`[id = "e${id}"]`);
       }
       this.highlighterFn({ target: target, type: EV_MOUSE_OFF });
     }
@@ -391,5 +391,12 @@ export class TableViewComponent implements OnInit, OnDestroy {
       objs.push({ classes: cName, data: data });
     }
     this._cyService.saveAsCSV(objs);
+  }
+
+  truncateData(data: string): string {
+    if (data.length > 240) {
+      return data.substring(0, 238) + "...";
+    }
+    return data;
   }
 }

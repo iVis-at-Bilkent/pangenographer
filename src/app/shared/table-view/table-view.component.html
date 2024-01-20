@@ -27,6 +27,7 @@
     [disabled]="isLoading || !params.results || params.results.length < 1"
     class="btn btn-sm"
     (click)="downloadAsCSV4Checked()"
+    title="Download selected objects as CSV"
   >
     <img
       class="img-icon m-1"
@@ -36,6 +37,7 @@
           : 'Download selected objects'
       "
       src="../assets/img/downloading-file.svg"
+      title="Download selected objects as CSV"
     />
   </button>
 
@@ -56,12 +58,14 @@
     [disabled]="isLoading || !params.results || params.results.length < 1"
     class="btn btn-sm"
     (click)="tableStateChanged()"
+    title="Minimize/Maximize table"
   >
     <img
       [src]="
         isDraggable ? 'assets/img/minimize.svg' : 'assets/img/maximize.svg'
       "
       [title]="isDraggable ? 'Minimize table' : 'Maximize table'"
+      title="Minimize/Maximize table"
     />
   </button>
 </div>
@@ -131,6 +135,7 @@
               class="m-1 cb-table-all"
               [(ngModel)]="isCheckbox4AllChecked"
               (change)="cb4AllChanged()"
+              title="Select all"
             />
           </th>
         </tr>
@@ -156,6 +161,14 @@
               e.val | number : "1.0-2"
             }}</span>
             <span *ngIf="e.type == 2">{{ e.val | date : "medium" }}</span>
+            <div *ngIf="e.type == 4" [table-tooltip]="e.val">
+              <span>
+                <ngb-highlight
+                  [result]="truncateData(e.val)"
+                  [term]="filterTxt"
+                ></ngb-highlight>
+              </span>
+            </div>
           </td>
           <td *ngIf="!isDraggable && params.columns.length - 1 >= columnLimit">
             <span>...</span>
@@ -166,6 +179,7 @@
               type="checkbox"
               class="m-1 row-cb"
               (change)="cbChanged(i, $event.target)"
+              title="Select row"
             />
           </td>
         </tr>
@@ -184,10 +198,16 @@
       size="sm"
     >
       <ng-template ngbPaginationPrevious
-        ><img class="img-sm-icon" src="/assets/img/left-arrow.svg"
+        ><img
+          class="img-sm-icon"
+          src="/assets/img/left-arrow.svg"
+          title="Previous page"
       /></ng-template>
       <ng-template ngbPaginationNext
-        ><img class="img-sm-icon" src="/assets/img/right-arrow.svg"
+        ><img
+          class="img-sm-icon"
+          src="/assets/img/right-arrow.svg"
+          title="Next page"
       /></ng-template>
     </ngb-pagination>
   </div>
