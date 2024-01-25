@@ -1,27 +1,42 @@
-import { Component, OnInit } from '@angular/core';
-import { CytoscapeService } from '../../../cytoscape.service';
-import { areSetsEqual } from '../../../constants';
-import { GlobalVariableService } from '../../../global-variable.service';
-import { GroupCustomizationService } from '../../../../custom/group-customization.service';
+import { Component, OnInit } from "@angular/core";
+import { GroupCustomizationService } from "../../../../custom/group-customization.service";
+import { areSetsEqual } from "../../../constants";
+import { CytoscapeService } from "../../../cytoscape.service";
+import { GlobalVariableService } from "../../../global-variable.service";
 @Component({
-  selector: 'app-group-tab',
-  templateUrl: './group-tab.component.html',
-  styleUrls: ['./group-tab.component.css']
+  selector: "app-group-tab",
+  templateUrl: "./group-tab.component.html",
+  styleUrls: ["./group-tab.component.css"],
 })
 export class GroupTabComponent implements OnInit {
-  options: { name: string, fn: any }[];
+  options: { name: string; fn: any }[];
   selectedOption: string;
   prevGraph: Set<string>;
   currGraph: Set<string>;
 
-  constructor(private _cyService: CytoscapeService, private _g: GlobalVariableService, private _customizationService: GroupCustomizationService) { }
+  constructor(
+    private _cyService: CytoscapeService,
+    private _g: GlobalVariableService,
+    private _customizationService: GroupCustomizationService
+  ) {}
 
   ngOnInit() {
-    this.options = [{ name: 'None', fn: null },
-    { name: 'By the Louvain modularity algorithm', fn: () => { this._cyService.louvainClustering(); } },
-    { name: 'By the Markov clustering algorithm', fn: () => { this._cyService.markovClustering(); } },
-    ].concat(this._customizationService.clusteringMethods)
-    
+    this.options = [
+      { name: "None", fn: null },
+      {
+        name: "By the Louvain modularity algorithm",
+        fn: () => {
+          this._cyService.louvainClustering();
+        },
+      },
+      {
+        name: "By the Markov clustering algorithm",
+        fn: () => {
+          this._cyService.markovClustering();
+        },
+      },
+    ].concat(this._customizationService.clusteringMethods);
+
     this.selectedOption = this.options[0].name;
   }
 
@@ -43,7 +58,7 @@ export class GroupTabComponent implements OnInit {
 
   public componentOpened() {
     this.setGraphState();
-    // set radio to None because graph has changed 
+    // set radio to None because graph has changed
     if (!areSetsEqual(this.prevGraph, this.currGraph)) {
       this.selectedOption = this.options[0].name;
     }

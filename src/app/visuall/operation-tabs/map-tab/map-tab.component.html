@@ -4,7 +4,6 @@
       class="panel-heading"
       data-bs-toggle="collapse"
       data-bs-target="#filter-class"
-      aria-expanded="true"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">Filter by Node/Edge Type</b></span
@@ -22,7 +21,6 @@
       class="panel-heading collapsed"
       data-bs-toggle="collapse"
       data-bs-target="#rule-elements"
-      aria-expanded="false"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">Query by Rule</b></span
@@ -56,7 +54,10 @@
           "
         >
           <div title="New rule" class="text-center" (click)="newRuleClick()">
-            <b class="pointer">new</b>&nbsp;<img src="assets/img/add.svg" />
+            <b class="pointer">new</b>&nbsp;<img
+              src="assets/img/add.svg"
+              title="Add new query rule"
+            />
           </div>
         </div>
       </div>
@@ -76,6 +77,7 @@
           [disabled]="isClassTypeLocked"
           [(ngModel)]="selectedClass"
           (change)="changeSelectedClass()"
+          title="Class"
         >
           <option
             [disabled]="opt.isDisabled"
@@ -132,6 +134,7 @@
               type="checkbox"
               class="form-check-input cb-filter cb-is-on-db"
               [(ngModel)]="isQueryOnDb"
+              title="Query on database"
             />
             <label class="form-label va-text">Database</label>
           </div>
@@ -141,6 +144,7 @@
               class="form-check-input cb-filter cb-is-load-graph"
               [(ngModel)]="tableInput.isLoadGraph"
               [disabled]="!isQueryOnDb"
+              title="Load graph from database"
             />
             <label class="form-label va-text">Graph</label>
           </div>
@@ -150,6 +154,7 @@
               class="form-check-input cb-filter cb-is-merge-graph"
               [(ngModel)]="tableInput.isMergeGraph"
               [disabled]="!isQueryOnDb"
+              title="Merge graph from database"
             />
             <label class="form-label va-text">Merge</label>
           </div>
@@ -171,6 +176,7 @@
             type="button"
             [value]="changeBtnTxt"
             (click)="addOrUpdateRule()"
+            title="Add or update query rule"
           />
           <input
             class="btn btn-sm btn-dark va-text m-1"
@@ -197,7 +203,6 @@
       (click)="groupTabCliked()"
       data-bs-toggle="collapse"
       data-bs-target="#group"
-      aria-expanded="true"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">Group Nodes</b></span
@@ -214,7 +219,6 @@
       class="panel-heading collapsed"
       data-bs-toggle="collapse"
       data-bs-target="#graph-theoretic-measures"
-      aria-expanded="true"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">Calculate Theoretic Property</b></span
@@ -223,6 +227,22 @@
 
     <div id="graph-theoretic-measures" class="collapse">
       <app-graph-theoretic-properties-tab></app-graph-theoretic-properties-tab>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div
+      class="panel-heading collapsed"
+      data-bs-toggle="collapse"
+      data-bs-target="#BLAST-search"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">BLAST Search</b></span
+      >
+    </div>
+
+    <div id="BLAST-search" class="collapse">
+      <app-blast-tab></app-blast-tab>
     </div>
   </div>
 

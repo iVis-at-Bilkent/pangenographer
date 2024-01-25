@@ -3,7 +3,6 @@
     class="panel-heading"
     data-bs-toggle="collapse"
     data-bs-target="#pangenograph-settings"
-    aria-expanded="true"
   >
     <span class="panel-title accordion-toggle"
       ><b class="va-heading2">PanGenomeGraph</b></span
@@ -59,7 +58,6 @@
     class="panel-heading"
     data-bs-toggle="collapse"
     data-bs-target="#general-settings"
-    aria-expanded="true"
   >
     <span class="panel-title accordion-toggle"
       ><b class="va-heading2">General</b></span
@@ -97,6 +95,7 @@
           (click)="settingChanged(i, 'mergedElemIndicator')"
           name="optradio1"
           [id]="'mergedElemIndic' + i"
+          title="Show query results using"
         />
         <label class="form-check-label" [for]="'mergedElemIndic' + i">
           {{ str }}
@@ -117,6 +116,7 @@
           [id]="'groupOpt' + i"
           (click)="settingChanged(i, 'groupingOption')"
           name="optradio2"
+          title="Group using"
         />
         <label class="form-check-label" [for]="'groupOpt' + i">
           {{ str }}
@@ -149,6 +149,7 @@
         <select
           class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
           (change)="highlightStyleSelected($event.target)"
+          title="Highlight style"
         >
           <option
             *ngFor="let t of currHighlightStyles; let i = index"
@@ -214,6 +215,7 @@
           [id]="'objInclusionType' + i"
           (click)="settingChanged(i, 'objectInclusionType')"
           name="optradio4"
+          title="Object inclusion type"
         />
         <label class="form-check-label" [for]="'objInclusionType' + i">
           {{ str }}
@@ -257,6 +259,7 @@
           (keydown.enter)="settingChanged(dataPageSize, 'dataPageSize')"
           [(ngModel)]="dataPageSize"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Query result page size"
         />
       </div>
     </div>
@@ -271,6 +274,7 @@
           (keydown.enter)="settingChanged(dataPageLimit, 'dataPageLimit')"
           [(ngModel)]="dataPageLimit"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Query result page limit"
         />
       </div>
     </div>
@@ -286,6 +290,7 @@
           "
           [(ngModel)]="queryHistoryLimit"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Query history limit"
         />
       </div>
     </div>
@@ -299,6 +304,7 @@
           (keydown.enter)="settingChanged(dbTimeout, 'dbTimeout')"
           [(ngModel)]="dbTimeout"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Database execution timeout (sec)"
         />
       </div>
     </div>
@@ -312,6 +318,7 @@
           (keydown.enter)="settingChanged(tableColumnLimit, 'tableColumnLimit')"
           [(ngModel)]="tableColumnLimit"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Maximum number of columns in tables"
         />
       </div>
     </div>
@@ -327,6 +334,7 @@
           "
           [(ngModel)]="edgeCollapseLimit"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Multiple edge collapse limit"
         />
       </div>
     </div>
@@ -338,6 +346,7 @@
           (keydown.enter)="settingChanged(compoundPadding, 'compoundPadding')"
           [(ngModel)]="compoundPadding"
           class="form-control inp-3-char std-inp-hei va-small-text"
+          title="Compound padding"
         />
       </div>
     </div>
@@ -347,6 +356,8 @@
         type="checkbox"
         [(ngModel)]="isStoreUserProfile"
         (change)="settingChanged(isStoreUserProfile, 'isStoreUserProfile')"
+        id="storeUserProfile"
+        title="Store user profile"
       />
       <label class="va-text">Store user profile</label>
     </div>
@@ -367,7 +378,6 @@
     class="panel-heading collapsed"
     data-bs-toggle="collapse"
     data-bs-target="#timebar-settings"
-    aria-expanded="false"
   >
     <span class="panel-title accordion-toggle"
       ><b class="va-heading2">Timebar</b></span
@@ -404,6 +414,7 @@
             min="1"
             max="100"
             [disabled]="!timebarBoolSettings[0].isEnable"
+            title="Animation step"
           />
         </div>
         <div class="va-text">{{ timebarPlayingStep }}</div>
@@ -422,6 +433,7 @@
               min="10"
               max="2500"
               [disabled]="!timebarBoolSettings[0].isEnable"
+              title="Animation period"
             />
           </div>
           <div class="va-text">{{ timebarPlayingPeriod }}</div>
@@ -441,6 +453,7 @@
               min="0"
               max="100"
               [disabled]="!timebarBoolSettings[0].isEnable"
+              title="Zoom sensitivity"
             />
           </div>
           <div class="va-text">{{ timebarZoomingStep }}</div>
@@ -462,6 +475,7 @@
               name="optradio5"
               [disabled]="!timebarBoolSettings[0].isEnable"
               [id]="'statsInclusionType' + i"
+              title="Statistics inclusion type"
             />
             <label class="form-check-label" [for]="'statsInclusionType' + i">
               {{ str }}

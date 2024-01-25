@@ -1,28 +1,28 @@
 import {
   Component,
-  OnInit,
   ElementRef,
-  ViewChild,
   OnDestroy,
+  OnInit,
+  ViewChild,
 } from "@angular/core";
+import { BehaviorSubject, Subscription } from "rxjs";
+import { CustomizationModule } from "src/app/custom/customization.module";
+import {
+  MAX_HIGHTLIGHT_WIDTH,
+  MAX_LENGTH_OF_UP_DOWN_STREAM,
+  MIN_HIGHTLIGHT_WIDTH,
+  MIN_LENGTH_OF_UP_DOWN_STREAM,
+  getCyStyleFromColorAndWid,
+} from "../../constants";
 import { GlobalVariableService } from "../../global-variable.service";
 import {
-  TimebarGraphInclusionTypes,
-  TimebarStatsInclusionTypes,
-  MergedElemIndicatorTypes,
   BoolSetting,
   GroupingOptionTypes,
+  MergedElemIndicatorTypes,
+  TimebarGraphInclusionTypes,
+  TimebarStatsInclusionTypes,
 } from "../../user-preference";
 import { UserProfileService } from "../../user-profile.service";
-import { BehaviorSubject, Subscription } from "rxjs";
-import {
-  MIN_HIGHTLIGHT_WIDTH,
-  MAX_HIGHTLIGHT_WIDTH,
-  getCyStyleFromColorAndWid,
-  MIN_LENGTH_OF_UP_DOWN_STREAM,
-  MAX_LENGTH_OF_UP_DOWN_STREAM,
-} from "../../constants";
-import { CustomizationModule } from "src/app/custom/customization.module";
 
 @Component({
   selector: "app-settings-tab",
@@ -236,7 +236,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.queryResultPagination = up.queryResultPagination.getValue();
 
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
-    this.pangenomegrapherBoolSettings[0].isEnable = up_p.isHighlightInZeroOutZero.getValue();
+    this.pangenomegrapherBoolSettings[0].isEnable =
+      up_p.isHighlightInZeroOutZero.getValue();
 
     this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
     this.timebarBoolSettings[1].isEnable =

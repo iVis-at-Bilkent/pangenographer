@@ -168,7 +168,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this.unbindHoverListener();
   }
 
-  private elemHovered(e) {
+  private elemHovered(e: any) {
     this._ngZone.run(() => {
       if (e.type == "mouseover") {
         if (this.params.isUseCySelector4Highlight) {

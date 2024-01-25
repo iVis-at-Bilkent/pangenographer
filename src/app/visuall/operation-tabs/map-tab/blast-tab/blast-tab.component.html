@@ -1,0 +1,339 @@
+<div>
+  <div>
+    <p>Last RID: {{ rid }}</p>
+    <p>Last RTOE: {{ rtoe }}</p>
+    <p>Last Status: {{ status }}</p>
+    <p>Last Result:</p>
+    <pre class="result">{{ result }}</pre>
+  </div>
+  <div>
+    <label class="va-text">Query:</label>
+    <input
+      class="btn btn-sm btn-primary va-text m-2 center"
+      type="button"
+      (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
+      value="Get Selected Segment's Sequence"
+      title="Get Selected Segment's Sequence"
+    />
+    <div class="form-inline mx-1">
+      <textarea
+        (change)="onQueryChange($event)"
+        [(ngModel)]="query"
+        class="form-control std-inp-hei va-small-text ms-1 w5-5 h-100"
+        placeholder="Accession, GI, or FASTA."
+      ></textarea>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Database:</label>
+    <div class="form-inline mx-1">
+      <textarea
+        (change)="onDatabaseChange($event)"
+        [(ngModel)]="database"
+        class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+        placeholder="Database from appendix 2 or one uploaded to blastdb_custom (see appendix 4)"
+      ></textarea>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Program:</label>
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onProgramChange($event)"
+        title="Program"
+        [(ngModel)]="selectedProgramIdx"
+      >
+        <option
+          *ngFor="let program of programs; let i = index"
+          [value]="program"
+          [selected]="selectedProgramIdx === i"
+        >
+          {{ program }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div class="form-check form-check-inline va-text">
+    <input
+      class="form-check-input"
+      type="checkbox"
+      [(ngModel)]="enableMegaBlast"
+      (change)="onMegaBlastChange($event)"
+      id="enableMegaBlast"
+      title="Enable MegaBlast"
+    />
+    <label class="va-text">Enable MegaBlast</label>
+  </div>
+  <div>
+    <label class="va-text">Filter:</label>
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onFilterChange($event)"
+        title="Filter"
+        [(ngModel)]="selectedFilterIdx"
+      >
+        <option
+          *ngFor="let filter of filters; let i = index"
+          [value]="filter"
+          [selected]="selectedFilterIdx === i"
+        >
+          {{ filter }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Format Type:</label>
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onFormatTypeChange($event)"
+        title="Format Type"
+        [(ngModel)]="selectedFormatTypeIdx"
+      >
+        <option
+          *ngFor="let type of formatTypes; let i = index"
+          [value]="type"
+          [selected]="selectedFormatTypeIdx === i"
+        >
+          {{ type }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Expect: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onExpectChange($event)"
+        [(ngModel)]="expect"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Expect"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Nucleotide Reward: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onNucleotideRewardChange($event)"
+        [(ngModel)]="nulceotideReward"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Nucleotide Reward"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Nucleotide Penalty: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        max="0"
+        (keydown.enter)="onNucleotidePenaltyChange($event)"
+        [(ngModel)]="nucleotidePenalty"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Nucleotide Penalty"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Gap Costs:</label>
+    <div class="form-inline mx-1">
+      <textarea
+        (change)="onGapCostChange($event)"
+        [(ngModel)]="gapCost"
+        class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+        placeholder="Pair of positive integers separated by a space such as “11 1”."
+      ></textarea>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Matrix:</label>
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onMatrixChange($event)"
+        title="Matrix"
+        [(ngModel)]="selectedMatrixIdx"
+      >
+        <option
+          *ngFor="let matrix of matrixs; let i = index"
+          [value]="matrix"
+          [selected]="selectedMatrixIdx === i"
+        >
+          {{ matrix }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Hitlist Size: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onHitlistSizeChange($event)"
+        [(ngModel)]="hitlistSize"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Hitlist Size"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Descriptions: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onDescriptionsChange($event)"
+        [(ngModel)]="descriptions"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Descriptions"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Alignments: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onAlignmentsChange($event)"
+        [(ngModel)]="alignments"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Alignments"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">NCBI GenInfo:</label>
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onNCBIGenInfoChange($event)"
+        title="NCBI GenInfo"
+        [(ngModel)]="selectedNCBIGenInfoIdx"
+      >
+        <option
+          *ngFor="let genInfo of ncbiGenInfos; let i = index"
+          [value]="genInfo"
+          [selected]="selectedNCBIGenInfoIdx === i"
+        >
+          {{ genInfo }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">BLAST search request identifier (RID):</label>
+    <div class="form-inline mx-1">
+      <textarea
+        (change)="onRIDChange($event)"
+        [(ngModel)]="rid"
+        class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+        placeholder="The Request ID (RID) returned when the search was submitted"
+      ></textarea>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Threshold: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onThresholdChange($event)"
+        [(ngModel)]="threshold"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Threshold"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Word Size: (0 for undefined)</label>
+    <div class="mx-1">
+      <input
+        type="number"
+        min="0"
+        (keydown.enter)="onWordSizeChange($event)"
+        [(ngModel)]="wordSize"
+        class="form-control inp-3-char std-inp-hei va-small-text"
+        title="Word Size"
+      />
+    </div>
+  </div>
+  <div>
+    <label class="va-text"
+      >Composition Based Statistics: (-1 for undefined)</label
+    >
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onCompositionBasedStatisticsChange($event)"
+        title="Composition Based Statistics"
+        [(ngModel)]="selectedCompositionBasedStatisticsIdx"
+      >
+        <option
+          *ngFor="
+            let compositionBasedStatistic of compositionBasedStatistics;
+            let i = index
+          "
+          [value]="compositionBasedStatistic"
+          [selected]="selectedCompositionBasedStatisticsIdx === i"
+        >
+          {{ compositionBasedStatistic }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <div>
+    <label class="va-text">Format Object:</label>
+    <div class="form-inline mx-1">
+      <select
+        class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+        (change)="onFormatObjectChange($event)"
+        title="Format Object"
+        [(ngModel)]="selectedFormatObjectIdx"
+      >
+        <option
+          *ngFor="let formatObject of formatObjects; let i = index"
+          [value]="formatObject"
+          [selected]="selectedFormatObjectIdx === i"
+        >
+          {{ formatObject }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <input
+      class="btn btn-sm btn-dark va-text m-2 center"
+      type="button"
+      (click)="executeBlastQueryWithParams()"
+      value="Execute"
+      title="Execute Query"
+    />
+  </div>
+  <div>
+    <input
+      class="btn btn-sm btn-dark va-text m-2 center"
+      type="button"
+      (click)="checkBlastQueryStatus()"
+      value="Check Query Status"
+      title="Check Query Status"
+    />
+  </div>
+  <input
+    class="btn btn-sm btn-dark va-text m-2 center"
+    type="button"
+    (click)="getBlastQueryResult()"
+    value="Get Results"
+    title="Get Results"
+  />
+</div>

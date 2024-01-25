@@ -28,6 +28,7 @@
     class="btn btn-sm"
     (click)="downloadAsCSV4Checked()"
     title="Download selected objects as CSV"
+    type="button"
   >
     <img
       class="img-icon m-1"
@@ -46,6 +47,7 @@
     [disabled]="isLoading || !params.results || params.results.length < 1"
     class="btn btn-sm"
     (click)="loadGraph4Checked()"
+    type="button"
   >
     <img
       class="img-icon"
@@ -59,6 +61,7 @@
     class="btn btn-sm"
     (click)="tableStateChanged()"
     title="Minimize/Maximize table"
+    type="button"
   >
     <img
       [src]="

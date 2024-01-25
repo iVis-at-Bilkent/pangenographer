@@ -35,6 +35,7 @@ import { RuleDropdownComponent } from "./rule-dropdown/rule-dropdown.component";
 import { RuleTreeComponent } from "./rule-tree/rule-tree.component";
 import { TimebarComponent } from "./timebar/timebar.component";
 import { ToolbarComponent } from "./toolbar/toolbar.component";
+import { BlastTabComponent } from './operation-tabs/map-tab/blast-tab/blast-tab.component';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     RuleDropdownComponent,
     PanelContainerComponent,
     LoadGraphFromFileModalComponent,
+    BlastTabComponent,
   ],
   imports: [
     BrowserModule,

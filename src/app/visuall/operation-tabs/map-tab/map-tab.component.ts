@@ -1,43 +1,43 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import {
-  GENERIC_TYPE,
-  COLLAPSED_EDGE_CLASS,
-  CLUSTER_CLASS,
-} from "../../constants";
-import { DbAdapterService } from "../../db-service/db-adapter.service";
-import { CytoscapeService } from "../../cytoscape.service";
-import { GlobalVariableService } from "../../global-variable.service";
-import { TimebarService } from "../../timebar.service";
-import { TYPES_NOT_TO_SHOW } from "../../constants";
-import {
-  ClassOption,
-  Rule,
-  RuleSync,
-  QueryRule,
-  ClassBasedRules,
-  RuleNode,
-  getBoolExpressionFromMetric,
-  deepCopyRuleNode,
-} from "./query-types";
 import { Subject, Subscription } from "rxjs";
+import { CustomizationModule } from "src/app/custom/customization.module";
 import {
-  TableViewInput,
   TableData,
   TableDataType,
   TableFiltering,
   TableRowMeta,
+  TableViewInput,
   property2TableData,
 } from "../../../shared/table-view/table-view-types";
+import {
+  CLUSTER_CLASS,
+  COLLAPSED_EDGE_CLASS,
+  GENERIC_TYPE,
+  TYPES_NOT_TO_SHOW,
+} from "../../constants";
+import { CytoscapeService } from "../../cytoscape.service";
 import {
   DbResponse,
   DbResponseType,
   GraphResponse,
   HistoryMetaData,
 } from "../../db-service/data-types";
-import { GroupTabComponent } from "./group-tab/group-tab.component";
+import { DbAdapterService } from "../../db-service/db-adapter.service";
+import { GlobalVariableService } from "../../global-variable.service";
+import { TimebarService } from "../../timebar.service";
 import { MergedElemIndicatorTypes } from "../../user-preference";
 import { UserProfileService } from "../../user-profile.service";
-import { CustomizationModule } from "src/app/custom/customization.module";
+import { GroupTabComponent } from "./group-tab/group-tab.component";
+import {
+  ClassBasedRules,
+  ClassOption,
+  QueryRule,
+  Rule,
+  RuleNode,
+  RuleSync,
+  deepCopyRuleNode,
+  getBoolExpressionFromMetric,
+} from "./query-types";
 
 @Component({
   selector: "app-map-tab",
@@ -600,7 +600,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
   }
 
   getDataForQueryResult(e: TableRowMeta) {
-    let fn = (x) => {
+    let fn = (x: any) => {
       this._cyService.loadElementsFromDatabase(x, this.tableInput.isMergeGraph);
     };
     let historyMeta: HistoryMetaData = {

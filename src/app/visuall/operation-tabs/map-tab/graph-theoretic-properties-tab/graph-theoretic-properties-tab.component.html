@@ -1,41 +1,94 @@
 <div>
   <div class="d-flex flex-wrap align-items-center justify-content-center m-1">
-    <select class="form-select tight-select filter-form va-small-text" [(ngModel)]="selectedPropFn">
+    <select
+      class="form-select tight-select filter-form va-small-text"
+      [(ngModel)]="selectedPropFn"
+      title="Property"
+    >
       <option value="">Choose a property</option>
-      <option *ngFor="let prop of theoreticProps" [value]="prop.fn">{{prop.text}}
+      <option *ngFor="let prop of theoreticProps" [value]="prop.fn">
+        {{ prop.text }}
       </option>
     </select>
   </div>
-  <div *ngIf="selectedPropFn && selectedPropFn.length > 0"
-    class="d-flex flex-wrap align-items-center justify-content-center m-1">
+  <div
+    *ngIf="selectedPropFn && selectedPropFn.length > 0"
+    class="d-flex flex-wrap align-items-center justify-content-center m-1"
+  >
     <div class="form-check m-1 va-text">
-      <input type="checkbox" class="form-check-input cb-filter" [(ngModel)]="isDirectedGraph" id="cb0" />
+      <input
+        type="checkbox"
+        class="form-check-input cb-filter"
+        [(ngModel)]="isDirectedGraph"
+        id="cb0"
+      />
       <label class="form-check-label" for="cb0">Directed</label>
     </div>
     <div class="form-check m-1 va-text">
-      <input type="checkbox" class="form-check-input cb-filter" [(ngModel)]="isConsiderOriginalEdges" id="cb1" />
-      <label class="form-check-label" for="cb1">Consider original edges instead</label>
+      <input
+        type="checkbox"
+        class="form-check-input cb-filter"
+        [(ngModel)]="isConsiderOriginalEdges"
+        id="cb1"
+      />
+      <label class="form-check-label" for="cb1"
+        >Consider original edges instead</label
+      >
     </div>
     <div class="form-check m-1 va-text">
-      <input type="checkbox" class="form-check-input cb-filter" [(ngModel)]="isMapNodeSizes" id="cb2" />
+      <input
+        type="checkbox"
+        class="form-check-input cb-filter"
+        [(ngModel)]="isMapNodeSizes"
+        id="cb2"
+      />
       <label class="form-check-label" for="cb2">Adjust node size</label>
     </div>
-    <input type="number" (keydown.enter)="avgNodeSizeChanged()" min="5" max="1000" title="Average node size"
-      [(ngModel)]="currNodeSize" class="mx-1 inp-3-char std-inp-hei form-control va-small-text">
+    <input
+      type="number"
+      (keydown.enter)="avgNodeSizeChanged()"
+      min="5"
+      max="1000"
+      title="Average node size"
+      [(ngModel)]="currNodeSize"
+      class="mx-1 inp-3-char std-inp-hei form-control va-small-text"
+    />
   </div>
-  <div *ngIf="selectedPropFn && selectedPropFn.length > 0"
-    class="d-flex flex-wrap align-items-center justify-content-center m-1">
+  <div
+    *ngIf="selectedPropFn && selectedPropFn.length > 0"
+    class="d-flex flex-wrap align-items-center justify-content-center m-1"
+  >
     <div class="form-check m-1 va-text">
-      <input type="checkbox" class="form-check-input cb-filter" [(ngModel)]="isMapBadgeSizes" id="cb3" />
+      <input
+        type="checkbox"
+        class="form-check-input cb-filter"
+        [(ngModel)]="isMapBadgeSizes"
+        id="cb3"
+      />
       <label class="form-check-label" for="cb3">Adjust badge size</label>
     </div>
-    <app-color-picker (onColorSelected)="colorSelected($event)" [currColor]="badgeColor"></app-color-picker>
+    <app-color-picker
+      (onColorSelected)="colorSelected($event)"
+      [currColor]="badgeColor"
+    ></app-color-picker>
   </div>
-  <div *ngIf="selectedPropFn && selectedPropFn.length > 0"
-    class="d-flex flex-wrap align-items-center justify-content-center m-1">
-    <input class="btn btn-sm btn-dark va-text m-1" type="button" value="Execute" (click)="runProperty()">
+  <div
+    *ngIf="selectedPropFn && selectedPropFn.length > 0"
+    class="d-flex flex-wrap align-items-center justify-content-center m-1"
+  >
+    <input
+      class="btn btn-sm btn-dark va-text m-1"
+      type="button"
+      value="Execute"
+      (click)="runProperty()"
+    />
     <div class="form-check m-1 va-text">
-      <input type="checkbox" class="form-check-input cb-filter" [(ngModel)]="isOnSelected" id="cb4" />
+      <input
+        type="checkbox"
+        class="form-check-input cb-filter"
+        [(ngModel)]="isOnSelected"
+        id="cb4"
+      />
       <label class="form-check-label" for="cb4">On selected only</label>
     </div>
   </div>
