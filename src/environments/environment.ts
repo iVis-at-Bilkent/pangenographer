@@ -5,10 +5,10 @@
 export const environment = {
   production: false,
   dbConfig: {
-    getSampleUrl: 'http://ivis.cs.bilkent.edu.tr:2000/db/neo4j/tx/commit',
-    username: 'neo4j',
-    password: '12345678'
-  }
+    getSampleUrl: "http://ivis.cs.bilkent.edu.tr:2000/db/neo4j/tx/commit",
+    username: "neo4j",
+    password: "12345678",
+  },
 };
 
 /*

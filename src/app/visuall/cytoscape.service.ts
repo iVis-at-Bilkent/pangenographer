@@ -418,7 +418,7 @@ export class CytoscapeService {
         this._g.cy.$().unselect();
       }
     }
-    
+
     let ele2highlight = this._g.cy.collection();
     const cnt = elemIds.length;
     for (let i = 0; i < cnt; i++) {
@@ -892,7 +892,7 @@ export class CytoscapeService {
     }
   }
 
-  showCollapsed4Node(node) {
+  showCollapsed4Node(node: any) {
     const collapsed = node.data("collapsedChildren");
     this._g.viewUtils.show(collapsed);
     const collapsedNodes = collapsed.filter("." + C.COLLAPSED_NODE_CLASS);
@@ -906,7 +906,7 @@ export class CytoscapeService {
     }
   }
 
-  showCollapsed4Edge(edge) {
+  showCollapsed4Edge(edge: any) {
     const collapsed = edge.data("collapsedEdges");
     this._g.viewUtils.show(collapsed);
     const collapsedEdges = collapsed.filter("." + C.COLLAPSED_EDGE_CLASS);
@@ -916,7 +916,7 @@ export class CytoscapeService {
   }
 
   // expands all the compound nodes and deletes them recursively
-  hideCompounds(elems) {
+  hideCompounds(elems: any) {
     this._timebarService.setIgnoreChanges(true);
     const nodes = elems
       .filter("." + C.CLUSTER_CLASS)
@@ -1227,7 +1227,7 @@ export class CytoscapeService {
         const cluster = compounNodes[i]
           .children()
           .not("." + C.CLUSTER_CLASS)
-          .map((x) => x.id());
+          .map((x: any) => x.id());
         clusters.push(cluster);
       }
       this._g.layout.clusters = clusters;
@@ -1260,5 +1260,20 @@ export class CytoscapeService {
     return name.replace(/\$\$\$(\d+)\$\$\$/g, (match, charCode) => {
       return String.fromCharCode(Number(charCode));
     });
+  }
+
+  prepareAllNodesFastaData(nodes: any = this._g.cy.nodes()): string {
+    let fastaData = "";
+    for (let i = 0; i < nodes.length; i++) {
+      if (nodes[i].data("segmentData")) {
+        fastaData +=
+          ">" +
+          nodes[i].data("segmentName") +
+          "\n" +
+          nodes[i].data("segmentData") +
+          "\n";
+      }
+    }
+    return fastaData;
   }
 }

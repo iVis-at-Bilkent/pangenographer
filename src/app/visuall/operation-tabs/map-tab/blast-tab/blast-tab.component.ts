@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
+import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
 
 @Component({
@@ -56,7 +57,15 @@ export class BlastTabComponent implements OnInit {
   result: string = "";
   resultTableInput: string = "";
 
-  constructor(protected _http: HttpClient, private _g: GlobalVariableService) {}
+  standaloneQuery: string = "";
+  standaloneStatus: string = "";
+  standaloneUrl: string = "http://ivis.cs.bilkent.edu.tr:5201";
+
+  constructor(
+    protected _http: HttpClient,
+    private _g: GlobalVariableService,
+    private _cyService: CytoscapeService
+  ) {}
 
   ngOnInit(): void {}
 
@@ -186,7 +195,7 @@ export class BlastTabComponent implements OnInit {
     });
   }
 
-  fillQueryTextareaWithSelectedSegmentsSequence() {
+  fillQueryTextareaWithSelectedSegmentsSequence(isStandalone: boolean = false) {
     const selectedSegments = this._g.cy.$(":selected");
     if (selectedSegments.length == 0) {
       this._g.showErrorModal(
@@ -195,8 +204,13 @@ export class BlastTabComponent implements OnInit {
       );
       return;
     }
-    const selectedSegment = selectedSegments[0];
-    const selectedSegmentSeq = selectedSegment.data("segmentData");
+    let selectedSegmentSeq =
+      this._cyService.prepareAllNodesFastaData(selectedSegments);
+
+    if (isStandalone) {
+      this.standaloneQuery = selectedSegmentSeq;
+      return;
+    }
     this.query = selectedSegmentSeq;
   }
 
@@ -289,5 +303,65 @@ export class BlastTabComponent implements OnInit {
     this.selectedFormatObjectIdx = event.target.selectedIndex;
     this.selectedFormatObject =
       this.formatObjects[this.selectedFormatObjectIdx];
+  }
+
+  runBlastStandaloneQuery(
+    requestBody: any,
+    isMakeDb: boolean,
+    callback?: (result: string) => void
+  ) {
+    let url = this.standaloneUrl;
+    if (isMakeDb) {
+      url += "/makeBlastDb";
+    } else {
+      url += "/blastn";
+    }
+    this._g.setLoadingStatus(true);
+    this._g.statusMsg.next("Executing Blast query...");
+    const errFn = (err: any) => {
+      this._g.statusMsg.next("Blast query execution raised an error!");
+      this._g.showErrorModal("Blast Query Execution Error", err.message);
+      this._g.setLoadingStatus(false);
+    };
+    this._http.post(url, requestBody).subscribe((x) => {
+      this._g.setLoadingStatus(false);
+      if (x["errors"] && x["errors"].length > 0) {
+        errFn(x["errors"][0]);
+        return;
+      }
+      this._g.statusMsg.next("");
+      if (callback) {
+        callback(x["results"]);
+      }
+    }, errFn);
+  }
+
+  makeBlastDb() {
+    this.runBlastStandaloneQuery(
+      { fastaData: this._cyService.prepareAllNodesFastaData() },
+      true,
+      (result) => {
+        this.standaloneStatus = result;
+      }
+    );
+  }
+
+  executeStandaloneBlastQueryWithParams() {
+    if (!this.standaloneQuery) {
+      this._g.showErrorModal(
+        "No query sequence",
+        "Please enter a query sequence and try again."
+      );
+      return;
+    }
+    this.runBlastStandaloneQuery(
+      {
+        fastaData: this.standaloneQuery,
+      },
+      false,
+      (result) => {
+        this.standaloneStatus = result;
+      }
+    );
   }
 }

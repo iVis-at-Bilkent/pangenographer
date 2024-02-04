@@ -327,7 +327,7 @@ export class Neo4jDb implements DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
@@ -625,7 +625,7 @@ export class Neo4jDb implements DbService {
     const requestBody = {
       statements: [{ statement: query, parameters: null }],
     };
-    const errFn = (err) => {
+    const errFn = (err: any) => {
       this._g.statusMsg.next("Database query execution raised an error!");
       this._g.showErrorModal("Database Query Execution Error", err.message);
       this._g.setLoadingStatus(false);
