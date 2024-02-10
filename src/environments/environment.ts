@@ -9,6 +9,7 @@ export const environment = {
     username: "neo4j",
     password: "12345678",
   },
+  blastStandaloneUrl: "http://ivis.cs.bilkent.edu.tr:5201",
 };
 
 /*

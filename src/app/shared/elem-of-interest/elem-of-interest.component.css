@@ -4,7 +4,7 @@
 }
 
 .down-icon:after {
-  font-family: 'FontAwesome', sans-serif;
+  font-family: "FontAwesome", sans-serif;
   content: "\f077";
   float: right;
   padding-right: 4px;
@@ -13,7 +13,7 @@
 /* symbol for "collapsed" panels */
 
 .up-icon:after {
-  font-family: 'FontAwesome', sans-serif;
+  font-family: "FontAwesome", sans-serif;
   content: "\f078";
   float: right;
   padding-right: 4px;
@@ -47,12 +47,12 @@
 
 @keyframes borderanim {
   0% {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   }
   50% {
     box-shadow: 0 0 white;
   }
   100% {
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   }
 }

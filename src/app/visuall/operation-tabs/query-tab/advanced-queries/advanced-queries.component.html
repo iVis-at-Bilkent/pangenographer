@@ -1,82 +1,154 @@
-<input #file type="file" (change)="fileSelected()" accept="text/*, .json, .csv" style="display: none;" />
+<input
+  #file
+  type="file"
+  (change)="fileSelected()"
+  accept="text/*, .json, .csv"
+  style="display: none"
+/>
 <div>
   <div class="va-text">
     <div class="d-flex align-items-center justify-content-center">
-      <select class="form-select tight-select filter-form va-small-text query-select" [(ngModel)]="selectedQuery"
-        (change)="changeAdvancedQuery($event)">
+      <select
+        class="form-select tight-select filter-form va-small-text query-select"
+        [(ngModel)]="selectedQuery"
+        (change)="changeAdvancedQuery($event)"
+        title="Choose a query"
+      >
         <option value="">Choose a query</option>
-        <option *ngFor="let p of queries" [value]="p">{{p}}</option>
+        <option *ngFor="let p of queries" [value]="p">{{ p }}</option>
       </select>
     </div>
   </div>
 </div>
 
-<div *ngIf="selectedIdx==0 || selectedIdx==1 || selectedIdx==2">
+<div *ngIf="selectedIdx == 0 || selectedIdx == 1 || selectedIdx == 2">
   <div class="panel">
     <div class="panel">
-      <div class="form-inline va-text m-2 justify-content-center" *ngIf="selectedIdx==2">
+      <div
+        class="form-inline va-text m-2 justify-content-center"
+        *ngIf="selectedIdx == 2"
+      >
         <span>Get common &nbsp;</span>
-        <input [disabled]="!isDirected" type="radio" class="form-check-input" name="optradio1"
-          (click)="targetOrRegulator = 0" value="0" [checked]="targetOrRegulator === 0"><span>target(s) &nbsp;</span>
-        <input [disabled]="!isDirected" type="radio" class="form-check-input" name="optradio1"
-          (click)="targetOrRegulator = 1" value="1" [checked]="targetOrRegulator === 1"><span> regulator(s) for</span>
+        <input
+          [disabled]="!isDirected"
+          type="radio"
+          class="form-check-input"
+          name="optradio1"
+          (click)="targetOrRegulator = 0"
+          value="0"
+          [checked]="targetOrRegulator === 0"
+          title="Get common target(s) or regulator(s)"
+        /><span>target(s) &nbsp;</span>
+        <input
+          [disabled]="!isDirected"
+          type="radio"
+          class="form-check-input"
+          name="optradio1"
+          (click)="targetOrRegulator = 1"
+          value="1"
+          [checked]="targetOrRegulator === 1"
+          title="Get common target(s) or regulator(s)"
+        /><span> regulator(s) for</span>
       </div>
     </div>
     <!-- selected nodes -->
     <div class="panel">
-      <app-elem-of-interest [header]="'Nodes of Interest'" (selectedElemsChanged)="setSelected($event)">
+      <app-elem-of-interest
+        [header]="'Nodes of Interest'"
+        (selectedElemsChanged)="setSelected($event)"
+      >
       </app-elem-of-interest>
     </div>
 
     <!-- ignored types -->
     <div class="panel">
-      <div class="subpanel-heading collapsed px-1" data-bs-toggle="collapse" data-bs-target="#types2consider"
-        aria-expanded="false">
-        <span class="panel-title accordion-toggle"><span class="va-heading3">Object Types to Consider</span></span>
+      <div
+        class="subpanel-heading collapsed px-1"
+        data-bs-toggle="collapse"
+        data-bs-target="#types2consider"
+      >
+        <span class="panel-title accordion-toggle"
+          ><span class="va-heading3">Object Types to Consider</span></span
+        >
       </div>
       <div id="types2consider" class="collapse">
-        <app-types-view (onFilterByType)="addRemoveType($event)"></app-types-view>
+        <app-types-view
+          (onFilterByType)="addRemoveType($event)"
+        ></app-types-view>
       </div>
     </div>
 
     <!-- options -->
     <div class="panel">
-      <div class="subpanel-heading collapsed px-1" data-bs-toggle="collapse" data-bs-target="#options"
-        aria-expanded="false">
-        <span class="panel-title accordion-toggle"><span class="va-heading3">Options</span></span>
+      <div
+        class="subpanel-heading collapsed px-1"
+        data-bs-toggle="collapse"
+        data-bs-target="#options"
+      >
+        <span class="panel-title accordion-toggle"
+          ><span class="va-heading3">Options</span></span
+        >
       </div>
       <div id="options" class="collapse">
         <div class="form-inline justify-content-center">
           <label class="va-text">Length limit</label>
           <div class="mx-1">
-            <input type="number" max="10" min="1" [(ngModel)]="lengthLimit"
-              class="form-control inp-3-char std-inp-hei va-small-text">
+            <input
+              type="number"
+              max="10"
+              min="1"
+              [(ngModel)]="lengthLimit"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Length limit"
+            />
           </div>
           <div class="form-check va-text m-1">
-            <input class="form-check-input" type="checkbox" [(ngModel)]="isDirected" id="isDirected">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [(ngModel)]="isDirected"
+              id="isDirected"
+            />
             <label for="isDirected" class="form-check-label">Directed</label>
           </div>
         </div>
-
-
       </div>
     </div>
 
     <div class="form-inline justify-content-center">
-      <input class="btn btn-sm btn-dark va-text m-1" type="button" value="Execute" (click)="runQuery(false, null)">
+      <input
+        class="btn btn-sm btn-dark va-text m-1"
+        type="button"
+        value="Execute"
+        (click)="runQuery(false, null)"
+      />
 
       <div class="form-check va-text m-1">
-        <input class="form-check-input" type="checkbox" [(ngModel)]="tableInput.isLoadGraph" id="isGraph">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [(ngModel)]="tableInput.isLoadGraph"
+          id="isGraph"
+        />
         <label class="form-check-label" for="isGraph">Graph</label>
       </div>
 
       <div class="form-check va-text m-1">
-        <input class="form-check-input" type="checkbox" [(ngModel)]="tableInput.isMergeGraph" id="isMerge">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          [(ngModel)]="tableInput.isMergeGraph"
+          id="isMerge"
+        />
         <label class="form-check-label" for="isMerge">Merge</label>
       </div>
     </div>
   </div>
-  <app-table-view [params]="tableInput" [tableFilled]="tableFilled"
-    (onDataForQueryResult)="getDataForQueryResult($event)" (onFilteringChanged)="filterTable($event)">
+  <app-table-view
+    [params]="tableInput"
+    [tableFilled]="tableFilled"
+    (onDataForQueryResult)="getDataForQueryResult($event)"
+    (onFilteringChanged)="filterTable($event)"
+  >
   </app-table-view>
 </div>

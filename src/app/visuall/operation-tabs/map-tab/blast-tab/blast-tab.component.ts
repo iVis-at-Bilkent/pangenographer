@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
+import { environment } from "src/environments/environment";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
 
@@ -59,7 +60,7 @@ export class BlastTabComponent implements OnInit {
 
   standaloneQuery: string = "";
   standaloneStatus: string = "";
-  standaloneUrl: string = "http://ivis.cs.bilkent.edu.tr:5201";
+  standaloneUrl: string = environment.blastStandaloneUrl;
 
   constructor(
     protected _http: HttpClient,

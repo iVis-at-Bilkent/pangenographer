@@ -4,7 +4,6 @@
       class="panel-heading"
       data-bs-toggle="collapse"
       data-bs-target="#advanced-query-tab"
-      aria-expanded="true"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">General Queries</b></span
@@ -21,7 +20,6 @@
       class="panel-heading collapsed"
       data-bs-toggle="collapse"
       data-bs-target="#custom-query-tab"
-      aria-expanded="true"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">Custom Queries</b></span
@@ -36,6 +34,7 @@
               class="form-select tight-select filter-form va-small-text query-select"
               [(ngModel)]="selectedQuery"
               (change)="changeQuery($event)"
+              title="Choose a query"
             >
               <option value="">Choose a query</option>
               <option *ngFor="let p of queries" [value]="p.text">

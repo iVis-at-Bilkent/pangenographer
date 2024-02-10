@@ -84,4 +84,6 @@ app.post("/blastn", async (req, res) => {
   }
 });
 
-app.listen(5201, () => {});
+app.listen(5201, () => {
+  console.log("BLAST server running on port 5201");
+});

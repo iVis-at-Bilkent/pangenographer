@@ -1,20 +1,32 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { GlobalVariableService } from '../../../global-variable.service';
-import { DbAdapterService } from '../../../db-service/db-adapter.service';
-import { CytoscapeService } from '../../../cytoscape.service';
-import { TableViewInput, property2TableData, TableData, TableDataType, TableFiltering, TableRowMeta } from '../../../../shared/table-view/table-view-types';
-import { Subject, Subscription } from 'rxjs';
-import { Neo4jEdgeDirection, GraphElem, ElemAsQueryParam, DbResponseType } from '../../../db-service/data-types';
-import { getCyStyleFromColorAndWid, isJson } from '../../../constants';
-import { FileReaderService } from 'src/app/visuall/file-reader.service';
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Subject, Subscription } from "rxjs";
+import { FileReaderService } from "src/app/visuall/file-reader.service";
+import {
+  TableData,
+  TableDataType,
+  TableFiltering,
+  TableRowMeta,
+  TableViewInput,
+  property2TableData,
+} from "../../../../shared/table-view/table-view-types";
+import { getCyStyleFromColorAndWid, isJson } from "../../../constants";
+import { CytoscapeService } from "../../../cytoscape.service";
+import {
+  DbResponseType,
+  ElemAsQueryParam,
+  GraphElem,
+  Neo4jEdgeDirection,
+} from "../../../db-service/data-types";
+import { DbAdapterService } from "../../../db-service/db-adapter.service";
+import { GlobalVariableService } from "../../../global-variable.service";
 
 @Component({
-  selector: 'app-advanced-queries',
-  templateUrl: './advanced-queries.component.html',
-  styleUrls: ['./advanced-queries.component.css']
+  selector: "app-advanced-queries",
+  templateUrl: "./advanced-queries.component.html",
+  styleUrls: ["./advanced-queries.component.css"],
 })
 export class AdvancedQueriesComponent implements OnInit, OnDestroy {
-  @ViewChild('file', { static: false }) file;
+  @ViewChild("file", { static: false }) file: any;
   queries: string[];
   selectedQuery: string;
   selectedIdx: number;
@@ -23,27 +35,50 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   lengthLimit = 2;
   isDirected = true;
   selectedNodes: ElemAsQueryParam[] = [];
-  selectedClass = '';
+  selectedClass = "";
   targetOrRegulator = 0;
   clickedNodeIdx = -1;
-  addNodeBtnTxt = 'Select Nodes to Add';
+  addNodeBtnTxt = "Select Nodes to Add";
   tableInput: TableViewInput = {
-    columns: ['Title'], results: [], isEmphasizeOnHover: true, tableTitle: 'Query Results', isShowExportAsCSV: true,
-    resultCnt: 0, currPage: 1, pageSize: 0, isLoadGraph: false, isMergeGraph: true, isNodeData: true
+    columns: ["Title"],
+    results: [],
+    isEmphasizeOnHover: true,
+    tableTitle: "Query Results",
+    isShowExportAsCSV: true,
+    resultCnt: 0,
+    currPage: 1,
+    pageSize: 0,
+    isLoadGraph: false,
+    isMergeGraph: true,
+    isNodeData: true,
   };
-  tableFilter: TableFiltering = { orderBy: null, orderDirection: null, txt: '', skip: null };
+  tableFilter: TableFiltering = {
+    orderBy: null,
+    orderDirection: null,
+    txt: "",
+    skip: null,
+  };
   tableFilled = new Subject<boolean>();
   dataPageSizeSubs: Subscription;
   dataModelSubs: Subscription;
   dbResponse = null;
 
-  constructor(private _g: GlobalVariableService, private _dbService: DbAdapterService, private _cyService: CytoscapeService, private _fileReaderService: FileReaderService) {
-    this.queries = ['Get neighborhood', 'Get graph of interest', 'Get common targets/regulators'];
+  constructor(
+    private _g: GlobalVariableService,
+    private _dbService: DbAdapterService,
+    private _cyService: CytoscapeService,
+    private _fileReaderService: FileReaderService
+  ) {
+    this.queries = [
+      "Get neighborhood",
+      "Get graph of interest",
+      "Get common targets/regulators",
+    ];
     this.selectedIdx = -1;
   }
 
   ngOnInit(): void {
-    this.dataModelSubs = this._g.dataModel.subscribe(x => {
+    this.dataModelSubs = this._g.dataModel.subscribe((x) => {
       if (x) {
         for (const n in x.nodes) {
           this.nodeEdgeClasses.push(n);
@@ -53,8 +88,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
         }
       }
     });
-    this.selectedQuery = '';
-    this.dataPageSizeSubs = this._g.userPrefs.dataPageSize.subscribe(x => { this.tableInput.pageSize = x; this.tableInput.currPage = 1; this.tableFilter.skip = 0; });
+    this.selectedQuery = "";
+    this.dataPageSizeSubs = this._g.userPrefs.dataPageSize.subscribe((x) => {
+      this.tableInput.pageSize = x;
+      this.tableInput.currPage = 1;
+      this.tableFilter.skip = 0;
+    });
   }
 
   ngOnDestroy(): void {
@@ -66,28 +105,31 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     }
   }
 
-  changeAdvancedQuery(event) {
-    this.selectedIdx = this.queries.findIndex(x => x == event.target.value);
+  changeAdvancedQuery(event: any) {
+    this.selectedIdx = this.queries.findIndex((x) => x == event.target.value);
   }
 
   addSelectedNodes() {
     if (this._g.isSwitch2ObjTabOnSelect) {
       this._g.isSwitch2ObjTabOnSelect = false;
-      this.addNodeBtnTxt = 'Complete Selection';
+      this.addNodeBtnTxt = "Complete Selection";
       return;
     }
-    this.addNodeBtnTxt = 'Select Nodes to Add';
+    this.addNodeBtnTxt = "Select Nodes to Add";
     this._g.isSwitch2ObjTabOnSelect = true;
-    const selectedNodes = this._g.cy.nodes(':selected');
+    const selectedNodes = this._g.cy.nodes(":selected");
     if (selectedNodes.length < 1) {
       return;
     }
-    const dbIds = selectedNodes.map(x => x.id().slice(1));
+    const dbIds = selectedNodes.map((x: any) => x.id().slice(1));
     const labels = this._g.getLabels4ElemsAsArray(dbIds);
-    const types = selectedNodes.map(x => x.classes()[0]);
+    const types = selectedNodes.map((x: any) => x.classes()[0]);
     for (let i = 0; i < labels.length; i++) {
-      if (this.selectedNodes.findIndex(x => x.dbId == dbIds[i]) < 0) {
-        this.selectedNodes.push({ dbId: dbIds[i], label: types[i] + ':' + labels[i] });
+      if (this.selectedNodes.findIndex((x) => x.dbId == dbIds[i]) < 0) {
+        this.selectedNodes.push({
+          dbId: dbIds[i],
+          label: types[i] + ":" + labels[i],
+        });
       }
     }
   }
@@ -95,7 +137,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   removeSelected(i: number) {
     if (i == this.clickedNodeIdx) {
       this.clickedNodeIdx = -1;
-      const idSelector = 'n' + this.selectedNodes[i].dbId;
+      const idSelector = "n" + this.selectedNodes[i].dbId;
       this._g.cy.$id(idSelector).unselect();
     } else if (i < this.clickedNodeIdx) {
       this.clickedNodeIdx--;
@@ -113,11 +155,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       this.tableFilter.skip = 0;
       this.tableInput.currPage = 1;
     }
-    const dbIds = this.selectedNodes.map(x => x.dbId);
+    const dbIds = this.selectedNodes.map((x) => x.dbId);
     if (dbIds.length < 1) {
       return;
     }
-    const isClientSidePagination = this._g.userPrefs.queryResultPagination.getValue() == 'Client';
+    const isClientSidePagination =
+      this._g.userPrefs.queryResultPagination.getValue() == "Client";
     const prepareDataFn = (x) => {
       if (!idFilter && !isFromFilter) {
         this.dbResponse = x;
@@ -125,7 +168,11 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
       if (!idFilter) {
         if (isClientSidePagination) {
-          const clientSideX = this.filterDbResponse(x, isFromFilter ? this.tableFilter : null, idFilter);
+          const clientSideX = this.filterDbResponse(
+            x,
+            isFromFilter ? this.tableFilter : null,
+            idFilter
+          );
           this.fillTable(clientSideX, !isFromFilter, isClientSidePagination);
         } else {
           this.fillTable(x, !isFromFilter, isClientSidePagination);
@@ -133,10 +180,20 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       }
       if (this.tableInput.isLoadGraph || idFilter) {
         if (isClientSidePagination) {
-          const clientSideX = this.filterDbResponse(x, isFromFilter ? this.tableFilter : null, idFilter);
-          this._cyService.loadElementsFromDatabase(this.prepareElems4Cy(clientSideX), this.tableInput.isMergeGraph);
+          const clientSideX = this.filterDbResponse(
+            x,
+            isFromFilter ? this.tableFilter : null,
+            idFilter
+          );
+          this._cyService.loadElementsFromDatabase(
+            this.prepareElems4Cy(clientSideX),
+            this.tableInput.isMergeGraph
+          );
         } else {
-          this._cyService.loadElementsFromDatabase(this.prepareElems4Cy(x), this.tableInput.isMergeGraph);
+          this._cyService.loadElementsFromDatabase(
+            this.prepareElems4Cy(x),
+            this.tableInput.isMergeGraph
+          );
         }
         this.highlightSeedNodes();
         this.highlightTargetRegulators(x);
@@ -145,20 +202,45 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     if (isFromFilter && isClientSidePagination) {
       prepareDataFn(this.dbResponse);
     } else {
-      const types = this.ignoredTypes.map(x => `'${x}'`);
+      const types = this.ignoredTypes.map((x) => `'${x}'`);
       if (this.selectedIdx == 1) {
-        this._dbService.getGraphOfInterest(dbIds, types, this.lengthLimit, this.isDirected, DbResponseType.table, this.tableFilter, idFilter, prepareDataFn);
+        this._dbService.getGraphOfInterest(
+          dbIds,
+          types,
+          this.lengthLimit,
+          this.isDirected,
+          DbResponseType.table,
+          this.tableFilter,
+          idFilter,
+          prepareDataFn
+        );
       } else if (this.selectedIdx == 2) {
         let dir: Neo4jEdgeDirection = this.targetOrRegulator;
         if (!this.isDirected) {
           dir = Neo4jEdgeDirection.BOTH;
         }
-        this._dbService.getCommonStream(dbIds, types, this.lengthLimit, dir, DbResponseType.table, this.tableFilter, idFilter, prepareDataFn);
+        this._dbService.getCommonStream(
+          dbIds,
+          types,
+          this.lengthLimit,
+          dir,
+          DbResponseType.table,
+          this.tableFilter,
+          idFilter,
+          prepareDataFn
+        );
       } else if (this.selectedIdx == 0) {
-        this._dbService.getNeighborhood(dbIds, types, this.lengthLimit, this.isDirected, this.tableFilter, idFilter, prepareDataFn);
+        this._dbService.getNeighborhood(
+          dbIds,
+          types,
+          this.lengthLimit,
+          this.isDirected,
+          this.tableFilter,
+          idFilter,
+          prepareDataFn
+        );
       }
     }
-
   }
 
   setSelected(x: ElemAsQueryParam[]) {
@@ -166,17 +248,26 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   // used for client-side filtering
-  private filterDbResponse(x, filter: TableFiltering, idFilter: (string | number)[]) {
-    const r = { columns: x.columns, data: [[null, null, null, null, null, null, null, null]] };
-    const idxNodes = x.columns.indexOf('nodes');
-    const idxNodeId = x.columns.indexOf('nodeElementId');
-    const idxNodeClass = x.columns.indexOf('nodeClass');
-    const idxEdges = x.columns.indexOf('edges');
-    const idxEdgeId = x.columns.indexOf('edgeElementId');
-    const idxEdgeClass = x.columns.indexOf('edgeClass');
-    const idxEdgeSrcTgt = x.columns.indexOf('edgeSourceTargets');
-    const idxTotalCnt = x.columns.indexOf('totalNodeCount');
-    const maxResultCnt = this._g.userPrefs.dataPageLimit.getValue() * this._g.userPrefs.dataPageSize.getValue();
+  private filterDbResponse(
+    x: any,
+    filter: TableFiltering,
+    idFilter: (string | number)[]
+  ) {
+    const r = {
+      columns: x.columns,
+      data: [[null, null, null, null, null, null, null, null]],
+    };
+    const idxNodes = x.columns.indexOf("nodes");
+    const idxNodeId = x.columns.indexOf("nodeElementId");
+    const idxNodeClass = x.columns.indexOf("nodeClass");
+    const idxEdges = x.columns.indexOf("edges");
+    const idxEdgeId = x.columns.indexOf("edgeElementId");
+    const idxEdgeClass = x.columns.indexOf("edgeClass");
+    const idxEdgeSrcTgt = x.columns.indexOf("edgeSourceTargets");
+    const idxTotalCnt = x.columns.indexOf("totalNodeCount");
+    const maxResultCnt =
+      this._g.userPrefs.dataPageLimit.getValue() *
+      this._g.userPrefs.dataPageSize.getValue();
 
     const nodes = x.data[0][idxNodes];
     const nodeClass = x.data[0][idxNodeClass];
@@ -189,40 +280,73 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     r.data[0][idxEdgeClass] = edgeClass;
     r.data[0][idxEdgeId] = edgeId;
     r.data[0][idxEdgeSrcTgt] = edgeSrcTgt;
-    r.data[0][idxTotalCnt] = x.data[0][idxTotalCnt] > maxResultCnt ? maxResultCnt : x.data[0][idxTotalCnt];
+    r.data[0][idxTotalCnt] =
+      x.data[0][idxTotalCnt] > maxResultCnt
+        ? maxResultCnt
+        : x.data[0][idxTotalCnt];
 
     const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
 
-    let tempNodes: { node: any, cls: string, elementId: string }[] = [];
-    const srcNodeIds = this.selectedNodes.map(x => x.dbId);
+    let tempNodes: { node: any; cls: string; elementId: string }[] = [];
+    const srcNodeIds = this.selectedNodes.map((x) => x.dbId);
     if (idFilter) {
-      tempNodes = nodes.map((_, i) => { return { node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] } })
-        .filter((_, i) => { return idFilter.includes(nodeId[i]) || srcNodeIds.findIndex(x => x == nodeId[i]) > -1; });
-    }
-    else if (filter) {
+      tempNodes = nodes
+        .map((_: any, i: number) => {
+          return { node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] };
+        })
+        .filter((_: any, i: number) => {
+          return (
+            idFilter.includes(nodeId[i]) ||
+            srcNodeIds.findIndex((x) => x == nodeId[i]) > -1
+          );
+        });
+    } else if (filter) {
       for (let i = 0; i < nodes.length; i++) {
-        const vals = Object.values(nodes[i]).join('');
+        const vals = Object.values(nodes[i]).join("");
         // always include source nodes
-        if (srcNodeIds.includes(nodeId[i]) || (isIgnoreCase && vals.toLowerCase().includes(filter.txt.toLowerCase())) || (!isIgnoreCase && vals.includes(filter.txt))) {
-          tempNodes.push({ node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] });
+        if (
+          srcNodeIds.includes(nodeId[i]) ||
+          (isIgnoreCase &&
+            vals.toLowerCase().includes(filter.txt.toLowerCase())) ||
+          (!isIgnoreCase && vals.includes(filter.txt))
+        ) {
+          tempNodes.push({
+            node: nodes[i],
+            cls: nodeClass[i],
+            elementId: nodeId[i],
+          });
         }
       }
     } else {
-      tempNodes = nodes.map((_, i) => { return { node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] } })
+      tempNodes = nodes.map((_: any, i: number) => {
+        return { node: nodes[i], cls: nodeClass[i], elementId: nodeId[i] };
+      });
     }
 
     // order by
     if (!idFilter && filter && filter.orderDirection.length > 0) {
       const o = filter.orderBy;
-      if (filter.orderDirection == 'asc') {
-        tempNodes = tempNodes.sort((a, b) => { if (!a.node[o]) return 1; if (!b.node[o]) return -1; if (a.node[o] > b.node[o]) return 1; if (b.node[o] > a.node[o]) return -1; return 0 });
+      if (filter.orderDirection == "asc") {
+        tempNodes = tempNodes.sort((a, b) => {
+          if (!a.node[o]) return 1;
+          if (!b.node[o]) return -1;
+          if (a.node[o] > b.node[o]) return 1;
+          if (b.node[o] > a.node[o]) return -1;
+          return 0;
+        });
       } else {
-        tempNodes = tempNodes.sort((a, b) => { if (!a.node[o]) return 1; if (!b.node[o]) return -1; if (a.node[o] < b.node[o]) return 1; if (b.node[o] < a.node[o]) return -1; return 0 });
+        tempNodes = tempNodes.sort((a, b) => {
+          if (!a.node[o]) return 1;
+          if (!b.node[o]) return -1;
+          if (a.node[o] < b.node[o]) return 1;
+          if (b.node[o] < a.node[o]) return -1;
+          return 0;
+        });
       }
     }
     const skip = filter && filter.skip ? filter.skip : 0;
     for (let i = 0; i < srcNodeIds.length; i++) {
-      const idx = tempNodes.findIndex(x => x.elementId == srcNodeIds[i]);
+      const idx = tempNodes.findIndex((x) => x.elementId == srcNodeIds[i]);
       // move src node to the beginning
       if (idx > -1) {
         const tmp = tempNodes[idx];
@@ -234,19 +358,26 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       this.tableInput.resultCnt = tempNodes.length;
     }
 
-    tempNodes = tempNodes.slice(skip, skip + this._g.userPrefs.dataPageSize.getValue());
-    r.data[0][idxNodes] = tempNodes.map(x => x.node);
-    r.data[0][idxNodeClass] = tempNodes.map(x => x.cls);
-    r.data[0][idxNodeId] = tempNodes.map(x => x.elementId);
+    tempNodes = tempNodes.slice(
+      skip,
+      skip + this._g.userPrefs.dataPageSize.getValue()
+    );
+    r.data[0][idxNodes] = tempNodes.map((x) => x.node);
+    r.data[0][idxNodeClass] = tempNodes.map((x) => x.cls);
+    r.data[0][idxNodeId] = tempNodes.map((x) => x.elementId);
     return r;
   }
 
   // fill table from graph response
-  private fillTable(data, isRefreshColumns = true, isClientSidePagination = true) {
-    const idxNodes = data.columns.indexOf('nodes');
-    const idxNodeId = data.columns.indexOf('nodeElementId');
-    const idxNodeClass = data.columns.indexOf('nodeClass');
-    const idxTotalCnt = data.columns.indexOf('totalNodeCount');
+  private fillTable(
+    data: any,
+    isRefreshColumns = true,
+    isClientSidePagination = true
+  ) {
+    const idxNodes = data.columns.indexOf("nodes");
+    const idxNodeId = data.columns.indexOf("nodeElementId");
+    const idxNodeClass = data.columns.indexOf("nodeClass");
+    const idxTotalCnt = data.columns.indexOf("totalNodeCount");
     const nodes = data.data[0][idxNodes];
     const nodeClass = data.data[0][idxNodeClass];
     const nodeId = data.data[0][idxNodeId];
@@ -263,44 +394,63 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     const props = this._g.dataModel.getValue();
     for (let i = 0; i < nodes.length; i++) {
       const d = nodes[i];
-      delete d['tconst'];
-      delete d['nconst'];
+      delete d["tconst"];
+      delete d["nconst"];
       const propNames = Object.keys(d);
       const row: TableData[] = [{ type: TableDataType.string, val: nodeId[i] }];
       for (const n of propNames) {
         const idx = this.tableInput.columns.indexOf(n);
         if (idx == -1) {
           this.tableInput.columns.push(n);
-          row[this.tableInput.columns.length] = property2TableData(props, enumMapping, n, d[n], nodeClass[i], false);
+          row[this.tableInput.columns.length] = property2TableData(
+            props,
+            enumMapping,
+            n,
+            d[n],
+            nodeClass[i],
+            false
+          );
         } else {
-          row[idx + 1] = property2TableData(props, enumMapping, n, d[n], nodeClass[i], false);
+          row[idx + 1] = property2TableData(
+            props,
+            enumMapping,
+            n,
+            d[n],
+            nodeClass[i],
+            false
+          );
         }
       }
       // fill empty columns
       for (let j = 0; j < this.tableInput.columns.length + 1; j++) {
         if (!row[j]) {
-          row[j] = { val: '', type: TableDataType.string };
+          row[j] = { val: "", type: TableDataType.string };
         }
       }
       this.tableInput.classNames.push(nodeClass[i]);
       this.tableInput.results.push(row);
     }
 
-    const maxColCnt = Math.max(...this.tableInput.results.map(x => x.length));
+    const maxColCnt = Math.max(...this.tableInput.results.map((x) => x.length));
     for (let i = 0; i < this.tableInput.results.length; i++) {
       for (let j = this.tableInput.results[i].length; j < maxColCnt; j++) {
-        this.tableInput.results[i].push({ val: '', type: TableDataType.string });
+        this.tableInput.results[i].push({
+          val: "",
+          type: TableDataType.string,
+        });
       }
     }
     this.tableFilled.next(true);
   }
 
   private highlightSeedNodes() {
-    const dbIds = new Set(this.selectedNodes.map(x => x.dbId));
-    const seedNodes = this._g.cy.nodes().filter(node => dbIds.has(node.id().substring(1)));
+    const dbIds = new Set(this.selectedNodes.map((x) => x.dbId));
+    const seedNodes = this._g.cy
+      .nodes()
+      .filter((node: any) => dbIds.has(node.id().substring(1)));
     // add a new higlight style
     if (this._g.userPrefs.highlightStyles.length < 2) {
-      const cyStyle = getCyStyleFromColorAndWid('#0b9bcd', 4.5);
+      const cyStyle = getCyStyleFromColorAndWid("#0b9bcd", 4.5);
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     }
     const currHighlightIdx = this._g.userPrefs.currHighlightIdx.getValue();
@@ -312,64 +462,83 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   private highlightTargetRegulators(data) {
-    const idxTargetRegulator = data.columns.indexOf('targetRegulatorNodeIds');
+    const idxTargetRegulator = data.columns.indexOf("targetRegulatorNodeIds");
     const dbIds = new Set(data.data[0][idxTargetRegulator]);
     if (!dbIds || dbIds.size < 1) {
       return;
     }
-    const cyNodes = this._g.cy.nodes().filter(node => dbIds.has(node.id().substring(1)));
+    const cyNodes = this._g.cy
+      .nodes()
+      .filter((node) => dbIds.has(node.id().substring(1)));
 
     // add a new higlight style
     if (this._g.userPrefs.highlightStyles.length < 3) {
-      const cyStyle = getCyStyleFromColorAndWid('#04f06a', 4.5);
+      const cyStyle = getCyStyleFromColorAndWid("#04f06a", 4.5);
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     }
     this._g.viewUtils.highlight(cyNodes, 2);
   }
 
   addSelectedNodesFromFile() {
-    this.file.nativeElement.value = '';
+    this.file.nativeElement.value = "";
     this.file.nativeElement.click();
   }
 
   fileSelected() {
-    this._fileReaderService.readTxtFile(this.file.nativeElement.files[0], (txt) => {
-      let elems: GraphElem[] = [];
-      if (!isJson(txt)) {
-        const arr = txt.split('\n').map(x => x.split('|'));
-        if (arr.length < 0) {
-          return;
-        }
-        const idx4id = arr[0].indexOf('id');
+    this._fileReaderService.readTxtFile(
+      this.file.nativeElement.files[0],
+      (txt) => {
+        let elems: GraphElem[] = [];
+        if (!isJson(txt)) {
+          const arr = txt.split("\n").map((x) => x.split("|"));
+          if (arr.length < 0) {
+            return;
+          }
+          const idx4id = arr[0].indexOf("id");
 
-        for (let i = 1; i < arr.length; i++) {
-          if (this.selectedNodes.find(x => x.dbId == arr[i][idx4id].substring(1))) {
-            continue;
+          for (let i = 1; i < arr.length; i++) {
+            if (
+              this.selectedNodes.find(
+                (x) => x.dbId == arr[i][idx4id].substring(1)
+              )
+            ) {
+              continue;
+            }
+            const o = {};
+            for (let j = 1; j < arr[0].length; j++) {
+              o[arr[0][j]] = arr[i][j];
+            }
+            elems.push({ classes: arr[i][0], data: o });
           }
-          const o = {};
-          for (let j = 1; j < arr[0].length; j++) {
-            o[arr[0][j]] = arr[i][j];
-          }
-          elems.push({ classes: arr[i][0], data: o });
-        }
-      } else {
-        elems = JSON.parse(txt) as GraphElem[];
-        const fn1 = x => this.selectedNodes.find(y => y.dbId === x.data.id.substring(1)) === undefined;
-        if (!(elems instanceof Array)) {
-          elems = (JSON.parse(txt).nodes as any[]).filter(fn1);
         } else {
-          elems = elems.filter(x => x.data.id.startsWith('n') && fn1(x));
+          elems = JSON.parse(txt) as GraphElem[];
+          const fn1 = (x: any) =>
+            this.selectedNodes.find(
+              (y) => y.dbId === x.data.id.substring(1)
+            ) === undefined;
+          if (!(elems instanceof Array)) {
+            elems = (JSON.parse(txt).nodes as any[]).filter(fn1);
+          } else {
+            elems = elems.filter((x) => x.data.id.startsWith("n") && fn1(x));
+          }
         }
-      }
 
-      const labels = this._g.getLabels4ElemsAsArray(null, true, elems);
-      this.selectedNodes = this.selectedNodes.concat(elems.map((x, i) => { return { dbId: x.data.id.substring(1), label: x.classes.split(' ')[0] + ':' + labels[i] } }));
-    });
+        const labels = this._g.getLabels4ElemsAsArray(null, true, elems);
+        this.selectedNodes = this.selectedNodes.concat(
+          elems.map((x, i) => {
+            return {
+              dbId: x.data.id.substring(1),
+              label: x.classes.split(" ")[0] + ":" + labels[i],
+            };
+          })
+        );
+      }
+    );
   }
 
-  addRemoveType(e: { className: string, willBeShowed: boolean }) {
+  addRemoveType(e: { className: string; willBeShowed: boolean }) {
     if (e.willBeShowed) {
-      const idx = this.ignoredTypes.findIndex(x => x === e.className);
+      const idx = this.ignoredTypes.findIndex((x) => x === e.className);
       if (idx > -1) {
         this.ignoredTypes.splice(idx, 1);
       }
@@ -383,7 +552,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   selectedNodeClicked(i: number) {
     this._g.isSwitch2ObjTabOnSelect = false;
     this.clickedNodeIdx = i;
-    const idSelector = 'n' + this.selectedNodes[i].dbId;
+    const idSelector = "n" + this.selectedNodes[i].dbId;
     this._g.cy.$().unselect();
     this._g.cy.elements(`[id = "${idSelector}"]`).select();
     this._g.isSwitch2ObjTabOnSelect = true;
@@ -394,19 +563,19 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   filterTable(filter: TableFiltering) {
-    console.log('filter table: ', filter);
+    console.log("filter table: ", filter);
     this.tableFilter = filter;
     this.runQuery(true, null);
   }
 
   prepareElems4Cy(data) {
-    const idxNodes = data.columns.indexOf('nodes');
-    const idxNodeId = data.columns.indexOf('nodeElementId');
-    const idxNodeClass = data.columns.indexOf('nodeClass');
-    const idxEdges = data.columns.indexOf('edges');
-    const idxEdgeId = data.columns.indexOf('edgeElementId');
-    const idxEdgeClass = data.columns.indexOf('edgeClass');
-    const idxEdgeSrcTgt = data.columns.indexOf('edgeSourceTargets');
+    const idxNodes = data.columns.indexOf("nodes");
+    const idxNodeId = data.columns.indexOf("nodeElementId");
+    const idxNodeClass = data.columns.indexOf("nodeClass");
+    const idxEdges = data.columns.indexOf("edges");
+    const idxEdgeId = data.columns.indexOf("edgeElementId");
+    const idxEdgeClass = data.columns.indexOf("edgeClass");
+    const idxEdgeSrcTgt = data.columns.indexOf("edgeSourceTargets");
 
     const nodes = data.data[0][idxNodes];
     const nodeClass = data.data[0][idxNodeClass];
@@ -419,7 +588,11 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     const cyData = { nodes: [], edges: [] };
     const nodeIdsDict = {};
     for (let i = 0; i < nodes.length; i++) {
-      cyData.nodes.push({ elementId: nodeId[i], labels: [nodeClass[i]], properties: nodes[i] });
+      cyData.nodes.push({
+        elementId: nodeId[i],
+        labels: [nodeClass[i]],
+        properties: nodes[i],
+      });
       nodeIdsDict[nodeId[i]] = true;
     }
 
@@ -427,14 +600,26 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       const srcId = edgeSrcTgt[i][0];
       const tgtId = edgeSrcTgt[i][1];
       // check if src and target exist in cy or current data.
-      const isSrcLoaded = this.tableInput.isMergeGraph ? this._g.cy.elements(`[id = "n${srcId}"]`).length > 0 : false;
-      const isTgtLoaded = this.tableInput.isMergeGraph ? this._g.cy.elements(`[id = "n${tgtId}"]`).length > 0 : false;
-      if ((nodeIdsDict[srcId] || isSrcLoaded) && (nodeIdsDict[tgtId] || isTgtLoaded)) {
-        cyData.edges.push({ properties: edges[i], startNodeElementId: srcId, endNodeElementId: tgtId, elementId: edgeId[i], type: edgeClass[i] });
+      const isSrcLoaded = this.tableInput.isMergeGraph
+        ? this._g.cy.elements(`[id = "n${srcId}"]`).length > 0
+        : false;
+      const isTgtLoaded = this.tableInput.isMergeGraph
+        ? this._g.cy.elements(`[id = "n${tgtId}"]`).length > 0
+        : false;
+      if (
+        (nodeIdsDict[srcId] || isSrcLoaded) &&
+        (nodeIdsDict[tgtId] || isTgtLoaded)
+      ) {
+        cyData.edges.push({
+          properties: edges[i],
+          startNodeElementId: srcId,
+          endNodeElementId: tgtId,
+          elementId: edgeId[i],
+          type: edgeClass[i],
+        });
       }
     }
 
     return cyData;
   }
-
 }

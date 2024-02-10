@@ -532,7 +532,7 @@ export class Neo4jDb implements DbService {
         return { columns: [], data: [] };
       }
       const cols = Object.keys(obj[0].row[0]);
-      const data = obj.map((x) => Object.values(x.row[0]));
+      const data = obj.map((x: any) => Object.values(x.row[0]));
       // put id to first
       const idxId = cols.indexOf("ElementId(x)");
       if (idxId > -1) {
@@ -550,7 +550,7 @@ export class Neo4jDb implements DbService {
     }
     return {
       columns: response.results[0].columns,
-      data: response.results[0].data.map((x) => x.row),
+      data: response.results[0].data.map((x: any) => x.row),
     };
   }
 
@@ -569,8 +569,11 @@ export class Neo4jDb implements DbService {
       };
       // response is a node response
       if (obj.nodeIds) {
-        r.tableData.data = obj.nodeIds.map((x, i) => [x, obj.nodes[i]]);
-        r.graphData.nodes = obj.nodeIds.map((x, i) => {
+        r.tableData.data = obj.nodeIds.map((x: any, i: number) => [
+          x,
+          obj.nodes[i],
+        ]);
+        r.graphData.nodes = obj.nodeIds.map((x: any, i: number) => {
           return {
             properties: obj.nodes[i],
             labels: obj.nodeTypes[i],
@@ -580,7 +583,7 @@ export class Neo4jDb implements DbService {
       } else {
         r.tableData.data = obj.edgeIds.map((x, i) => [x, obj.edges[i]]);
         r.graphData.nodes = r.graphData.nodes.concat(
-          obj.srcNodeIds.map((x, i) => {
+          obj.srcNodeIds.map((x: any, i: number) => {
             return {
               properties: obj.srcNodes[i],
               labels: obj.srcNodeTypes[i],
@@ -589,7 +592,7 @@ export class Neo4jDb implements DbService {
           })
         );
         r.graphData.nodes = r.graphData.nodes.concat(
-          obj.tgtNodeIds.map((x, i) => {
+          obj.tgtNodeIds.map((x: any, i: number) => {
             return {
               properties: obj.tgtNodes[i],
               labels: obj.tgtNodeTypes[i],

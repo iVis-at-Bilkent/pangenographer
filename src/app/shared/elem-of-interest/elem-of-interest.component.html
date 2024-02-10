@@ -1,32 +1,71 @@
-<input #file type="file" (change)="fileSelected()" accept="text/*, .json, .csv" style="display: none;" />
+<input
+  #file
+  type="file"
+  (change)="fileSelected()"
+  accept="text/*, .json, .csv"
+  style="display: none"
+/>
 
-<div class="subpanel-heading px-1" (click)="isShow=!isShow">
+<div class="subpanel-heading px-1" (click)="isShow = !isShow">
   <span class="panel-title">
-    <span class="va-heading3">{{header}}</span>
-    <span [ngClass]="{'down-icon': isShow, 'up-icon': !isShow}"></span>
+    <span class="va-heading3">{{ header }}</span>
+    <span [ngClass]="{ 'down-icon': isShow, 'up-icon': !isShow }"></span>
   </span>
-
 </div>
-<div [ngClass]="{'max-h500': isShow, 'max-h0': !isShow}">
+<div [ngClass]="{ 'max-h500': isShow, 'max-h0': !isShow }">
   <div class="d-flex flex-wrap justify-content-center">
-    <div *ngFor="let n of selectedNodes; let i = index;" class="rounded va-text m-1 p-1"
-      [style.border]="i==clickedNodeIdx ? '2px solid #888888':'2px solid #dee2e6'">
+    <div
+      *ngFor="let n of selectedNodes; let i = index"
+      class="rounded va-text m-1 p-1"
+      [style.border]="
+        i == clickedNodeIdx ? '2px solid #888888' : '2px solid #dee2e6'
+      "
+    >
       <div class="text-center pointer" (click)="selectedNodeClicked(i)">
-        <span>{{n.label}}</span>&nbsp;
-        <img class="icon" src="assets/img/close.svg" (click)="removeSelected(i)" title="Remove">
+        <span>{{ n.label }}</span
+        >&nbsp;
+        <img
+          class="icon"
+          src="assets/img/close.svg"
+          (click)="removeSelected(i)"
+          title="Remove"
+        />
       </div>
     </div>
   </div>
   <div>
-    <button class="btn btn-sm m-1">
-      <img src="assets/img/add-from-file.svg" class="img-btn" title="Add objects from file"
-        (click)="addSelectedNodesFromFile()">
+    <button class="btn btn-sm m-1" type="button">
+      <img
+        src="assets/img/add-from-file.svg"
+        class="img-btn"
+        title="Add objects from file"
+        (click)="addSelectedNodesFromFile()"
+      />
     </button>
-    <button class="btn btn-sm m-1" [ngClass]="{'highlighted-btn': addNodeBtnTxt == 'Complete selection'}">
-      <img [src]="addNodeBtnImg" class="img-btn" [title]="addNodeBtnTxt" (click)="addSelectedNodes()">
+    <button
+      class="btn btn-sm m-1"
+      [ngClass]="{ 'highlighted-btn': addNodeBtnTxt == 'Complete selection' }"
+      type="button"
+    >
+      <img
+        [src]="addNodeBtnImg"
+        class="img-btn"
+        [title]="addNodeBtnTxt"
+        (click)="addSelectedNodes()"
+        title="Add selected nodes"
+      />
     </button>
-    <button *ngIf="selectedNodes && selectedNodes.length > 0" class="btn btn-sm m-1">
-      <img src="assets/img/delete-bin.svg" class="img-btn" (click)="removeAllSelectedNodes()" title="Remove all">
+    <button
+      *ngIf="selectedNodes && selectedNodes.length > 0"
+      class="btn btn-sm m-1"
+      type="button"
+    >
+      <img
+        src="assets/img/delete-bin.svg"
+        class="img-btn"
+        (click)="removeAllSelectedNodes()"
+        title="Remove all"
+      />
     </button>
   </div>
 </div>
