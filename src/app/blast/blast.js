@@ -10,19 +10,16 @@ const filePath = "/home/ivis/visuall/pangenographer/src/app/blast/";
 
 const app = express();
 app.use(cors());
-app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.json({ limit: "100mb" }));
 
 app.post("/makeBlastDb", async (req, res) => {
   try {
     // -in all_nodes.fasta -dbtype nucl
 
     const blastOutput = await new Promise((resolve, reject) => {
-      const fileContent = req.body.fastaData;
-      let curfilePath = filePath + "all_nodes.fasta";
-
       let fileError = undefined;
 
-      fs.writeFile(curfilePath, fileContent, (err) => {
+      fs.writeFile(filePath + "all_nodes.fasta", req.body.fastaData, (err) => {
         if (err) {
           fileError = err;
         }
@@ -50,22 +47,20 @@ app.post("/makeBlastDb", async (req, res) => {
 
 app.post("/blastn", async (req, res) => {
   try {
-    // -query query.fasta -db all_nodes.fasta -outfmt 6
+    // -query query.fasta -db all_nodes.fasta
 
     const blastOutput = await new Promise((resolve, reject) => {
-      const fileContent = req.body.fastaData;
-      let curfilePath = filePath + "query.fasta";
-
       let fileError = undefined;
 
-      fs.writeFile(curfilePath, fileContent, (err) => {
+      fs.writeFile(filePath + "query.fasta", req.body.fastaData, (err) => {
         if (err) {
           fileError = err;
         }
       });
 
       exec(
-        "blastn -query query.fasta -db all_nodes.fasta -outfmt 6",
+        "blastn -query query.fasta -db all_nodes.fasta " +
+          req.body.commandLineArguments,
         (error, stdout, stderr) => {
           if (error || fileError) {
             error = error || fileError;
@@ -77,7 +72,10 @@ app.post("/blastn", async (req, res) => {
       );
     });
 
-    res.json({ results: blastOutput });
+    res.json({
+      results: blastOutput,
+      isFormat6: req.body.commandLineArguments.includes("-outfmt 6"),
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Error running BLAST");

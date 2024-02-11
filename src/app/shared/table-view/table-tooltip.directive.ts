@@ -37,8 +37,6 @@ export class TableTooltipDirective {
       this.renderer.createText(this.tooltipText)
     );
 
-    console.log("tooltipText", this.tooltipText);
-
     this.renderer.appendChild(document.body, this.tooltip);
 
     this.renderer.addClass(this.tooltip, "table-tooltip");

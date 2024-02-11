@@ -5,20 +5,16 @@
   accept="text/*, .json, .csv"
   style="display: none"
 />
-<div>
-  <div class="va-text">
-    <div class="d-flex align-items-center justify-content-center">
-      <select
-        class="form-select tight-select filter-form va-small-text query-select"
-        [(ngModel)]="selectedQuery"
-        (change)="changeAdvancedQuery($event)"
-        title="Choose a query"
-      >
-        <option value="">Choose a query</option>
-        <option *ngFor="let p of queries" [value]="p">{{ p }}</option>
-      </select>
-    </div>
-  </div>
+<div class="va-text d-flex align-items-center justify-content-center">
+  <select
+    class="form-select tight-select filter-form va-small-text query-select"
+    [(ngModel)]="selectedQuery"
+    (change)="changeAdvancedQuery($event)"
+    title="Choose a query"
+  >
+    <option value="">Choose a query</option>
+    <option *ngFor="let p of queries" [value]="p">{{ p }}</option>
+  </select>
 </div>
 
 <div *ngIf="selectedIdx == 0 || selectedIdx == 1 || selectedIdx == 2">

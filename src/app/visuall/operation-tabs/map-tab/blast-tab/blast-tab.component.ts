@@ -1,9 +1,14 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
+import { Subject } from "rxjs";
 import { environment } from "src/environments/environment";
+import {
+  TableData,
+  TableDataType,
+  TableViewInput,
+} from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
-
 @Component({
   selector: "app-blast-tab",
   templateUrl: "./blast-tab.component.html",
@@ -11,22 +16,33 @@ import { GlobalVariableService } from "../../../global-variable.service";
 })
 export class BlastTabComponent implements OnInit {
   query: string = "";
-  database: string = "nr";
-  programs: string[] = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
-  selectedProgram: string = "blastn";
-  selectedProgramIdx: number = 0;
-  enableMegaBlast: boolean = false;
-  filters: string[] = ["F", "T", "L", "mT", "mL"];
-  selectedFilter: string = "F";
-  selectedFilterIdx: number = 0;
-  formatTypes: string[] = ["Text", "HTML", "XML", "XML2", "JSON2", "Tabular"];
-  selectedFormatType: string = "HTML";
-  selectedFormatTypeIdx: number = 0;
-  expect: number = 0;
-  nulceotideReward: number = 0;
-  nucleotidePenalty: number = 0;
-  gapCost: string = "";
-  matrixs: string[] = [
+  blastTypes: string[] = ["Standalone", "Web"];
+  selectedBlastType: string = "Standalone";
+  selectedBlastTypeIdx: number = 0;
+
+  webDatabase: string = "nr";
+  webPrograms: string[] = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
+  webSelectedProgram: string = "blastn";
+  webSelectedProgramIdx: number = 0;
+  webEnableMegaBlast: boolean = false;
+  webFilters: string[] = ["F", "T", "L", "mT", "mL"];
+  webSelectedFilter: string = "F";
+  webSelectedFilterIdx: number = 0;
+  webFormatTypes: string[] = [
+    "Text",
+    "HTML",
+    "XML",
+    "XML2",
+    "JSON2",
+    "Tabular",
+  ];
+  webSelectedFormatType: string = "HTML";
+  webSelectedFormatTypeIdx: number = 0;
+  webExpect: number = 0;
+  webNulceotideReward: number = 0;
+  webNucleotidePenalty: number = 0;
+  webGapCost: string = "";
+  webMatrixs: string[] = [
     "BLOSUM45",
     "BLOSUM50",
     "BLOSUM62",
@@ -36,31 +52,68 @@ export class BlastTabComponent implements OnInit {
     "PAM30",
     "PAM70",
   ];
-  selectedMatrix: string = "BLOSUM62";
-  selectedMatrixIdx: number = 2;
-  hitlistSize: number = 0;
-  descriptions: number = 0;
-  alignments: number = 0;
-  ncbiGenInfos: string[] = ["T", "F"];
-  selectedNCBIGenInfo: string = "T";
-  selectedNCBIGenInfoIdx: number = 0;
-  rid: string = "";
-  rtoe: number = undefined;
-  status: string = "";
-  threshold: number = 0;
-  wordSize: number = 0;
-  compositionBasedStatistics: number[] = [-1, 0, 1, 2, 3];
-  selectedCompositionBasedStatistic: number = -1;
-  selectedCompositionBasedStatisticsIdx: number = 0;
-  formatObjects: string[] = ["SearchInfo", "Alignments"];
-  selectedFormatObject: string = "SearchInfo";
-  selectedFormatObjectIdx: number = 0;
-  result: string = "";
-  resultTableInput: string = "";
+  webSelectedMatrix: string = "BLOSUM62";
+  webSelectedMatrixIdx: number = 2;
+  webHitlistSize: number = 0;
+  webDescriptions: number = 0;
+  webAlignments: number = 0;
+  webNcbiGenInfos: string[] = ["T", "F"];
+  webSelectedNCBIGenInfo: string = "T";
+  webSelectedNCBIGenInfoIdx: number = 0;
+  webRid: string = "";
+  webRtoe: number = undefined;
+  webStatus: string = "";
+  webThreshold: number = 0;
+  webWordSize: number = 0;
+  webCompositionBasedStatistics: number[] = [-1, 0, 1, 2, 3];
+  webSelectedCompositionBasedStatistic: number = -1;
+  webSelectedCompositionBasedStatisticsIdx: number = 0;
+  webFormatObjects: string[] = ["SearchInfo", "Alignments"];
+  webSelectedFormatObject: string = "SearchInfo";
+  webSelectedFormatObjectIdx: number = 0;
+  webResult: string = "";
+  webResultTableInput: string = "";
+
+  standaloneTableOutput: TableViewInput = {
+    results: [],
+    columns: [
+      "ID",
+      "Query Name",
+      "Source Name",
+      "Percent Identity",
+      "Alignment Length",
+      "Mismatches",
+      "Gap Opens",
+      "Query Start",
+      "Query End",
+      "Source Start",
+      "Source End",
+      "E-value",
+      "Bit Score",
+    ],
+    isLoadGraph: false,
+    isMergeGraph: false,
+    currPage: 1,
+    pageSize: 20,
+    resultCnt: 0,
+    isNodeData: false,
+    isShowExportAsCSV: false,
+    isHide0: false,
+    isUseCySelector4Highlight: false,
+    isHideLoadGraph: false,
+    isReplace_inHeaders: false,
+    isDisableHover: false,
+    tableTitle: "Blast Result",
+    isEmphasizeOnHover: false,
+  };
 
   standaloneQuery: string = "";
   standaloneStatus: string = "";
   standaloneUrl: string = environment.blastStandaloneUrl;
+  standaloneCommandLineArguments: string = "-outfmt 6";
+  standaloneIsTableOutput: boolean = false;
+  standaloneIsTableOutputFilled = new Subject<boolean>();
+  standaloneclearTableOutputFilter = new Subject<boolean>();
 
   constructor(
     protected _http: HttpClient,
@@ -70,7 +123,19 @@ export class BlastTabComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  private runBlastQuery(queryParams: string, callback: (x: any) => any) {
+  onchangeBlastTypeChange(event: any) {
+    this.selectedBlastType = event.target.value;
+    if (this.selectedBlastType === "Standalone") {
+      this.selectedBlastTypeIdx = 0;
+    } else if (this.selectedBlastType === "Web") {
+      this.selectedBlastTypeIdx = 1;
+    } else {
+      this.selectedBlastTypeIdx = -1;
+    }
+    this.query = "";
+  }
+
+  private runWebBlastQuery(queryParams: string, callback: (x: any) => any) {
     const url = "https://blast.ncbi.nlm.nih.gov/blast/Blast.cgi?";
     this._g.setLoadingStatus(true);
     const q = url + queryParams;
@@ -88,7 +153,7 @@ export class BlastTabComponent implements OnInit {
     }, error);
   }
 
-  executeBlastQueryWithParams() {
+  executeWebBlastQueryWithParams() {
     let queryParams = "CMD=Put";
     if (this.query) {
       queryParams += "&QUERY=" + this.query;
@@ -99,8 +164,8 @@ export class BlastTabComponent implements OnInit {
       );
       return;
     }
-    if (this.database) {
-      queryParams += "&DATABASE=" + this.database;
+    if (this.webDatabase) {
+      queryParams += "&DATABASE=" + this.webDatabase;
     } else {
       this._g.showErrorModal(
         "No database selected",
@@ -108,8 +173,8 @@ export class BlastTabComponent implements OnInit {
       );
       return;
     }
-    if (this.selectedProgram) {
-      queryParams += "&PROGRAM=" + this.selectedProgram;
+    if (this.webSelectedProgram) {
+      queryParams += "&PROGRAM=" + this.webSelectedProgram;
     } else {
       this._g.showErrorModal(
         "No program selected",
@@ -117,80 +182,80 @@ export class BlastTabComponent implements OnInit {
       );
       return;
     }
-    if (this.enableMegaBlast) {
+    if (this.webEnableMegaBlast) {
       queryParams += "&MEGABLAST=on";
     }
-    if (this.selectedFilter && this.selectedFilter != "F") {
-      queryParams += "&FILTER=" + this.selectedFilter;
+    if (this.webSelectedFilter && this.webSelectedFilter != "F") {
+      queryParams += "&FILTER=" + this.webSelectedFilter;
     }
-    if (this.selectedFormatType) {
-      queryParams += "&FORMAT_TYPE=" + this.selectedFormatType;
+    if (this.webSelectedFormatType) {
+      queryParams += "&FORMAT_TYPE=" + this.webSelectedFormatType;
     }
-    if (this.expect) {
-      queryParams += "&EXPECT=" + this.expect;
+    if (this.webExpect) {
+      queryParams += "&EXPECT=" + this.webExpect;
     }
-    if (this.nulceotideReward) {
-      queryParams += "&NUCL_REWARD=" + this.nulceotideReward;
+    if (this.webNulceotideReward) {
+      queryParams += "&NUCL_REWARD=" + this.webNulceotideReward;
     }
-    if (this.nucleotidePenalty) {
-      queryParams += "&NUCL_PENALTY=" + this.nucleotidePenalty;
+    if (this.webNulceotideReward) {
+      queryParams += "&NUCL_PENALTY=" + this.webNulceotideReward;
     }
-    if (this.gapCost) {
-      queryParams += "&GAPCOSTS=" + this.gapCost;
+    if (this.webGapCost) {
+      queryParams += "&GAPCOSTS=" + this.webGapCost;
     }
-    queryParams += "&MATRIX_NAME=" + this.selectedMatrix;
-    if (this.hitlistSize) {
-      queryParams += "&HITLIST_SIZE=" + this.hitlistSize;
+    queryParams += "&MATRIX_NAME=" + this.webSelectedMatrix;
+    if (this.webHitlistSize) {
+      queryParams += "&HITLIST_SIZE=" + this.webHitlistSize;
     }
-    if (this.descriptions) {
-      queryParams += "&DESCRIPTIONS=" + this.descriptions;
+    if (this.webDescriptions) {
+      queryParams += "&DESCRIPTIONS=" + this.webDescriptions;
     }
-    if (this.alignments) {
-      queryParams += "&ALIGNMENTS=" + this.alignments;
+    if (this.webAlignments) {
+      queryParams += "&ALIGNMENTS=" + this.webAlignments;
     }
-    queryParams += "&NCBI_GI=" + this.selectedNCBIGenInfo;
-    if (this.threshold) {
-      queryParams += "&THRESHOLD=" + this.threshold;
+    queryParams += "&NCBI_GI=" + this.webSelectedNCBIGenInfo;
+    if (this.webThreshold) {
+      queryParams += "&THRESHOLD=" + this.webThreshold;
     }
-    if (this.wordSize) {
-      queryParams += "&WORD_SIZE=" + this.wordSize;
+    if (this.webWordSize) {
+      queryParams += "&WORD_SIZE=" + this.webWordSize;
     }
-    if (this.selectedCompositionBasedStatistic != -1) {
+    if (this.webSelectedCompositionBasedStatistic != -1) {
       queryParams +=
         "&COMPOSITION_BASED_STATISTICS=" +
-        this.selectedCompositionBasedStatistic;
+        this.webSelectedCompositionBasedStatistic;
     }
     console.log(queryParams.replace(/&/g, "\n"));
-    this.runBlastQuery(queryParams, (result: any) => {
+    this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/^    RID = (.*)$/m);
-      this.rid = match && match[1];
+      this.webRid = match && match[1];
       console.log(match);
       match = result.match(/^    RTOE = (.*)$/m);
-      this.rtoe = match && match[1];
+      this.webRtoe = match && match[1];
       console.log(match);
-      console.log(this.rid);
-      console.log(this.rtoe);
+      console.log(this.webRid);
+      console.log(this.webRtoe);
       this._g.statusMsg.next("Blast query submitted successfully.");
     });
   }
 
-  checkBlastQueryStatus() {
-    let queryParams = "CMD=Get&RID=" + this.rid;
-    this.runBlastQuery(queryParams, (result: any) => {
+  checkWebBlastQueryStatus() {
+    let queryParams = "CMD=Get&RID=" + this.webRid;
+    this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/Status=(\w+)/);
-      this.status = match && match[1];
+      this.webStatus = match && match[1];
       console.log(result);
       console.log(match);
-      console.log(this.status);
+      console.log(this.webStatus);
       this._g.statusMsg.next("Blast query checked successfully.");
     });
   }
 
-  getBlastQueryResult() {
-    let queryParams = "CMD=Get&RID=" + this.rid + "&VIEW_RESULTS=FromRes";
-    queryParams += "&FORMAT_TYPE=" + this.selectedFormatType;
-    this.runBlastQuery(queryParams, (result: any) => {
-      this.result = result;
+  getWebBlastQueryResult() {
+    let queryParams = "CMD=Get&RID=" + this.webRid + "&VIEW_RESULTS=FromRes";
+    queryParams += "&FORMAT_TYPE=" + this.webSelectedFormatType;
+    this.runWebBlastQuery(queryParams, (result: any) => {
+      this.webResult = result;
       console.log(result);
       this._g.statusMsg.next("Blast query result retrieved successfully.");
     });
@@ -219,97 +284,99 @@ export class BlastTabComponent implements OnInit {
     this.query = event.target.value.trim();
   }
 
-  onDatabaseChange(event: any) {
-    this.database = event.target.value.trim();
+  onWebDatabaseChange(event: any) {
+    this.webDatabase = event.target.value.trim();
   }
 
-  onProgramChange(event: any) {
-    this.selectedProgramIdx = event.target.selectedIndex;
-    this.selectedProgram = this.programs[this.selectedProgramIdx];
+  onWebProgramChange(event: any) {
+    this.webSelectedProgramIdx = event.target.selectedIndex;
+    this.webSelectedProgram = this.webPrograms[this.webSelectedProgramIdx];
   }
 
-  onMegaBlastChange(event: any) {
-    this.enableMegaBlast = event.target.checked;
+  onWebMegaBlastChange(event: any) {
+    this.webEnableMegaBlast = event.target.checked;
   }
 
-  onFilterChange(event: any) {
-    this.selectedFilterIdx = event.target.selectedIndex;
-    this.selectedFilter = this.filters[this.selectedFilterIdx];
+  onWebFilterChange(event: any) {
+    this.webSelectedFilterIdx = event.target.selectedIndex;
+    this.webSelectedFilter = this.webFilters[this.webSelectedFilterIdx];
   }
 
-  onFormatTypeChange(event: any) {
-    this.selectedFormatTypeIdx = event.target.selectedIndex;
-    this.selectedFormatType = this.formatTypes[this.selectedFormatTypeIdx];
+  onWebFormatTypeChange(event: any) {
+    this.webSelectedFormatTypeIdx = event.target.selectedIndex;
+    this.webSelectedFormatType =
+      this.webFormatTypes[this.webSelectedFormatTypeIdx];
   }
 
-  onExpectChange(event: any) {
-    this.expect = event.target.value.trim();
+  onWebExpectChange(event: any) {
+    this.webExpect = event.target.value.trim();
   }
 
-  onNucleotideRewardChange(event: any) {
-    this.nulceotideReward = event.target.value.trim();
+  onWebNucleotideRewardChange(event: any) {
+    this.webNulceotideReward = event.target.value.trim();
   }
 
-  onNucleotidePenaltyChange(event: any) {
-    this.nucleotidePenalty = event.target.value.trim();
+  onWebNucleotidePenaltyChange(event: any) {
+    this.webNulceotideReward = event.target.value.trim();
   }
 
-  onGapCostChange(event: any) {
-    this.gapCost = event.target.value.trim();
+  onWebGapCostChange(event: any) {
+    this.webGapCost = event.target.value.trim();
   }
 
-  onMatrixChange(event: any) {
-    this.selectedMatrixIdx = event.target.selectedIndex;
-    this.selectedMatrix = this.matrixs[this.selectedMatrixIdx];
+  onWebMatrixChange(event: any) {
+    this.webSelectedMatrixIdx = event.target.selectedIndex;
+    this.webSelectedMatrix = this.webMatrixs[this.webSelectedMatrixIdx];
   }
 
-  onHitlistSizeChange(event: any) {
-    this.hitlistSize = event.target.value.trim();
+  onWebHitlistSizeChange(event: any) {
+    this.webHitlistSize = event.target.value.trim();
   }
 
-  onDescriptionsChange(event: any) {
-    this.descriptions = event.target.value.trim();
+  onWebDescriptionsChange(event: any) {
+    this.webDescriptions = event.target.value.trim();
   }
 
-  onAlignmentsChange(event: any) {
-    this.alignments = event.target.value.trim();
+  onWebAlignmentsChange(event: any) {
+    this.webAlignments = event.target.value.trim();
   }
 
-  onNCBIGenInfoChange(event: any) {
-    this.selectedNCBIGenInfoIdx = event.target.selectedIndex;
-    this.selectedNCBIGenInfo = this.ncbiGenInfos[this.selectedNCBIGenInfoIdx];
+  onWebNCBIGenInfoChange(event: any) {
+    this.webSelectedNCBIGenInfoIdx = event.target.selectedIndex;
+    this.webSelectedNCBIGenInfo =
+      this.webNcbiGenInfos[this.webSelectedNCBIGenInfoIdx];
   }
 
-  onRIDChange(event: any) {
-    this.rid = event.target.value.trim();
+  onWebRIDChange(event: any) {
+    this.webRid = event.target.value.trim();
   }
 
-  onThresholdChange(event: any) {
-    this.threshold = event.target.value.trim();
+  onWebThresholdChange(event: any) {
+    this.webThreshold = event.target.value.trim();
   }
 
-  onWordSizeChange(event: any) {
-    this.wordSize = event.target.value.trim();
+  onWebWordSizeChange(event: any) {
+    this.webWordSize = event.target.value.trim();
   }
 
-  onCompositionBasedStatisticsChange(event: any) {
-    this.selectedCompositionBasedStatisticsIdx = event.target.selectedIndex;
-    this.selectedCompositionBasedStatistic =
-      this.compositionBasedStatistics[
-        this.selectedCompositionBasedStatisticsIdx
+  onWebCompositionBasedStatisticsChange(event: any) {
+    this.webSelectedCompositionBasedStatisticsIdx = event.target.selectedIndex;
+    this.webSelectedCompositionBasedStatistic =
+      this.webCompositionBasedStatistics[
+        this.webSelectedCompositionBasedStatisticsIdx
       ];
   }
 
-  onFormatObjectChange(event: any) {
-    this.selectedFormatObjectIdx = event.target.selectedIndex;
-    this.selectedFormatObject =
-      this.formatObjects[this.selectedFormatObjectIdx];
+  onWebFormatObjectChange(event: any) {
+    this.webSelectedFormatObjectIdx = event.target.selectedIndex;
+    this.webSelectedFormatObject =
+      this.webFormatObjects[this.webSelectedFormatObjectIdx];
   }
 
   runBlastStandaloneQuery(
     requestBody: any,
     isMakeDb: boolean,
-    callback?: (result: string) => void
+    callback?: (result: any) => void
   ) {
     let url = this.standaloneUrl;
     if (isMakeDb) {
@@ -332,7 +399,7 @@ export class BlastTabComponent implements OnInit {
       }
       this._g.statusMsg.next("");
       if (callback) {
-        callback(x["results"]);
+        callback(x);
       }
     }, errFn);
   }
@@ -341,8 +408,8 @@ export class BlastTabComponent implements OnInit {
     this.runBlastStandaloneQuery(
       { fastaData: this._cyService.prepareAllNodesFastaData() },
       true,
-      (result) => {
-        this.standaloneStatus = result;
+      (res) => {
+        this.standaloneStatus = res.results;
       }
     );
   }
@@ -358,11 +425,53 @@ export class BlastTabComponent implements OnInit {
     this.runBlastStandaloneQuery(
       {
         fastaData: this.standaloneQuery,
+        commandLineArguments: this.standaloneCommandLineArguments,
       },
       false,
-      (result) => {
-        this.standaloneStatus = result;
+      (res) => {
+        this.standaloneStatus = res.results;
+        this.standaloneIsTableOutput = res.isFormat6;
+
+        if (this.standaloneIsTableOutput) {
+          this.fillStandaloneTableOutput();
+        }
       }
     );
+  }
+
+  fillStandaloneTableOutput() {
+    let lines = this.standaloneStatus.split("\n");
+    this.standaloneTableOutput.results = [];
+    let nextId = 1;
+
+    for (let i = 0; i < lines.length; i++) {
+      let row: TableData[] = [];
+      let cols = lines[i].split("\t");
+      row.push({ val: nextId++, type: TableDataType.string });
+      row.push({ val: cols[0], type: TableDataType.string });
+      row.push({ val: cols[1], type: TableDataType.string });
+      row.push({ val: cols[2], type: TableDataType.number });
+      row.push({ val: cols[3], type: TableDataType.number });
+      row.push({ val: cols[4], type: TableDataType.number });
+      row.push({ val: cols[5], type: TableDataType.number });
+      row.push({ val: cols[6], type: TableDataType.number });
+      row.push({ val: cols[7], type: TableDataType.number });
+      row.push({ val: cols[8], type: TableDataType.number });
+      row.push({ val: cols[9], type: TableDataType.number });
+      row.push({ val: cols[10], type: TableDataType.number });
+      row.push({ val: cols[11], type: TableDataType.number });
+      this.standaloneTableOutput.results.push(row);
+    }
+    this.standaloneTableOutput.pageSize =
+      this._g.userPrefs.dataPageSize.getValue();
+    this.standaloneTableOutput.currPage = 1;
+    this.standaloneTableOutput.resultCnt =
+      this.standaloneTableOutput.results.length;
+  }
+
+  onStandaloneTableFilterChange(event: any) {}
+
+  onStandaloneCommandLineArgumentsChange(event: any) {
+    this.standaloneCommandLineArguments = event.target.value.trim();
   }
 }
