@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { CustomizationModule } from "../../custom/customization.module";
 import { TableFiltering } from "../../shared/table-view/table-view-types";
 import { GlobalVariableService } from "../global-variable.service";
 import {
@@ -16,6 +15,7 @@ import {
   HistoryMetaData,
   Neo4jEdgeDirection,
 } from "./data-types";
+import { Neo4jDb } from "./neo4j-db.service";
 
 @Injectable({
   providedIn: "root",
@@ -24,8 +24,8 @@ import {
 export class DbAdapterService {
   private _db: DbService;
   // put prefered database service type as argument
-  constructor(private _g: GlobalVariableService) {
-    this._db = CustomizationModule.db;
+  constructor(private _g: GlobalVariableService, private db: Neo4jDb) {
+    this._db = db;
   }
 
   getNeighbors(

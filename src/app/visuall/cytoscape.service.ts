@@ -16,7 +16,6 @@ import { ExternalToolService } from "./external-tool.service";
 import { FileReaderService } from "./file-reader.service";
 import { GlobalVariableService } from "./global-variable.service";
 import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
-import { TimebarService } from "./timebar.service";
 import { UserPrefHelper } from "./user-pref-helper";
 import {
   GroupingOptionTypes,
@@ -35,7 +34,6 @@ export class CytoscapeService {
 
   constructor(
     private _g: GlobalVariableService,
-    private _timebarService: TimebarService,
     private _cyExtService: CyExtService,
     private _profile: UserProfileService,
     private _ngZone: NgZone,
@@ -44,15 +42,8 @@ export class CytoscapeService {
     private _fileReaderService: FileReaderService,
     private _externalToolService: ExternalToolService
   ) {
-    this.userPrefHelper = new UserPrefHelper(
-      this,
-      this._timebarService,
-      this._g,
-      this._profile
-    );
+    this.userPrefHelper = new UserPrefHelper(this, this._g, this._profile);
     this.louvainClusterer = new LouvainClustering();
-    this._timebarService.hideCompoundsFn = this.hideCompounds.bind(this);
-    this._timebarService.showCollapsedFn = this.showCollapsed.bind(this);
   }
 
   initCy(containerElem: HTMLElement) {
@@ -97,7 +88,7 @@ export class CytoscapeService {
 
     this.bindSelectObjOfThisType();
     (<any>window).cy = this._g.cy;
-    this._g.cy.on("select unselect", (e) => {
+    this._g.cy.on("select unselect", (e: any) => {
       this._ngZone.run(() => {
         this.elemSelected(e);
       });
@@ -115,17 +106,7 @@ export class CytoscapeService {
     this._g.listen4graphEvents();
   }
 
-  private runLayoutIfNoTimebar() {
-    if (!this._g.userPrefs.timebar.isEnabled.getValue()) {
-      this._g.performLayout(false);
-    } else {
-      this._timebarService.isRandomizedLayout = false;
-      this._g.isLoadFromExpandCollapse = false;
-      this._g.isLoadFromHistory = false;
-    }
-  }
-
-  private elemSelected(e) {
+  private elemSelected(e: any) {
     if (e.type == "select") {
       if (this._g.isSwitch2ObjTabOnSelect) {
         this._g.operationTabChanged.next(0);
@@ -575,14 +556,6 @@ export class CytoscapeService {
     }
   }
 
-  showHideTimebar(isChecked: boolean) {
-    this._g.cy.resize();
-    this._timebarService.showHideTimebar(isChecked);
-    setTimeout(() => {
-      this._cyExtService.setNavigatorPosition();
-    }, 0);
-  }
-
   loadFile(file: File) {
     this._fileReaderService.readTxtFile(file, (txt) => {
       try {
@@ -692,7 +665,7 @@ export class CytoscapeService {
       this._g.cy.remove(":selected");
     }
     this._g.handleCompoundsOnHideDelete();
-    this.runLayoutIfNoTimebar();
+    this._g.performLayout(false);
   }
 
   deleteElements(data: GraphResponse, sourceNodeName: string) {
@@ -709,7 +682,7 @@ export class CytoscapeService {
       }
     }
     this._g.handleCompoundsOnHideDelete();
-    this.runLayoutIfNoTimebar();
+    this._g.performLayout(false);
   }
 
   addParentNode(idSuffix: string | number, parent = undefined): string {
@@ -850,7 +823,6 @@ export class CytoscapeService {
       this._g.viewUtils.show(this._g.cy.$());
       this._g.applyClassFiltering();
       this._g.hideTypesNotToShow();
-      this._timebarService.coverVisibleRange();
       this.showCollapsed(null, null);
       const currVisible = this._g.cy.$(":visible");
       if (!currVisible.same(prevVisible)) {
@@ -917,7 +889,6 @@ export class CytoscapeService {
 
   // expands all the compound nodes and deletes them recursively
   hideCompounds(elems: any) {
-    this._timebarService.setIgnoreChanges(true);
     const nodes = elems
       .filter("." + C.CLUSTER_CLASS)
       .not("." + C.META_EDGE_CLASS);
@@ -935,22 +906,21 @@ export class CytoscapeService {
     for (let i in edgeIdDict) {
       this.hideCompoundEdge(this._g.cy.edges("#" + i));
     }
-    this._timebarService.setIgnoreChanges(false);
   }
 
-  hideCompoundNode(node, edgeIdDict) {
+  hideCompoundNode(node: any, edgeIdDict: any) {
     let children = node.children(); // a node might have children
     let collapsed = node.data("collapsedChildren"); // a node might a collapsed
     let collapsedEdgeIds = children
       .connectedEdges()
       .filter("." + C.COLLAPSED_EDGE_CLASS)
-      .map((x) => x.id());
+      .map((x: any) => x.id());
 
     if (collapsed) {
       children = children.union(collapsed);
       collapsedEdgeIds = collapsed
         .edges("." + C.COLLAPSED_EDGE_CLASS)
-        .map((x) => x.id());
+        .map((x: any) => x.id());
       this._g.expandCollapseApi.expand(node, C.EXPAND_COLLAPSE_FAST_OPT);
     }
     for (const i of collapsedEdgeIds) {
@@ -970,7 +940,7 @@ export class CytoscapeService {
     this._g.cy.remove(node);
   }
 
-  hideCompoundEdge(edge) {
+  hideCompoundEdge(edge: any) {
     if (
       !edge ||
       edge.length < 1 ||
@@ -992,8 +962,8 @@ export class CytoscapeService {
     return (
       this._g.cy
         .$()
-        .map((x) => x.hidden())
-        .filter((x) => x).length > 0
+        .map((x: any) => x.hidden())
+        .filter((x: any) => x).length > 0
     );
   }
 

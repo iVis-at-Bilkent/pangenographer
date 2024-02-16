@@ -6,7 +6,6 @@ import {
   ViewChild,
 } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
-import { CustomizationModule } from "src/app/custom/customization.module";
 import {
   MAX_HIGHTLIGHT_WIDTH,
   MAX_LENGTH_OF_UP_DOWN_STREAM,
@@ -19,8 +18,6 @@ import {
   BoolSetting,
   GroupingOptionTypes,
   MergedElemIndicatorTypes,
-  TimebarGraphInclusionTypes,
-  TimebarStatsInclusionTypes,
 } from "../../user-preference";
 import { UserProfileService } from "../../user-profile.service";
 
@@ -32,12 +29,8 @@ import { UserProfileService } from "../../user-profile.service";
 export class SettingsTabComponent implements OnInit, OnDestroy {
   generalBoolSettings: BoolSetting[];
   pangenomegrapherBoolSettings: BoolSetting[];
-  timebarBoolSettings: BoolSetting[];
   highlightWidth: number;
   highlightColor: string;
-  timebarPlayingStep: number;
-  timebarPlayingPeriod: number;
-  timebarZoomingStep: number;
   compoundPadding: string;
   @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
   @ViewChild("dbQueryDate2", { static: false }) dbQueryDate2: ElementRef;
@@ -47,18 +40,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   dbTimeout: number;
   tableColumnLimit: number;
   edgeCollapseLimit: number;
-  timebarGraphInclusionTypes: string[] = [
-    "overlaps",
-    "contains",
-    "contained by",
-  ];
-  timebarStatsInclusionTypes: string[] = ["all", "begin", "middle", "end"];
   mergedElemIndicators: string[] = ["None", "Selection", "Highlight"];
   groupingOptions: string[] = ["Compounds", "Circles"];
   // multiple choice settings
-  graphInclusionType: TimebarGraphInclusionTypes;
   queryResultPagination: "Client" | "Server";
-  statsInclusionType: TimebarStatsInclusionTypes;
   mergedElemIndicator: MergedElemIndicatorTypes;
   groupingOption: GroupingOptionTypes;
   nodeLabelWrap: number = 0;
@@ -69,8 +54,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
   lengthOfUpDownstream: number = 3;
-  customSubTabs: { component: any; text: string }[] =
-    CustomizationModule.settingsSubTabs;
   loadFromFileSubs: Subscription;
   tabChangeSubs: Subscription;
 
@@ -145,24 +128,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       },
     ];
 
-    this.timebarBoolSettings = [
-      {
-        text: "Show timebar",
-        isEnable: false,
-        path2userPref: "timebar.isEnabled",
-      },
-      {
-        text: "Hide disconnected nodes on animation",
-        isEnable: false,
-        path2userPref: "timebar.isHideDisconnectedNodesOnAnim",
-      },
-      {
-        text: "Maintain graph range on topology changes",
-        isEnable: false,
-        path2userPref: "timebar.isMaintainGraphRange",
-      },
-    ];
-
     this.isInit = true;
 
     this.tabChangeSubs = this._g.operationTabChanged.subscribe((x) => {
@@ -185,7 +150,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   private fillUIFromMemory() {
     // reference variables for shorter text
     const up = this._g.userPrefs;
-    const up_t = this._g.userPrefs.timebar;
     const up_p = this._g.userPrefs.pangenomegrapher;
 
     this.generalBoolSettings[0].isEnable =
@@ -232,21 +196,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       .style({ "selection-box-color": this.selectionColor });
     this.compoundPadding = up.compoundPadding.getValue();
     this.isStoreUserProfile = up.isStoreUserProfile.getValue();
-    this.graphInclusionType = up.objectInclusionType.getValue();
     this.queryResultPagination = up.queryResultPagination.getValue();
 
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
     this.pangenomegrapherBoolSettings[0].isEnable =
       up_p.isHighlightInZeroOutZero.getValue();
-
-    this.timebarBoolSettings[0].isEnable = up_t.isEnabled.getValue();
-    this.timebarBoolSettings[1].isEnable =
-      up_t.isHideDisconnectedNodesOnAnim.getValue();
-    this.timebarBoolSettings[2].isEnable = up_t.isMaintainGraphRange.getValue();
-    this.timebarPlayingStep = up_t.playingStep.getValue();
-    this.timebarPlayingPeriod = up_t.playingPeriod.getValue();
-    this.timebarZoomingStep = up_t.zoomingStep.getValue();
-    this.statsInclusionType = up_t.statsInclusionType.getValue();
 
     this.setHighlightStyles();
     this.highlightStyleSelected(this._g.userPrefs.currHighlightIdx.getValue());
@@ -325,7 +279,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this._profile.saveUserPrefs();
   }
 
-  onSelWidSelected(w) {
+  onSelWidSelected(w: any) {
     let width = parseFloat(w.target.value);
     if (Number(width)) {
       if (width < 0) width = 1;
@@ -351,7 +305,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  onlengthOfUpDownstreamSelected(x) {
+  onlengthOfUpDownstreamSelected(x: any) {
     let length = parseInt(x.target.value);
     if (length > MAX_LENGTH_OF_UP_DOWN_STREAM) {
       length = MAX_LENGTH_OF_UP_DOWN_STREAM;
@@ -431,20 +385,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   resetGeneralSettings() {
     this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, [
-      "timebar",
       "pangenograph",
     ]);
     this.setViewUtilsStyle();
     this.fillUIFromMemory();
     this._g.updateSelectionCyStyle();
-  }
-
-  resetTimebarSettings() {
-    this.transferSubjectValues(
-      this._g.userPrefsFromFiles.timebar,
-      this._g.userPrefs.timebar
-    );
-    this.fillUIFromMemory();
   }
 
   resetPangenographSettings() {
@@ -455,7 +400,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.fillUIFromMemory();
   }
 
-  private transferSubjectValues(from, to, skip = null) {
+  private transferSubjectValues(from: any, to: any, skip = null) {
     for (const k in from) {
       if ((skip && k == skip[0]) || (skip && k == skip[1])) {
         continue;

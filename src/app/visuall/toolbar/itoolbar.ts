@@ -12,8 +12,6 @@ export interface ToolbarAction {
   title: string;
   // must be the name of function, function should be parameterless
   fn: string;
-  // must be false for custom items
-  isStd: boolean;
   // irregular DOM elements should be hard coded to HTML
   isRegular: boolean;
 }

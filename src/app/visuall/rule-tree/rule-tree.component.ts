@@ -1,18 +1,20 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { RuleNode } from '../operation-tabs/map-tab/query-types';
-import { Subject, Subscription } from 'rxjs';
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Subject, Subscription } from "rxjs";
+import { RuleNode } from "../operation-tabs/map-tab/query-types";
 
 @Component({
-  selector: 'app-rule-tree',
-  templateUrl: './rule-tree.component.html',
-  styleUrls: ['./rule-tree.component.css']
+  selector: "app-rule-tree",
+  templateUrl: "./rule-tree.component.html",
+  styleUrls: ["./rule-tree.component.css"],
 })
 export class RuleTreeComponent implements OnInit {
-
-  constructor() { }
+  constructor() {}
   @Input() root: RuleNode;
   @Input() editedRuleNode: Subject<RuleNode>;
-  @Output() onRuleRequested = new EventEmitter<{ node: RuleNode, isEdit: boolean }>();
+  @Output() onRuleRequested = new EventEmitter<{
+    node: RuleNode;
+    isEdit: boolean;
+  }>();
   @Output() onEmpty = new EventEmitter<boolean>();
   @Output() onOperatorAdded = new EventEmitter<RuleNode>();
   currNode: RuleNode;
@@ -21,7 +23,7 @@ export class RuleTreeComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.editedRuleNode) {
-      this.editedRuleNodeSubs = this.editedRuleNode.subscribe(x => {
+      this.editedRuleNodeSubs = this.editedRuleNode.subscribe((x) => {
         x.isEditing = false;
       });
     }
@@ -35,15 +37,19 @@ export class RuleTreeComponent implements OnInit {
 
   operatorClicked(r: RuleNode) {
     const op = r.r.ruleOperator;
-    if (op == 'AND') {
-      r.r.ruleOperator = 'OR';
+    if (op == "AND") {
+      r.r.ruleOperator = "OR";
     } else {
-      r.r.ruleOperator = 'AND';
+      r.r.ruleOperator = "AND";
     }
   }
 
-  addOperator(curr: RuleNode, code: 'AND' | 'OR') {
-    const newNode: RuleNode = { r: { ruleOperator: code }, children: [], parent: curr };
+  addOperator(curr: RuleNode, code: "AND" | "OR") {
+    const newNode: RuleNode = {
+      r: { ruleOperator: code },
+      children: [],
+      parent: curr,
+    };
     curr.children.push(newNode);
     this.currNode = newNode;
     this.operatorEmitter(newNode);
@@ -64,7 +70,7 @@ export class RuleTreeComponent implements OnInit {
     }
   }
 
-  addRule(e: { node: RuleNode, isEdit: boolean }) {
+  addRule(e: { node: RuleNode; isEdit: boolean }) {
     // since component is recursive, we should only set it once
     if (!this.root.parent && e.isEdit) {
       if (!e.node.isEditing) {
@@ -75,8 +81,8 @@ export class RuleTreeComponent implements OnInit {
     this.onRuleRequested.emit(e);
   }
 
-  btnFromDropdownClicked(e: 'AND' | 'OR' | 'C') {
-    if (e != 'C') {
+  btnFromDropdownClicked(e: "AND" | "OR" | "C") {
+    if (e != "C") {
       this.addOperator(this.root, e);
     } else {
       this.addRule({ node: this.root, isEdit: false });
@@ -107,5 +113,4 @@ export class RuleTreeComponent implements OnInit {
       this.clearAllEditings(child);
     }
   }
-
 }

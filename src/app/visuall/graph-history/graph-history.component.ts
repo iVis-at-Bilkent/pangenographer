@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { GlobalVariableService } from "../global-variable.service";
-import { GraphHistoryItem } from "../db-service/data-types";
 import { Subscription } from "rxjs";
+import { GraphHistoryItem } from "../db-service/data-types";
+import { GlobalVariableService } from "../global-variable.service";
 
 @Component({
   selector: "app-graph-history",

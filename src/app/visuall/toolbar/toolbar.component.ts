@@ -7,9 +7,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import flatpickr from "flatpickr";
 import { Subscription } from "rxjs";
-import { ToolbarCustomizationService } from "../../custom/toolbar-customization.service";
 import { getPropNamesFromObj } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GlobalVariableService } from "../global-variable.service";
@@ -42,7 +40,6 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     private _cyService: CytoscapeService,
     private modalService: NgbModal,
     private _g: GlobalVariableService,
-    private _customizationService: ToolbarCustomizationService,
     private _profile: UserProfileService
   ) {
     this.menu = [
@@ -53,21 +50,18 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/load.svg",
             title: "Load",
             fn: "load",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/save.svg",
             title: "Save",
             fn: "saveAsJson",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/png.svg",
             title: "Save as PNG",
             fn: "saveAsPng",
-            isStd: true,
             isRegular: true,
           },
         ],
@@ -79,14 +73,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/delete-simple.svg",
             title: "Delete Selected",
             fn: "deleteSelected",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/history.svg",
             title: "Query History",
             fn: "showHideGraphHistory",
-            isStd: true,
             isRegular: true,
           },
         ],
@@ -98,14 +90,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/hide-selected.svg",
             title: "Hide Selected",
             fn: "hideSelected",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/show-all.svg",
             title: "Show All",
             fn: "showAll",
-            isStd: true,
             isRegular: true,
           },
         ],
@@ -117,28 +107,24 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/search.svg",
             title: "Search to Highlight",
             fn: "highlightSearch",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "",
             title: "must be hard coded to HTML",
             fn: "",
-            isStd: true,
             isRegular: false,
           },
           {
             imgSrc: "assets/img/toolbar/highlight-selected.svg",
             title: "Highlight Selected",
             fn: "highlightSelected",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/remove-highlights.svg",
             title: "Remove Highlights",
             fn: "removeHighlights",
-            isStd: true,
             isRegular: true,
           },
         ],
@@ -150,14 +136,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/layout-cose.svg",
             title: "Perform Layout",
             fn: "performLayout",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/layout-static.svg",
             title: "Recalculate Layout",
             fn: "reLayout",
-            isStd: true,
             isRegular: true,
           },
         ],
@@ -169,14 +153,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
             imgSrc: "assets/img/toolbar/quick-help.svg",
             title: "Quick Help",
             fn: "openQuickHelp",
-            isStd: true,
             isRegular: true,
           },
           {
             imgSrc: "assets/img/toolbar/about.svg",
             title: "About",
             fn: "openAbout",
-            isStd: true,
             isRegular: true,
           },
         ],
@@ -194,7 +176,6 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.mergeCustomMenu();
     this.statusMsgSubs = this._g.statusMsg.subscribe((x) => {
       this.statusMsgQueue.push(x);
       this.processMsgQueue();
@@ -205,9 +186,6 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       // user preferences from local storage should be setted
       // Better way might be to use a shared behaviour subject just like `isUserPrefReady`. Its name might be isUserPrefFromLocalStorageReady
-      setTimeout(() => {
-        this.setDates4DbQuery();
-      }, 1);
     });
   }
 
@@ -236,31 +214,12 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this._cyService.setNavigatorPosition();
   }
 
-  mergeCustomMenu() {
-    const m = this._customizationService.menu;
-    // in any case, set isStd property to false
-    m.map((x) => x.items.map((y) => (y.isStd = false)));
-
-    for (const i of m) {
-      const idx = this.menu.findIndex((x) => x.div === i.div);
-      if (idx === -1) {
-        this.menu.push(i);
-      } else {
-        this.menu[idx].items.push(...i.items);
-      }
-    }
-  }
-
   fileSelected() {
     this._cyService.loadFile(this.file.nativeElement.files[0]);
   }
 
   triggerAct(act: ToolbarAction) {
-    if (act.isStd) {
-      this[act.fn]();
-    } else {
-      this._customizationService[act.fn]();
-    }
+    this[act.fn]();
   }
 
   load() {
@@ -361,65 +320,5 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     this._g.userPrefs.dbQueryTimeRange.start.next(minDate);
     this._g.userPrefs.dbQueryTimeRange.end.next(maxDate);
     this._profile.saveUserPrefs();
-  }
-
-  private setDates4DbQuery() {
-    const maxDate = this._g.userPrefsFromFiles.dbQueryTimeRange.end.getValue();
-    const minDate =
-      this._g.userPrefsFromFiles.dbQueryTimeRange.start.getValue();
-    const d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-    const opt1 = {
-      defaultDate: new Date(d1),
-      enableTime: true,
-      enableSeconds: true,
-      time_24hr: true,
-      onChange: (x, _, instance) => {
-        const dateTime = x[0].getTime();
-        const startDate = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-        const endDate = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-        if (dateTime >= endDate) {
-          instance.setDate(startDate);
-          this.showDateTimeError(
-            "Start datetime should be earlier than end datetime"
-          );
-          return;
-        }
-        this._g.userPrefs.dbQueryTimeRange.start.next(dateTime);
-        this._profile.saveUserPrefs();
-      },
-      minDate: minDate,
-      maxDate: maxDate,
-    };
-    const d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-    const opt2 = {
-      defaultDate: new Date(d2),
-      enableTime: true,
-      enableSeconds: true,
-      time_24hr: true,
-      onChange: (x, _, instance) => {
-        const dateTime = x[0].getTime();
-        const startDate = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-        const endDate = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-        if (dateTime <= startDate) {
-          instance.setDate(endDate);
-          this.showDateTimeError(
-            "End datetime should be later than start datetime"
-          );
-          return;
-        }
-        this._g.userPrefs.dbQueryTimeRange.end.next(dateTime);
-        this._profile.saveUserPrefs();
-      },
-      minDate: minDate,
-      maxDate: maxDate,
-    };
-    flatpickr(this.dbQueryDate1.nativeElement, opt1);
-    flatpickr(this.dbQueryDate2.nativeElement, opt2);
-    this.isLimitDbQueries2range =
-      this._g.userPrefs.isLimitDbQueries2range.getValue();
-  }
-
-  private showDateTimeError(msg: string) {
-    this._g.showErrorModal("Date Selection", msg);
   }
 }

@@ -3,7 +3,6 @@ import { Injectable } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { BehaviorSubject } from "rxjs";
 import appPref from "../../assets/appPref.json";
-import { CyStyleCustomizationService } from "../custom/cy-style-customization.service";
 import {
   CLUSTER_CLASS,
   COLLAPSED_EDGE_CLASS,
@@ -78,11 +77,7 @@ export class GlobalVariableService {
     sourceAndTarget: [],
   };
 
-  constructor(
-    private _http: HttpClient,
-    private _modalService: NgbModal,
-    private _cyCustomStyle: CyStyleCustomizationService
-  ) {
+  constructor(private _http: HttpClient, private _modalService: NgbModal) {
     this.hiddenClasses = new Set([]);
     // set user preferences staticly (necessary for rendering html initially)
     this.setUserPrefs(appPref, this.userPrefs);
@@ -813,7 +808,6 @@ export class GlobalVariableService {
         "target-arrow-shape": this.setTargetArrowShape.bind(this),
       })
       .update();
-    this._cyCustomStyle.addCustomStyles(this.cy);
 
     // add override styles
     this.cy

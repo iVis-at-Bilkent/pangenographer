@@ -156,7 +156,6 @@
       }
     }
   },
-  "timebarDataMapping": {},
   "enumMapping": {},
   "appPreferences": {
     "isAutoIncrementalLayoutOnChange": true,
@@ -221,16 +220,6 @@
     "pangenomegrapher": {
       "lengthOfUpDownstream": 3,
       "isHighlightInZeroOutZero": false
-    },
-    "timebar": {
-      "isEnabled": false,
-      "playingStep": 50,
-      "playingPeriod": 1350,
-      "zoomingStep": 50,
-      "statsInclusionType": 0,
-      "graphRangeRatio": 0.33,
-      "isHideDisconnectedNodesOnAnim": false,
-      "isMaintainGraphRange": false
     }
   },
   "cssStyle": {

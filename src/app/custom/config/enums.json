@@ -1,17 +1,1 @@
-{
-    "is_adult": {
-        "0": "No",
-        "1": "Yes"
-    },
-    "title_type": {
-        "short": "Short movie",
-        "movie": "Movie",
-        "tvSeries": "TV series",
-        "tvEpisode": "TV episode",
-        "tvMiniSeries": "TV mini-series",
-        "videoGame": "Video game",
-        "tvMovie": "TV movie",
-        "video": "Video",
-        "tvSpecial": "TV special"
-    }
-}
+{}

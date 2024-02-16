@@ -2,17 +2,34 @@
 <div class="modal-header">
   <div class="modal-title va-heading1 text-center">Load Graph</div>
   <div>
-    <button #closeBtn type="button" class="btn-close" data-dismiss="modal" aria-label="Close"
-      (click)="activeModal.dismiss('Cross click')">
-      
-    </button>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
   </div>
 </div>
 <div class="modal-body text-center va-text">
   <div>Would you like to replace the existing map?</div>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary va-text" data-dismiss="modal" (click)="replace()">Replace</button>
-  <button type="button" class="btn btn-primary va-text" data-dismiss="modal"
-    (click)="activeModal.dismiss('Cancel')">Cancel</button>
+  <button
+    type="button"
+    class="btn btn-primary va-text"
+    data-dismiss="modal"
+    (click)="replace()"
+  >
+    Replace
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary va-text"
+    data-dismiss="modal"
+    (click)="activeModal.dismiss('Cancel')"
+  >
+    Cancel
+  </button>
 </div>

@@ -1,79 +1,193 @@
 <div class="row m-1 g-0 justify-content-center">
   <div class="col-3 px-1">
-    <select autofocus class="form-select tight-select filter-form va-small-text prop" [(ngModel)]="selectedProp"
-      [disabled]="isGenericTypeSelected" (change)="changeSelectedProp()">
-      <option *ngFor="let p of selectedClassProps" [value]="p" class="prop-opt">{{p}}</option>
+    <select
+      title="Select an option"
+      autofocus
+      class="form-select tight-select filter-form va-small-text prop"
+      [(ngModel)]="selectedProp"
+      [disabled]="isGenericTypeSelected"
+      (change)="changeSelectedProp()"
+    >
+      <option *ngFor="let p of selectedClassProps" [value]="p" class="prop-opt">
+        {{ p }}
+      </option>
     </select>
   </div>
 
   <div class="col-3 ps-1">
-    <select class="form-select tight-select filter-form va-small-text prop-op-key" [(ngModel)]="selectedOperatorKey"
-      [disabled]="isGenericTypeSelected">
-      <option *ngFor="let o of operatorKeys" [value]="o" class="prop-op-key">{{o}}</option>
+    <select
+      title="Select an option"
+      class="form-select tight-select filter-form va-small-text prop-op-key"
+      [(ngModel)]="selectedOperatorKey"
+      [disabled]="isGenericTypeSelected"
+    >
+      <option *ngFor="let o of operatorKeys" [value]="o" class="prop-op-key">
+        {{ o }}
+      </option>
     </select>
   </div>
 
   <div class="col-5 ps-1">
-    <div [hidden]="selectedPropertyCategory != 0 && selectedOperatorKey != 'one of'">
-      <input [type]="currInpType" title="Value" [(ngModel)]="filterInp"
-        [disabled]="isGenericTypeSelected || isShowTxtArea" (click)="filterInpClicked()"
-        class="tight-select std-inp-hei form-control filter-form filter-input va-small-text" placeholder="Filter...">
+    <div
+      [hidden]="
+        selectedPropertyCategory != 0 && selectedOperatorKey != 'one of'
+      "
+    >
+      <input
+        [type]="currInpType"
+        title="Value"
+        [(ngModel)]="filterInp"
+        [disabled]="isGenericTypeSelected || isShowTxtArea"
+        (click)="filterInpClicked()"
+        class="tight-select std-inp-hei form-control filter-form filter-input va-small-text"
+        placeholder="Filter..."
+      />
     </div>
     <div [hidden]="selectedPropertyCategory != 1">
-      <input type="text" #dateInp [disabled]="isGenericTypeSelected"
-        class="tight-select std-inp-hei filter-form form-control va-small-text">
+      <input
+        type="text"
+        #dateInp
+        [disabled]="isGenericTypeSelected"
+        class="tight-select std-inp-hei filter-form form-control va-small-text"
+        title="Input field"
+        placeholder="Enter a value"
+      />
     </div>
-    <div [hidden]="selectedPropertyCategory != 2 || selectedOperatorKey == 'one of'">
-      <select class="form-select tight-select filter-form va-small-text" [(ngModel)]="optInp" (change)="optSelected()">
-        <option *ngFor="let p of finiteSetPropertyMap" [value]="p.key">{{p.value}}</option>
+    <div
+      [hidden]="
+        selectedPropertyCategory != 2 || selectedOperatorKey == 'one of'
+      "
+    >
+      <select
+        title="Select an option"
+        class="form-select tight-select filter-form va-small-text"
+        [(ngModel)]="optInp"
+        (change)="optSelected()"
+      >
+        <option *ngFor="let p of finiteSetPropertyMap" [value]="p.key">
+          {{ p.value }}
+        </option>
       </select>
     </div>
   </div>
 
   <div class="col-1 text-center">
-    <img src="assets/img/tick.svg" title="Add/Update" (click)="onAddRuleClick($event)">
+    <img
+      src="assets/img/tick.svg"
+      title="Add/Update"
+      (click)="onAddRuleClick($event)"
+    />
   </div>
 </div>
-<div class="draggable-content" ngResizable ngDraggable [handle]="DragHandle" [position]="position" [rzHandles]="'all'"
-  *ngIf="isShowTxtArea" [rzMinWidth]="350" [rzMinHeight]="250" (endOffset)="onMoveEnd($event)"
-  (rzStop)="onResizeStop($event)" [style.width]="txtAreaSize.width + 'px'" [style.height]="txtAreaSize.height + 'px'">
+<div
+  class="draggable-content"
+  ngResizable
+  ngDraggable
+  [handle]="DragHandle"
+  [position]="position"
+  [rzHandles]="'all'"
+  *ngIf="isShowTxtArea"
+  [rzMinWidth]="350"
+  [rzMinHeight]="250"
+  (endOffset)="onMoveEnd($event)"
+  (rzStop)="onResizeStop($event)"
+  [style.width]="txtAreaSize.width + 'px'"
+  [style.height]="txtAreaSize.height + 'px'"
+>
   <div class="d-flex flex-column h-100">
-    <div #DragHandle style="cursor: move;" class="modal-header">
-      <div class="modal-title va-heading1 text-center"><span *ngIf="selectedProp">{{selectedProp}} - </span>One of</div>
+    <div #DragHandle style="cursor: move" class="modal-header">
+      <div class="modal-title va-heading1 text-center">
+        <span *ngIf="selectedProp">{{ selectedProp }} - </span>One of
+      </div>
       <div>
-        <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="txtAreaPopupCancel()">
-
-        </button>
+        <button
+          type="button"
+          class="btn-close"
+          data-dismiss="modal"
+          aria-label="Close"
+          (click)="txtAreaPopupCancel()"
+        ></button>
       </div>
     </div>
     <div class="flex-grow-1 h-100 m-1">
-      <textarea *ngIf="selectedPropertyCategory != 2" class="va-text form-control" rows="3" cols="40"
-        [(ngModel)]="textAreaInp">
+      <textarea
+        title="Input field"
+        placeholder="Enter a value"
+        *ngIf="selectedPropertyCategory != 2"
+        class="va-text form-control"
+        rows="3"
+        cols="40"
+        [(ngModel)]="textAreaInp"
+      >
       </textarea>
-      <select #multiSelect *ngIf="selectedPropertyCategory == 2" multiple [size]="finiteSetPropertyMap.length"
-        class="form-select tight-select filter-form va-small-text" (change)="filterInpClicked()">
-        <option *ngFor="let p of finiteSetPropertyMap" [value]="p.key" [(selected)]="option2selected[p.key]">{{p.value}}
+      <select
+        title="Select an option"
+        #multiSelect
+        *ngIf="selectedPropertyCategory == 2"
+        multiple
+        [size]="finiteSetPropertyMap.length"
+        class="form-select tight-select filter-form va-small-text"
+        (change)="filterInpClicked()"
+      >
+        <option
+          *ngFor="let p of finiteSetPropertyMap"
+          [value]="p.key"
+          [(selected)]="option2selected[p.key]"
+        >
+          {{ p.value }}
         </option>
       </select>
     </div>
     <div class="d-flex align-items-center justify-content-center">
-      <select title="Saved lists" class="m-1 form-select tight-select filter-form va-small-text"
-        [(ngModel)]="currSelectedList" (change)="changeSelectedSavedList($event.target)">
+      <select
+        title="Saved lists"
+        class="m-1 form-select tight-select filter-form va-small-text"
+        [(ngModel)]="currSelectedList"
+        (change)="changeSelectedSavedList($event.target)"
+      >
         <option disabled selected value>Choose a predefined list</option>
-        <option *ngFor="let p of fittingSavedLists" [value]="p">{{p}} </option>
+        <option *ngFor="let p of fittingSavedLists" [value]="p">{{ p }}</option>
       </select>
-      <input autoSizeInput maxlength="33" [includeBorders]="true" [extraWidth]="3" type="text" title="Name"
-        [(ngModel)]="currListName" class="tight-select filter-form form-control std-inp-hei m-1 va-small-text">
+      <input
+        autoSizeInput
+        maxlength="33"
+        [includeBorders]="true"
+        [extraWidth]="3"
+        type="text"
+        title="Name"
+        [(ngModel)]="currListName"
+        class="tight-select filter-form form-control std-inp-hei m-1 va-small-text"
+      />
       <span class="m-1">
-        <img src="assets/img/tick.svg" title="Add/Update list" (click)="saveCurrList()">
+        <img
+          src="assets/img/tick.svg"
+          title="Add/Update list"
+          (click)="saveCurrList()"
+        />
       </span>
       <span class="m-1" *ngIf="currListName != 'New list'">
-        <img src="assets/img/toolbar/delete-simple.svg" title="Delete list" (click)="deleteList()">
+        <img
+          src="assets/img/toolbar/delete-simple.svg"
+          title="Delete list"
+          (click)="deleteList()"
+        />
       </span>
     </div>
     <div class="align-self-center">
-      <button type="button" class="m-1 btn btn-sm btn-primary va-text" (click)="txtAreaPopupOk()">OK</button>
-      <button type="button" class="m-1 btn btn-sm btn-secondary va-text" (click)="txtAreaPopupCancel()">Cancel</button>
+      <button
+        type="button"
+        class="m-1 btn btn-sm btn-primary va-text"
+        (click)="txtAreaPopupOk()"
+      >
+        OK
+      </button>
+      <button
+        type="button"
+        class="m-1 btn btn-sm btn-secondary va-text"
+        (click)="txtAreaPopupCancel()"
+      >
+        Cancel
+      </button>
     </div>
   </div>
 </div>

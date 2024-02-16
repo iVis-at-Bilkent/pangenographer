@@ -32,46 +32,6 @@
     </div>
     <div>&nbsp;&nbsp;</div>
   </ng-container>
-  <div class="col-xs-auto border rounded mid">
-    <input
-      type="checkbox"
-      class="form-check-input"
-      [(ngModel)]="isLimitDbQueries2range"
-      (change)="changeIsLimitDbQueryRange()"
-      title="Limit Database Queries To Time Range"
-    />
-    <input
-      type="text"
-      #dbQueryDate1
-      [disabled]="!isLimitDbQueries2range"
-      title="Limit Database Queries To Time Range"
-      class="inp-10-ch p-1 tight-select filter-form form-control va-small-text"
-    />
-    <span class="dash" [ngClass]="{ 'color-disabled': !isLimitDbQueries2range }"
-      >-</span
-    >
-    <input
-      type="text"
-      #dbQueryDate2
-      [disabled]="!isLimitDbQueries2range"
-      title="Limit Database Queries To Time Range"
-      class="inp-10-ch p-1 tight-select filter-form form-control va-small-text"
-    />
-    &nbsp;
-    <div
-      [ngClass]="{ 'color-disabled-bg': !isLimitDbQueries2range }"
-      (click)="resetDbQueryRange()"
-      title="Show Entire Range"
-    >
-      <img
-        class="toolbar-element"
-        [ngClass]="{ disabled: !isLimitDbQueries2range }"
-        src="/assets/img/width.svg"
-        title="width"
-      />
-    </div>
-    &nbsp;
-  </div>
   <div>&nbsp;&nbsp;</div>
   <div class="va-small-text ms-auto my-auto">
     {{ statusMsg }}

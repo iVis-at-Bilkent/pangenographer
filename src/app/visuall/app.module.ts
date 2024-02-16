@@ -7,13 +7,13 @@ import { RouterModule } from "@angular/router";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { AngularDraggableModule } from "angular2-draggable";
 import { AutoSizeInputModule } from "ngx-autosize-input";
-import { CustomizationModule } from "../custom/customization.module";
 import { SharedModule } from "../shared/shared.module";
 import { AppComponent } from "./app.component";
 import { ColorPickerComponent } from "./color-picker/color-picker.component";
 import { CytoscapeComponent } from "./cytoscape/cytoscape.component";
 import { GraphHistoryComponent } from "./graph-history/graph-history.component";
 import { NavbarComponent } from "./navbar/navbar.component";
+import { BlastTabComponent } from "./operation-tabs/map-tab/blast-tab/blast-tab.component";
 import { GraphTheoreticPropertiesTabComponent } from "./operation-tabs/map-tab/graph-theoretic-properties-tab/graph-theoretic-properties-tab.component";
 import { GroupTabComponent } from "./operation-tabs/map-tab/group-tab/group-tab.component";
 import { MapTabComponent } from "./operation-tabs/map-tab/map-tab.component";
@@ -22,7 +22,6 @@ import { OperationTabsComponent } from "./operation-tabs/operation-tabs.componen
 import { AdvancedQueriesComponent } from "./operation-tabs/query-tab/advanced-queries/advanced-queries.component";
 import { QueryTabComponent } from "./operation-tabs/query-tab/query-tab.component";
 import { SettingsTabComponent } from "./operation-tabs/settings-tab/settings-tab.component";
-import { TimebarMetricEditorComponent } from "./operation-tabs/settings-tab/timebar-metric-editor/timebar-metric-editor.component";
 import { PanelContainerComponent } from "./panel-container/panel-container.component";
 import { AboutModalComponent } from "./popups/about-modal/about-modal.component";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
@@ -33,16 +32,13 @@ import { SaveProfileModalComponent } from "./popups/save-profile-modal/save-prof
 import { PropertyRuleComponent } from "./property-rule/property-rule.component";
 import { RuleDropdownComponent } from "./rule-dropdown/rule-dropdown.component";
 import { RuleTreeComponent } from "./rule-tree/rule-tree.component";
-import { TimebarComponent } from "./timebar/timebar.component";
 import { ToolbarComponent } from "./toolbar/toolbar.component";
-import { BlastTabComponent } from './operation-tabs/map-tab/blast-tab/blast-tab.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavbarComponent,
     ToolbarComponent,
-    TimebarComponent,
     OperationTabsComponent,
     CytoscapeComponent,
     SaveAsPngModalComponent,
@@ -53,7 +49,6 @@ import { BlastTabComponent } from './operation-tabs/map-tab/blast-tab/blast-tab.
     SettingsTabComponent,
     QueryTabComponent,
     GroupTabComponent,
-    TimebarMetricEditorComponent,
     ColorPickerComponent,
     PropertyRuleComponent,
     ErrorModalComponent,
@@ -74,7 +69,6 @@ import { BlastTabComponent } from './operation-tabs/map-tab/blast-tab/blast-tab.
     NgbModule,
     AutoSizeInputModule,
     AngularDraggableModule,
-    CustomizationModule,
     SharedModule,
     RouterModule.forRoot([]),
   ],

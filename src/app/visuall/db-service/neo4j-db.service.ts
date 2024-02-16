@@ -2,19 +2,13 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { TableFiltering } from "../../shared/table-view/table-view-types";
-import {
-  GENERIC_TYPE,
-  LONG_MAX,
-  LONG_MIN,
-  PATH_WALK_NAME_DISALLOWED_REGEX,
-} from "../constants";
+import { GENERIC_TYPE, PATH_WALK_NAME_DISALLOWED_REGEX } from "../constants";
 import { GlobalVariableService } from "../global-variable.service";
 import {
   ClassBasedRules,
   Rule,
   RuleNode,
 } from "../operation-tabs/map-tab/query-types";
-import { TimebarGraphInclusionTypes } from "../user-preference";
 import {
   DbQueryMeta,
   DbResponse,
@@ -165,17 +159,8 @@ export class Neo4jDb implements DbService {
     }
     edgeCql += "]-";
 
-    let f2 = this.dateFilterFromUserPref("n", true);
-    if (meta && meta.isMultiLength) {
-      for (let i = 0; i < meta.edgeType.length; i++) {
-        f2 += this.dateFilterFromUserPref("e" + i, false);
-      }
-    } else {
-      f2 += this.dateFilterFromUserPref("e", false);
-    }
-
     this.runQuery(
-      `MATCH p=(n)${edgeCql}(${targetCql}) WHERE ${idFilter} ${f2} RETURN p`,
+      `MATCH p=(n)${edgeCql}(${targetCql}) WHERE ${idFilter} RETURN p`,
       callback
     );
   }
@@ -215,16 +200,7 @@ export class Neo4jDb implements DbService {
   }
 
   getSampleData(callback: (x: GraphResponse) => any) {
-    const f1 = this.dateFilterFromUserPref("n", true);
-    const f2 = this.dateFilterFromUserPref("e", false);
-    let f = "";
-    if (f1.length > 0) {
-      f += " WHERE " + f1.substr(5);
-    }
-    if (f2.length > 0) {
-      f += f2;
-    }
-    const query = `MATCH (n)-[e]-() ${f} RETURN n,e limit 150`;
+    const query = `MATCH (n)-[e]-() RETURN n,e limit 150`;
     this.runQuery(query, callback);
   }
 
@@ -294,14 +270,12 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    const timeMap = this.getTimebarMapping4Java();
     let d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
     let d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
     if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
       d1 = 0;
       d2 = 0;
     }
-    const inclusionType = this._g.userPrefs.objectInclusionType.getValue();
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
@@ -312,7 +286,7 @@ export class Neo4jDb implements DbService {
       `CALL graphOfInterest([${dbIds
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
-      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
+      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${d1}, ${d2}, ${timeout}, ${idf})`,
       cb,
       type,
       false
@@ -340,8 +314,6 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    const inclusionType = this._g.userPrefs.objectInclusionType.getValue();
-    const timeMap = this.getTimebarMapping4Java();
     let d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
     let d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
     if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
@@ -357,8 +329,7 @@ export class Neo4jDb implements DbService {
       this.runQuery(
         `CALL commonStreamCount([${dbIds
           .map((element) => `'${element}'`)
-          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase},
-       ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
+          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase}, ${d1}, ${d2}, ${timeout}, ${idf})`,
         cb,
         type,
         false
@@ -368,7 +339,7 @@ export class Neo4jDb implements DbService {
         `CALL commonStream([${dbIds
           .map((element) => `'${element}'`)
           .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currPage},
-       '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
+       '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${d1}, ${d2}, ${timeout}, ${idf})`,
         cb,
         type,
         false
@@ -396,7 +367,6 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    const timeMap = this.getTimebarMapping4Java();
     let d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
     let d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
     if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
@@ -407,13 +377,12 @@ export class Neo4jDb implements DbService {
     if (idFilter) {
       idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
     }
-    const inclusionType = this._g.userPrefs.objectInclusionType.getValue();
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     this.runQuery(
       `CALL neighborhood([${dbIds
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
-      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeMap}, ${d1}, ${d2}, ${inclusionType}, ${timeout}, ${idf})`,
+      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${d1}, ${d2}, ${timeout}, ${idf})`,
       cb,
       DbResponseType.table,
       false
@@ -426,70 +395,6 @@ export class Neo4jDb implements DbService {
       pageSize = pageSize * this._g.userPrefs.dataPageLimit.getValue();
     }
     return pageSize;
-  }
-
-  private getTimebarMapping4Java(): string {
-    // {Person:["start_t", "end_t"]}
-    const mapping = this._g.appDescription.getValue().timebarDataMapping;
-    let s = "{";
-    for (const k in mapping) {
-      s +=
-        k +
-        ':["' +
-        mapping[k].begin_datetime +
-        '","' +
-        mapping[k].end_datetime +
-        '"],';
-    }
-    s = s.slice(0, -1);
-    s += "}";
-    if (s.length == 1) {
-      s = "{}";
-    }
-    return s;
-  }
-
-  private dateFilterFromUserPref(varName: string, isNode: boolean): string {
-    if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
-      return "";
-    }
-    let s = "";
-    let keys = [];
-
-    if (isNode) {
-      keys = Object.keys(this._g.appDescription.getValue().objects);
-    } else {
-      keys = Object.keys(this._g.appDescription.getValue().relations);
-    }
-
-    const d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-    const d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-    const inclusionType = this._g.userPrefs.objectInclusionType.getValue();
-    const mapping = this._g.appDescription.getValue().timebarDataMapping;
-
-    if (!mapping || Object.keys(mapping).length < 1) {
-      return "";
-    }
-
-    s = " AND (";
-    for (const k of keys) {
-      if (!mapping[k]) {
-        continue;
-      }
-      const p1 = `COALESCE(${varName}.${mapping[k].begin_datetime}, ${LONG_MIN})`;
-      const p2 = `COALESCE(${varName}.${mapping[k].end_datetime}, ${LONG_MAX})`;
-      const bothNull = `(${varName}.${mapping[k].end_datetime} IS NULL AND ${varName}.${mapping[k].begin_datetime} IS NULL)`;
-      if (inclusionType == TimebarGraphInclusionTypes.overlaps) {
-        s += `(${bothNull} OR (${p1} <= ${d2} AND ${p2} >= ${d1})) AND`;
-      } else if (inclusionType == TimebarGraphInclusionTypes.contains) {
-        s += `(${bothNull} OR (${d1} <= ${p1} AND ${d2} >= ${p2})) AND`;
-      } else if (inclusionType == TimebarGraphInclusionTypes.contained_by) {
-        s += `(${bothNull} OR (${p1} <= ${d1} AND ${p2} >= ${d2})) AND`;
-      }
-    }
-    s = s.slice(0, -4);
-    s += ")";
-    return s;
   }
 
   private extractGraph(response): GraphResponse {
@@ -723,7 +628,6 @@ export class Neo4jDb implements DbService {
       );
       conditions = "(" + conditions + ") AND " + s;
     }
-    conditions += this.dateFilterFromUserPref("x", !rule.isEdge);
 
     return matchClause + "WHERE " + conditions + "\n";
   }

@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { Subject, Subscription } from "rxjs";
-import { CustomizationModule } from "src/app/custom/customization.module";
 import {
   TableData,
   TableDataType,
@@ -24,7 +23,6 @@ import {
 } from "../../db-service/data-types";
 import { DbAdapterService } from "../../db-service/db-adapter.service";
 import { GlobalVariableService } from "../../global-variable.service";
-import { TimebarService } from "../../timebar.service";
 import { MergedElemIndicatorTypes } from "../../user-preference";
 import { UserProfileService } from "../../user-profile.service";
 import { GroupTabComponent } from "./group-tab/group-tab.component";
@@ -81,8 +79,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
   changeBtnTxt = "Update";
   currRuleName = "New rule";
   isShowPropertyRule = true;
-  customSubTabs: { component: any; text: string }[] =
-    CustomizationModule.mapSubTabs;
   loadFromFileSubs: Subscription;
   dataPageSizeSubs: Subscription;
   appDescSubs: Subscription;
@@ -94,7 +90,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
     private _cyService: CytoscapeService,
     private _g: GlobalVariableService,
     private _dbService: DbAdapterService,
-    private _timebarService: TimebarService,
     private _profile: UserProfileService
   ) {
     this.isQueryOnDb = true;
@@ -299,7 +294,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
     this.isShowPropertyRule = true;
   }
 
-  runQueryOnClient(cb: (s: number, end: number) => void, cbParams: any[]) {
+  runQueryOnClient() {
     const fnStr2 =
       getBoolExpressionFromMetric(this.queryRule) +
       " return true; return false;";
@@ -321,10 +316,9 @@ export class MapTabComponent implements OnInit, OnDestroy {
       this._g.isSwitch2ObjTabOnSelect = true;
     }
     this._g.applyClassFiltering();
-    cb.apply(this, cbParams);
   }
 
-  runQueryOnDatabase(cb: (s: number, end: number) => void, cbParams: any[]) {
+  runQueryOnDatabase() {
     if (!this.queryRule || Object.keys(this.queryRule).length === 0) {
       this._g.showErrorModal("Query", "There is no query!");
       return;
@@ -366,7 +360,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
           this._cyService.loadElementsFromDatabase(x.graphData, isMerge);
         }
       }
-      cb.apply(this, cbParams);
       if (isClientSidePagination) {
         this.tableInput.resultCnt = Math.min(
           x.count,
@@ -512,19 +505,12 @@ export class MapTabComponent implements OnInit, OnDestroy {
     this.tableFilled.next(true);
   }
 
-  maintainChartRange(s: number, e: number) {
-    if (this._g.userPrefs.timebar.isMaintainGraphRange.value) {
-      this._timebarService.setChartRange(s, e);
-    }
-  }
-
   runQuery() {
-    const arr = this._timebarService.getChartRange();
     if (this.isQueryOnDb) {
       this.dbResponse = null;
-      this.runQueryOnDatabase(this.maintainChartRange, arr);
+      this.runQueryOnDatabase();
     } else {
-      this.runQueryOnClient(this.maintainChartRange, arr);
+      this.runQueryOnClient();
     }
   }
 

@@ -1,5 +1,5 @@
 import { BehaviorSubject } from "rxjs";
-import { QueryRule, TimebarMetric } from "./operation-tabs/map-tab/query-types";
+import { QueryRule } from "./operation-tabs/map-tab/query-types";
 
 export interface UserPref {
   // boolean settings
@@ -36,7 +36,6 @@ export interface UserPref {
   currHighlightIdx: BehaviorSubject<number>;
   compoundPadding: BehaviorSubject<string>;
   edgeCollapseLimit: BehaviorSubject<number>;
-  objectInclusionType: BehaviorSubject<TimebarGraphInclusionTypes>;
   queryResultPagination: BehaviorSubject<"Client" | "Server">;
   selectionColor: BehaviorSubject<string>;
   selectionWidth: BehaviorSubject<number>;
@@ -46,29 +45,6 @@ export interface UserPref {
     lengthOfUpDownstream: BehaviorSubject<number>;
     isHighlightInZeroOutZero: BehaviorSubject<boolean>;
   };
-
-  timebar: {
-    isEnabled: BehaviorSubject<boolean>;
-    isHideDisconnectedNodesOnAnim: BehaviorSubject<boolean>;
-    isMaintainGraphRange: BehaviorSubject<boolean>;
-    playingStep: BehaviorSubject<number>;
-    playingPeriod: BehaviorSubject<number>;
-    zoomingStep: BehaviorSubject<number>;
-    statsInclusionType: BehaviorSubject<TimebarStatsInclusionTypes>;
-  };
-}
-
-export enum TimebarGraphInclusionTypes {
-  overlaps = 0,
-  contains = 1,
-  contained_by = 2,
-}
-
-export enum TimebarStatsInclusionTypes {
-  all = 0,
-  begin = 1,
-  middle = 2,
-  end = 3,
 }
 
 export enum MergedElemIndicatorTypes {
@@ -94,7 +70,6 @@ export interface BoolSetting {
 
 export interface UserProfile {
   queryRules: QueryRule[];
-  timebarMetrics: TimebarMetric[];
   userPref: any;
 }
 

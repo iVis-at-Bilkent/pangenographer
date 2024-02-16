@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subject, Subscription } from "rxjs";
-import { CustomizationModule } from "../../../custom/customization.module";
 import {
   TableData,
   TableDataType,
@@ -39,8 +38,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   isShowStatsTable: boolean = false;
   isShowObjTable: boolean = false;
   highlightedPathWalk: string = "";
-  customSubTabs: { component: any; text: string }[] =
-    CustomizationModule.objSubTabs;
 
   tableInput: TableViewInput = {
     columns: ["Type", "Count", "Selected", "Hidden"],

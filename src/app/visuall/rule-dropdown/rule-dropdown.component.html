@@ -1,11 +1,34 @@
 <div class="dropdown-container d-flex d-inline-flex flex-column">
   <span class="text-center">
-    <img title="Add" src="assets/img/add.svg" alt="Add Rule" (click)="isShowDropDown=!isShowDropDown">
+    <img
+      title="Add"
+      src="assets/img/add.svg"
+      alt="Add Rule"
+      (click)="isShowDropDown = !isShowDropDown"
+    />
   </span>
   <div *ngIf="isShowDropDown" class="dropdown-content">
-    <button type="button" class="dd-item dropdown-item va-small-text" (click)="btnClick('AND')">AND</button>
-    <button type="button" class="dd-item dropdown-item va-small-text" (click)="btnClick('OR')">OR</button>
-    <button type="button" class="dd-item dropdown-item va-small-text" *ngIf="isShowConditionBtn"
-      (click)="btnClick('C')">Condition</button>
+    <button
+      type="button"
+      class="dd-item dropdown-item va-small-text"
+      (click)="btnClick('AND')"
+    >
+      AND
+    </button>
+    <button
+      type="button"
+      class="dd-item dropdown-item va-small-text"
+      (click)="btnClick('OR')"
+    >
+      OR
+    </button>
+    <button
+      type="button"
+      class="dd-item dropdown-item va-small-text"
+      *ngIf="isShowConditionBtn"
+      (click)="btnClick('C')"
+    >
+      Condition
+    </button>
   </div>
 </div>

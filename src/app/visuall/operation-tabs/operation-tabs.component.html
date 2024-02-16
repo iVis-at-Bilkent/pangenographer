@@ -1,7 +1,13 @@
-<ul class="nav nav-tabs justify-content-center" id="edit-tab" role="tablist">
+<ul class="nav nav-tabs justify-content-center" id="edit-tab" role="list">
   <li class="nav-item" *ngFor="let t of tabs; index as i">
-    <a class="nav-link va-heading1" data-bs-toggle="tab" href="#" [class.active]="i==currTab"
-      (click)="setTab(i)">{{t.text}}</a>
+    <a
+      class="nav-link va-heading1"
+      data-bs-toggle="tab"
+      href="#"
+      [class.active]="i == currTab"
+      (click)="setTab(i)"
+      >{{ t.text }}</a
+    >
   </li>
 </ul>
 
@@ -9,7 +15,11 @@
 
 <!--Content will be dynamically loaded-->
 <div class="tab-content" id="edit-tab-content">
-  <div *ngFor="let t of tabs; let i = index" class="tab-pane fade tab-column m-1" [ngClass]="{'active show': currTab==i}">
+  <div
+    *ngFor="let t of tabs; let i = index"
+    class="tab-pane fade tab-column m-1"
+    [ngClass]="{ 'active show': currTab == i }"
+  >
     <ng-container *ngComponentOutlet="t.component"></ng-container>
   </div>
 </div>

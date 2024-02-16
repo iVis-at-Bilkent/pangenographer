@@ -1,6 +1,6 @@
-import { Component, OnInit, HostListener } from "@angular/core";
-import { CytoscapeService } from "../cytoscape.service";
+import { Component, HostListener, OnInit } from "@angular/core";
 import { ContextMenuService } from "../context-menu/context-menu.service";
+import { CytoscapeService } from "../cytoscape.service";
 import { GlobalVariableService } from "../global-variable.service";
 
 @Component({

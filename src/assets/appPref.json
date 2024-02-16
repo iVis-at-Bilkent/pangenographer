@@ -51,15 +51,6 @@
     "queryResultPagination": "Client",
     "tilingPadding": 4,
     "pangenograph": {
-        "lengthOfUpDownstream" : 1
-    },
-    "timebar": {
-        "isEnabled": false,
-        "playingStep": 50,
-        "playingPeriod": 1350,
-        "zoomingStep": 50,
-        "statsInclusionType": 0,
-        "isHideDisconnectedNodesOnAnim": false,
-        "isMaintainGraphRange": false
+        "lengthOfUpDownstream": 1
     }
 }

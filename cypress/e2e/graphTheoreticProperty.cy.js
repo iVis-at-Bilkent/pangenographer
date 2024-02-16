@@ -1,4 +1,4 @@
-import { open, navbarAction, openSubTab } from "../helper";
+import { navbarAction, open, openSubTab } from "../helper";
 
 context("Calculate Theoretic Property", () => {
   beforeEach(open);

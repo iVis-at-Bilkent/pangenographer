@@ -1,14 +1,12 @@
 import { Injectable } from "@angular/core";
-import { UserProfile } from "./user-preference";
-import {
-  QueryRule,
-  TimebarMetric,
-  RuleNode,
-  deepCopyTimebarMetrics,
-  deepCopyQueryRules,
-} from "./operation-tabs/map-tab/query-types";
 import { BehaviorSubject } from "rxjs";
 import { GlobalVariableService } from "./global-variable.service";
+import {
+  QueryRule,
+  RuleNode,
+  deepCopyQueryRules,
+} from "./operation-tabs/map-tab/query-types";
+import { UserProfile } from "./user-preference";
 
 @Injectable({
   providedIn: "root",
@@ -78,11 +76,7 @@ export class UserProfileService {
     return [];
   }
 
-  downloadProfileAsFile(
-    isSaveSettings = true,
-    isSaveQueryRules = true,
-    isSaveTimebarStats = true
-  ) {
+  downloadProfileAsFile(isSaveSettings = true, isSaveQueryRules = true) {
     const p = this.getUserProfile();
     if (p) {
       if (!isSaveSettings) {
@@ -90,9 +84,6 @@ export class UserProfileService {
       }
       if (!isSaveQueryRules) {
         p.queryRules = undefined;
-      }
-      if (!isSaveTimebarStats) {
-        p.timebarMetrics = undefined;
       }
     }
     const str = JSON.stringify(p);
@@ -140,28 +131,6 @@ export class UserProfileService {
       localStorage.setItem("profile", JSON.stringify(p));
     } else {
       localStorage.setItem("profile", JSON.stringify({ queryRules: f }));
-    }
-  }
-
-  getTimebarMetrics(): TimebarMetric[] {
-    const p = this.getUserProfile();
-    if (p && p.timebarMetrics) {
-      return p.timebarMetrics;
-    }
-    return [];
-  }
-
-  saveTimebarMetrics(t: TimebarMetric[]) {
-    const p = this.getUserProfile();
-    if (p) {
-      let t2 = deepCopyTimebarMetrics(t);
-      for (const m of t2) {
-        this.deleteParents(m.rules);
-      }
-      p.timebarMetrics = t2;
-      localStorage.setItem("profile", JSON.stringify(p));
-    } else {
-      localStorage.setItem("profile", JSON.stringify({ timebarMetrics: [] }));
     }
   }
 

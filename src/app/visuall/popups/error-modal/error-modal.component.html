@@ -1,16 +1,26 @@
 <!-- Modal error -->
 <div class="modal-header">
-  <div class="modal-title va-heading1 text-center">{{title}}</div>
+  <div class="modal-title va-heading1 text-center">{{ title }}</div>
   <div>
-    <button #closeBtn type="button" class="btn-close" data-dismiss="modal" aria-label="Close"
-      (click)="activeModal.dismiss('Cross click')">
-      
-    </button>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
   </div>
 </div>
-<div class="modal-body text-center va-text" [innerHtml]="msg">
-</div>
+<div class="modal-body text-center va-text" [innerHtml]="msg"></div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary va-text" id="save-png-btn1" data-dismiss="modal"
-    (click)="activeModal.dismiss('OK click')">OK</button>
+  <button
+    type="button"
+    class="btn btn-primary va-text"
+    id="save-png-btn1"
+    data-dismiss="modal"
+    (click)="activeModal.dismiss('OK click')"
+  >
+    OK
+  </button>
 </div>

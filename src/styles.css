@@ -74,11 +74,6 @@ app-cytoscape {
   position: relative;
 }
 
-app-timebar {
-  grid-area: ti;
-  padding-left: 10px;
-}
-
 app-operation-tabs {
   grid-area: ot;
   padding-left: 10px;
@@ -356,8 +351,6 @@ label.form-check-label,
 input.form-check-input {
   cursor: pointer;
 }
-
-/* custom selected bar charts in Timebar */
 
 rect[fill-opacity="0"]:not([stroke="none"]) {
   stroke: white;

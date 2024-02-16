@@ -1,23 +1,22 @@
 import { Injectable } from "@angular/core";
-import navigator from "cytoscape-navigator";
-import fcose from "cytoscape-fcose";
-import popper from "cytoscape-popper";
-import expandCollapse from "cytoscape-expand-collapse";
-import viewUtilities from "cytoscape-view-utilities";
-import layoutUtilities from "cytoscape-layout-utilities";
-import cytoscapeVisualCues from "../../lib/cytoscape-visual-cues/cytoscape-visual-cues.esm.js";
-import cise from "cytoscape-cise";
 import cytoscape from "cytoscape";
-import timebar from "../../lib/timebar/cytoscape-timebar";
+import cise from "cytoscape-cise";
+import expandCollapse from "cytoscape-expand-collapse";
+import fcose from "cytoscape-fcose";
+import layoutUtilities from "cytoscape-layout-utilities";
+import navigator from "cytoscape-navigator";
+import panzoom from "cytoscape-panzoom";
+import popper from "cytoscape-popper";
+import viewUtilities from "cytoscape-view-utilities";
 import * as $ from "jquery";
-import { GlobalVariableService } from "./global-variable.service";
+import cytoscapeVisualCues from "../../lib/cytoscape-visual-cues/cytoscape-visual-cues.esm.js";
 import {
+  EXPAND_COLLAPSE_CUE_SIZE,
   MAX_HIGHLIGHT_CNT,
   expandCollapseCuePosition,
-  EXPAND_COLLAPSE_CUE_SIZE,
   getCyStyleFromColorAndWid,
 } from "./constants";
-import panzoom from "cytoscape-panzoom";
+import { GlobalVariableService } from "./global-variable.service";
 
 // service for cytoscape.js extensions
 @Injectable({
@@ -29,7 +28,6 @@ export class CyExtService {
   constructor(private _g: GlobalVariableService) {}
 
   registerExtensions() {
-    timebar(cytoscape);
     navigator(cytoscape);
     viewUtilities(cytoscape);
     expandCollapse(cytoscape);

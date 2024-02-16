@@ -2,23 +2,42 @@
 <div class="modal-header">
   <div class="modal-title va-heading1 text-center">Save User Profile</div>
   <div>
-    <button #closeBtn type="button" class="btn-close" data-dismiss="modal" aria-label="Close"
-      (click)="activeModal.dismiss('Cross click')">
-      
-    </button>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
   </div>
 </div>
 
 <div class="modal-body text-center va-text">
-  <div class="card border-0 mx-3 my-2" *ngFor="let boolSetting of boolSettings; let i = index">
+  <div
+    class="card border-0 mx-3 my-2"
+    *ngFor="let boolSetting of boolSettings; let i = index"
+  >
     <div class="form-check form-check-inline">
-      <input [id]="'save-profile-cb' + i" type="checkbox" class="form-check-input cb-filter" [(ngModel)]="boolSetting.isEnable" />
-      <label class="form-label va-text">{{boolSetting.text}}</label>
+      <input
+        [id]="'save-profile-cb' + i"
+        type="checkbox"
+        class="form-check-input cb-filter"
+        [(ngModel)]="boolSetting.isEnable"
+        placeholder="Save Profile"
+      />
+      <label class="form-label va-text">{{ boolSetting.text }}</label>
     </div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary va-text" data-dismiss="modal"
-    (click)="save2File()">OK</button>
+  <button
+    type="button"
+    class="btn btn-primary va-text"
+    data-dismiss="modal"
+    (click)="save2File()"
+  >
+    OK
+  </button>
 </div>

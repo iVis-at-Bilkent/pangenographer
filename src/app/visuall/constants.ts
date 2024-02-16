@@ -29,14 +29,10 @@ export const MIN_LENGTH_OF_UP_DOWN_STREAM = 1;
 export const EXPAND_COLLAPSE_CUE_SIZE = 12;
 export const MAX_TABLE_COLUMN_COUNT = 100;
 export const MIN_TABLE_COLUMN_COUNT = 1;
-export const HIDE_EMPTY_TIMEBAR_DELAY = 1000;
 export const CSS_SM_TEXT_SIZE = 11;
 export const CSS_FONT_NAME = "Arial";
 export const CLUSTER_CLASS = "Cluster";
 export const LAYOUT_ANIM_DUR = 500;
-
-export const LONG_MAX = "9000000036854776000";
-export const LONG_MIN = "-9000000036854776000";
 
 export const GENERIC_TYPE = {
   ANY_CLASS: "Any Object",
@@ -97,23 +93,6 @@ export const NEO4J_2_JS_STR_OPERATORS = {
   Contains: "includes",
   "Starts with": "startsWith",
   "Ends with": "endsWith",
-};
-
-export const TIME_UNITS = {
-  century: 3153600000000,
-  decade: 315360000000,
-  year: 31536000000,
-  quarter: 7884000000,
-  month: 2592000000,
-  week: 604800000,
-  day: 86400000,
-  hour: 3600000,
-  "5min": 300000,
-  minute: 60000,
-  "5sec": 5000,
-  second: 1000,
-  "50ms": 50,
-  ms: 1,
 };
 
 export const MONTHS = [

@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import { GroupCustomizationService } from "../../../../custom/group-customization.service";
 import { areSetsEqual } from "../../../constants";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
@@ -16,8 +15,7 @@ export class GroupTabComponent implements OnInit {
 
   constructor(
     private _cyService: CytoscapeService,
-    private _g: GlobalVariableService,
-    private _customizationService: GroupCustomizationService
+    private _g: GlobalVariableService
   ) {}
 
   ngOnInit() {
@@ -35,7 +33,7 @@ export class GroupTabComponent implements OnInit {
           this._cyService.markovClustering();
         },
       },
-    ].concat(this._customizationService.clusteringMethods);
+    ];
 
     this.selectedOption = this.options[0].name;
   }

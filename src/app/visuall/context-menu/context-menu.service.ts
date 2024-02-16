@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import cytoscape from "cytoscape";
 import * as contextMenus from "cytoscape-context-menus";
-import { ContextMenuCustomizationService } from "../../custom/context-menu-customization.service";
 import { CytoscapeService } from "../cytoscape.service";
 import { DbAdapterService } from "../db-service/db-adapter.service";
 import { GlobalVariableService } from "../global-variable.service";
@@ -17,7 +16,6 @@ export class ContextMenuService {
   constructor(
     private _cyService: CytoscapeService,
     private _g: GlobalVariableService,
-    private _customizationService: ContextMenuCustomizationService,
     private _dbService: DbAdapterService
   ) {
     this.menu = [
@@ -125,7 +123,6 @@ export class ContextMenuService {
   bindContextMenuExtension() {
     // register context menu extension
     cytoscape.use(contextMenus);
-    this.menu = this._customizationService.menu.concat(this.menu);
     this._g.cy.contextMenus({
       menuItems: this.menu,
       menuItemClasses: ["vall-ctx-menu-item"],

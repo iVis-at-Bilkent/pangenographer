@@ -1,26 +1,56 @@
-<div *ngIf="isShow" ngResizable ngDraggable [handle]="DragHandle" [rzHandles]="'n,e,s,w,se,sw,nw'" [position]="position"
-  class="draggable-content" (endOffset)="onMoveEnd($event)" (rzStop)="onResizeStop($event)"
-  [style.width]="currSize.width + 'px'" [style.height]="currSize.height + 'px'">
-  <div #DragHandle style="cursor: move;" class="modal-header">
+<div
+  *ngIf="isShow"
+  ngResizable
+  ngDraggable
+  [handle]="DragHandle"
+  [rzHandles]="'n,e,s,w,se,sw,nw'"
+  [position]="position"
+  class="draggable-content"
+  (endOffset)="onMoveEnd($event)"
+  (rzStop)="onResizeStop($event)"
+  [style.width]="currSize.width + 'px'"
+  [style.height]="currSize.height + 'px'"
+>
+  <div #DragHandle style="cursor: move" class="modal-header">
     <div class="modal-title va-heading1 text-center">Query History</div>
     <div>
-      <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close" (click)="closeClicked()">
-        
-      </button>
+      <button
+        type="button"
+        class="btn-close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="closeClicked()"
+      ></button>
     </div>
   </div>
   <div class="list-group">
-    <button *ngFor="let h of graphHistory; let i = index" type="button" class="list-group-item p-1"
-      [ngClass]="{'active': activeItemIdx == i}" (click)="load(i)">
+    <button
+      *ngFor="let h of graphHistory; let i = index"
+      type="button"
+      class="list-group-item p-1"
+      [ngClass]="{ active: activeItemIdx == i }"
+      (click)="load(i)"
+    >
       <div class="d-flex va-text">
-        <div class="me-2">{{i+1}}</div>
+        <div class="me-2">{{ i + 1 }}</div>
         <div class="me-auto text-start" [innerHTML]="h.expo"></div>
         <div>
-          <img class="std-icon m-1" *ngIf="h.base64png.length > 6" src="../../assets/img/graph.svg" title="Show graph"
-            (mouseover)="onMouseOver(i)" (mouseout)="onMouseOut()">
+          <img
+            class="std-icon m-1"
+            *ngIf="h.base64png.length > 6"
+            src="../../assets/img/graph.svg"
+            title="Show graph"
+            (mouseover)="onMouseOver(i)"
+            (mouseout)="onMouseOut()"
+          />
         </div>
         <div>
-          <img class="std-icon m-1" src="../../assets/img/toolbar/delete-simple.svg" (click)="delete(i)">
+          <img
+            class="std-icon m-1"
+            src="../../assets/img/toolbar/delete-simple.svg"
+            (click)="delete(i)"
+            title="Delete"
+          />
         </div>
       </div>
     </button>
@@ -28,5 +58,5 @@
 </div>
 
 <div *ngIf="imgSrc" class="img-bg">
-  <img class="popped-img rounded border" [src]="imgSrc">
+  <img class="popped-img rounded border" [src]="imgSrc" alt="Image" />
 </div>

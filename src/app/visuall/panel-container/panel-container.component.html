@@ -1,6 +1,12 @@
-<div class="panel" *ngFor="let p of panels; let i = index;">
-  <div class="panel-heading collapsed" data-bs-toggle="collapse" [attr.data-bs-target]="'#' + containerId + i" aria-expanded="false">
-    <span class="panel-title accordion-toggle"><b class="va-heading2">{{p.text}}</b></span>
+<div class="panel" *ngFor="let p of panels; let i = index">
+  <div
+    class="panel-heading collapsed"
+    data-bs-toggle="collapse"
+    [attr.data-bs-target]="'#' + containerId + i"
+  >
+    <span class="panel-title accordion-toggle"
+      ><b class="va-heading2">{{ p.text }}</b></span
+    >
   </div>
   <div [id]="containerId + i" class="collapse">
     <ng-container *ngComponentOutlet="p.component"></ng-container>

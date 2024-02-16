@@ -68,29 +68,6 @@ export function deepCopyQueryRules(metrics: QueryRule[]): QueryRule[] {
   return t2;
 }
 
-export function deepCopyTimebarMetric(metric: TimebarMetric): TimebarMetric {
-  let r: RuleNode = deepCopyRuleNode(metric.rules);
-  return {
-    className: metric.className,
-    incrementFn: metric.incrementFn,
-    name: metric.name,
-    rules: r,
-    color: metric.color,
-    isEdge: metric.isEdge,
-    isEditing: metric.isEditing,
-  };
-}
-
-export function deepCopyTimebarMetrics(
-  metrics: TimebarMetric[]
-): TimebarMetric[] {
-  let t2: TimebarMetric[] = [];
-  for (const m of metrics) {
-    t2.push(deepCopyTimebarMetric(m));
-  }
-  return t2;
-}
-
 export enum PropertyCategory {
   other = 0,
   date = 1,
@@ -113,31 +90,6 @@ export interface RuleSync {
   selectedClass: string;
 }
 
-// 2 type of metric exists: sum or count.
-// Sum: sums the property values of elements which satisfy the conditional expressions
-// Count: counts the elements which satisfy the conditional expressions
-export interface TimebarMetric {
-  incrementFn: (x: any) => number;
-  rules: RuleNode;
-  name: string;
-  className: string;
-  isEdge?: boolean;
-  isEditing?: boolean;
-  color?: string;
-}
-
-export interface TimebarUnitData {
-  isBegin: boolean;
-  d: number;
-  id: string;
-}
-
-export interface TimebarItem {
-  start: number;
-  end: number;
-  cyElem: any;
-}
-
 export function isSumRule(r: Rule): boolean {
   return (
     r &&
@@ -148,9 +100,7 @@ export function isSumRule(r: Rule): boolean {
   );
 }
 
-export function getBoolExpressionFromMetric(
-  m: TimebarMetric | ClassBasedRules
-): string {
+export function getBoolExpressionFromMetric(m: ClassBasedRules): string {
   let classCondition = "";
   // apply class condition
   if (m.className.toLowerCase() == GENERIC_TYPE.EDGES_CLASS.toLowerCase()) {

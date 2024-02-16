@@ -29,7 +29,7 @@ export interface DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   );
   getCommonStream(
     dbIds: (string | number)[],
@@ -39,7 +39,7 @@ export interface DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   );
   getNeighborhood(
     dbIds: (string | number)[],
@@ -48,7 +48,7 @@ export interface DbService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   );
   getConsecutiveNodes(
     properties: (string | number)[],
