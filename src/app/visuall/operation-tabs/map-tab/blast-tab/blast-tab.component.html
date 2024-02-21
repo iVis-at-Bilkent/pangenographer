@@ -2,18 +2,18 @@
   <div class="va-text d-flex align-items-center justify-content-center">
     <select
       class="form-select tight-select filter-form va-small-text query-select"
-      [(ngModel)]="selectedBlastType"
-      (change)="onchangeBlastTypeChange($event)"
-      title="Choose a BLAST type"
+      [(ngModel)]="selectedType"
+      (change)="onchangeTypeChange($event)"
+      title="Choose a type"
     >
-      <option value="">Choose a BLAST type</option>
-      <option *ngFor="let type of blastTypes" [value]="type">
+      <option value="">Choose a type</option>
+      <option *ngFor="let type of types" [value]="type">
         {{ type }}
       </option>
     </select>
   </div>
 
-  <div *ngIf="selectedBlastTypeIdx === 1" class="panel">
+  <div *ngIf="selectedTypeIdx === 1" class="panel">
     <div>
       <p *ngIf="webRid">Last RID: {{ webRid }}</p>
       <p *ngIf="webRtoe">Last RTOE: {{ webRtoe }}</p>
@@ -248,7 +248,7 @@
       </div>
     </div>
     <div>
-      <label class="va-text">BLAST search request identifier (RID):</label>
+      <label class="va-text">Search request identifier (RID):</label>
       <div class="form-inline mx-1">
         <textarea
           (change)="onWebRIDChange($event)"
@@ -353,9 +353,9 @@
     </div>
   </div>
 
-  <div *ngIf="selectedBlastTypeIdx === 0" class="panel">
+  <div *ngIf="selectedTypeIdx === 0" class="panel">
     <div>
-      <pre class="result">{{ standaloneStatus }}</pre>
+      <pre *ngIf="standaloneStatus" class="result">{{ standaloneStatus }}</pre>
       <app-table-view
         [params]="standaloneTableOutput"
         [tableFilled]="standaloneIsTableOutputFilled"
@@ -364,14 +364,27 @@
       >
       </app-table-view>
     </div>
-    <div>
+    <div *ngIf="standaloneStatus" class="save">
       <input
         class="btn btn-sm btn-dark va-text m-2 center"
         type="button"
-        (click)="makeBlastDb()"
-        value="Make Blast DB"
-        title="Make Blast DB"
+        (click)="saveResult()"
+        value="Save Result"
+        title="Save Result"
       />
+    </div>
+    <div class="make-db">
+      <input
+        class="btn btn-sm btn-dark va-text m-2 center float-left"
+        type="button"
+        (click)="makeDb()"
+        value="Make DB"
+        title="Make DB"
+      />
+
+      <pre *ngIf="standaloneDBStatus" class="va-text">{{
+        standaloneDBStatus
+      }}</pre>
     </div>
     <div>
       <label class="va-text">Command Line Arguments:</label>
@@ -405,7 +418,7 @@
     <input
       class="btn btn-sm btn-dark va-text m-2 center"
       type="button"
-      (click)="executeStandaloneBlastQueryWithParams()"
+      (click)="executeStandaloneQueryWithParams()"
       value="Execute"
       title="Execute Query"
     />

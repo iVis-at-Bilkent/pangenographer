@@ -336,6 +336,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.openFileInput();
   }
 
+  loadUserProfile() {
+    this.isLoadFile4Graph = false;
+    this.isLoadFileGFA = false;
+    this.openFileInput();
+  }
+
   saveAsJson() {
     this._cyService.saveAsJson();
   }
@@ -346,6 +352,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   saveAsPng() {
     this._modalService.open(SaveAsPngModalComponent);
+  }
+
+  saveUserProfile() {
+    this._modalService.open(SaveProfileModalComponent, { size: "sm" });
   }
 
   deleteSelected() {
@@ -454,16 +464,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showHideGraphHistory() {
     const v = this._g.showHideGraphHistory.getValue();
     this._g.showHideGraphHistory.next(!v);
-  }
-
-  loadUserProfile() {
-    this.isLoadFile4Graph = false;
-    this.isLoadFileGFA = false;
-    this.openFileInput();
-  }
-
-  saveUserProfile() {
-    this._modalService.open(SaveProfileModalComponent, { size: "sm" });
   }
 
   private openFileInput() {

@@ -1,3 +1,18 @@
 .result {
-    max-height: 400px;
+  max-height: 400px;
+}
+
+.make-db {
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  text-wrap: break-word;
+}
+
+.save {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

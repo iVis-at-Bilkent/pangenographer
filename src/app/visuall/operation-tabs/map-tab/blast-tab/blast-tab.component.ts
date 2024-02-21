@@ -16,9 +16,9 @@ import { GlobalVariableService } from "../../../global-variable.service";
 })
 export class BlastTabComponent implements OnInit {
   query: string = "";
-  blastTypes: string[] = ["Standalone", "Web"];
-  selectedBlastType: string = "Standalone";
-  selectedBlastTypeIdx: number = 0;
+  types: string[] = ["Standalone", "Web"];
+  selectedType: string = "Standalone";
+  selectedTypeIdx: number = 0;
 
   webDatabase: string = "nr";
   webPrograms: string[] = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
@@ -114,6 +114,7 @@ export class BlastTabComponent implements OnInit {
   standaloneIsTableOutput: boolean = false;
   standaloneIsTableOutputFilled = new Subject<boolean>();
   standaloneclearTableOutputFilter = new Subject<boolean>();
+  standaloneDBStatus: string = "";
 
   constructor(
     protected _http: HttpClient,
@@ -123,14 +124,14 @@ export class BlastTabComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  onchangeBlastTypeChange(event: any) {
-    this.selectedBlastType = event.target.value;
-    if (this.selectedBlastType === "Standalone") {
-      this.selectedBlastTypeIdx = 0;
-    } else if (this.selectedBlastType === "Web") {
-      this.selectedBlastTypeIdx = 1;
+  onchangeTypeChange(event: any) {
+    this.selectedType = event.target.value;
+    if (this.selectedType === "Standalone") {
+      this.selectedTypeIdx = 0;
+    } else if (this.selectedType === "Web") {
+      this.selectedTypeIdx = 1;
     } else {
-      this.selectedBlastTypeIdx = -1;
+      this.selectedTypeIdx = -1;
     }
     this.query = "";
   }
@@ -373,7 +374,7 @@ export class BlastTabComponent implements OnInit {
       this.webFormatObjects[this.webSelectedFormatObjectIdx];
   }
 
-  runBlastStandaloneQuery(
+  runStandaloneQuery(
     requestBody: any,
     isMakeDb: boolean,
     callback?: (result: any) => void
@@ -404,17 +405,27 @@ export class BlastTabComponent implements OnInit {
     }, errFn);
   }
 
-  makeBlastDb() {
-    this.runBlastStandaloneQuery(
+  makeDb() {
+    if (this._g.cy.nodes().length == 0) {
+      this._g.showErrorModal("No nodes", "Please load a graph and try again.");
+      return;
+    }
+    this.runStandaloneQuery(
       { fastaData: this._cyService.prepareAllNodesFastaData() },
       true,
       (res) => {
-        this.standaloneStatus = res.results;
+        this.standaloneDBStatus =
+          "Succesfully added " +
+          res.results.split("\n")[9].split(" ")[5] +
+          " sequences.";
+        setTimeout(() => {
+          this.standaloneDBStatus = "";
+        }, 10000);
       }
     );
   }
 
-  executeStandaloneBlastQueryWithParams() {
+  executeStandaloneQueryWithParams() {
     if (!this.standaloneQuery) {
       this._g.showErrorModal(
         "No query sequence",
@@ -422,7 +433,7 @@ export class BlastTabComponent implements OnInit {
       );
       return;
     }
-    this.runBlastStandaloneQuery(
+    this.runStandaloneQuery(
       {
         fastaData: this.standaloneQuery,
         commandLineArguments: this.standaloneCommandLineArguments,
@@ -473,5 +484,16 @@ export class BlastTabComponent implements OnInit {
 
   onStandaloneCommandLineArgumentsChange(event: any) {
     this.standaloneCommandLineArguments = event.target.value.trim();
+  }
+
+  saveResult() {
+    if (this.selectedTypeIdx) {
+      this._cyService.saveAsTxt(this.webResult, "blast_web_result.txt");
+    } else {
+      this._cyService.saveAsTxt(
+        this.standaloneStatus,
+        "blast_standalone_result.txt"
+      );
+    }
   }
 }
