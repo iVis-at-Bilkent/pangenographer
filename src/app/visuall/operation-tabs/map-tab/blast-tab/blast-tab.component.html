@@ -1,49 +1,92 @@
 <div class="panel">
-  <div class="va-text d-flex align-items-center justify-content-center">
-    <select
-      class="form-select tight-select filter-form va-small-text query-select"
-      [(ngModel)]="selectedType"
-      (change)="onchangeTypeChange($event)"
-      title="Choose a type"
-    >
-      <option value="">Choose a type</option>
-      <option *ngFor="let type of types" [value]="type">
-        {{ type }}
-      </option>
-    </select>
-  </div>
+  <div class="mx-1">
+    <div class="va-text d-flex align-items-center justify-content-center m-2">
+      <select
+        class="form-select tight-select filter-form va-small-text query-select"
+        [(ngModel)]="selectedType"
+        (change)="onchangeTypeChange($event)"
+        title="Choose a type"
+      >
+        <option value="">Choose a type</option>
+        <option *ngFor="let type of types" [value]="type">
+          {{ type }}
+        </option>
+      </select>
+    </div>
 
-  <div *ngIf="selectedTypeIdx === 1" class="panel">
-    <div>
-      <p *ngIf="webRid">Last RID: {{ webRid }}</p>
-      <p *ngIf="webRtoe">Last RTOE: {{ webRtoe }}</p>
-      <p *ngIf="webStatus">Last Status: {{ webStatus }}</p>
-      <div *ngIf="webResult">
-        <p>Last Result:</p>
-        <pre class="result">{{ webResult }}</pre>
+    <div *ngIf="selectedTypeIdx === 1" class="panel">
+      <div class="va-text">
+        <div *ngIf="webRid">
+          Last RID: <strong>{{ webRid }}</strong>
+        </div>
+        <div *ngIf="webRtoe">
+          Last RTOE: <strong>{{ webRtoe }}</strong>
+        </div>
+        <div *ngIf="webStatus">
+          Last Status: <strong>{{ webStatus }}</strong>
+        </div>
+        <div *ngIf="webResult">
+          <p>Last Result</p>
+          <pre class="result">{{ webResult }}</pre>
+        </div>
+        <div *ngIf="webResult" class="save">
+          <input
+            class="btn btn-sm btn-dark va-text m-2 center"
+            type="button"
+            (click)="saveResult()"
+            value="Save Result"
+            title="Save Result"
+          />
+        </div>
       </div>
-    </div>
-    <div>
-      <label class="va-text">Query:</label>
-      <input
-        class="btn btn-sm btn-primary va-text m-2 center"
-        type="button"
-        (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
-        value="Get Selected Segment's Sequence"
-        title="Get Selected Segment's Sequence"
-      />
-      <div class="form-inline mx-1">
-        <textarea
-          (change)="onQueryChange($event)"
-          [(ngModel)]="query"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5 h-100"
-          placeholder="Accession, GI, or FASTA."
-        ></textarea>
+
+      <div class="form-inline blast-option">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="executeWebBlastQueryWithParams()"
+          value="Execute"
+          title="Execute Query"
+        />
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="checkWebBlastQueryStatus()"
+          value="Check Query Status"
+          title="Check Query Status"
+        />
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="getWebBlastQueryResult()"
+          value="Get Results"
+          title="Get Results"
+        />
       </div>
-    </div>
-    <div>
-      <label class="va-text">Database:</label>
-      <div class="form-inline mx-1">
+
+      <div class="blast-option">
+        <div class="query">
+          <label class="va-text">Query</label>
+          <input
+            class="btn btn-sm btn-primary va-text m-2 center"
+            type="button"
+            (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
+            value="Get Selected Segment's Sequence"
+            title="Get Selected Segment's Sequence"
+          />
+        </div>
+        <div class="form-inline">
+          <textarea
+            (change)="onQueryChange($event)"
+            [(ngModel)]="query"
+            class="form-control std-inp-hei va-small-text w5-5 h-100"
+            placeholder="Accession, GI, or FASTA."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-inline blast-option">
+        <label class="va-text blast-option-label">Database</label>
         <textarea
           (change)="onWebDatabaseChange($event)"
           [(ngModel)]="webDatabase"
@@ -51,205 +94,40 @@
           placeholder="Database from appendix 2 or one uploaded to blastdb_custom (see appendix 4)"
         ></textarea>
       </div>
-    </div>
-    <div>
-      <label class="va-text">Program:</label>
-      <div class="form-inline mx-1">
+
+      <div class="form-inline blast-option">
+        <label class="va-text blast-option-label">Program</label>
         <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+          class="form-select tight-select filter-form va-small-text inp-4-char w-auto blast-option-label"
           (change)="onWebProgramChange($event)"
           title="Program"
-          [(ngModel)]="webSelectedProgramIdx"
+          [(ngModel)]="webSelectedProgram"
         >
           <option
             *ngFor="let program of webPrograms; let i = index"
             [value]="program"
-            [selected]="webSelectedProgramIdx === i"
           >
             {{ program }}
           </option>
         </select>
+
+        <div class="form-check form-check-inline va-text">
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [(ngModel)]="webEnableMegaBlast"
+            (change)="onWebMegaBlastChange($event)"
+            id="enableMegaBlast"
+            title="Enable MegaBlast"
+          />
+          <label class="va-text">Enable MegaBlast</label>
+        </div>
       </div>
-    </div>
-    <div class="form-check form-check-inline va-text">
-      <input
-        class="form-check-input"
-        type="checkbox"
-        [(ngModel)]="webEnableMegaBlast"
-        (change)="onWebMegaBlastChange($event)"
-        id="enableMegaBlast"
-        title="Enable MegaBlast"
-      />
-      <label class="va-text">Enable MegaBlast</label>
-    </div>
-    <div>
-      <label class="va-text">Filter:</label>
-      <div class="form-inline mx-1">
-        <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="onWebFilterChange($event)"
-          title="Filter"
-          [(ngModel)]="webSelectedFilterIdx"
+
+      <div class="form-inline blast-option">
+        <label class="va-text blast-option-label"
+          >Search request identifier (RID)</label
         >
-          <option
-            *ngFor="let filter of webFilters; let i = index"
-            [value]="filter"
-            [selected]="webSelectedFilterIdx === i"
-          >
-            {{ filter }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Format Type:</label>
-      <div class="form-inline mx-1">
-        <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="onWebFormatTypeChange($event)"
-          title="Format Type"
-          [(ngModel)]="webSelectedFormatTypeIdx"
-        >
-          <option
-            *ngFor="let type of webFormatTypes; let i = index"
-            [value]="type"
-            [selected]="webSelectedFormatTypeIdx === i"
-          >
-            {{ type }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Expect: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebExpectChange($event)"
-          [(ngModel)]="webExpect"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Expect"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Nucleotide Reward: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebNucleotideRewardChange($event)"
-          [(ngModel)]="webNulceotideReward"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Nucleotide Reward"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Nucleotide Penalty: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          max="0"
-          (keydown.enter)="onWebNucleotidePenaltyChange($event)"
-          [(ngModel)]="webNulceotideReward"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Nucleotide Penalty"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Gap Costs:</label>
-      <div class="form-inline mx-1">
-        <textarea
-          (change)="onWebGapCostChange($event)"
-          [(ngModel)]="webGapCost"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
-          placeholder="Pair of positive integers separated by a space such as “11 1”."
-        ></textarea>
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Matrix:</label>
-      <div class="form-inline mx-1">
-        <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="onWebMatrixChange($event)"
-          title="Matrix"
-          [(ngModel)]="webSelectedMatrixIdx"
-        >
-          <option
-            *ngFor="let matrix of webMatrixs; let i = index"
-            [value]="matrix"
-            [selected]="webSelectedMatrixIdx === i"
-          >
-            {{ matrix }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Hitlist Size: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebHitlistSizeChange($event)"
-          [(ngModel)]="webHitlistSize"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Hitlist Size"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Descriptions: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebDescriptionsChange($event)"
-          [(ngModel)]="webDescriptions"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Descriptions"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Alignments: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebAlignmentsChange($event)"
-          [(ngModel)]="webAlignments"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Alignments"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">NCBI GenInfo:</label>
-      <div class="form-inline mx-1">
-        <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="onWebNCBIGenInfoChange($event)"
-          title="NCBI GenInfo"
-          [(ngModel)]="webSelectedNCBIGenInfoIdx"
-        >
-          <option
-            *ngFor="let genInfo of webNcbiGenInfos; let i = index"
-            [value]="genInfo"
-            [selected]="webSelectedNCBIGenInfoIdx === i"
-          >
-            {{ genInfo }}
-          </option>
-        </select>
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Search request identifier (RID):</label>
-      <div class="form-inline mx-1">
         <textarea
           (change)="onWebRIDChange($event)"
           [(ngModel)]="webRid"
@@ -257,170 +135,382 @@
           placeholder="The Request ID (RID) returned when the search was submitted"
         ></textarea>
       </div>
-    </div>
-    <div>
-      <label class="va-text">Threshold: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebThresholdChange($event)"
-          [(ngModel)]="webThreshold"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Threshold"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Word Size: (0 for undefined)</label>
-      <div class="mx-1">
-        <input
-          type="number"
-          min="0"
-          (keydown.enter)="onWebWordSizeChange($event)"
-          [(ngModel)]="webWordSize"
-          class="form-control inp-3-char std-inp-hei va-small-text"
-          title="Word Size"
-        />
-      </div>
-    </div>
-    <div>
-      <label class="va-text"
-        >Composition Based Statistics: (-1 for undefined)</label
-      >
-      <div class="form-inline mx-1">
+
+      <div class="form-inline blast-option">
+        <label class="va-text blast-option-label">Format Type</label>
         <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="onWebCompositionBasedStatisticsChange($event)"
-          title="Composition Based Statistics"
-          [(ngModel)]="webSelectedCompositionBasedStatisticsIdx"
+          class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+          (change)="onWebFormatTypeChange($event)"
+          title="Format Type"
+          [(ngModel)]="webSelectedFormatType"
         >
           <option
-            *ngFor="
-              let compositionBasedStatistic of webCompositionBasedStatistics;
-              let i = index
+            *ngFor="let type of webFormatTypes; let i = index"
+            [value]="type"
+          >
+            {{ type }}
+          </option>
+        </select>
+      </div>
+
+      <div class="panel">
+        <div
+          class="subpanel-heading collapsed px-1"
+          data-bs-toggle="collapse"
+          data-bs-target="#formatTypeParameters"
+        >
+          <span class="panel-title accordion-toggle"
+            ><span class="va-heading3">Format Type Parameters</span></span
+          >
+        </div>
+        <div id="formatTypeParameters" class="collapse">
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label">NCBI GenInfo</label>
+            <select
+              class="form-select tight-select filter-form va-small-text inp-4-char"
+              (change)="onWebNCBIGenInfoChange($event)"
+              title="NCBI GenInfo"
+              [(ngModel)]="webSelectedNCBIGenInfo"
+            >
+              <option
+                *ngFor="let genInfo of webNcbiGenInfos; let i = index"
+                [value]="genInfo"
+              >
+                {{ genInfo }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label">Format Object</label>
+            <select
+              class="form-select tight-select filter-form va-small-text inp-4-char"
+              (change)="onWebFormatObjectChange($event)"
+              title="Format Object"
+              [(ngModel)]="webSelectedFormatObject"
+            >
+              <option
+                *ngFor="let formatObject of webFormatObjects; let i = index"
+                [value]="formatObject"
+              >
+                {{ formatObject }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label"
+              >Hitlist Size (0 for undefined)</label
+            >
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebHitlistSizeChange($event)"
+              [(ngModel)]="webHitlistSize"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Hitlist Size"
+            />
+          </div>
+
+          <div
+            *ngIf="
+              webSelectedFormatType === 'HTML' ||
+              webSelectedFormatType === 'Text'
             "
-            [value]="compositionBasedStatistic"
-            [selected]="webSelectedCompositionBasedStatisticsIdx === i"
+            class="form-inline blast-option"
           >
-            {{ compositionBasedStatistic }}
-          </option>
-        </select>
+            <label class="va-text blast-option-label"
+              >Descriptions (0 for undefined)</label
+            >
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebDescriptionsChange($event)"
+              [(ngModel)]="webDescriptions"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Descriptions"
+            />
+          </div>
+
+          <div
+            *ngIf="
+              webSelectedFormatType === 'HTML' ||
+              webSelectedFormatType === 'Text'
+            "
+            class="form-inline blast-option"
+          >
+            <label class="va-text blast-option-label"
+              >Alignments (0 for undefined)</label
+            >
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebAlignmentsChange($event)"
+              [(ngModel)]="webAlignments"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Alignments"
+            />
+          </div>
+        </div>
       </div>
-    </div>
-    <div>
-      <label class="va-text">Format Object:</label>
-      <div class="form-inline mx-1">
-        <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
-          (change)="onWebFormatObjectChange($event)"
-          title="Format Object"
-          [(ngModel)]="webSelectedFormatObjectIdx"
+
+      <div class="panel">
+        <div
+          class="subpanel-heading collapsed px-1"
+          data-bs-toggle="collapse"
+          data-bs-target="#algorithmParameters"
         >
-          <option
-            *ngFor="let formatObject of webFormatObjects; let i = index"
-            [value]="formatObject"
-            [selected]="webSelectedFormatObjectIdx === i"
+          <span class="panel-title accordion-toggle"
+            ><span class="va-heading3">Algorithm Parameters</span></span
           >
-            {{ formatObject }}
-          </option>
-        </select>
+        </div>
+        <div id="algorithmParameters" class="collapse">
+          <div>
+            <div class="text-center font-weight-bold m-2">
+              General Parameters
+            </div>
+            <div class="form-inline blast-option">
+              <label class="va-text blast-option-label"
+                >Expect Threshold (0 for undefined)</label
+              >
+              <input
+                type="number"
+                min="0"
+                (keydown.enter)="onWebExpectChange($event)"
+                [(ngModel)]="webExpect"
+                class="form-control inp-3-char std-inp-hei va-small-text"
+                title="Expect"
+              />
+            </div>
+
+            <div class="form-inline blast-option">
+              <label class="va-text blast-option-label"
+                >Word Size (0 for undefined)</label
+              >
+              <input
+                type="number"
+                min="0"
+                (keydown.enter)="onWebWordSizeChange($event)"
+                [(ngModel)]="webWordSize"
+                class="form-control inp-3-char std-inp-hei va-small-text"
+                title="Word Size"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div class="text-center font-weight-bold m-2">
+              Scoring Parameters
+            </div>
+            <div class="form-inline blast-option">
+              <label class="va-text blast-option-label">Gap Costs</label>
+              <textarea
+                (change)="onWebGapCostChange($event)"
+                [(ngModel)]="webGapCost"
+                class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+                placeholder="Pair of positive integers separated by a space such as “11 1”."
+              ></textarea>
+            </div>
+
+            <div
+              *ngIf="webSelectedProgram !== 'blastn'"
+              class="form-inline blast-option"
+            >
+              <label class="va-text blast-option-label">Matrix</label>
+              <select
+                class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+                (change)="onWebMatrixChange($event)"
+                title="Matrix"
+                [(ngModel)]="webSelectedMatrixIdx"
+              >
+                <option
+                  *ngFor="let matrix of webMatrixs; let i = index"
+                  [value]="matrix"
+                  [selected]="webSelectedMatrixIdx === i"
+                >
+                  {{ matrix }}
+                </option>
+              </select>
+            </div>
+
+            <div
+              *ngIf="
+                webSelectedProgram !== 'blastn' &&
+                webSelectedProgram !== 'tblastx'
+              "
+              class="form-inline blast-option"
+            >
+              <label class="va-text blast-option-label"
+                >Composition Based Statistics (-1 for undefined)</label
+              >
+              <select
+                class="form-select tight-select filter-form va-small-text inp-4-char"
+                (change)="onWebCompositionBasedStatisticsChange($event)"
+                title="Composition Based Statistics"
+                [(ngModel)]="webSelectedCompositionBasedStatistic"
+              >
+                <option
+                  *ngFor="
+                    let compositionBasedStatistic of webCompositionBasedStatistics;
+                    let i = index
+                  "
+                  [value]="compositionBasedStatistic"
+                >
+                  {{ compositionBasedStatistic }}
+                </option>
+              </select>
+            </div>
+
+            <div
+              *ngIf="webSelectedProgram !== 'blastn'"
+              class="form-inline blast-option"
+            >
+              <label class="va-text blast-option-label"
+                >Threshold (0 for undefined)</label
+              >
+              <input
+                type="number"
+                min="0"
+                (keydown.enter)="onWebThresholdChange($event)"
+                [(ngModel)]="webThreshold"
+                class="form-control inp-3-char std-inp-hei va-small-text"
+                title="Threshold"
+              />
+            </div>
+
+            <div
+              *ngIf="webSelectedProgram === 'blastn'"
+              class="form-inline blast-option"
+            >
+              <label class="va-text blast-option-label"
+                >Nucleotide Reward (0 for undefined)</label
+              >
+              <input
+                type="number"
+                min="0"
+                (keydown.enter)="onWebNucleotideRewardChange($event)"
+                [(ngModel)]="webNulceotideReward"
+                class="form-control inp-3-char std-inp-hei va-small-text"
+                title="Nucleotide Reward"
+              />
+            </div>
+
+            <div
+              *ngIf="webSelectedProgram === 'blastn'"
+              class="form-inline blast-option"
+            >
+              <label class="va-text blast-option-label"
+                >Nucleotide Penalty (0 for undefined)</label
+              >
+              <input
+                type="number"
+                max="0"
+                (keydown.enter)="onWebNucleotidePenaltyChange($event)"
+                [(ngModel)]="webNulceotideReward"
+                class="form-control inp-3-char std-inp-hei va-small-text"
+                title="Nucleotide Penalty"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div class="text-center font-weight-bold m-2">
+              Filters and Masking
+            </div>
+            <div class="form-inline blast-option">
+              <label class="va-text blast-option-label">Filter and Mask</label>
+              <select
+                class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+                (change)="onWebFilterChange($event)"
+                title="Filter"
+                [(ngModel)]="webSelectedFilter"
+              >
+                <option
+                  *ngFor="let filter of webFilters; let i = index"
+                  [value]="filter"
+                >
+                  {{ filter }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div>
+    <div *ngIf="selectedTypeIdx === 0" class="panel">
+      <div>
+        <pre *ngIf="standaloneStatus" class="result">{{
+          standaloneStatus
+        }}</pre>
+        <app-table-view
+          [params]="standaloneTableOutput"
+          [tableFilled]="standaloneIsTableOutputFilled"
+          [clearFilter]="standaloneclearTableOutputFilter"
+          (onFilteringChanged)="onStandaloneTableFilterChange($event)"
+        >
+        </app-table-view>
+      </div>
+      <div *ngIf="standaloneStatus" class="save">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="saveResult()"
+          value="Save Result"
+          title="Save Result"
+        />
+      </div>
+      <div class="make-db">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center float-left"
+          type="button"
+          (click)="makeDb()"
+          value="Make DB"
+          title="Make DB"
+        />
+
+        <pre *ngIf="standaloneDBStatus" class="va-text">{{
+          standaloneDBStatus
+        }}</pre>
+      </div>
+      <div>
+        <label class="va-text">Command Line Arguments</label>
+        <div class="form-inline">
+          <textarea
+            (change)="onStandaloneCommandLineArgumentsChange($event)"
+            [(ngModel)]="standaloneCommandLineArguments"
+            class="form-control std-inp-hei va-small-text w5-5 h-10"
+            placeholder="Command line arguments for blastn."
+          ></textarea>
+        </div>
+      </div>
+      <div>
+        <div class="query">
+          <label class="va-text">Query</label>
+          <input
+            class="btn btn-sm btn-primary va-text m-2 center"
+            type="button"
+            (click)="fillQueryTextareaWithSelectedSegmentsSequence(true)"
+            value="Get Selected Segment's Sequence"
+            title="Get Selected Segment's Sequence"
+          />
+        </div>
+        <div class="form-inline">
+          <textarea
+            (change)="onQueryChange($event)"
+            [(ngModel)]="standaloneQuery"
+            class="form-control std-inp-hei va-small-text w5-5 h-100"
+            placeholder="Accession, GI, or FASTA."
+          ></textarea>
+        </div>
+      </div>
       <input
         class="btn btn-sm btn-dark va-text m-2 center"
         type="button"
-        (click)="executeWebBlastQueryWithParams()"
+        (click)="executeStandaloneQueryWithParams()"
         value="Execute"
         title="Execute Query"
       />
-      <input
-        class="btn btn-sm btn-dark va-text m-2 center"
-        type="button"
-        (click)="checkWebBlastQueryStatus()"
-        value="Check Query Status"
-        title="Check Query Status"
-      />
-      <input
-        class="btn btn-sm btn-dark va-text m-2 center"
-        type="button"
-        (click)="getWebBlastQueryResult()"
-        value="Get Results"
-        title="Get Results"
-      />
     </div>
-  </div>
-
-  <div *ngIf="selectedTypeIdx === 0" class="panel">
-    <div>
-      <pre *ngIf="standaloneStatus" class="result">{{ standaloneStatus }}</pre>
-      <app-table-view
-        [params]="standaloneTableOutput"
-        [tableFilled]="standaloneIsTableOutputFilled"
-        [clearFilter]="standaloneclearTableOutputFilter"
-        (onFilteringChanged)="onStandaloneTableFilterChange($event)"
-      >
-      </app-table-view>
-    </div>
-    <div *ngIf="standaloneStatus" class="save">
-      <input
-        class="btn btn-sm btn-dark va-text m-2 center"
-        type="button"
-        (click)="saveResult()"
-        value="Save Result"
-        title="Save Result"
-      />
-    </div>
-    <div class="make-db">
-      <input
-        class="btn btn-sm btn-dark va-text m-2 center float-left"
-        type="button"
-        (click)="makeDb()"
-        value="Make DB"
-        title="Make DB"
-      />
-
-      <pre *ngIf="standaloneDBStatus" class="va-text">{{
-        standaloneDBStatus
-      }}</pre>
-    </div>
-    <div>
-      <label class="va-text">Command Line Arguments:</label>
-      <div class="form-inline mx-1">
-        <textarea
-          (change)="onStandaloneCommandLineArgumentsChange($event)"
-          [(ngModel)]="standaloneCommandLineArguments"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
-          placeholder="Command line arguments for blastn."
-        ></textarea>
-      </div>
-    </div>
-    <div>
-      <label class="va-text">Query:</label>
-      <input
-        class="btn btn-sm btn-primary va-text m-2 center"
-        type="button"
-        (click)="fillQueryTextareaWithSelectedSegmentsSequence(true)"
-        value="Get Selected Segment's Sequence"
-        title="Get Selected Segment's Sequence"
-      />
-      <div class="form-inline mx-1">
-        <textarea
-          (change)="onQueryChange($event)"
-          [(ngModel)]="standaloneQuery"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5 h-100"
-          placeholder="Accession, GI, or FASTA."
-        ></textarea>
-      </div>
-    </div>
-    <input
-      class="btn btn-sm btn-dark va-text m-2 center"
-      type="button"
-      (click)="executeStandaloneQueryWithParams()"
-      value="Execute"
-      title="Execute Query"
-    />
   </div>
 </div>

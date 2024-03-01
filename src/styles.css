@@ -396,8 +396,6 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   color: black;
 }
 
-/* 6600ff 00ffff 999966 cc00cc*/
-
 .edge-CIGAR-M-Eq-X {
   color: #0099ff;
 }

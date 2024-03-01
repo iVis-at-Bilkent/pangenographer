@@ -16,3 +16,17 @@
   justify-content: center;
   align-items: center;
 }
+
+.query {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.blast-option {
+  margin-bottom: 10px;
+}
+
+.blast-option-label {
+  margin-right: 10px;
+}

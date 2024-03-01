@@ -1,14 +1,14 @@
 import {
   Component,
-  OnInit,
-  Output,
   EventEmitter,
   Input,
   OnDestroy,
+  OnInit,
+  Output,
 } from "@angular/core";
-import { GlobalVariableService } from "../../visuall/global-variable.service";
 import { Subscription } from "rxjs";
 import { TYPES_NOT_TO_SHOW } from "src/app/visuall/constants";
+import { GlobalVariableService } from "../../visuall/global-variable.service";
 @Component({
   selector: "app-types-view",
   templateUrl: "./types-view.component.html",

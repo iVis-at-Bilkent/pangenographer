@@ -303,11 +303,11 @@ export class PropertyRuleComponent implements OnInit {
     this.isShowTxtArea = false;
   }
 
-  onMoveEnd(e) {
+  onMoveEnd(e: any) {
     this.position = e;
   }
 
-  onResizeStop(e) {
+  onResizeStop(e: any) {
     this.txtAreaSize = e.size;
   }
 
@@ -419,7 +419,7 @@ export class PropertyRuleComponent implements OnInit {
     }
   }
 
-  private addOperators(op) {
+  private addOperators(op: any) {
     for (let [k, v] of Object.entries(op)) {
       this.operators[k] = v;
       this.operatorKeys.push(k);

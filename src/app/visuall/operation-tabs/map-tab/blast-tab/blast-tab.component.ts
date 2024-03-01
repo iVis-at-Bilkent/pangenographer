@@ -23,11 +23,9 @@ export class BlastTabComponent implements OnInit {
   webDatabase: string = "nr";
   webPrograms: string[] = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
   webSelectedProgram: string = "blastn";
-  webSelectedProgramIdx: number = 0;
   webEnableMegaBlast: boolean = false;
   webFilters: string[] = ["F", "T", "L", "mT", "mL"];
   webSelectedFilter: string = "F";
-  webSelectedFilterIdx: number = 0;
   webFormatTypes: string[] = [
     "Text",
     "HTML",
@@ -37,7 +35,6 @@ export class BlastTabComponent implements OnInit {
     "Tabular",
   ];
   webSelectedFormatType: string = "HTML";
-  webSelectedFormatTypeIdx: number = 0;
   webExpect: number = 0;
   webNulceotideReward: number = 0;
   webNucleotidePenalty: number = 0;
@@ -59,7 +56,6 @@ export class BlastTabComponent implements OnInit {
   webAlignments: number = 0;
   webNcbiGenInfos: string[] = ["T", "F"];
   webSelectedNCBIGenInfo: string = "T";
-  webSelectedNCBIGenInfoIdx: number = 0;
   webRid: string = "";
   webRtoe: number = undefined;
   webStatus: string = "";
@@ -70,7 +66,6 @@ export class BlastTabComponent implements OnInit {
   webSelectedCompositionBasedStatisticsIdx: number = 0;
   webFormatObjects: string[] = ["SearchInfo", "Alignments"];
   webSelectedFormatObject: string = "SearchInfo";
-  webSelectedFormatObjectIdx: number = 0;
   webResult: string = "";
   webResultTableInput: string = "";
 
@@ -290,8 +285,7 @@ export class BlastTabComponent implements OnInit {
   }
 
   onWebProgramChange(event: any) {
-    this.webSelectedProgramIdx = event.target.selectedIndex;
-    this.webSelectedProgram = this.webPrograms[this.webSelectedProgramIdx];
+    this.webSelectedProgram = event.target.value.trim();
   }
 
   onWebMegaBlastChange(event: any) {
@@ -299,14 +293,11 @@ export class BlastTabComponent implements OnInit {
   }
 
   onWebFilterChange(event: any) {
-    this.webSelectedFilterIdx = event.target.selectedIndex;
-    this.webSelectedFilter = this.webFilters[this.webSelectedFilterIdx];
+    this.webSelectedFilter = event.target.value.trim();
   }
 
   onWebFormatTypeChange(event: any) {
-    this.webSelectedFormatTypeIdx = event.target.selectedIndex;
-    this.webSelectedFormatType =
-      this.webFormatTypes[this.webSelectedFormatTypeIdx];
+    this.webSelectedFormatType = event.target.value.trim();
   }
 
   onWebExpectChange(event: any) {
@@ -343,9 +334,7 @@ export class BlastTabComponent implements OnInit {
   }
 
   onWebNCBIGenInfoChange(event: any) {
-    this.webSelectedNCBIGenInfoIdx = event.target.selectedIndex;
-    this.webSelectedNCBIGenInfo =
-      this.webNcbiGenInfos[this.webSelectedNCBIGenInfoIdx];
+    this.webSelectedNCBIGenInfo = event.target.value.trim();
   }
 
   onWebRIDChange(event: any) {
@@ -361,17 +350,11 @@ export class BlastTabComponent implements OnInit {
   }
 
   onWebCompositionBasedStatisticsChange(event: any) {
-    this.webSelectedCompositionBasedStatisticsIdx = event.target.selectedIndex;
-    this.webSelectedCompositionBasedStatistic =
-      this.webCompositionBasedStatistics[
-        this.webSelectedCompositionBasedStatisticsIdx
-      ];
+    this.webSelectedCompositionBasedStatistic = event.target.value;
   }
 
   onWebFormatObjectChange(event: any) {
-    this.webSelectedFormatObjectIdx = event.target.selectedIndex;
-    this.webSelectedFormatObject =
-      this.webFormatObjects[this.webSelectedFormatObjectIdx];
+    this.webSelectedFormatObject = event.target.value.trim();
   }
 
   runStandaloneQuery(
