@@ -40,7 +40,7 @@
         </div>
       </div>
 
-      <div class="form-inline blast-option">
+      <div class="web-buttons blast-option">
         <input
           class="btn btn-sm btn-dark va-text m-2 center"
           type="button"
@@ -167,7 +167,7 @@
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label">NCBI GenInfo</label>
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char"
+              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
               (change)="onWebNCBIGenInfoChange($event)"
               title="NCBI GenInfo"
               [(ngModel)]="webSelectedNCBIGenInfo"
@@ -184,7 +184,7 @@
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label">Format Object</label>
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char"
+              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
               (change)="onWebFormatObjectChange($event)"
               title="Format Object"
               [(ngModel)]="webSelectedFormatObject"
@@ -440,13 +440,16 @@
 
     <div *ngIf="selectedTypeIdx === 0" class="panel">
       <div>
-        <pre *ngIf="standaloneStatus" class="result">{{
-          standaloneStatus
-        }}</pre>
+        <pre
+          *ngIf="standaloneStatus && !standaloneTableOutput"
+          class="result"
+          >{{ standaloneStatus }}</pre
+        >
         <app-table-view
+          *ngIf="standaloneTableOutput"
           [params]="standaloneTableOutput"
           [tableFilled]="standaloneIsTableOutputFilled"
-          [clearFilter]="standaloneclearTableOutputFilter"
+          [clearFilter]="standaloneClearTableOutputFilter"
           (onFilteringChanged)="onStandaloneTableFilterChange($event)"
         >
         </app-table-view>

@@ -5,7 +5,9 @@ import { environment } from "src/environments/environment";
 import {
   TableData,
   TableDataType,
+  TableFiltering,
   TableViewInput,
+  filterTableDatas,
 } from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
@@ -72,12 +74,11 @@ export class BlastTabComponent implements OnInit {
   standaloneTableOutput: TableViewInput = {
     results: [],
     columns: [
-      "ID",
       "Query Name",
       "Source Name",
       "Percent Identity",
       "Alignment Length",
-      "Mismatches",
+      "Mis-matches",
       "Gap Opens",
       "Query Start",
       "Query End",
@@ -89,7 +90,7 @@ export class BlastTabComponent implements OnInit {
     isLoadGraph: false,
     isMergeGraph: false,
     currPage: 1,
-    pageSize: 20,
+    pageSize: 15,
     resultCnt: 0,
     isNodeData: false,
     isShowExportAsCSV: false,
@@ -108,7 +109,7 @@ export class BlastTabComponent implements OnInit {
   standaloneCommandLineArguments: string = "-outfmt 6";
   standaloneIsTableOutput: boolean = false;
   standaloneIsTableOutputFilled = new Subject<boolean>();
-  standaloneclearTableOutputFilter = new Subject<boolean>();
+  standaloneClearTableOutputFilter = new Subject<boolean>();
   standaloneDBStatus: string = "";
 
   constructor(
@@ -221,16 +222,11 @@ export class BlastTabComponent implements OnInit {
         "&COMPOSITION_BASED_STATISTICS=" +
         this.webSelectedCompositionBasedStatistic;
     }
-    console.log(queryParams.replace(/&/g, "\n"));
     this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/^    RID = (.*)$/m);
       this.webRid = match && match[1];
-      console.log(match);
       match = result.match(/^    RTOE = (.*)$/m);
       this.webRtoe = match && match[1];
-      console.log(match);
-      console.log(this.webRid);
-      console.log(this.webRtoe);
       this._g.statusMsg.next("Blast query submitted successfully.");
     });
   }
@@ -240,9 +236,6 @@ export class BlastTabComponent implements OnInit {
     this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/Status=(\w+)/);
       this.webStatus = match && match[1];
-      console.log(result);
-      console.log(match);
-      console.log(this.webStatus);
       this._g.statusMsg.next("Blast query checked successfully.");
     });
   }
@@ -252,7 +245,6 @@ export class BlastTabComponent implements OnInit {
     queryParams += "&FORMAT_TYPE=" + this.webSelectedFormatType;
     this.runWebBlastQuery(queryParams, (result: any) => {
       this.webResult = result;
-      console.log(result);
       this._g.statusMsg.next("Blast query result retrieved successfully.");
     });
   }
@@ -427,7 +419,11 @@ export class BlastTabComponent implements OnInit {
         this.standaloneIsTableOutput = res.isFormat6;
 
         if (this.standaloneIsTableOutput) {
-          this.fillStandaloneTableOutput();
+          this.onStandaloneTableFilterChange({
+            txt: "",
+            orderBy: "Query Name",
+            orderDirection: "asc",
+          });
         }
       }
     );
@@ -436,34 +432,50 @@ export class BlastTabComponent implements OnInit {
   fillStandaloneTableOutput() {
     let lines = this.standaloneStatus.split("\n");
     this.standaloneTableOutput.results = [];
-    let nextId = 1;
+    let id = 0;
 
     for (let i = 0; i < lines.length; i++) {
       let row: TableData[] = [];
-      let cols = lines[i].split("\t");
-      row.push({ val: nextId++, type: TableDataType.string });
-      row.push({ val: cols[0], type: TableDataType.string });
-      row.push({ val: cols[1], type: TableDataType.string });
-      row.push({ val: cols[2], type: TableDataType.number });
-      row.push({ val: cols[3], type: TableDataType.number });
-      row.push({ val: cols[4], type: TableDataType.number });
-      row.push({ val: cols[5], type: TableDataType.number });
-      row.push({ val: cols[6], type: TableDataType.number });
-      row.push({ val: cols[7], type: TableDataType.number });
-      row.push({ val: cols[8], type: TableDataType.number });
-      row.push({ val: cols[9], type: TableDataType.number });
-      row.push({ val: cols[10], type: TableDataType.number });
-      row.push({ val: cols[11], type: TableDataType.number });
-      this.standaloneTableOutput.results.push(row);
+      let cols = lines[i].trim().split("\t");
+      if (cols.length == 12) {
+        row.push({ val: id++, type: TableDataType.number });
+        row.push({ val: cols[0], type: TableDataType.number });
+        row.push({ val: cols[1], type: TableDataType.number });
+        row.push({ val: cols[2], type: TableDataType.number });
+        row.push({ val: cols[3], type: TableDataType.number });
+        row.push({ val: cols[4], type: TableDataType.number });
+        row.push({ val: cols[5], type: TableDataType.number });
+        row.push({ val: cols[6], type: TableDataType.number });
+        row.push({ val: cols[7], type: TableDataType.number });
+        row.push({ val: cols[8], type: TableDataType.number });
+        row.push({ val: cols[9], type: TableDataType.number });
+        row.push({ val: cols[10], type: TableDataType.string });
+        row.push({ val: cols[11], type: TableDataType.number });
+        this.standaloneTableOutput.results.push(row);
+      }
     }
     this.standaloneTableOutput.pageSize =
       this._g.userPrefs.dataPageSize.getValue();
     this.standaloneTableOutput.currPage = 1;
     this.standaloneTableOutput.resultCnt =
       this.standaloneTableOutput.results.length;
+
+    this.standaloneIsTableOutputFilled.next(true);
+    this.standaloneClearTableOutputFilter.next(true);
   }
 
-  onStandaloneTableFilterChange(event: any) {}
+  onStandaloneTableFilterChange(filter: TableFiltering) {
+    this.standaloneIsTableOutputFilled.next(false);
+    this.fillStandaloneTableOutput();
+    filterTableDatas(
+      filter,
+      this.standaloneTableOutput,
+      this._g.userPrefs.isIgnoreCaseInText.getValue()
+    );
+    setTimeout(() => {
+      this.standaloneIsTableOutputFilled.next(true);
+    }, 100);
+  }
 
   onStandaloneCommandLineArgumentsChange(event: any) {
     this.standaloneCommandLineArguments = event.target.value.trim();

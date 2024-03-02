@@ -30,3 +30,9 @@
 .blast-option-label {
   margin-right: 10px;
 }
+
+.web-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
