@@ -346,15 +346,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       let renderedKey = key.replace(/[_\-]/g, " ");
       let renderedValue = props[key];
 
-      const attributeType = this.findTypeOfAttribute(key);
-      if (attributeType === "datetime") {
-        if (typeof renderedValue !== "undefined") {
-          renderedValue = new Date(renderedValue).toLocaleString();
-        } else {
-          renderedValue = "";
-        }
-      }
-
       if (renderedValue !== undefined) {
         renderedValue = this.getMappedProperty(
           this.selectedClasses,

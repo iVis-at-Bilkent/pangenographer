@@ -4,8 +4,6 @@ export const HIGHLIGHT_ANIM_DUR = 400;
 export const HIGHLIGHT_WAIT_DUR = 1500;
 export const EV_MOUSE_ON = "mouseover";
 export const EV_MOUSE_OFF = "mouseout";
-export const DATE_PROP_START = "start_time";
-export const DATE_PROP_END = "end_time";
 export const CY_BATCH_END_DELAY = 100;
 export const OBJ_INFO_UPDATE_DELAY = 200;
 
@@ -53,15 +51,6 @@ export const NUMBER_OPERATORS = {
   "one of": "One of",
 };
 
-export const DATETIME_OPERATORS = {
-  "=": "=",
-  "\u2260": "<>",
-  "<": "<",
-  ">": ">",
-  "\u2264": "<=",
-  "\u2265": ">=",
-};
-
 export const ENUM_OPERATORS = {
   "=": "=",
   "\u2260": "<>",
@@ -95,37 +84,7 @@ export const NEO4J_2_JS_STR_OPERATORS = {
   "Ends with": "endsWith",
 };
 
-export const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
 export const TYPES_NOT_TO_SHOW = ["PATHS", "WALKS", "PSEUDO"];
-
-export const SHORT_MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
-];
 
 export const PATH_WALK_NAME_DISALLOWED_REGEX =
   /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
@@ -319,9 +278,6 @@ export function extend(a, b) {
 export const deepCopy = <T>(target: T): T => {
   if (target === null) {
     return target;
-  }
-  if (target instanceof Date) {
-    return new Date(target.getTime()) as any;
   }
   if (target instanceof Array) {
     const cp = [] as any[];

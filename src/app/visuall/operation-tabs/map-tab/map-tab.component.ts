@@ -47,8 +47,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
   selectedClassProps: string[];
   selectedClass: string;
   attributeType: string;
-  isDateProp: boolean;
-  currDatetimes: Date[];
   queryRule: ClassBasedRules;
   currRuleNode: RuleNode;
   editedRuleNode: Subject<RuleNode> = new Subject<RuleNode>();
@@ -96,8 +94,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
     this.tableInput.isMergeGraph = true;
     this.classOptions = [];
     this.selectedClassProps = [];
-    this.isDateProp = false;
-    this.currDatetimes = [new Date()];
     this.loadFromFileSubs = this._profile.onLoadFromFile.subscribe((x) => {
       if (!x) {
         return;
@@ -239,10 +235,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
   }
 
   addRule2QueryRules(r: Rule) {
-    if (r.propertyType == "datetime") {
-      r.inputOperand = new Date(r.rawInput).toLocaleString();
-    }
-
     if (this.currRuleNode.r) {
       if (this.currRuleNode.isEditing) {
         this.currRuleNode.r = r;

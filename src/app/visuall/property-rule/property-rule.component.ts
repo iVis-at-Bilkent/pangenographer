@@ -9,10 +9,8 @@ import {
   ViewChild,
 } from "@angular/core";
 import { IPosition } from "angular2-draggable";
-import flatpickr from "flatpickr";
 import { BehaviorSubject, Subject, Subscription } from "rxjs";
 import {
-  DATETIME_OPERATORS,
   ENUM_OPERATORS,
   GENERIC_TYPE,
   LIST_OPERATORS,
@@ -57,7 +55,6 @@ export class PropertyRuleComponent implements OnInit {
   @Input() isStrict: boolean;
   @Input() refreshView: Subject<boolean>;
   @Output() onRuleReady = new EventEmitter<Rule>();
-  @ViewChild("dateInp", { static: false }) dateInp: ElementRef;
   @ViewChild("multiSelect", { static: false }) multiSelect: ElementRef;
   isShowTxtArea = false;
   txtAreaSize: { width: number; height: number } = { width: 350, height: 250 };
@@ -97,7 +94,7 @@ export class PropertyRuleComponent implements OnInit {
       this.filterInp = this.loadRule.inputOperand;
       this.selectedProp = this.loadRule.propertyOperand;
       // will set the operators according to selected property
-      this.changeSelectedProp(this.filterInp, this.loadRule.rawInput);
+      this.changeSelectedProp(this.filterInp);
       for (const opKey in this.operators) {
         if (this.operators[opKey] == this.loadRule.operator) {
           this.selectedOperatorKey = opKey;
@@ -111,7 +108,7 @@ export class PropertyRuleComponent implements OnInit {
     }
   }
 
-  changeSelectedProp(filterInp = "", unixDateValue = null) {
+  changeSelectedProp(filterInp = "") {
     const model = this._g.dataModel.getValue();
     this.textAreaInp = "";
     this.selectedOperatorKey = null;
@@ -146,24 +143,6 @@ export class PropertyRuleComponent implements OnInit {
       this.currInpType = "text";
     } else if (attrType.startsWith("enum")) {
       this.addOperators(ENUM_OPERATORS);
-    } else if (attrType == "datetime") {
-      this.addOperators(DATETIME_OPERATORS);
-      let opt = {
-        defaultDate: new Date(),
-        enableTime: true,
-        enableSeconds: true,
-        time_24hr: true,
-        minDate: this._g.userPrefs.dbQueryTimeRange.start.getValue(),
-        maxDate: this._g.userPrefs.dbQueryTimeRange.end.getValue(),
-      };
-      if (unixDateValue) {
-        opt.defaultDate = new Date(unixDateValue);
-      }
-
-      // view child gives undefined
-      setTimeout(() => {
-        flatpickr(this.dateInp.nativeElement, opt);
-      }, 0);
     }
   }
 
@@ -197,11 +176,7 @@ export class PropertyRuleComponent implements OnInit {
       atType = atType.substr(atType.indexOf(",") + 1);
     }
 
-    if (atType == "datetime") {
-      value =
-        this.dateInp.nativeElement["_flatpickr"].selectedDates[0].getTime();
-      rawValue = value;
-    } else if (atType == "int") {
+    if (atType == "int") {
       value = parseInt(value);
     } else if (atType == "float") {
       value = parseFloat(value);
@@ -447,9 +422,6 @@ export class PropertyRuleComponent implements OnInit {
       this.finiteSetPropertyMap = arr;
       return PropertyCategory.finiteSet;
     }
-    if (this.attributeType == "datetime") {
-      return PropertyCategory.date;
-    }
     return PropertyCategory.other;
   }
 
@@ -471,7 +443,7 @@ export class PropertyRuleComponent implements OnInit {
     }
     const t = rule.propertyType;
     if (
-      (t == "datetime" || t == "float" || t == "int") &&
+      (t == "float" || t == "int") &&
       !isNumber(inp) &&
       this.selectedOperatorKey != this.ONE_OF
     ) {

@@ -19,10 +19,6 @@ export interface UserPref {
   groupingOption: BehaviorSubject<GroupingOptionTypes>;
   nodeLabelWrap: BehaviorSubject<TextWrapTypes>;
   isLimitDbQueries2range: BehaviorSubject<boolean>;
-  dbQueryTimeRange: {
-    start: BehaviorSubject<number>;
-    end: BehaviorSubject<number>;
-  };
   savedLists: SavedLists;
   dataPageSize: BehaviorSubject<number>;
   dataPageLimit: BehaviorSubject<number>;

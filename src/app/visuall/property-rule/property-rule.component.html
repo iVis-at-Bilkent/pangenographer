@@ -43,16 +43,6 @@
         placeholder="Filter..."
       />
     </div>
-    <div [hidden]="selectedPropertyCategory != 1">
-      <input
-        type="text"
-        #dateInp
-        [disabled]="isGenericTypeSelected"
-        class="tight-select std-inp-hei filter-form form-control va-small-text"
-        title="Input field"
-        placeholder="Enter a value"
-      />
-    </div>
     <div
       [hidden]="
         selectedPropertyCategory != 2 || selectedOperatorKey == 'one of'

@@ -70,7 +70,6 @@ export function deepCopyQueryRules(metrics: QueryRule[]): QueryRule[] {
 
 export enum PropertyCategory {
   other = 0,
-  date = 1,
   finiteSet = 2,
 }
 
@@ -174,16 +173,9 @@ function getJsExpressionForMetricRule(r: Rule) {
   if (
     r.propertyType == "int" ||
     r.propertyType == "float" ||
-    r.propertyType == "datetime" ||
     r.propertyType == "edge"
   ) {
     let op = NEO4J_2_JS_NUMBER_OPERATORS[r.operator];
-    if (r.propertyType == "datetime") {
-      if (op && r.rawInput) {
-        return `x.data('${r.propertyOperand}') ${op} ${r.rawInput}`;
-      }
-      return `x.data('${r.propertyOperand}')`;
-    }
     if (r.propertyType == "edge") {
       if (op && r.inputOperand) {
         return `x.connectedEdges('.${r.propertyOperand}').union(${collapsedEdges4Node}).length ${op} ${r.inputOperand}`;

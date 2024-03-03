@@ -270,12 +270,6 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    let d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-    let d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-    if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
-      d1 = 0;
-      d2 = 0;
-    }
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
@@ -286,7 +280,7 @@ export class Neo4jDb implements DbService {
       `CALL graphOfInterest([${dbIds
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
-      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${d1}, ${d2}, ${timeout}, ${idf})`,
+      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
       cb,
       type,
       false
@@ -314,12 +308,6 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    let d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-    let d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-    if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
-      d1 = 0;
-      d2 = 0;
-    }
     const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
@@ -329,7 +317,7 @@ export class Neo4jDb implements DbService {
       this.runQuery(
         `CALL commonStreamCount([${dbIds
           .map((element) => `'${element}'`)
-          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase}, ${d1}, ${d2}, ${timeout}, ${idf})`,
+          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase}, {}, 0, 0, 0, ${timeout}, ${idf})`,
         cb,
         type,
         false
@@ -339,7 +327,7 @@ export class Neo4jDb implements DbService {
         `CALL commonStream([${dbIds
           .map((element) => `'${element}'`)
           .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currPage},
-       '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${d1}, ${d2}, ${timeout}, ${idf})`,
+       '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
         cb,
         type,
         false
@@ -354,7 +342,7 @@ export class Neo4jDb implements DbService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x) => void
+    cb: (x: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
@@ -367,12 +355,6 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    let d1 = this._g.userPrefs.dbQueryTimeRange.start.getValue();
-    let d2 = this._g.userPrefs.dbQueryTimeRange.end.getValue();
-    if (!this._g.userPrefs.isLimitDbQueries2range.getValue()) {
-      d1 = 0;
-      d2 = 0;
-    }
     let idf = "null";
     if (idFilter) {
       idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
@@ -382,7 +364,7 @@ export class Neo4jDb implements DbService {
       `CALL neighborhood([${dbIds
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
-      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${d1}, ${d2}, ${timeout}, ${idf})`,
+      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
       cb,
       DbResponseType.table,
       false
@@ -397,7 +379,7 @@ export class Neo4jDb implements DbService {
     return pageSize;
   }
 
-  private extractGraph(response): GraphResponse {
+  private extractGraph(response: any): GraphResponse {
     let nodes = [];
     let edges = [];
 
@@ -425,7 +407,7 @@ export class Neo4jDb implements DbService {
     return { nodes: nodes, edges: edges };
   }
 
-  private extractTable(response, isTimeboxed = true): TableResponse {
+  private extractTable(response: any, isTimeboxed = true): TableResponse {
     if (response.errors && response.errors.length > 0) {
       this._g.showErrorModal("Database Query", response.errors);
       this._g.setLoadingStatus(false);
@@ -459,7 +441,7 @@ export class Neo4jDb implements DbService {
     };
   }
 
-  private extractGenericData(response, isTimeboxed = true): DbResponse {
+  private extractGenericData(response: any, isTimeboxed = true): DbResponse {
     if (response.errors && response.errors.length > 0) {
       this._g.showErrorModal("Database Query", response.errors);
       this._g.setLoadingStatus(false);
@@ -486,7 +468,10 @@ export class Neo4jDb implements DbService {
           };
         });
       } else {
-        r.tableData.data = obj.edgeIds.map((x, i) => [x, obj.edges[i]]);
+        r.tableData.data = obj.edgeIds.map((x: any, i: number) => [
+          x,
+          obj.edges[i],
+        ]);
         r.graphData.nodes = r.graphData.nodes.concat(
           obj.srcNodeIds.map((x: any, i: number) => {
             return {
@@ -505,7 +490,7 @@ export class Neo4jDb implements DbService {
             };
           })
         );
-        r.graphData.edges = obj.edgeIds.map((x, i) => {
+        r.graphData.edges = obj.edgeIds.map((x: any, i: number) => {
           return {
             properties: obj.edges[i],
             type: obj.edgeTypes[i],
@@ -522,49 +507,12 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
-  runQuery2(query: string, callback?: () => void) {
-    const conf = environment.dbConfig;
-    const url = conf.getSampleUrl;
-    const username = conf.username;
-    const password = conf.password;
-    this._g.setLoadingStatus(true);
-    console.log(query);
-    this._g.statusMsg.next("Executing database query...");
-    const requestBody = {
-      statements: [{ statement: query, parameters: null }],
-    };
-    const errFn = (err: any) => {
-      this._g.statusMsg.next("Database query execution raised an error!");
-      this._g.showErrorModal("Database Query Execution Error", err.message);
-      this._g.setLoadingStatus(false);
-    };
-    this._http
-      .post(url, requestBody, {
-        headers: {
-          Accept: "application/json; charset=UTF-8",
-          "Content-Type": "application/json",
-          Authorization: "Basic " + btoa(username + ":" + password),
-        },
-      })
-      .subscribe((x) => {
-        this._g.setLoadingStatus(false);
-        if (x["errors"] && x["errors"].length > 0) {
-          errFn(x["errors"][0]);
-          return;
-        }
-        this._g.statusMsg.next("");
-        if (callback) {
-          callback();
-        }
-      }, errFn);
-  }
-
   importGFA(GFAData: GFAData, cb?: () => void) {
-    this.runQuery2(this.GFAdata2CQL(GFAData), cb);
+    this.runQuery(this.GFAdata2CQL(GFAData), cb, 0, false);
   }
 
-  clearData() {
-    this.runQuery2("MATCH (n) DETACH DELETE n");
+  clearData(cb?: () => void) {
+    this.runQuery("MATCH (n) DETACH DELETE n", cb, 0, false);
   }
 
   // ------------------------------------------------- methods for conversion to CQL -------------------------------------------------

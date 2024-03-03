@@ -725,7 +725,7 @@ export class CytoscapeService {
         elems[i].move({ parent: "c" + id });
       }
     } else {
-      const currCluster: string[] = elems.map((x) => x.id());
+      const currCluster: string[] = elems.map((x: any) => x.id());
       if (!this._g.layout.clusters || this._g.layout.clusters.length < 1) {
         this._g.layout.clusters = [currCluster];
       } else {
@@ -738,11 +738,11 @@ export class CytoscapeService {
     this._g.performLayout(false);
   }
 
-  removeElementsFromCurrentClusters(elems) {
+  removeElementsFromCurrentClusters(elems: any) {
     if (!this._g.layout.clusters) {
       return;
     }
-    const currCluster: string[] = elems.map((x) => x.id());
+    const currCluster: string[] = elems.map((x: any) => x.id());
     // remove elements from current clusters
     for (const cluster of this._g.layout.clusters) {
       for (const item of currCluster) {

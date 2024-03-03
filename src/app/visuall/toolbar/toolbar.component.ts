@@ -302,23 +302,4 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     const v = this._g.showHideGraphHistory.getValue();
     this._g.showHideGraphHistory.next(!v);
   }
-
-  changeIsLimitDbQueryRange() {
-    this._g.userPrefs.isLimitDbQueries2range.next(this.isLimitDbQueries2range);
-    this._profile.saveUserPrefs();
-  }
-
-  resetDbQueryRange() {
-    if (!this.isLimitDbQueries2range) {
-      return;
-    }
-    const minDate =
-      this._g.userPrefsFromFiles.dbQueryTimeRange.start.getValue();
-    const maxDate = this._g.userPrefsFromFiles.dbQueryTimeRange.end.getValue();
-    this.dbQueryDate1.nativeElement._flatpickr.setDate(minDate);
-    this.dbQueryDate2.nativeElement._flatpickr.setDate(maxDate);
-    this._g.userPrefs.dbQueryTimeRange.start.next(minDate);
-    this._g.userPrefs.dbQueryTimeRange.end.next(maxDate);
-    this._profile.saveUserPrefs();
-  }
 }
