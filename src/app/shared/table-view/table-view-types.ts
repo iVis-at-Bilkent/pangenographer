@@ -31,6 +31,7 @@ export interface TableViewInput {
   isEmphasizeOnHover?: boolean;
   classNameOfObjects?: string;
   classNames?: string[];
+  isBlastResultTable?: boolean;
 }
 
 export interface TableFiltering {

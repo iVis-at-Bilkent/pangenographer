@@ -385,14 +385,14 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   resetGeneralSettings() {
     this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, [
-      "pangenograph",
+      "pangenographer",
     ]);
     this.setViewUtilsStyle();
     this.fillUIFromMemory();
     this._g.updateSelectionCyStyle();
   }
 
-  resetPangenographSettings() {
+  resetPangenographerSettings() {
     this.transferSubjectValues(
       this._g.userPrefsFromFiles.pangenomegrapher,
       this._g.userPrefs.pangenomegrapher

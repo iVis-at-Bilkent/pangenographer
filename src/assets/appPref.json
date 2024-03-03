@@ -50,7 +50,7 @@
     "objectInclusionType": 0,
     "queryResultPagination": "Client",
     "tilingPadding": 4,
-    "pangenograph": {
+    "pangenographer": {
         "lengthOfUpDownstream": 1
     }
 }

@@ -95,12 +95,13 @@ export class BlastTabComponent implements OnInit {
     isNodeData: false,
     isShowExportAsCSV: false,
     isHide0: false,
-    isUseCySelector4Highlight: false,
-    isHideLoadGraph: false,
+    isUseCySelector4Highlight: true,
+    isHideLoadGraph: true,
     isReplace_inHeaders: false,
     isDisableHover: false,
     tableTitle: "Blast Result",
-    isEmphasizeOnHover: false,
+    isEmphasizeOnHover: true,
+    isBlastResultTable: true,
   };
 
   standaloneQuery: string = "";

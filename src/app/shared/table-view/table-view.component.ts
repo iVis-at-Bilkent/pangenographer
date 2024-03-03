@@ -61,6 +61,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   filterTxtChanged: () => void;
   @ViewChild("dynamicDiv", { static: false }) dynamicDiv;
   checkedIdx: any = {};
+  checkedIdx4BlastSegmentNames: any = {};
   emphasizeRowFn: Function;
   higlightOnHoverSubs: Subscription;
   tableFillSubs: Subscription;
@@ -184,7 +185,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
   private onTableFilled() {
     this.isLoading = false;
-    this.checkedIdx = {};
+    this.resetCheckedIdxs();
     this.isCheckbox4AllChecked = false;
     if (this.params.results && this.params.results.length > 0) {
       this.isShowTable = true;
@@ -302,12 +303,54 @@ export class TableViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  cbChanged(idx: number, t: EventTarget) {
-    const isChecked = (<HTMLInputElement>t).checked;
-    delete this.checkedIdx[idx];
-
-    if (isChecked) {
+  checkboxChanged(
+    idx: number,
+    t: EventTarget = undefined, // undefined for setting checked status
+    forceCheck?: boolean
+  ) {
+    if (t !== undefined) {
+      const isChecked = (<HTMLInputElement>t).checked;
+      if (isChecked) {
+        this.checkedIdx[idx] = true;
+        this.checkboxHighlightChangedBlast(idx, true);
+      } else {
+        delete this.checkedIdx[idx];
+        this.checkboxHighlightChangedBlast(idx, false);
+      }
+    } else if (forceCheck) {
       this.checkedIdx[idx] = true;
+      this.checkboxHighlightChangedBlast(idx, true);
+    } else {
+      delete this.checkedIdx[idx];
+      this.checkboxHighlightChangedBlast(idx, false);
+    }
+  }
+
+  checkboxHighlightChangedBlast(idx: number, highlight: boolean) {
+    if (
+      this.params.isBlastResultTable &&
+      this.params.isUseCySelector4Highlight
+    ) {
+      let segmentName = this.params.results[idx][2].val;
+      if (highlight) {
+        if (this.checkedIdx4BlastSegmentNames[segmentName]) {
+          this.checkedIdx4BlastSegmentNames[segmentName]++;
+        } else {
+          this.checkedIdx4BlastSegmentNames[segmentName] = 1;
+          this._g.highlightElements(
+            this._g.cy.nodes(`[segmentName = "${segmentName}"]`)
+          );
+        }
+      } else {
+        if (this.checkedIdx4BlastSegmentNames[segmentName] > 1) {
+          this.checkedIdx4BlastSegmentNames[segmentName]--;
+        } else {
+          delete this.checkedIdx4BlastSegmentNames[segmentName];
+          this._g.removeHighlights(
+            this._g.cy.nodes(`[segmentName = "${segmentName}"]`)
+          );
+        }
+      }
     }
   }
 
@@ -325,8 +368,8 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  cb4AllChanged() {
-    this.checkedIdx = {};
+  checkbox4AllChanged() {
+    this.resetCheckedIdxs();
     let elems = this.dynamicDiv.nativeElement.querySelectorAll(".row-cb");
     let elemsArr: HTMLInputElement[] = [];
     for (let i = 0; i < elems.length; i++) {
@@ -336,11 +379,12 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
     if (this.isCheckbox4AllChecked) {
       for (let i = 0; i < this.params.results.length; i++) {
-        this.checkedIdx[i] = true;
+        this.checkboxChanged(i, undefined, true);
         elemsArr[i].checked = true;
       }
     } else {
       for (let i = 0; i < elemsArr.length; i++) {
+        this.checkboxChanged(i, undefined, false);
         elemsArr[i].checked = false;
       }
     }
@@ -398,5 +442,10 @@ export class TableViewComponent implements OnInit, OnDestroy {
       return data.substring(0, 238) + "...";
     }
     return data;
+  }
+
+  private resetCheckedIdxs() {
+    this.checkedIdx = {};
+    this.checkedIdx4BlastSegmentNames = {};
   }
 }

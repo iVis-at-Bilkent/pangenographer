@@ -2,13 +2,13 @@
   <div
     class="panel-heading"
     data-bs-toggle="collapse"
-    data-bs-target="#pangenograph-settings"
+    data-bs-target="#pangenographer-settings"
   >
     <span class="panel-title accordion-toggle"
-      ><b class="va-heading2">PanGenomeGraph</b></span
+      ><b class="va-heading2">PanGenomeGrapher</b></span
     >
   </div>
-  <div id="pangenograph-settings" class="collapse show">
+  <div id="pangenographer-settings" class="collapse show">
     <div
       class="va-text"
       *ngFor="let setting of pangenomegrapherBoolSettings; let i = index"
@@ -20,6 +20,7 @@
           [(ngModel)]="setting.isEnable"
           [id]="'pangenomegrapherBool' + i"
           (change)="settingChanged(setting.isEnable, setting.path2userPref)"
+          title="PanGenomeGrapher"
         />
         <label class="form-check-label" [for]="'pangenomegrapherBool' + i">{{
           setting.text
@@ -46,7 +47,7 @@
     <input
       class="btn btn-sm btn-dark va-text m-2 center"
       type="button"
-      (click)="resetPangenographSettings()"
+      (click)="resetPangenographerSettings()"
       value="Default"
       title="Reset to Default"
     />
@@ -75,6 +76,7 @@
           [(ngModel)]="setting.isEnable"
           [id]="'generalBool' + i"
           (change)="settingChanged(setting.isEnable, setting.path2userPref)"
+          title="General"
         />
         <label class="form-check-label" [for]="'generalBool' + i">{{
           setting.text

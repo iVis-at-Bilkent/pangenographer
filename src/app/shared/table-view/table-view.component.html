@@ -137,7 +137,7 @@
               type="checkbox"
               class="m-1 cb-table-all"
               [(ngModel)]="isCheckbox4AllChecked"
-              (change)="cb4AllChanged()"
+              (change)="checkbox4AllChanged()"
               title="Select all"
             />
           </th>
@@ -163,7 +163,6 @@
             <span *ngIf="e.type == 1 && (e.val != 0 || !params.isHide0)">{{
               e.val | number : "1.0-2"
             }}</span>
-            <span *ngIf="e.type == 2">{{ e.val | date : "medium" }}</span>
             <div *ngIf="e.type == 4" [table-tooltip]="e.val">
               <span>
                 <ngb-highlight
@@ -181,7 +180,7 @@
             <input
               type="checkbox"
               class="m-1 row-cb"
-              (change)="cbChanged(i, $event.target)"
+              (change)="checkboxChanged(i, $event.target)"
               title="Select row"
             />
           </td>
