@@ -7,6 +7,7 @@ import {
 } from "@angular/core";
 import { BehaviorSubject, Subscription } from "rxjs";
 import {
+  HIGHLIGHT_NAMES,
   MAX_HIGHTLIGHT_WIDTH,
   MAX_LENGTH_OF_UP_DOWN_STREAM,
   MIN_HIGHTLIGHT_WIDTH,
@@ -176,9 +177,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.dbTimeout = up.dbTimeout.getValue();
     this.tableColumnLimit = up.tableColumnLimit.getValue();
     this.edgeCollapseLimit = up.edgeCollapseLimit.getValue();
-    this.currHighlightStyles = up.highlightStyles.map(
-      (_, i) => "Style " + (i + 1)
-    );
+
+    this.currHighlightStyles = up.highlightStyles.map((_, i) => {
+      return this.getHighlightStyleName(i);
+    });
     this.highlightStyleIdx = up.currHighlightIdx.getValue();
     this.highlightColor =
       up.highlightStyles[
@@ -188,6 +190,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up.highlightStyles[
         this._g.userPrefs.currHighlightIdx.getValue()
       ].wid.getValue();
+
     this.selectionColor = up.selectionColor.getValue();
     this.selectionWidth = up.selectionWidth.getValue();
     this._g.cy
@@ -213,7 +216,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.currHighlightStyles = [];
     let styles = this._g.viewUtils.getHighlightStyles();
     for (let i = 0; i < styles.length; i++) {
-      this.currHighlightStyles.push("Style " + (i + 1));
+      this.currHighlightStyles.push(this.getHighlightStyleName(i));
       let c = styles[i].node["underlay-color"];
       let w = styles[i].node["underlay-padding"];
       if (this._g.userPrefs.highlightStyles[i]) {
@@ -228,6 +231,14 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
     this._g.userPrefs.highlightStyles.splice(styles.length);
     this._profile.saveUserPrefs();
+  }
+
+  private getHighlightStyleName(i: number) {
+    if (i < HIGHLIGHT_NAMES.length) {
+      return HIGHLIGHT_NAMES[i];
+    } else {
+      return "Style " + (i + 1);
+    }
   }
 
   // set view utils extension highlight styles from memory (_g.userPrefs)
@@ -292,7 +303,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         .style({ "overlay-padding": width })
         .selector("edge:selected")
         .style({
-          "overlay-padding": (e) => {
+          "overlay-padding": (e: any) => {
             return (width + e.width()) / 2 + "px";
           },
         })

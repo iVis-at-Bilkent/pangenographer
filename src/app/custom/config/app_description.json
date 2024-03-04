@@ -185,6 +185,22 @@
     "tableColumnLimit": 3,
     "highlightStyles": [
       {
+        "wid": 5,
+        "color": "#0000ff"
+      },
+      {
+        "wid": 5,
+        "color": "#ff0000"
+      },
+      {
+        "wid": 5,
+        "color": "#006622"
+      },
+      {
+        "wid": 5,
+        "color": "#80FF80"
+      },
+      {
         "wid": 3,
         "color": "#FCE903"
       },
@@ -195,17 +211,9 @@
       {
         "wid": 3,
         "color": "#04f06a"
-      },
-      {
-        "wid": 5,
-        "color": "#0000ff"
-      },
-      {
-        "wid": 5,
-        "color": "#ff0000"
       }
     ],
-    "currHighlightIdx": 0,
+    "currHighlightIdx": 4,
     "selectionColor": "#6c757d",
     "selectionWidth": 4.5,
     "groupingOption": 0,

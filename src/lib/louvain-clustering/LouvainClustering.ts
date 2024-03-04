@@ -25,10 +25,8 @@ export interface ClusterOptions {
   sensitivityThreshold?: number;
 }
 
-
 // Thanks to the original author https://github.com/upphiminn/jLouvain
 export class LouvainClustering {
-
   private maxIterations: number = -1;
   private sensitivityThreshold: number = 0.0000001;
   private original_graph: Graph;
@@ -57,13 +55,17 @@ export class LouvainClustering {
   }
 
   private getNeighboursOfNode(graph: Graph, node: string | number) {
-    if (typeof graph.adj[node] === 'undefined') {
+    if (typeof graph.adj[node] === "undefined") {
       return [];
     }
     return Object.keys(graph.adj[node]);
   }
 
-  private getEdgeWeight(graph: Graph, node1: string | number, node2: string | number) {
+  private getEdgeWeight(
+    graph: Graph,
+    node1: string | number,
+    node2: string | number
+  ) {
     return graph.adj[node1] ? graph.adj[node1][node2] : undefined;
   }
 
@@ -77,11 +79,12 @@ export class LouvainClustering {
 
   private addEdge2Graph(graph: Graph, edge: Edge) {
     this.updateAdj(graph, edge);
-    if (this.edge_index[edge.source + '_' + edge.target]) {
-      graph.edges[this.edge_index[edge.source + '_' + edge.target]].weight = edge.weight;
+    if (this.edge_index[edge.source + "_" + edge.target]) {
+      graph.edges[this.edge_index[edge.source + "_" + edge.target]].weight =
+        edge.weight;
     } else {
       graph.edges.push(edge);
-      this.edge_index[edge.source + '_' + edge.target] = graph.edges.length - 1;
+      this.edge_index[edge.source + "_" + edge.target] = graph.edges.length - 1;
     }
   }
 
@@ -104,7 +107,7 @@ export class LouvainClustering {
   }
 
   private clone(obj: any) {
-    if (obj === null || typeof obj !== 'object') {
+    if (obj === null || typeof obj !== "object") {
       return obj;
     }
     let temp = obj.constructor();
@@ -123,14 +126,14 @@ export class LouvainClustering {
     status.loops = {};
     status.totalWeight = this.getTotalWeight(graph);
 
-    if (typeof part === 'undefined') {
+    if (typeof part === "undefined") {
       graph.nodes.forEach((node, i) => {
         status.node2Community[node] = i;
 
         let deg = this.getDegree4Node(graph, node);
 
         if (deg < 0) {
-          throw new TypeError('Graph should only have positive weights.');
+          throw new TypeError("Graph should only have positive weights.");
         }
 
         status.degrees[i] = deg;
@@ -152,7 +155,7 @@ export class LouvainClustering {
           const weight = graph.adj[node][neighbour];
 
           if (weight <= 0) {
-            throw new TypeError('Graph should only have positive weights.');
+            throw new TypeError("Graph should only have positive weights.");
           }
 
           if (part[neighbour] === com) {
@@ -178,14 +181,19 @@ export class LouvainClustering {
       const in_degree = status.internals[com] || 0;
       const degree = status.degrees[com] || 0;
       if (links > 0) {
-        result = result + in_degree / links - Math.pow(degree / (2.0 * links), 2);
+        result =
+          result + in_degree / links - Math.pow(degree / (2.0 * links), 2);
       }
     });
 
     return result;
   }
 
-  private neighcom(node: string | number, graph: Graph, status: ClusteringStatus) {
+  private neighcom(
+    node: string | number,
+    graph: Graph,
+    status: ClusteringStatus
+  ) {
     // compute the communities in the neighb. of the node, with the graph given by
     // node2Community
     const weights = {};
@@ -202,17 +210,31 @@ export class LouvainClustering {
     return weights;
   }
 
-  private insert2Community(node, com, weight, status: ClusteringStatus) {
+  private insert2Community(
+    node: any,
+    com: any,
+    weight: any,
+    status: ClusteringStatus
+  ) {
     // insert node into com and modify status
     status.node2Community[node] = +com;
-    status.degrees[com] = (status.degrees[com] || 0) + (status.gdegrees[node] || 0);
-    status.internals[com] = (status.internals[com] || 0) + weight + (status.loops[node] || 0);
+    status.degrees[com] =
+      (status.degrees[com] || 0) + (status.gdegrees[node] || 0);
+    status.internals[com] =
+      (status.internals[com] || 0) + weight + (status.loops[node] || 0);
   }
 
-  private removeFromCommunity(node, com, weight, status: ClusteringStatus) {
+  private removeFromCommunity(
+    node: any,
+    com: any,
+    weight: any,
+    status: ClusteringStatus
+  ) {
     //remove node from com and modify status
-    status.degrees[com] = (status.degrees[com] || 0) - (status.gdegrees[node] || 0);
-    status.internals[com] = (status.internals[com] || 0) - weight - (status.loops[node] || 0);
+    status.degrees[com] =
+      (status.degrees[com] || 0) - (status.gdegrees[node] || 0);
+    status.internals[com] =
+      (status.internals[com] || 0) - weight - (status.loops[node] || 0);
     status.node2Community[node] = -1;
   }
 
@@ -224,7 +246,8 @@ export class LouvainClustering {
 
     dict_keys.forEach(function (key) {
       const value = dict[key];
-      let new_value = typeof new_values[value] === 'undefined' ? -1 : new_values[value];
+      let new_value =
+        typeof new_values[value] === "undefined" ? -1 : new_values[value];
       if (new_value === -1) {
         new_values[value] = count;
         new_value = count;
@@ -250,15 +273,22 @@ export class LouvainClustering {
 
       graph.nodes.forEach((node, i) => {
         let comNode = status.node2Community[node];
-        let degcTotw = (status.gdegrees[node] || 0) / (status.totalWeight * 2.0);
+        let degcTotw =
+          (status.gdegrees[node] || 0) / (status.totalWeight * 2.0);
         let neighCommunities = this.neighcom(node, graph, status);
-        this.removeFromCommunity(node, comNode, neighCommunities[comNode] || 0.0, status);
+        this.removeFromCommunity(
+          node,
+          comNode,
+          neighCommunities[comNode] || 0.0,
+          status
+        );
         let bestCom = comNode;
         let bestIncrease = 0;
         const neighCommunitiesEntries = Object.keys(neighCommunities); // make iterable;
 
         neighCommunitiesEntries.forEach(function (com) {
-          const incr = neighCommunities[com] - (status.degrees[com] || 0.0) * degcTotw;
+          const incr =
+            neighCommunities[com] - (status.degrees[com] || 0.0) * degcTotw;
 
           if (incr > bestIncrease) {
             bestIncrease = incr;
@@ -266,7 +296,12 @@ export class LouvainClustering {
           }
         });
 
-        this.insert2Community(node, bestCom, neighCommunities[bestCom] || 0, status);
+        this.insert2Community(
+          node,
+          bestCom,
+          neighCommunities[bestCom] || 0,
+          status
+        );
 
         // convert from string to number
         if (+bestCom !== comNode) {
@@ -283,21 +318,25 @@ export class LouvainClustering {
   }
 
   // Produce the graph where nodes are the communities
-  private inducedGraph(partition, graph: Graph): Graph {
+  private inducedGraph(partition: any, graph: Graph): Graph {
     const ret: Graph = { nodes: [], edges: [], adj: {} };
     // add nodes from partition values
     const partitionValues = Object.values(partition) as string[];
     ret.nodes = ret.nodes.concat(this.makeSet(partitionValues)); // make set
 
-    let wPrec;
-    let weight;
+    let wPrec: any;
+    let weight: any;
     graph.edges.forEach((edge, i) => {
       weight = edge.weight || 1;
       const com1 = partition[edge.source];
       const com2 = partition[edge.target];
       wPrec = this.getEdgeWeight(ret, com1, com2) || 0;
       const newWeight = wPrec + weight;
-      this.addEdge2Graph(ret, { source: com1, target: com2, weight: newWeight });
+      this.addEdge2Graph(ret, {
+        source: com1,
+        target: com2,
+        weight: newWeight,
+      });
     });
 
     this.edge_index = {};
@@ -328,7 +367,14 @@ export class LouvainClustering {
       return [part];
     }
 
-    const status: ClusteringStatus = { totalWeight: 0, gdegrees: {}, degrees: {}, internals: {}, node2Community: {}, loops: {} };
+    const status: ClusteringStatus = {
+      totalWeight: 0,
+      gdegrees: {},
+      degrees: {},
+      internals: {},
+      node2Community: {},
+      loops: {},
+    };
 
     this.initStatus(this.original_graph, status, part_init);
     let mod = this.modularity(status);
@@ -360,10 +406,12 @@ export class LouvainClustering {
   }
 
   /**
-   * @param  {} elems is a cytoscape.js collection https://js.cytoscape.org/#cy.collection 
+   * @param  {} elems is a cytoscape.js collection https://js.cytoscape.org/#cy.collection
    */
-  cluster(elems, options: ClusterOptions = null) {
-    let weightFn = (x) => { return 1 };
+  cluster(elems: any, options: ClusterOptions = null) {
+    let weightFn = (x: any) => {
+      return 1;
+    };
     if (options) {
       if (options.maxIterations) {
         this.maxIterations = options.maxIterations;
@@ -375,12 +423,17 @@ export class LouvainClustering {
         weightFn = options.weightFn;
       }
     }
-    const nodes = elems.filter('node').map(x => x.id());
-    const edges = elems.filter('edge').map(x => { return { source: x.source().id(), target: x.target().id(), weight: weightFn(x) } });
+    const nodes = elems.filter("node").map((x: any) => x.id());
+    const edges = elems.filter("edge").map((x: any) => {
+      return {
+        source: x.source().id(),
+        target: x.target().id(),
+        weight: weightFn(x),
+      };
+    });
     let graph: Graph = { nodes: nodes, edges: edges, adj: this.makeAdj(edges) };
     this.original_graph = graph;
     const dendogram = this.generateDendogram(graph, undefined);
     return this.partitionAtLevel(dendogram, dendogram.length - 1);
   }
-
 }

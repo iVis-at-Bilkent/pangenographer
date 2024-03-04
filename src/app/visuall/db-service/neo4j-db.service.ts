@@ -507,11 +507,11 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
-  importGFA(GFAData: GFAData, cb?: () => void) {
+  importGFA(GFAData: GFAData, cb: () => void) {
     this.runQuery(this.GFAdata2CQL(GFAData), cb, 0, false);
   }
 
-  clearData(cb?: () => void) {
+  clearData(cb: () => void) {
     this.runQuery("MATCH (n) DETACH DELETE n", cb, 0, false);
   }
 

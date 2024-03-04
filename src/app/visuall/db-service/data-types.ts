@@ -56,8 +56,8 @@ export interface DbService {
     objectType: string,
     callback: (x: GraphResponse) => any
   );
-  importGFA(GFAData: GFAData, cb?: () => void);
-  clearData();
+  importGFA(GFAData: GFAData, cb: () => void);
+  clearData(cb: () => void);
   getElementsUpToCertainDistance(
     nodeId: string,
     distance: number,

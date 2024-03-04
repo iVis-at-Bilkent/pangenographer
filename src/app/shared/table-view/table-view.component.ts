@@ -12,7 +12,13 @@ import {
 } from "@angular/core";
 import { IPosition } from "angular2-draggable";
 import { Subject, Subscription } from "rxjs";
-import { EV_MOUSE_OFF, EV_MOUSE_ON, debounce } from "../../visuall/constants";
+import {
+  BLAST_HIGH_PERCENTAGE,
+  EV_MOUSE_OFF,
+  EV_MOUSE_ON,
+  HIGHLIGHT_INDEX,
+  debounce,
+} from "../../visuall/constants";
 import { CytoscapeService } from "../../visuall/cytoscape.service";
 import { GraphElem } from "../../visuall/db-service/data-types";
 import { GlobalVariableService } from "../../visuall/global-variable.service";
@@ -185,7 +191,8 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
   private onTableFilled() {
     this.isLoading = false;
-    this.resetCheckedIdxs();
+    this.checkedIdx = {};
+    this.checkedIdx4BlastSegmentNames = {};
     this.isCheckbox4AllChecked = false;
     if (this.params.results && this.params.results.length > 0) {
       this.isShowTable = true;
@@ -332,23 +339,84 @@ export class TableViewComponent implements OnInit, OnDestroy {
       this.params.isUseCySelector4Highlight
     ) {
       let segmentName = this.params.results[idx][2].val;
+
       if (highlight) {
-        if (this.checkedIdx4BlastSegmentNames[segmentName]) {
-          this.checkedIdx4BlastSegmentNames[segmentName]++;
+        if (this.params.results[idx][3].val >= BLAST_HIGH_PERCENTAGE) {
+          // high percentage check, high percentages index is 0
+          if (!this.checkedIdx4BlastSegmentNames[segmentName]) {
+            // if high percentage is not checked yet for this segment
+            this.checkedIdx4BlastSegmentNames[segmentName] = [1, 0];
+            this._g.highlightElements(
+              this._g.cy.nodes(`[segmentName = "${segmentName}"]`),
+              HIGHLIGHT_INDEX.blastHighPercentage
+            );
+          } else if (this.checkedIdx4BlastSegmentNames[segmentName][0]) {
+            // if high percentage is checked more than one
+            this.checkedIdx4BlastSegmentNames[segmentName][0]++;
+          } else if (
+            !this.checkedIdx4BlastSegmentNames[segmentName][0] &&
+            this.checkedIdx4BlastSegmentNames[segmentName][1]
+          ) {
+            // if low percentage is checked and high percentage is not checked yet, we transform it to high percentage
+            this.checkedIdx4BlastSegmentNames[segmentName][0] = 1;
+            let element = this._g.cy.nodes(`[segmentName = "${segmentName}"]`);
+            this._g.removeHighlights(element);
+            this._g.highlightElements(
+              element,
+              HIGHLIGHT_INDEX.blastHighPercentage
+            );
+          }
         } else {
-          this.checkedIdx4BlastSegmentNames[segmentName] = 1;
-          this._g.highlightElements(
-            this._g.cy.nodes(`[segmentName = "${segmentName}"]`)
-          );
+          // low percentage check, low percentages index is 1
+          if (!this.checkedIdx4BlastSegmentNames[segmentName]) {
+            // if not checked yet
+            this.checkedIdx4BlastSegmentNames[segmentName] = [0, 1];
+            this._g.highlightElements(
+              this._g.cy.nodes(`[segmentName = "${segmentName}"]`),
+              HIGHLIGHT_INDEX.blastLowPercentage
+            );
+          } else if (this.checkedIdx4BlastSegmentNames[segmentName][1]) {
+            // if low percentage is checked
+            this.checkedIdx4BlastSegmentNames[segmentName][1]++;
+          }
         }
-      } else {
-        if (this.checkedIdx4BlastSegmentNames[segmentName] > 1) {
-          this.checkedIdx4BlastSegmentNames[segmentName]--;
-        } else {
+      } else if (!highlight && this.checkedIdx4BlastSegmentNames[segmentName]) {
+        // if will be unchecked and highlighted
+        if (
+          this.checkedIdx4BlastSegmentNames[segmentName][0] +
+            this.checkedIdx4BlastSegmentNames[segmentName][1] ==
+          1
+        ) {
+          // if only one is checked either high or low percentage, we remove highlights
           delete this.checkedIdx4BlastSegmentNames[segmentName];
           this._g.removeHighlights(
             this._g.cy.nodes(`[segmentName = "${segmentName}"]`)
           );
+        } else if (
+          this.checkedIdx4BlastSegmentNames[segmentName][0] == 1 &&
+          this.params.results[idx][3].val >= BLAST_HIGH_PERCENTAGE
+        ) {
+          // if high percentage is checked and it is checked by one, we transform it to low percentage
+          this.checkedIdx4BlastSegmentNames[segmentName][0]--;
+          let element = this._g.cy.nodes(`[segmentName = "${segmentName}"]`);
+          this._g.removeHighlights(element);
+          this._g.highlightElements(
+            element,
+            HIGHLIGHT_INDEX.blastLowPercentage
+          );
+        } else if (
+          this.checkedIdx4BlastSegmentNames[segmentName][0] &&
+          this.params.results[idx][3].val < BLAST_HIGH_PERCENTAGE
+        ) {
+          // if low percentage is checked and it is checked by more than one
+          this.checkedIdx4BlastSegmentNames[segmentName][1]--;
+        } else {
+          // if high and low percentages are checked more than one
+          if (this.params.results[idx][3].val < BLAST_HIGH_PERCENTAGE) {
+            this.checkedIdx4BlastSegmentNames[segmentName][1]--;
+          } else {
+            this.checkedIdx4BlastSegmentNames[segmentName][0]--;
+          }
         }
       }
     }
@@ -369,7 +437,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   }
 
   checkbox4AllChanged() {
-    this.resetCheckedIdxs();
+    this.checkedIdx = {};
     let elems = this.dynamicDiv.nativeElement.querySelectorAll(".row-cb");
     let elemsArr: HTMLInputElement[] = [];
     for (let i = 0; i < elems.length; i++) {
@@ -442,10 +510,5 @@ export class TableViewComponent implements OnInit, OnDestroy {
       return data.substring(0, 238) + "...";
     }
     return data;
-  }
-
-  private resetCheckedIdxs() {
-    this.checkedIdx = {};
-    this.checkedIdx4BlastSegmentNames = {};
   }
 }

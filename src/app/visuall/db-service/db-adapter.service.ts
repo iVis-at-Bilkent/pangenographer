@@ -218,13 +218,13 @@ export class DbAdapterService {
     );
   }
 
-  getGFAdata2ImportGFA(GFAData: GFAData, cb?: () => void) {
+  getGFAdata2ImportGFA(GFAData: GFAData, cb: () => void) {
     this._g.add2GraphHistory(`Import GFA`);
     this._db.importGFA(GFAData, cb);
   }
 
-  clearData() {
+  clearData(cb: () => void) {
     this._g.add2GraphHistory(`Clear Data`);
-    this._db.clearData();
+    this._db.clearData(cb);
   }
 }

@@ -9,6 +9,7 @@ import {
   COLLAPSED_NODE_CLASS,
   CY_BATCH_END_DELAY,
   EXPAND_COLLAPSE_FAST_OPT,
+  HIGHLIGHT_INDEX,
   HIGHLIGHT_OPACITY,
   LAYOUT_ANIM_DUR,
   TYPES_NOT_TO_SHOW,
@@ -210,7 +211,7 @@ export class GlobalVariableService {
     }
   }
 
-  highlightElements(eles: any) {
+  highlightElements(eles: any, idx?: number) {
     if (this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()) {
       eles.forEach((ele: any) => {
         if (
@@ -220,14 +221,14 @@ export class GlobalVariableService {
         ) {
           this.viewUtils.highlight(
             ele,
-            this.userPrefs.currHighlightIdx.getValue()
+            idx ? idx : this.userPrefs.currHighlightIdx.getValue()
           );
         }
       });
     } else {
       this.viewUtils.highlight(
         eles,
-        this.userPrefs.currHighlightIdx.getValue()
+        idx ? idx : this.userPrefs.currHighlightIdx.getValue()
       );
     }
   }
@@ -268,7 +269,7 @@ export class GlobalVariableService {
       })
       .selector("edge:selected")
       .style({
-        "overlay-padding": (e) => {
+        "overlay-padding": (e: any) => {
           return (
             (this.userPrefs.selectionWidth.getValue() + e.width()) / 2 + "px"
           );
@@ -423,14 +424,14 @@ export class GlobalVariableService {
         if (
           this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()
         ) {
-          this.viewUtils.highlight(x, 3);
+          this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroIndegree); // highlight source nodes
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
         if (
           this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()
         ) {
-          this.viewUtils.highlight(x, 4);
+          this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroOutdegree); // highlight target nodes
         }
       }
     });

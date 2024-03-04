@@ -1,25 +1,7 @@
-export const HIGHLIGHT_OPACITY = 0.2;
-// it is more reasonable to make HIGHLIGHT_ANIM_DUR * 2 < HIGHLIGHT_WAIT_DUR
-export const HIGHLIGHT_ANIM_DUR = 400;
-export const HIGHLIGHT_WAIT_DUR = 1500;
-export const EV_MOUSE_ON = "mouseover";
-export const EV_MOUSE_OFF = "mouseout";
-export const CY_BATCH_END_DELAY = 100;
-export const OBJ_INFO_UPDATE_DELAY = 200;
-
-// defined in expand-collapse extension
-export const META_EDGE_CLASS = "cy-expand-collapse-meta-edge";
-export const COLLAPSED_EDGE_CLASS = "cy-expand-collapse-collapsed-edge";
-export const COLLAPSED_NODE_CLASS = "cy-expand-collapse-collapsed-node";
-export const EXPAND_COLLAPSE_FAST_OPT = {
-  layoutBy: null,
-  fisheye: false,
-  animate: false,
-};
-
 export const CY_NAVI_POSITION_WAIT_DUR = 500;
 export const MAX_HIGHTLIGHT_WIDTH = 20;
 export const MIN_HIGHTLIGHT_WIDTH = 1;
+export const MAX_HIGHLIGHT_CNT = 12;
 export const MAX_DATA_PAGE_SIZE = 10000;
 export const MIN_DATA_PAGE_SIZE = 1;
 export const MAX_LENGTH_OF_UP_DOWN_STREAM = 10;
@@ -31,6 +13,39 @@ export const CSS_SM_TEXT_SIZE = 11;
 export const CSS_FONT_NAME = "Arial";
 export const CLUSTER_CLASS = "Cluster";
 export const LAYOUT_ANIM_DUR = 500;
+export const META_EDGE_CLASS = "cy-expand-collapse-meta-edge"; // defined in expand-collapse extension
+export const COLLAPSED_EDGE_CLASS = "cy-expand-collapse-collapsed-edge";
+export const COLLAPSED_NODE_CLASS = "cy-expand-collapse-collapsed-node";
+export const HIGHLIGHT_OPACITY = 0.2;
+export const HIGHLIGHT_ANIM_DUR = 400; // it is more reasonable to make HIGHLIGHT_ANIM_DUR * 2 < HIGHLIGHT_WAIT_DUR
+export const HIGHLIGHT_WAIT_DUR = 1500;
+export const EV_MOUSE_ON = "mouseover";
+export const EV_MOUSE_OFF = "mouseout";
+export const CY_BATCH_END_DELAY = 100;
+export const OBJ_INFO_UPDATE_DELAY = 200;
+export const PATH_WALK_NAME_DISALLOWED_REGEX =
+  /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
+export const BLAST_HIGH_PERCENTAGE = 90;
+
+export const EXPAND_COLLAPSE_FAST_OPT = {
+  layoutBy: null,
+  fisheye: false,
+  animate: false,
+};
+
+export const HIGHLIGHT_INDEX = {
+  zeroIndegree: 0,
+  zeroOutdegree: 1,
+  blastHighPercentage: 2,
+  blastLowPercentage: 3,
+};
+
+export const HIGHLIGHT_NAMES = [
+  "Zero Indegree",
+  "Zero Outdegree",
+  "Blast Low Percentage",
+  "Blast High Percentage",
+];
 
 export const GENERIC_TYPE = {
   ANY_CLASS: "Any Object",
@@ -38,8 +53,6 @@ export const GENERIC_TYPE = {
   NODES_CLASS: "Any Node",
   EDGES_CLASS: "Any Edge",
 };
-
-export const MAX_HIGHLIGHT_CNT = 12;
 
 export const NUMBER_OPERATORS = {
   "=": "=",
@@ -85,9 +98,6 @@ export const NEO4J_2_JS_STR_OPERATORS = {
 };
 
 export const TYPES_NOT_TO_SHOW = ["PATHS", "WALKS", "PSEUDO"];
-
-export const PATH_WALK_NAME_DISALLOWED_REGEX =
-  /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
 
 /** https://davidwalsh.name/javascript-debounce-function
  * Returns a function, that, as long as it continues to be invoked, will not
@@ -164,7 +174,7 @@ export function getPropNamesFromObj(objects, types) {
 }
 
 // return union of 2 sets
-export function union(setA, setB) {
+export function union(setA: any, setB: any) {
   let _union = new Set(setA);
   for (let elem of setB) {
     _union.add(elem);
