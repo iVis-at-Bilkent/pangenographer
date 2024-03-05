@@ -324,10 +324,10 @@ export class TableViewComponent implements OnInit, OnDestroy {
         delete this.checkedIdx[idx];
         this.checkboxHighlightChangedBlast(idx, false);
       }
-    } else if (forceCheck) {
+    } else if (forceCheck && !this.checkedIdx[idx]) {
       this.checkedIdx[idx] = true;
       this.checkboxHighlightChangedBlast(idx, true);
-    } else {
+    } else if (!forceCheck && this.checkedIdx[idx]) {
       delete this.checkedIdx[idx];
       this.checkboxHighlightChangedBlast(idx, false);
     }
@@ -375,7 +375,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
               this._g.cy.nodes(`[segmentName = "${segmentName}"]`),
               HIGHLIGHT_INDEX.blastLowPercentage
             );
-          } else if (this.checkedIdx4BlastSegmentNames[segmentName][1]) {
+          } else {
             // if low percentage is checked
             this.checkedIdx4BlastSegmentNames[segmentName][1]++;
           }
@@ -437,7 +437,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
   }
 
   checkbox4AllChanged() {
-    this.checkedIdx = {};
     let elems = this.dynamicDiv.nativeElement.querySelectorAll(".row-cb");
     let elemsArr: HTMLInputElement[] = [];
     for (let i = 0; i < elems.length; i++) {
@@ -449,11 +448,13 @@ export class TableViewComponent implements OnInit, OnDestroy {
       for (let i = 0; i < this.params.results.length; i++) {
         this.checkboxChanged(i, undefined, true);
         elemsArr[i].checked = true;
+        this.checkedIdx[i] = true;
       }
     } else {
       for (let i = 0; i < elemsArr.length; i++) {
         this.checkboxChanged(i, undefined, false);
         elemsArr[i].checked = false;
+        delete this.checkedIdx[i];
       }
     }
   }
