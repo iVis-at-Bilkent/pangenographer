@@ -111,7 +111,6 @@ export class BlastTabComponent implements OnInit {
   standaloneIsTableOutput: boolean = false;
   standaloneIsTableOutputFilled = new Subject<boolean>();
   standaloneClearTableOutputFilter = new Subject<boolean>();
-  standaloneDBStatus: string = "";
 
   constructor(
     protected _http: HttpClient,
@@ -390,10 +389,11 @@ export class BlastTabComponent implements OnInit {
       { fastaData: this._cyService.prepareAllNodesFastaData() },
       true,
       (res) => {
-        this.standaloneDBStatus =
+        this._g.statusMsg.next(
           "Succesfully added " +
-          res.results.split("\n")[9].split(" ")[5] +
-          " sequences";
+            res.results.split("\n")[9].split(" ")[5] +
+            " sequences "
+        );
       }
     );
   }
