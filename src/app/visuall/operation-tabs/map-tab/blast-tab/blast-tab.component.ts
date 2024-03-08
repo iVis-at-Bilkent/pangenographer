@@ -18,8 +18,8 @@ import { GlobalVariableService } from "../../../global-variable.service";
 })
 export class BlastTabComponent implements OnInit {
   query: string = "";
-  types: string[] = ["Standalone", "Web"];
-  selectedType: string = "Standalone";
+  types: string[] = ["Standalone service", "Web service"];
+  selectedType: string = "Standalone service";
   selectedTypeIdx: number = 0;
 
   webDatabase: string = "nr";
@@ -123,9 +123,9 @@ export class BlastTabComponent implements OnInit {
 
   onchangeTypeChange(event: any) {
     this.selectedType = event.target.value;
-    if (this.selectedType === "Standalone") {
+    if (this.selectedType === "Standalone service") {
       this.selectedTypeIdx = 0;
-    } else if (this.selectedType === "Web") {
+    } else if (this.selectedType === "Web service") {
       this.selectedTypeIdx = 1;
     } else {
       this.selectedTypeIdx = -1;
@@ -228,7 +228,7 @@ export class BlastTabComponent implements OnInit {
       this.webRid = match && match[1];
       match = result.match(/^    RTOE = (.*)$/m);
       this.webRtoe = match && match[1];
-      this._g.statusMsg.next("Blast query submitted successfully.");
+      this._g.statusMsg.next("Blast query submitted successfully");
     });
   }
 
@@ -237,7 +237,7 @@ export class BlastTabComponent implements OnInit {
     this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/Status=(\w+)/);
       this.webStatus = match && match[1];
-      this._g.statusMsg.next("Blast query checked successfully.");
+      this._g.statusMsg.next("Blast query checked successfully");
     });
   }
 
@@ -246,7 +246,7 @@ export class BlastTabComponent implements OnInit {
     queryParams += "&FORMAT_TYPE=" + this.webSelectedFormatType;
     this.runWebBlastQuery(queryParams, (result: any) => {
       this.webResult = result;
-      this._g.statusMsg.next("Blast query result retrieved successfully.");
+      this._g.statusMsg.next("Blast query result retrieved successfully");
     });
   }
 
@@ -381,7 +381,7 @@ export class BlastTabComponent implements OnInit {
     }, errFn);
   }
 
-  makeDb() {
+  createDatabase() {
     if (this._g.cy.nodes().length == 0) {
       this._g.showErrorModal("No nodes", "Please load a graph and try again.");
       return;
@@ -393,10 +393,7 @@ export class BlastTabComponent implements OnInit {
         this.standaloneDBStatus =
           "Succesfully added " +
           res.results.split("\n")[9].split(" ")[5] +
-          " sequences.";
-        setTimeout(() => {
-          this.standaloneDBStatus = "";
-        }, 10000);
+          " sequences";
       }
     );
   }
@@ -425,6 +422,9 @@ export class BlastTabComponent implements OnInit {
             orderBy: "Query Name",
             orderDirection: "asc",
           });
+        } else {
+          this.standaloneTableOutput.results = [];
+          this.standaloneIsTableOutputFilled.next(false);
         }
       }
     );
@@ -482,7 +482,7 @@ export class BlastTabComponent implements OnInit {
     this.standaloneCommandLineArguments = event.target.value.trim();
   }
 
-  saveResult() {
+  saveResults() {
     if (this.selectedTypeIdx) {
       this._cyService.saveAsTxt(this.webResult, "blast_web_result.txt");
     } else {

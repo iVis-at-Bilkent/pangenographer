@@ -15,71 +15,22 @@
     </div>
 
     <div *ngIf="selectedTypeIdx === 1" class="panel">
-      <div class="va-text">
-        <div *ngIf="webRid">
-          Last RID: <strong>{{ webRid }}</strong>
-        </div>
-        <div *ngIf="webRtoe">
-          Last RTOE: <strong>{{ webRtoe }}</strong>
-        </div>
-        <div *ngIf="webStatus">
-          Last Status: <strong>{{ webStatus }}</strong>
-        </div>
-        <div *ngIf="webResult">
-          <p>Last Result</p>
-          <pre class="result">{{ webResult }}</pre>
-        </div>
-        <div *ngIf="webResult" class="save">
+      <div>
+        <div class="top-button">
           <input
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
-            (click)="saveResult()"
-            value="Save Result"
-            title="Save Result"
-          />
-        </div>
-      </div>
-
-      <div class="web-buttons blast-option">
-        <input
-          class="btn btn-sm btn-dark va-text m-2 center"
-          type="button"
-          (click)="executeWebBlastQueryWithParams()"
-          value="Execute"
-          title="Execute Query"
-        />
-        <input
-          class="btn btn-sm btn-dark va-text m-2 center"
-          type="button"
-          (click)="checkWebBlastQueryStatus()"
-          value="Check Query Status"
-          title="Check Query Status"
-        />
-        <input
-          class="btn btn-sm btn-dark va-text m-2 center"
-          type="button"
-          (click)="getWebBlastQueryResult()"
-          value="Get Results"
-          title="Get Results"
-        />
-      </div>
-
-      <div class="blast-option">
-        <div class="query">
-          <label class="va-text">Query</label>
-          <input
-            class="btn btn-sm btn-primary va-text m-2 center"
-            type="button"
-            (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
+            (click)="fillQueryTextareaWithSelectedSegmentsSequence(true)"
             value="Get Selected Segment's Sequence"
             title="Get Selected Segment's Sequence"
           />
         </div>
-        <div class="form-inline">
+        <div class="form-inline blast-option">
           <textarea
             (change)="onQueryChange($event)"
             [(ngModel)]="query"
-            class="form-control std-inp-hei va-small-text w5-5 h-100"
+            class="form-control std-inp-hei va-small-text w5-5"
+            rows="1"
             placeholder="Accession, GI, or FASTA."
           ></textarea>
         </div>
@@ -265,217 +216,228 @@
           >
         </div>
         <div id="algorithmParameters" class="collapse">
-          <div>
-            <div class="text-center font-weight-bold m-2">
-              General Parameters
-            </div>
-            <div class="form-inline blast-option">
-              <label class="va-text blast-option-label"
-                >Expect Threshold (0 for undefined)</label
-              >
-              <input
-                type="number"
-                min="0"
-                (keydown.enter)="onWebExpectChange($event)"
-                [(ngModel)]="webExpect"
-                class="form-control inp-3-char std-inp-hei va-small-text"
-                title="Expect"
-              />
-            </div>
-
-            <div class="form-inline blast-option">
-              <label class="va-text blast-option-label"
-                >Word Size (0 for undefined)</label
-              >
-              <input
-                type="number"
-                min="0"
-                (keydown.enter)="onWebWordSizeChange($event)"
-                [(ngModel)]="webWordSize"
-                class="form-control inp-3-char std-inp-hei va-small-text"
-                title="Word Size"
-              />
-            </div>
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label"
+              >Expect Threshold (0 for undefined)</label
+            >
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebExpectChange($event)"
+              [(ngModel)]="webExpect"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Expect"
+            />
           </div>
 
-          <div>
-            <div class="text-center font-weight-bold m-2">
-              Scoring Parameters
-            </div>
-            <div class="form-inline blast-option">
-              <label class="va-text blast-option-label">Gap Costs</label>
-              <textarea
-                (change)="onWebGapCostChange($event)"
-                [(ngModel)]="webGapCost"
-                class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
-                placeholder="Pair of positive integers separated by a space such as “11 1”."
-              ></textarea>
-            </div>
-
-            <div
-              *ngIf="webSelectedProgram !== 'blastn'"
-              class="form-inline blast-option"
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label"
+              >Word Size (0 for undefined)</label
             >
-              <label class="va-text blast-option-label">Matrix</label>
-              <select
-                class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
-                (change)="onWebMatrixChange($event)"
-                title="Matrix"
-                [(ngModel)]="webSelectedMatrixIdx"
-              >
-                <option
-                  *ngFor="let matrix of webMatrixs; let i = index"
-                  [value]="matrix"
-                  [selected]="webSelectedMatrixIdx === i"
-                >
-                  {{ matrix }}
-                </option>
-              </select>
-            </div>
-
-            <div
-              *ngIf="
-                webSelectedProgram !== 'blastn' &&
-                webSelectedProgram !== 'tblastx'
-              "
-              class="form-inline blast-option"
-            >
-              <label class="va-text blast-option-label"
-                >Composition Based Statistics (-1 for undefined)</label
-              >
-              <select
-                class="form-select tight-select filter-form va-small-text inp-4-char"
-                (change)="onWebCompositionBasedStatisticsChange($event)"
-                title="Composition Based Statistics"
-                [(ngModel)]="webSelectedCompositionBasedStatistic"
-              >
-                <option
-                  *ngFor="
-                    let compositionBasedStatistic of webCompositionBasedStatistics;
-                    let i = index
-                  "
-                  [value]="compositionBasedStatistic"
-                >
-                  {{ compositionBasedStatistic }}
-                </option>
-              </select>
-            </div>
-
-            <div
-              *ngIf="webSelectedProgram !== 'blastn'"
-              class="form-inline blast-option"
-            >
-              <label class="va-text blast-option-label"
-                >Threshold (0 for undefined)</label
-              >
-              <input
-                type="number"
-                min="0"
-                (keydown.enter)="onWebThresholdChange($event)"
-                [(ngModel)]="webThreshold"
-                class="form-control inp-3-char std-inp-hei va-small-text"
-                title="Threshold"
-              />
-            </div>
-
-            <div
-              *ngIf="webSelectedProgram === 'blastn'"
-              class="form-inline blast-option"
-            >
-              <label class="va-text blast-option-label"
-                >Nucleotide Reward (0 for undefined)</label
-              >
-              <input
-                type="number"
-                min="0"
-                (keydown.enter)="onWebNucleotideRewardChange($event)"
-                [(ngModel)]="webNulceotideReward"
-                class="form-control inp-3-char std-inp-hei va-small-text"
-                title="Nucleotide Reward"
-              />
-            </div>
-
-            <div
-              *ngIf="webSelectedProgram === 'blastn'"
-              class="form-inline blast-option"
-            >
-              <label class="va-text blast-option-label"
-                >Nucleotide Penalty (0 for undefined)</label
-              >
-              <input
-                type="number"
-                max="0"
-                (keydown.enter)="onWebNucleotidePenaltyChange($event)"
-                [(ngModel)]="webNulceotideReward"
-                class="form-control inp-3-char std-inp-hei va-small-text"
-                title="Nucleotide Penalty"
-              />
-            </div>
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebWordSizeChange($event)"
+              [(ngModel)]="webWordSize"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Word Size"
+            />
           </div>
 
-          <div>
-            <div class="text-center font-weight-bold m-2">
-              Filters and Masking
-            </div>
-            <div class="form-inline blast-option">
-              <label class="va-text blast-option-label">Filter and Mask</label>
-              <select
-                class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
-                (change)="onWebFilterChange($event)"
-                title="Filter"
-                [(ngModel)]="webSelectedFilter"
-              >
-                <option
-                  *ngFor="let filter of webFilters; let i = index"
-                  [value]="filter"
-                >
-                  {{ filter }}
-                </option>
-              </select>
-            </div>
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label">Gap Costs</label>
+            <textarea
+              (change)="onWebGapCostChange($event)"
+              [(ngModel)]="webGapCost"
+              class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+              placeholder="Pair of positive integers separated by a space such as “11 1”."
+            ></textarea>
           </div>
+
+          <div
+            *ngIf="webSelectedProgram !== 'blastn'"
+            class="form-inline blast-option"
+          >
+            <label class="va-text blast-option-label">Matrix</label>
+            <select
+              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+              (change)="onWebMatrixChange($event)"
+              title="Matrix"
+              [(ngModel)]="webSelectedMatrixIdx"
+            >
+              <option
+                *ngFor="let matrix of webMatrixs; let i = index"
+                [value]="matrix"
+                [selected]="webSelectedMatrixIdx === i"
+              >
+                {{ matrix }}
+              </option>
+            </select>
+          </div>
+
+          <div
+            *ngIf="
+              webSelectedProgram !== 'blastn' &&
+              webSelectedProgram !== 'tblastx'
+            "
+            class="form-inline blast-option"
+          >
+            <label class="va-text blast-option-label"
+              >Composition Based Statistics (-1 for undefined)</label
+            >
+            <select
+              class="form-select tight-select filter-form va-small-text inp-4-char"
+              (change)="onWebCompositionBasedStatisticsChange($event)"
+              title="Composition Based Statistics"
+              [(ngModel)]="webSelectedCompositionBasedStatistic"
+            >
+              <option
+                *ngFor="
+                  let compositionBasedStatistic of webCompositionBasedStatistics;
+                  let i = index
+                "
+                [value]="compositionBasedStatistic"
+              >
+                {{ compositionBasedStatistic }}
+              </option>
+            </select>
+          </div>
+
+          <div
+            *ngIf="webSelectedProgram !== 'blastn'"
+            class="form-inline blast-option"
+          >
+            <label class="va-text blast-option-label"
+              >Threshold (0 for undefined)</label
+            >
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebThresholdChange($event)"
+              [(ngModel)]="webThreshold"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Threshold"
+            />
+          </div>
+
+          <div
+            *ngIf="webSelectedProgram === 'blastn'"
+            class="form-inline blast-option"
+          >
+            <label class="va-text blast-option-label"
+              >Nucleotide Reward (0 for undefined)</label
+            >
+            <input
+              type="number"
+              min="0"
+              (keydown.enter)="onWebNucleotideRewardChange($event)"
+              [(ngModel)]="webNulceotideReward"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Nucleotide Reward"
+            />
+          </div>
+
+          <div
+            *ngIf="webSelectedProgram === 'blastn'"
+            class="form-inline blast-option"
+          >
+            <label class="va-text blast-option-label"
+              >Nucleotide Penalty (0 for undefined)</label
+            >
+            <input
+              type="number"
+              max="0"
+              (keydown.enter)="onWebNucleotidePenaltyChange($event)"
+              [(ngModel)]="webNulceotideReward"
+              class="form-control inp-3-char std-inp-hei va-small-text"
+              title="Nucleotide Penalty"
+            />
+          </div>
+
+          <div class="form-inline blast-option">
+            <label class="va-text blast-option-label">Filter and Mask</label>
+            <select
+              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+              (change)="onWebFilterChange($event)"
+              title="Filter"
+              [(ngModel)]="webSelectedFilter"
+            >
+              <option
+                *ngFor="let filter of webFilters; let i = index"
+                [value]="filter"
+              >
+                {{ filter }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="web-buttons blast-option">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="executeWebBlastQueryWithParams()"
+          value="Execute"
+          title="Execute Query"
+        />
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="checkWebBlastQueryStatus()"
+          value="Check Query Status"
+          title="Check Query Status"
+        />
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="getWebBlastQueryResult()"
+          value="Get Results"
+          title="Get Results"
+        />
+      </div>
+
+      <div class="va-text">
+        <div *ngIf="webRid">
+          Last RID: <strong>{{ webRid }}</strong>
+        </div>
+        <div *ngIf="webRtoe">
+          Last RTOE: <strong>{{ webRtoe }}</strong>
+        </div>
+        <div *ngIf="webStatus">
+          Last Status: <strong>{{ webStatus }}</strong>
+        </div>
+        <div *ngIf="webResult">
+          <p>Last Result</p>
+          <pre class="result">{{ webResult }}</pre>
+        </div>
+        <div *ngIf="webResult" class="save">
+          <input
+            class="btn btn-sm btn-dark va-text m-2 center"
+            type="button"
+            (click)="saveResults()"
+            value="Save Results"
+            title="Save Results"
+          />
         </div>
       </div>
     </div>
 
     <div *ngIf="selectedTypeIdx === 0" class="panel">
-      <div>
-        <pre
-          *ngIf="standaloneStatus && !standaloneTableOutput"
-          class="result"
-          >{{ standaloneStatus }}</pre
-        >
-        <app-table-view
-          *ngIf="standaloneTableOutput"
-          [params]="standaloneTableOutput"
-          [tableFilled]="standaloneIsTableOutputFilled"
-          [clearFilter]="standaloneClearTableOutputFilter"
-          (onFilteringChanged)="onStandaloneTableFilterChange($event)"
-        >
-        </app-table-view>
-      </div>
-      <div *ngIf="standaloneStatus" class="save">
-        <input
-          class="btn btn-sm btn-dark va-text m-2 center"
-          type="button"
-          (click)="saveResult()"
-          value="Save Result"
-          title="Save Result"
-        />
-      </div>
-      <div class="make-db">
+      <div class="top-button">
         <input
           class="btn btn-sm btn-dark va-text m-2 center float-left"
           type="button"
-          (click)="makeDb()"
-          value="Make DB"
-          title="Make DB"
+          (click)="createDatabase()"
+          value="Create Database"
+          title="Create Database"
         />
 
         <pre *ngIf="standaloneDBStatus" class="va-text">{{
           standaloneDBStatus
         }}</pre>
       </div>
+
       <div>
         <label class="va-text">Command Line Arguments</label>
         <div class="form-inline">
@@ -487,33 +449,63 @@
           ></textarea>
         </div>
       </div>
+
       <div>
-        <div class="query">
-          <label class="va-text">Query</label>
+        <div class="top-button">
           <input
-            class="btn btn-sm btn-primary va-text m-2 center"
+            class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
             (click)="fillQueryTextareaWithSelectedSegmentsSequence(true)"
             value="Get Selected Segment's Sequence"
             title="Get Selected Segment's Sequence"
           />
         </div>
-        <div class="form-inline">
+        <div class="form-inline blast-option">
           <textarea
             (change)="onQueryChange($event)"
             [(ngModel)]="standaloneQuery"
-            class="form-control std-inp-hei va-small-text w5-5 h-100"
+            class="form-control std-inp-hei va-small-text w5-5"
+            rows="1"
             placeholder="Accession, GI, or FASTA."
           ></textarea>
         </div>
       </div>
-      <input
-        class="btn btn-sm btn-dark va-text m-2 center"
-        type="button"
-        (click)="executeStandaloneQueryWithParams()"
-        value="Execute"
-        title="Execute Query"
-      />
+
+      <div class="top-button">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="executeStandaloneQueryWithParams()"
+          value="Execute"
+          title="Execute Query"
+        />
+      </div>
+
+      <div>
+        <pre
+          *ngIf="standaloneStatus && !standaloneIsTableOutput"
+          class="result"
+          >{{ standaloneStatus }}</pre
+        >
+        <app-table-view
+          *ngIf="standaloneTableOutput && standaloneIsTableOutput"
+          [params]="standaloneTableOutput"
+          [tableFilled]="standaloneIsTableOutputFilled"
+          [clearFilter]="standaloneClearTableOutputFilter"
+          (onFilteringChanged)="onStandaloneTableFilterChange($event)"
+        >
+        </app-table-view>
+      </div>
+
+      <div *ngIf="standaloneStatus" class="save">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="saveResults()"
+          value="Save Results"
+          title="Save Results"
+        />
+      </div>
     </div>
   </div>
 </div>

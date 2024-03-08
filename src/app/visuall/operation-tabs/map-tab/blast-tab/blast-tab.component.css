@@ -1,8 +1,8 @@
 .result {
-  max-height: 400px;
+  height: 400px;
 }
 
-.make-db {
+.top-button {
   display: flex;
   text-align: center;
   justify-content: center;
@@ -17,12 +17,6 @@
   align-items: center;
 }
 
-.query {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 .blast-option {
   margin-bottom: 10px;
 }
@@ -33,6 +27,13 @@
 
 .web-buttons {
   display: flex;
+  text-align: center;
+  justify-content: center;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  text-wrap: break-word;
+}
+
+textarea.form-control {
+  resize: vertical;
 }
