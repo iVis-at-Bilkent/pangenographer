@@ -1135,7 +1135,7 @@ export class CytoscapeService {
     });
   }
 
-  setRemovePoppersFn(fn) {
+  setRemovePoppersFn(fn: any) {
     this.removePopperFn = fn;
   }
 

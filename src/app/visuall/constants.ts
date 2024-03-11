@@ -26,6 +26,9 @@ export const OBJ_INFO_UPDATE_DELAY = 200;
 export const PATH_WALK_NAME_DISALLOWED_REGEX =
   /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
 export const BLAST_HIGH_PERCENTAGE = 90;
+export const BADGE_ZOOM_THRESHOLD = 0.8;
+export const BADGE_DEFAULT_NODE_SIZE = 40;
+export const BADGE_POPPER_UPDATE_DELAY = 100;
 
 export const EXPAND_COLLAPSE_FAST_OPT = {
   layoutBy: null,
