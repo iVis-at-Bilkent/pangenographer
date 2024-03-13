@@ -51,12 +51,6 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
   isMapBadgeSizes = false;
   isConsiderOriginalEdges = false;
   selectedPropFn: string = "";
-  poppedData: {
-    popper: HTMLDivElement;
-    elem: any;
-    fn: Function;
-    fn2: Function;
-  }[] = [];
   UPDATE_POPPER_WAIT = 100;
   cySelector = "";
   badgeColor = "#007bff";
@@ -72,11 +66,8 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this._cyService.setRemovePoppersFn(
-      this._extTool.destroyCurrentBadgePoppers.bind(this)
-    );
     this._g.cy.on("remove", (e: any) => {
-      this._extTool.destroyBadgePopper(e.target.id(), -1, this.poppedData);
+      this._extTool.destroyBadgePopper(e.target.id(), -1);
     });
     this._g.appDescription.subscribe((x) => {
       if (x !== null && x.appPreferences.avgNodeSize) {
@@ -96,10 +87,17 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     if (this.isOnSelected) {
       this.cySelector = ":selected";
     }
-    this._extTool.destroyCurrentBadgePoppers(this.poppedData);
+    this._extTool.destroyCurrentBadgePoppers();
     if (!this[this.selectedPropFn]) {
       return;
     }
+    this._extTool.setBadgePopperValues(
+      this.isMapNodeSizes,
+      this.isMapBadgeSizes,
+      this.currNodeSize,
+      this.maxPropValue,
+      this.badgeColor
+    );
     this[this.selectedPropFn]();
     this.maxPropValue = Math.max(
       ...this._g.cy.nodes().map((x: any) => x.data("__graphTheoreticProp"))
@@ -108,13 +106,14 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       this.maxPropValue,
       this.currNodeSize
     );
-    this._extTool.setBadgeColorsAndCoords(
-      this.poppedData,
-      this.badgeColor,
-      this.maxPropValue,
+    this._extTool.setBadgePopperValues(
+      this.isMapNodeSizes,
       this.isMapBadgeSizes,
-      this.currNodeSize
+      this.currNodeSize,
+      this.maxPropValue,
+      this.badgeColor
     );
+    this._extTool.setBadgeColorsAndCoords();
   }
 
   private edgeWeightFn(edge: any) {
@@ -141,15 +140,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       } else {
         badges.push(r.degree);
       }
-      this._extTool.generateBadge4Elem(
-        e,
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(e, badges);
     }
   }
 
@@ -169,15 +160,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       } else {
         badges.push(r.degree(e));
       }
-      this._extTool.generateBadge4Elem(
-        e,
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(e, badges);
     }
   }
 
@@ -193,15 +176,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       } else {
         badges.push(r.degree);
       }
-      this._extTool.generateBadge4Elem(
-        e,
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(e, badges);
     }
   }
 
@@ -252,15 +227,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       } else {
         badges[0] /= maxD;
       }
-      this._extTool.generateBadge4Elem(
-        e,
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(e, badges);
     }
   }
 
@@ -310,15 +277,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
         weight: this.edgeWeightFn.bind(this),
       });
       let badges = [r];
-      this._extTool.generateBadge4Elem(
-        e,
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(e, badges);
     }
   }
 
@@ -330,15 +289,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     });
     for (let i = 0; i < elems.length; i++) {
       let badges = [r.closeness(elems[i])];
-      this._extTool.generateBadge4Elem(
-        elems[i],
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(elems[i], badges);
     }
   }
 
@@ -350,15 +301,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     });
     for (let i = 0; i < elems.length; i++) {
       let badges = [r.betweenness(elems[i])];
-      this._extTool.generateBadge4Elem(
-        elems[i],
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(elems[i], badges);
     }
   }
 
@@ -370,15 +313,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     });
     for (let i = 0; i < elems.length; i++) {
       let badges = [r.betweennessNormalized(elems[i])];
-      this._extTool.generateBadge4Elem(
-        elems[i],
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(elems[i], badges);
     }
   }
 
@@ -387,15 +322,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     let r = this._g.cy.$(this.cySelector).pageRank();
     for (let i = 0; i < elems.length; i++) {
       let badges = [r.rank(elems[i])];
-      this._extTool.generateBadge4Elem(
-        elems[i],
-        badges,
-        this.poppedData,
-        this.isMapNodeSizes,
-        this.isMapBadgeSizes,
-        this.currNodeSize,
-        this.maxPropValue
-      );
+      this._extTool.generateBadge4Elem(elems[i], badges);
     }
   }
 

@@ -13,6 +13,7 @@ import {
 import { IPosition } from "angular2-draggable";
 import { Subject, Subscription } from "rxjs";
 import {
+  BADGE_DEFAULT_NODE_SIZE,
   BLAST_HIGH_PERCENTAGE,
   EV_MOUSE_OFF,
   EV_MOUSE_ON,
@@ -21,6 +22,7 @@ import {
 } from "../../visuall/constants";
 import { CytoscapeService } from "../../visuall/cytoscape.service";
 import { GraphElem } from "../../visuall/db-service/data-types";
+import { ExternalToolService } from "../../visuall/external-tool.service";
 import { GlobalVariableService } from "../../visuall/global-variable.service";
 import {
   TableFiltering,
@@ -76,6 +78,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
   hoveredElemId = "-";
   isCheckbox4AllChecked = false;
 
+  elemBadgeMaxPercentages: any = {};
+  badgeColor = "#007bff";
+
   @Input() params: TableViewInput;
   @Input() tableFilled = new Subject<boolean>();
   @Input() clearFilter = new Subject<boolean>();
@@ -88,7 +93,8 @@ export class TableViewComponent implements OnInit, OnDestroy {
   constructor(
     private _cyService: CytoscapeService,
     private _g: GlobalVariableService,
-    private _ngZone: NgZone
+    private _ngZone: NgZone,
+    private _extTool: ExternalToolService
   ) {}
 
   ngOnInit() {
@@ -113,6 +119,10 @@ export class TableViewComponent implements OnInit, OnDestroy {
       this.filterBy.bind(this),
       this.TXT_FILTER_DEBOUNCE
     );
+
+    this._g.cy.on("remove", (e: any) => {
+      this._extTool.destroyBadgePopper(e.target.id(), -1);
+    });
   }
 
   private resetHoverEvents() {
@@ -192,6 +202,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   private onTableFilled() {
     this.isLoading = false;
     this.checkedIdx = {};
+    this.elemBadgeMaxPercentages = {};
     this.checkedIdx4BlastSegmentNames = {};
     this.isCheckbox4AllChecked = false;
     if (this.params.results && this.params.results.length > 0) {
@@ -315,6 +326,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
     t: EventTarget = undefined, // undefined for setting checked status
     forceCheck?: boolean
   ) {
+    this._extTool.destroyCurrentBadgePoppers();
+    this.elemBadgeMaxPercentages = {};
+
     if (t !== undefined) {
       const isChecked = (<HTMLInputElement>t).checked;
       if (isChecked) {
@@ -331,6 +345,41 @@ export class TableViewComponent implements OnInit, OnDestroy {
       delete this.checkedIdx[idx];
       this.checkboxHighlightChangedBlast(idx, false);
     }
+
+    for (let idx in this.checkedIdx) {
+      let segmentName = this.params.results[idx][2].val;
+      let percentage = this.params.results[idx][3].val;
+      if (!this.elemBadgeMaxPercentages[segmentName]) {
+        this.elemBadgeMaxPercentages[segmentName] = percentage;
+      } else {
+        this.elemBadgeMaxPercentages[segmentName] = Math.max(
+          percentage,
+          this.elemBadgeMaxPercentages[segmentName]
+        );
+      }
+    }
+
+    this._extTool.setBadgePopperValues(
+      true,
+      false,
+      BADGE_DEFAULT_NODE_SIZE,
+      100,
+      this.badgeColor
+    );
+
+    this._cyService.setNodeSizeOnGraphTheoreticProp(
+      100,
+      BADGE_DEFAULT_NODE_SIZE
+    );
+    for (let segmentName in this.elemBadgeMaxPercentages) {
+      let badges = [];
+      badges.push(this.elemBadgeMaxPercentages[segmentName]);
+      this._extTool.generateBadge4Elem(
+        this._g.cy.nodes(`[segmentName = "${segmentName}"]`)[0],
+        badges
+      );
+    }
+    this._extTool.setBadgeColorsAndCoords();
   }
 
   checkboxHighlightChangedBlast(idx: number, highlight: boolean) {

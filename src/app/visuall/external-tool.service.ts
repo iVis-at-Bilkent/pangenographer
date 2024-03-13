@@ -11,10 +11,24 @@ import {
 } from "./constants";
 import { GlobalVariableService } from "./global-variable.service";
 import { SequenceDataService } from "./sequence-data.service";
+
+interface PoppedData {
+  popper: HTMLDivElement;
+  elem: any;
+  fn: Function;
+  fn2: Function;
+}
 @Injectable({
   providedIn: "root",
 })
 export class ExternalToolService {
+  poppedData: PoppedData[] = [];
+  isMapNodeSizes: boolean;
+  isMapBadgeSizes: boolean;
+  currNodeSize: number;
+  maxPropValue: number;
+  badgeColor: string;
+
   constructor(
     private _g: GlobalVariableService,
     private _SequenceDataService: SequenceDataService
@@ -654,42 +668,105 @@ export class ExternalToolService {
     return s;
   }
 
-  private showHideBadge(isShow: boolean, div: HTMLDivElement) {
-    let z = this._g.cy.zoom();
-    if (z <= BADGE_ZOOM_THRESHOLD) {
-      isShow = false;
-    }
-    let css = "0";
-    if (isShow) {
-      css = "1";
-    }
-    div.style.opacity = css;
+  setBadgePopperValues(
+    isMapNodeSizes: boolean,
+    isMapBadgeSizes: boolean,
+    currNodeSize: number,
+    maxPropValue: number,
+    badgeColor: string
+  ) {
+    this.isMapNodeSizes = isMapNodeSizes;
+    this.isMapBadgeSizes = isMapBadgeSizes;
+    this.currNodeSize = currNodeSize;
+    this.maxPropValue = maxPropValue;
+    this.badgeColor = badgeColor;
   }
 
-  destroyCurrentBadgePoppers(poppedData: any) {
-    let size = poppedData.length;
-    for (let i = 0; i < size; i++) {
-      this.destroyBadgePopper("", 0, poppedData);
+  destroyCurrentBadgePoppers() {
+    while (this.poppedData.length > 0) {
+      this.destroyBadgePopper("", 0);
     }
   }
 
-  destroyBadgePopper(id: string, i: number, poppedData: any) {
+  destroyBadgePopper(id: string, i: number) {
     if (i < 0) {
-      i = poppedData.findIndex((x: any) => x.elem.id() == id);
+      i = this.poppedData.findIndex((x: any) => x.elem.id() == id);
       if (i < 0) {
         return;
       }
     }
-    poppedData[i].popper.remove();
+    this.poppedData[i].popper.remove();
     // unbind previously bound functions
-    if (poppedData[i].fn) {
-      poppedData[i].elem.off("position", poppedData[i].fn);
-      poppedData[i].elem.off("style", poppedData[i].fn2);
-      this._g.cy.off("pan zoom resize", poppedData[i].fn);
+    if (this.poppedData[i].fn) {
+      this.poppedData[i].elem.off("position", this.poppedData[i].fn);
+      this.poppedData[i].elem.off("style", this.poppedData[i].fn2);
+      this._g.cy.off("pan zoom resize", this.poppedData[i].fn);
     }
-    poppedData[i].elem.removeClass("graphTheoreticDisplay");
-    poppedData[i].elem.data("__graphTheoreticProp", undefined);
-    poppedData.splice(i, 1);
+    this.poppedData[i].elem.removeClass("badgeDisplay");
+    this.poppedData[i].elem.data("__badgeProp", undefined);
+    this.poppedData.splice(i, 1);
+  }
+
+  generateBadge4Elem(e: any, badges: number[]) {
+    const div = document.createElement("div");
+    div.innerHTML = this.badgeGetHtml(badges);
+    div.style.position = "absolute";
+    div.style.top = "0px";
+    div.style.left = "0px";
+    document.getElementById("cy").appendChild(div);
+
+    if (this.isMapNodeSizes || this.isMapBadgeSizes) {
+      let sum = 0;
+      for (let i = 0; i < badges.length; i++) {
+        sum += badges[i];
+      }
+      e.data("__badgeProp", sum / badges.length);
+    }
+    if (this.isMapNodeSizes) {
+      e.removeClass("badgeDisplay");
+      e.addClass("badgeDisplay");
+    }
+
+    const positionHandlerFn = debounce2(
+      () => {
+        this.setBadgeCoords(e, div);
+        this.setBadgeCoordsOfChildren(e);
+      },
+      BADGE_POPPER_UPDATE_DELAY,
+      () => {
+        this.showHideBadge(false, div);
+      }
+    ).bind(this);
+    const styleHandlerFn = debounce(() => {
+      this.setBadgeVisibility(e, div);
+    }, BADGE_POPPER_UPDATE_DELAY * 2).bind(this);
+
+    e.on("position", positionHandlerFn);
+    e.on("style", styleHandlerFn);
+    this._g.cy.on("pan zoom resize", positionHandlerFn);
+    this.poppedData.push({
+      popper: div,
+      elem: e,
+      fn: positionHandlerFn,
+      fn2: styleHandlerFn,
+    });
+  }
+
+  setBadgeColorsAndCoords() {
+    for (let i = 0; i < this.poppedData.length; i++) {
+      let c = mapColor(
+        this.badgeColor,
+        this.maxPropValue,
+        this.poppedData[i].elem.data("__badgeProp")
+      );
+
+      for (let j = 0; j < this.poppedData[i].popper.children.length; j++) {
+        (
+          this.poppedData[i].popper.children[j] as HTMLSpanElement
+        ).style.background = c;
+      }
+      this.setBadgeCoords(this.poppedData[i].elem, this.poppedData[i].popper);
+    }
   }
 
   private setBadgeVisibility(e: any, div: HTMLDivElement) {
@@ -698,50 +775,17 @@ export class ExternalToolService {
     }
   }
 
-  setBadgeColorsAndCoords(
-    poppedData: any,
-    badgeColor: string,
-    maxPropValue: number,
-    isMapBadgeSizes: boolean,
-    currNodeSize: number
-  ) {
-    for (let i = 0; i < poppedData.length; i++) {
-      let c = mapColor(
-        badgeColor,
-        maxPropValue,
-        poppedData[i].elem.data("__graphTheoreticProp")
-      );
-      for (let j = 0; j < poppedData[i].popper.children.length; j++) {
-        (poppedData[i].popper.children[j] as HTMLSpanElement).style.background =
-          c;
-      }
-      this.setBadgeCoords(
-        poppedData[i].elem,
-        poppedData[i].popper,
-        isMapBadgeSizes,
-        currNodeSize,
-        maxPropValue
-      );
-    }
-  }
-
-  private setBadgeCoords(
-    e: any,
-    div: HTMLDivElement,
-    isMapBadgeSizes: boolean,
-    currNodeSize: number,
-    maxPropValue: number
-  ) {
+  private setBadgeCoords(e: any, div: HTMLDivElement) {
     // let the nodes resize first
     setTimeout(() => {
       let ratio = 1;
-      if (isMapBadgeSizes) {
-        let b = currNodeSize + 20;
-        let a = Math.max(5, currNodeSize - 20);
-        let x = e.data("__graphTheoreticProp");
-        ratio = (((b - a) * x) / maxPropValue + a) / currNodeSize;
+      if (this.isMapBadgeSizes) {
+        let b = this.currNodeSize + 20;
+        let a = Math.max(5, this.currNodeSize - 20);
+        let x = e.data("__badgeProp");
+        ratio = (((b - a) * x) / this.maxPropValue + a) / this.currNodeSize;
       } else {
-        ratio = currNodeSize / BADGE_DEFAULT_NODE_SIZE;
+        ratio = this.currNodeSize / BADGE_DEFAULT_NODE_SIZE;
       }
       ratio = ratio < BADGE_ZOOM_THRESHOLD ? BADGE_ZOOM_THRESHOLD : ratio;
 
@@ -761,98 +805,32 @@ export class ExternalToolService {
     }, 0);
   }
 
-  generateBadge4Elem(
-    e: any,
-    badges: number[],
-    poppedData: any,
-    isMapNodeSizes: boolean,
-    isMapBadgeSizes: boolean,
-    currNodeSize: number,
-    maxPropValue: number
-  ) {
-    const div = document.createElement("div");
-    div.innerHTML = this.badgeGetHtml(badges);
-    div.style.position = "absolute";
-    div.style.top = "0px";
-    div.style.left = "0px";
-    document.getElementById("cy").appendChild(div);
-
-    if (isMapNodeSizes || isMapBadgeSizes) {
-      let sum = 0;
-      for (let i = 0; i < badges.length; i++) {
-        sum += badges[i];
-      }
-      e.data("__graphTheoreticProp", sum / badges.length);
+  private showHideBadge(isShow: boolean, div: HTMLDivElement) {
+    let z = this._g.cy.zoom();
+    if (z <= BADGE_ZOOM_THRESHOLD) {
+      isShow = false;
     }
-    if (isMapNodeSizes) {
-      e.removeClass("graphTheoreticDisplay");
-      e.addClass("graphTheoreticDisplay");
+    let css = "0";
+    if (isShow) {
+      css = "1";
     }
-
-    const positionHandlerFn = debounce2(
-      () => {
-        this.setBadgeCoords(
-          e,
-          div,
-          isMapBadgeSizes,
-          currNodeSize,
-          maxPropValue
-        );
-        this.setBadgeCoordsOfChildren(
-          e,
-          poppedData,
-          isMapBadgeSizes,
-          currNodeSize,
-          maxPropValue
-        );
-      },
-      BADGE_POPPER_UPDATE_DELAY,
-      () => {
-        this.showHideBadge(false, div);
-      }
-    ).bind(this);
-    const styleHandlerFn = debounce(() => {
-      this.setBadgeVisibility(e, div);
-    }, BADGE_POPPER_UPDATE_DELAY * 2).bind(this);
-
-    e.on("position", positionHandlerFn);
-    e.on("style", styleHandlerFn);
-    this._g.cy.on("pan zoom resize", positionHandlerFn);
-    poppedData.push({
-      popper: div,
-      elem: e,
-      fn: positionHandlerFn,
-      fn2: styleHandlerFn,
-    });
+    div.style.opacity = css;
   }
 
-  private setBadgeCoordsOfChildren(
-    e: any,
-    poppedData: any,
-    isMapBadgeSizes: boolean,
-    currNodeSize: number,
-    maxPropValue: number
-  ) {
+  private setBadgeCoordsOfChildren(e: any) {
     const elems = e.children();
     for (let i = 0; i < elems.length; i++) {
       const child = elems[i];
       if (child.isParent()) {
-        this.setBadgeCoordsOfChildren(
-          child,
-          poppedData,
-          isMapBadgeSizes,
-          currNodeSize,
-          maxPropValue
-        );
+        this.setBadgeCoordsOfChildren(child);
       } else {
-        const idx = poppedData.findIndex((x: any) => x.elem.id() == child.id());
+        const idx = this.poppedData.findIndex(
+          (x: any) => x.elem.id() == child.id()
+        );
         if (idx > -1) {
           this.setBadgeCoords(
-            poppedData[idx].elem,
-            poppedData[idx].popper,
-            isMapBadgeSizes,
-            currNodeSize,
-            maxPropValue
+            this.poppedData[idx].elem,
+            this.poppedData[idx].popper
           );
         }
       }

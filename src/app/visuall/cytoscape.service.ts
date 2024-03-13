@@ -27,7 +27,6 @@ import { UserProfileService } from "./user-profile.service";
 })
 export class CytoscapeService {
   userPrefHelper: UserPrefHelper;
-  removePopperFn: Function;
   showObjPropsFn: Function;
   showStatsFn: Function;
   louvainClusterer: LouvainClustering;
@@ -138,18 +137,18 @@ export class CytoscapeService {
     }
     this._g.cy
       .style()
-      .selector("node.graphTheoreticDisplay")
+      .selector("node.badgeDisplay")
       .style({
         width: (e: any) => {
           let b = avgSize + 20;
           let a = Math.max(5, avgSize - 20);
-          let x = e.data("__graphTheoreticProp");
+          let x = e.data("__badgeProp");
           return ((b - a) * x) / maxVal + a + "px";
         },
         height: (e: any) => {
           let b = avgSize + 20;
           let a = Math.max(5, avgSize - 20);
-          let x = e.data("__graphTheoreticProp");
+          let x = e.data("__badgeProp");
           return ((((b - a) * x) / maxVal + a) * e.height()) / e.width() + "px";
         },
       })
@@ -533,7 +532,7 @@ export class CytoscapeService {
   removeHighlights() {
     this._g.removeHighlights();
     this._g.viewUtils.removeHighlights(this._g.filterRemovedElems(() => true));
-    this.removePopperFn();
+    this._externalToolService.destroyCurrentBadgePoppers();
   }
 
   unbindHighlightOnHoverListeners() {
@@ -1133,10 +1132,6 @@ export class CytoscapeService {
         isSelectionLocked = false;
       }, 100);
     });
-  }
-
-  setRemovePoppersFn(fn: any) {
-    this.removePopperFn = fn;
   }
 
   changeGroupingOption(x: GroupingOptionTypes) {
