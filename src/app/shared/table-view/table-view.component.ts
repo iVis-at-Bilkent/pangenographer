@@ -79,7 +79,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   isCheckbox4AllChecked = false;
 
   elemBadgeMaxPercentages: any = {};
-  badgeColor = "#007bff";
+  badgeColor = "#69D96E";
 
   @Input() params: TableViewInput;
   @Input() tableFilled = new Subject<boolean>();
