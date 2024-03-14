@@ -25,7 +25,6 @@ export const CY_BATCH_END_DELAY = 100;
 export const OBJ_INFO_UPDATE_DELAY = 200;
 export const PATH_WALK_NAME_DISALLOWED_REGEX =
   /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
-export const BLAST_HIGH_PERCENTAGE = 90;
 export const BADGE_ZOOM_THRESHOLD = 0.8;
 export const BADGE_DEFAULT_NODE_SIZE = 40;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
@@ -39,16 +38,9 @@ export const EXPAND_COLLAPSE_FAST_OPT = {
 export const HIGHLIGHT_INDEX = {
   zeroIndegree: 0,
   zeroOutdegree: 1,
-  blastHighPercentage: 2,
-  blastLowPercentage: 3,
 };
 
-export const HIGHLIGHT_NAMES = [
-  "Zero Indegree",
-  "Zero Outdegree",
-  "Blast Low Percentage",
-  "Blast High Percentage",
-];
+export const HIGHLIGHT_NAMES = ["Zero Indegree", "Zero Outdegree"];
 
 export const GENERIC_TYPE = {
   ANY_CLASS: "Any Object",

@@ -193,14 +193,6 @@
         "color": "#ff0000"
       },
       {
-        "wid": 5,
-        "color": "#006622"
-      },
-      {
-        "wid": 5,
-        "color": "#80FF80"
-      },
-      {
         "wid": 3,
         "color": "#FCE903"
       },
@@ -213,7 +205,7 @@
         "color": "#04f06a"
       }
     ],
-    "currHighlightIdx": 4,
+    "currHighlightIdx": 2,
     "selectionColor": "#6c757d",
     "selectionWidth": 4.5,
     "groupingOption": 0,
@@ -227,7 +219,7 @@
     "tilingPadding": 4,
     "pangenomegrapher": {
       "lengthOfUpDownstream": 3,
-      "isHighlightInZeroOutZero": false
+      "isHighlightInZeroOutZero": true
     }
   },
   "cssStyle": {

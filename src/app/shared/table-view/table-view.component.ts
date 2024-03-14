@@ -14,10 +14,8 @@ import { IPosition } from "angular2-draggable";
 import { Subject, Subscription } from "rxjs";
 import {
   BADGE_DEFAULT_NODE_SIZE,
-  BLAST_HIGH_PERCENTAGE,
   EV_MOUSE_OFF,
   EV_MOUSE_ON,
-  HIGHLIGHT_INDEX,
   debounce,
 } from "../../visuall/constants";
 import { CytoscapeService } from "../../visuall/cytoscape.service";
@@ -69,7 +67,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
   filterTxtChanged: () => void;
   @ViewChild("dynamicDiv", { static: false }) dynamicDiv;
   checkedIdx: any = {};
-  checkedIdx4BlastSegmentNames: any = {};
   emphasizeRowFn: Function;
   higlightOnHoverSubs: Subscription;
   tableFillSubs: Subscription;
@@ -203,7 +200,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this.isLoading = false;
     this.checkedIdx = {};
     this.elemBadgeMaxPercentages = {};
-    this.checkedIdx4BlastSegmentNames = {};
     this.isCheckbox4AllChecked = false;
     if (this.params.results && this.params.results.length > 0) {
       this.isShowTable = true;
@@ -326,25 +322,30 @@ export class TableViewComponent implements OnInit, OnDestroy {
     t: EventTarget = undefined, // undefined for setting checked status
     forceCheck?: boolean
   ) {
-    this._extTool.destroyCurrentBadgePoppers();
-    this.elemBadgeMaxPercentages = {};
-
     if (t !== undefined) {
       const isChecked = (<HTMLInputElement>t).checked;
       if (isChecked) {
         this.checkedIdx[idx] = true;
-        this.checkboxHighlightChangedBlast(idx, true);
       } else {
         delete this.checkedIdx[idx];
-        this.checkboxHighlightChangedBlast(idx, false);
       }
     } else if (forceCheck && !this.checkedIdx[idx]) {
       this.checkedIdx[idx] = true;
-      this.checkboxHighlightChangedBlast(idx, true);
     } else if (!forceCheck && this.checkedIdx[idx]) {
       delete this.checkedIdx[idx];
-      this.checkboxHighlightChangedBlast(idx, false);
     }
+
+    if (
+      this.params.isBlastResultTable &&
+      this.params.isUseCySelector4Highlight
+    ) {
+      this.placeBlastTableResultBadges();
+    }
+  }
+
+  private placeBlastTableResultBadges() {
+    this._extTool.destroyCurrentBadgePoppers();
+    this.elemBadgeMaxPercentages = {};
 
     for (let idx in this.checkedIdx) {
       let segmentName = this.params.results[idx][2].val;
@@ -380,95 +381,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
       );
     }
     this._extTool.setBadgeColorsAndCoords();
-  }
-
-  checkboxHighlightChangedBlast(idx: number, highlight: boolean) {
-    if (
-      this.params.isBlastResultTable &&
-      this.params.isUseCySelector4Highlight
-    ) {
-      let segmentName = this.params.results[idx][2].val;
-
-      if (highlight) {
-        if (this.params.results[idx][3].val >= BLAST_HIGH_PERCENTAGE) {
-          // high percentage check, high percentages index is 0
-          if (!this.checkedIdx4BlastSegmentNames[segmentName]) {
-            // if high percentage is not checked yet for this segment
-            this.checkedIdx4BlastSegmentNames[segmentName] = [1, 0];
-            this._g.highlightElements(
-              this._g.cy.nodes(`[segmentName = "${segmentName}"]`),
-              HIGHLIGHT_INDEX.blastHighPercentage
-            );
-          } else if (this.checkedIdx4BlastSegmentNames[segmentName][0]) {
-            // if high percentage is checked more than one
-            this.checkedIdx4BlastSegmentNames[segmentName][0]++;
-          } else if (
-            !this.checkedIdx4BlastSegmentNames[segmentName][0] &&
-            this.checkedIdx4BlastSegmentNames[segmentName][1]
-          ) {
-            // if low percentage is checked and high percentage is not checked yet, we transform it to high percentage
-            this.checkedIdx4BlastSegmentNames[segmentName][0] = 1;
-            let element = this._g.cy.nodes(`[segmentName = "${segmentName}"]`);
-            this._g.removeHighlights(element);
-            this._g.highlightElements(
-              element,
-              HIGHLIGHT_INDEX.blastHighPercentage
-            );
-          }
-        } else {
-          // low percentage check, low percentages index is 1
-          if (!this.checkedIdx4BlastSegmentNames[segmentName]) {
-            // if not checked yet
-            this.checkedIdx4BlastSegmentNames[segmentName] = [0, 1];
-            this._g.highlightElements(
-              this._g.cy.nodes(`[segmentName = "${segmentName}"]`),
-              HIGHLIGHT_INDEX.blastLowPercentage
-            );
-          } else {
-            // if low percentage is checked
-            this.checkedIdx4BlastSegmentNames[segmentName][1]++;
-          }
-        }
-      } else if (!highlight && this.checkedIdx4BlastSegmentNames[segmentName]) {
-        // if will be unchecked and highlighted
-        if (
-          this.checkedIdx4BlastSegmentNames[segmentName][0] +
-            this.checkedIdx4BlastSegmentNames[segmentName][1] ==
-          1
-        ) {
-          // if only one is checked either high or low percentage, we remove highlights
-          delete this.checkedIdx4BlastSegmentNames[segmentName];
-          this._g.removeHighlights(
-            this._g.cy.nodes(`[segmentName = "${segmentName}"]`)
-          );
-        } else if (
-          this.checkedIdx4BlastSegmentNames[segmentName][0] == 1 &&
-          this.params.results[idx][3].val >= BLAST_HIGH_PERCENTAGE
-        ) {
-          // if high percentage is checked and it is checked by one, we transform it to low percentage
-          this.checkedIdx4BlastSegmentNames[segmentName][0]--;
-          let element = this._g.cy.nodes(`[segmentName = "${segmentName}"]`);
-          this._g.removeHighlights(element);
-          this._g.highlightElements(
-            element,
-            HIGHLIGHT_INDEX.blastLowPercentage
-          );
-        } else if (
-          this.checkedIdx4BlastSegmentNames[segmentName][0] &&
-          this.params.results[idx][3].val < BLAST_HIGH_PERCENTAGE
-        ) {
-          // if low percentage is checked and it is checked by more than one
-          this.checkedIdx4BlastSegmentNames[segmentName][1]--;
-        } else {
-          // if high and low percentages are checked more than one
-          if (this.params.results[idx][3].val < BLAST_HIGH_PERCENTAGE) {
-            this.checkedIdx4BlastSegmentNames[segmentName][1]--;
-          } else {
-            this.checkedIdx4BlastSegmentNames[segmentName][0]--;
-          }
-        }
-      }
-    }
   }
 
   loadGraph4Checked() {
