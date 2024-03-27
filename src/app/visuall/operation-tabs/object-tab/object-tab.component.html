@@ -237,177 +237,205 @@
         </tbody>
       </table>
 
-      <table
-        *ngIf="selectedItemProps.pathNames"
-        class="table table-responsive table-borderless table-sm"
-      >
-        <div class="path-walk-title">
-          <span class="va-heading1 va-text-center">Paths</span>
-          <input
-            class="btn btn-sm btn-dark va-text m-2 center"
-            type="button"
-            (click)="getPathsSelected()"
-            value="Get Path"
-            title="Get Path"
-          />
-        </div>
-        <tbody>
-          <ng-container
-            *ngFor="let item of selectedItemProps.pathNames.val; let i = index"
+      <div *ngIf="selectedItemProps.pathNames" class="panel">
+        <div
+          class="subpanel-heading collapsed px-1"
+          data-bs-toggle="collapse"
+          data-bs-target="#paths"
+        >
+          <span class="panel-title accordion-toggle"
+            ><span class="va-heading3">Paths</span></span
           >
-            <div class="path-walk-container va-text">
-              <div class="path-walk-item-begin">
-                <div
-                  class="path-walk-name"
-                  (mouseover)="
-                    hightlightHoveredPath(selectedItemProps.pathNames.val[i])
-                  "
-                  (mouseout)="removeHighlightHoveredPathWalk()"
-                  [ngClass]="{
-                    isHoveredPathWalk:
-                      selectedItemProps.pathNames.val[i] === highlightedPathWalk
-                  }"
-                >
-                  <span
-                    ><b>Path name: </b>
-                    {{
-                      pathWalkNameTransform(selectedItemProps.pathNames.val[i])
-                    }}
-                  </span>
-                </div>
-                <div>
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="selectedItemProps.pathChecked[i]"
-                    (change)="setOtherPathsFalse(i)"
-                    title="Select path"
-                  />
-                </div>
-              </div>
-              <div>
-                <div class="path-walk-text-container">
-                  <span>
-                    {{
-                      selectedItemProps.pathSegmentNames[i]
-                        .replaceAll(";", " ")
-                        .replaceAll(",", " ")
-                    }}
-                  </span>
-                </div>
-              </div>
-              <div>
-                <span>
-                  <b>Overlaps </b>
-                </span>
-                <div class="path-walk-text-container">
-                  <span>
-                    {{ selectedItemProps.pathOverlaps[i].replaceAll(",", " ") }}
-                  </span>
-                </div>
-              </div>
+        </div>
+        <div id="paths" class="collapse">
+          <table class="table table-responsive table-borderless table-sm">
+            <div class="path-walk-title">
+              <input
+                class="btn btn-sm btn-dark va-text m-2 center"
+                type="button"
+                (click)="getPathsSelected()"
+                value="Get Path"
+                title="Get Path"
+              />
             </div>
-          </ng-container>
-        </tbody>
-      </table>
+            <tbody>
+              <ng-container
+                *ngFor="
+                  let item of selectedItemProps.pathNames.val;
+                  let i = index
+                "
+              >
+                <div class="path-walk-container va-text">
+                  <div class="path-walk-item-begin">
+                    <div
+                      class="path-walk-name"
+                      (mouseover)="
+                        hightlightHoveredPath(
+                          selectedItemProps.pathNames.val[i]
+                        )
+                      "
+                      (mouseout)="removeHighlightHoveredPathWalk()"
+                      [ngClass]="{
+                        isHoveredPathWalk:
+                          selectedItemProps.pathNames.val[i] ===
+                          highlightedPathWalk
+                      }"
+                    >
+                      <span
+                        ><b>Path name: </b>
+                        {{
+                          pathWalkNameTransform(
+                            selectedItemProps.pathNames.val[i]
+                          )
+                        }}
+                      </span>
+                    </div>
+                    <div>
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="selectedItemProps.pathChecked[i]"
+                        (change)="setOtherPathsFalse(i)"
+                        title="Select path"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div class="path-walk-text-container">
+                      <span>
+                        {{
+                          selectedItemProps.pathSegmentNames[i]
+                            .replaceAll(";", " ")
+                            .replaceAll(",", " ")
+                        }}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <span>
+                      <b>Overlaps </b>
+                    </span>
+                    <div class="path-walk-text-container">
+                      <span>
+                        {{
+                          selectedItemProps.pathOverlaps[i].replaceAll(",", " ")
+                        }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-      <table
-        *ngIf="selectedItemProps.walkSampleIds"
-        class="table table-responsive table-borderless table-sm"
-      >
-        <div class="path-walk-title">
-          <span class="va-heading1 va-text-center">Walks</span>
-          <input
-            class="btn btn-sm btn-dark va-text m-2 center"
-            type="button"
-            (click)="getWalksSelected()"
-            value="Get Walk"
-            title="Get Walk"
-          />
-        </div>
-        <tbody>
-          <ng-container
-            *ngFor="
-              let item of selectedItemProps.walkSampleIds.val;
-              let i = index
-            "
+      <div *ngIf="selectedItemProps.walkSampleIds" class="panel">
+        <div
+          class="subpanel-heading collapsed px-1"
+          data-bs-toggle="collapse"
+          data-bs-target="#walks"
+        >
+          <span class="panel-title accordion-toggle"
+            ><span class="va-heading3">Walks</span></span
           >
-            <div class="path-walk-container va-text">
-              <div class="path-walk-item-begin">
-                <div
-                  class="path-walk-name"
-                  (mouseover)="
-                    hightlightHoveredWalk(
-                      selectedItemProps.walkSampleIds.val[i]
-                    )
-                  "
-                  (mouseout)="removeHighlightHoveredPathWalk()"
-                  [ngClass]="{
-                    isHoveredPathWalk:
-                      selectedItemProps.walkSampleIds.val[i] ===
-                      highlightedPathWalk
-                  }"
-                >
-                  <span
-                    ><b>Walk sample identifier: </b>
-                    {{
-                      pathWalkNameTransform(
-                        selectedItemProps.walkSampleIds.val[i]
-                      )
-                    }}
-                  </span>
-                </div>
-                <div>
-                  <input
-                    type="checkbox"
-                    [(ngModel)]="selectedItemProps.walkChecked[i]"
-                    (change)="setOtherWalksFalse(i)"
-                    title="Select walk"
-                  />
-                </div>
-              </div>
-              <div>
-                <span
-                  ><b>Haplotype index: </b>
-                  {{ selectedItemProps.walkHapIndexes[i] }}
-                </span>
-              </div>
-              <div>
-                <span
-                  ><b>Sequence identifier: </b>
-                  {{ selectedItemProps.walkSeqIds[i] }}
-                </span>
-              </div>
-              <div>
-                <span
-                  ><b>Start position: </b>
-                  {{ selectedItemProps.walkSeqStarts[i] }}
-                </span>
-              </div>
-              <div>
-                <span
-                  ><b>End position: </b>
-                  {{ selectedItemProps.walkSeqEnds[i] }}
-                </span>
-              </div>
-              <div>
-                <span>
-                  <b>Walk </b>
-                </span>
-                <div class="path-walk-text-container">
-                  <span>
-                    {{
-                      selectedItemProps.walks[i]
-                        .replaceAll("\<", " \< ")
-                        .replaceAll("\>", " \> ")
-                        .substring(1)
-                    }}
-                  </span>
-                </div>
-              </div>
+        </div>
+        <div id="walks" class="collapse">
+          <table class="table table-responsive table-borderless table-sm">
+            <div class="path-walk-title">
+              <input
+                class="btn btn-sm btn-dark va-text m-2 center"
+                type="button"
+                (click)="getWalksSelected()"
+                value="Get Walk"
+                title="Get Walk"
+              />
             </div>
-          </ng-container>
-        </tbody>
-      </table>
+            <tbody>
+              <ng-container
+                *ngFor="
+                  let item of selectedItemProps.walkSampleIds.val;
+                  let i = index
+                "
+              >
+                <div class="path-walk-container va-text">
+                  <div class="path-walk-item-begin">
+                    <div
+                      class="path-walk-name"
+                      (mouseover)="
+                        hightlightHoveredWalk(
+                          selectedItemProps.walkSampleIds.val[i]
+                        )
+                      "
+                      (mouseout)="removeHighlightHoveredPathWalk()"
+                      [ngClass]="{
+                        isHoveredPathWalk:
+                          selectedItemProps.walkSampleIds.val[i] ===
+                          highlightedPathWalk
+                      }"
+                    >
+                      <span
+                        ><b>Walk sample identifier: </b>
+                        {{
+                          pathWalkNameTransform(
+                            selectedItemProps.walkSampleIds.val[i]
+                          )
+                        }}
+                      </span>
+                    </div>
+                    <div>
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="selectedItemProps.walkChecked[i]"
+                        (change)="setOtherWalksFalse(i)"
+                        title="Select walk"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <span
+                      ><b>Haplotype index: </b>
+                      {{ selectedItemProps.walkHapIndexes[i] }}
+                    </span>
+                  </div>
+                  <div>
+                    <span
+                      ><b>Sequence identifier: </b>
+                      {{ selectedItemProps.walkSeqIds[i] }}
+                    </span>
+                  </div>
+                  <div>
+                    <span
+                      ><b>Start position: </b>
+                      {{ selectedItemProps.walkSeqStarts[i] }}
+                    </span>
+                  </div>
+                  <div>
+                    <span
+                      ><b>End position: </b>
+                      {{ selectedItemProps.walkSeqEnds[i] }}
+                    </span>
+                  </div>
+                  <div>
+                    <span>
+                      <b>Walk </b>
+                    </span>
+                    <div class="path-walk-text-container">
+                      <span>
+                        {{
+                          selectedItemProps.walks[i]
+                            .replaceAll("\<", " \< ")
+                            .replaceAll("\>", " \> ")
+                            .substring(1)
+                        }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       <app-table-view
         *ngIf="isShowObjTable"

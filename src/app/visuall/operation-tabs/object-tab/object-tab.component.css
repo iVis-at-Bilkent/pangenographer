@@ -41,7 +41,7 @@ td {
 }
 
 .path-walk-container {
-  border-top: 2px solid #65676b;
+  border-top: 1px solid #65676b;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -50,7 +50,7 @@ td {
 .path-walk-title {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 }
 
 .path-walk-name {
@@ -63,7 +63,7 @@ td {
 }
 
 .path-walk-text-container {
-  padding: 1% 0% 1.5% 0%;
+  padding: 0% 0% 1.5% 0%;
   max-height: 200px;
   overflow-wrap: break-word;
   text-align: left;
