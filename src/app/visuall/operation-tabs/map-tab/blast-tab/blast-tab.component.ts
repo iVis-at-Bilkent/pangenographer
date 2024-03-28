@@ -102,6 +102,7 @@ export class BlastTabComponent implements OnInit {
     tableTitle: "Blast Result",
     isEmphasizeOnHover: true,
     isBlastResultTable: true,
+    allChecked: true
   };
 
   standaloneQuery: string = "";
@@ -137,7 +138,7 @@ export class BlastTabComponent implements OnInit {
     this._g.setLoadingStatus(true);
     const q = url + queryParams;
     console.log(q);
-    this._g.statusMsg.next("Executing blast query...");
+    this._g.statusMsg.next("Executing BLAST query...");
 
     let error = (x: any) => {
       this._g.setLoadingStatus(false);
@@ -227,7 +228,7 @@ export class BlastTabComponent implements OnInit {
       this.webRid = match && match[1];
       match = result.match(/^    RTOE = (.*)$/m);
       this.webRtoe = match && match[1];
-      this._g.statusMsg.next("Blast query submitted successfully");
+      this._g.statusMsg.next("BLAST query submitted successfully");
     });
   }
 
@@ -236,7 +237,7 @@ export class BlastTabComponent implements OnInit {
     this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/Status=(\w+)/);
       this.webStatus = match && match[1];
-      this._g.statusMsg.next("Blast query checked successfully");
+      this._g.statusMsg.next("BLAST query checked successfully");
     });
   }
 
@@ -245,7 +246,7 @@ export class BlastTabComponent implements OnInit {
     queryParams += "&FORMAT_TYPE=" + this.webSelectedFormatType;
     this.runWebBlastQuery(queryParams, (result: any) => {
       this.webResult = result;
-      this._g.statusMsg.next("Blast query result retrieved successfully");
+      this._g.statusMsg.next("BLAST query result retrieved successfully");
     });
   }
 
@@ -261,10 +262,6 @@ export class BlastTabComponent implements OnInit {
     let selectedSegmentSeq =
       this._cyService.prepareAllNodesFastaData(selectedSegments);
 
-    if (isStandalone) {
-      this.standaloneQuery = selectedSegmentSeq;
-      return;
-    }
     this.query = selectedSegmentSeq;
   }
 
@@ -361,10 +358,10 @@ export class BlastTabComponent implements OnInit {
       url += "/blastn";
     }
     this._g.setLoadingStatus(true);
-    this._g.statusMsg.next("Executing Blast query...");
+    this._g.statusMsg.next("Executing BLAST query...");
     const errFn = (err: any) => {
-      this._g.statusMsg.next("Blast query execution raised an error!");
-      this._g.showErrorModal("Blast Query Execution Error", err.message);
+      this._g.statusMsg.next("BLAST Query Execution Raised an Error!");
+      this._g.showErrorModal("BLAST Query Execution Error", err.message);
       this._g.setLoadingStatus(false);
     };
     this._http.post(url, requestBody).subscribe((x) => {
@@ -399,7 +396,7 @@ export class BlastTabComponent implements OnInit {
   }
 
   executeStandaloneQueryWithParams() {
-    if (!this.standaloneQuery) {
+    if (!this.query) {
       this._g.showErrorModal(
         "No query sequence",
         "Please enter a query sequence and try again."
@@ -408,7 +405,7 @@ export class BlastTabComponent implements OnInit {
     }
     this.runStandaloneQuery(
       {
-        fastaData: this.standaloneQuery,
+        fastaData: this.query,
         commandLineArguments: this.standaloneCommandLineArguments,
       },
       false,

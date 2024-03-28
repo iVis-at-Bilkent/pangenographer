@@ -73,7 +73,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   clearFilterSubs: Subscription;
   tableColumnLimitSubs: Subscription;
   hoveredElemId = "-";
-  isCheckbox4AllChecked = false;
+  isCheckbox4AllChecked: boolean = false;
 
   elemBadgeMaxPercentages: any = {};
   badgeColor = "#69D96E";
@@ -120,6 +120,15 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this._g.cy.on("remove", (e: any) => {
       this._extTool.destroyBadgePopper(e.target.id(), -1);
     });
+
+    this.checkAll();
+  }
+
+  // Checks all in the page if all conditions are met
+  private checkAll() {
+    if (this.params.allChecked) {
+      setTimeout(() => this.checkbox4AllChanged(), 50);
+    }
   }
 
   private resetHoverEvents() {
@@ -200,7 +209,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this.isLoading = false;
     this.checkedIdx = {};
     this.elemBadgeMaxPercentages = {};
-    this.isCheckbox4AllChecked = false;
+    this.isCheckbox4AllChecked = this.params.allChecked;
     if (this.params.results && this.params.results.length > 0) {
       this.isShowTable = true;
     } else if (this.filterTxt.length == 0) {
@@ -262,7 +271,8 @@ export class TableViewComponent implements OnInit, OnDestroy {
   }
 
   pageChanged(newPage: number) {
-    this.isCheckbox4AllChecked = false;
+    this.isCheckbox4AllChecked = this.params.allChecked;
+    this.checkAll();
     let o = this.params.columns[this.sortingIdx];
     let skip = (newPage - 1) * this.params.pageSize;
     this.onFilteringChanged.emit({

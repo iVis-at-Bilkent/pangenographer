@@ -29,7 +29,7 @@
           <textarea
             (change)="onQueryChange($event)"
             [(ngModel)]="query"
-            class="form-control std-inp-hei va-small-text w5-5"
+            class="form-control blast-sequence-input va-small-text w5-5"
             rows="1"
             placeholder="Accession, GI, or FASTA."
           ></textarea>
@@ -71,13 +71,13 @@
             id="enableMegaBlast"
             title="Enable MegaBlast"
           />
-          <label class="va-text">Enable MegaBlast</label>
+          <label class="va-text">Enable MegaBLAST</label>
         </div>
       </div>
 
       <div class="form-inline blast-option">
         <label class="va-text blast-option-label"
-          >Search request identifier (RID)</label
+          >Search Request Identifier (RID)</label
         >
         <textarea
           (change)="onWebRIDChange($event)"
@@ -85,6 +85,12 @@
           class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
           placeholder="The Request ID (RID) returned when the search was submitted"
         ></textarea>
+      </div>
+
+      <div *ngIf="webRtoe" class="form-inline blast-option">
+        <label class="va-text blast-option-label"
+          >Estimated Request Time of Execution(RTOE): {{ webRtoe }}
+        </label>
       </div>
 
       <div class="form-inline blast-option">
@@ -108,13 +114,13 @@
         <div
           class="subpanel-heading collapsed px-1"
           data-bs-toggle="collapse"
-          data-bs-target="#formatTypeParameters"
+          data-bs-target="#formatTypeOptions"
         >
           <span class="panel-title accordion-toggle"
-            ><span class="va-heading3">Format Type Parameters</span></span
+            ><span class="va-heading3">Format Type Options</span></span
           >
         </div>
-        <div id="formatTypeParameters" class="collapse">
+        <div id="formatTypeOptions" class="collapse">
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label">NCBI GenInfo</label>
             <select
@@ -209,13 +215,13 @@
         <div
           class="subpanel-heading collapsed px-1"
           data-bs-toggle="collapse"
-          data-bs-target="#algorithmParameters"
+          data-bs-target="#algorithmOptions"
         >
           <span class="panel-title accordion-toggle"
-            ><span class="va-heading3">Algorithm Parameters</span></span
+            ><span class="va-heading3">Algorithm Options</span></span
           >
         </div>
-        <div id="algorithmParameters" class="collapse">
+        <div id="algorithmOptions" class="collapse">
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label"
               >Expect Threshold (0 for undefined)</label
@@ -398,12 +404,6 @@
       </div>
 
       <div class="va-text">
-        <div *ngIf="webRid">
-          Last RID: <strong>{{ webRid }}</strong>
-        </div>
-        <div *ngIf="webRtoe">
-          Last RTOE: <strong>{{ webRtoe }}</strong>
-        </div>
         <div *ngIf="webStatus">
           Last Status: <strong>{{ webStatus }}</strong>
         </div>
@@ -435,18 +435,6 @@
       </div>
 
       <div>
-        <label class="va-text">Command Line Arguments</label>
-        <div class="form-inline">
-          <textarea
-            (change)="onStandaloneCommandLineArgumentsChange($event)"
-            [(ngModel)]="standaloneCommandLineArguments"
-            class="form-control std-inp-hei va-small-text w5-5 h-10"
-            placeholder="Command line arguments for blastn."
-          ></textarea>
-        </div>
-      </div>
-
-      <div>
         <div class="top-button">
           <input
             class="btn btn-sm btn-dark va-text m-2 center"
@@ -459,10 +447,22 @@
         <div class="form-inline blast-option">
           <textarea
             (change)="onQueryChange($event)"
-            [(ngModel)]="standaloneQuery"
-            class="form-control std-inp-hei va-small-text w5-5"
+            [(ngModel)]="query"
+            class="form-control blast-sequence-input va-small-text w5-5"
             rows="1"
             placeholder="Accession, GI, or FASTA."
+          ></textarea>
+        </div>
+      </div>
+
+      <div>
+        <label class="va-text">Command Line Arguments</label>
+        <div class="form-inline">
+          <textarea
+            (change)="onStandaloneCommandLineArgumentsChange($event)"
+            [(ngModel)]="standaloneCommandLineArguments"
+            class="form-control std-inp-hei va-small-text w5-5 h-10"
+            placeholder="Command line arguments for blastn."
           ></textarea>
         </div>
       </div>

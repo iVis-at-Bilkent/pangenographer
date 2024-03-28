@@ -32,6 +32,7 @@ export interface TableViewInput {
   classNameOfObjects?: string;
   classNames?: string[];
   isBlastResultTable?: boolean;
+  allChecked?: boolean;
 }
 
 export interface TableFiltering {

@@ -51,6 +51,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     isLoadGraph: false,
     isMergeGraph: true,
     isNodeData: true,
+    allChecked: false
   };
   tableFilter: TableFiltering = {
     orderBy: null,

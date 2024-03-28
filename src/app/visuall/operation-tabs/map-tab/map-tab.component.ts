@@ -66,6 +66,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
     isMergeGraph: true,
     isNodeData: true,
     isReplace_inHeaders: true,
+    allChecked: false
   };
   tableFilled = new Subject<boolean>();
   isClassTypeLocked: boolean;

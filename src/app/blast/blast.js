@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
 
-// Blast files path on the server
+// BLAST files path on the server
 // This should be changed for individual users
 const filePath = "/home/ivis/visuall/pangenographer/src/app/blast/";
 

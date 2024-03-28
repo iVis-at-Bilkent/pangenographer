@@ -37,3 +37,7 @@
 textarea.form-control {
   resize: vertical;
 }
+
+.blast-sequence-input {
+  height: 15em;
+}

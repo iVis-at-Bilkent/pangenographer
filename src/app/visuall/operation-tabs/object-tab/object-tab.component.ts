@@ -54,6 +54,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     isNodeData: false,
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
+    allChecked: false
   };
 
   multiObjTableInp: TableViewInput = {
@@ -72,6 +73,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     isNodeData: false,
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
+    allChecked: false
   };
 
   private NODE_TYPE = "_NODE_";
@@ -789,7 +791,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     setTimeout(() => this.tableFilled.next(true), 100);
   }
 
-  private increaseCountInObj(obj, p1: string, p2: string) {
+  private increaseCountInObj(obj: any, p1: string, p2: string) {
     if (obj[p1]) {
       if (obj[p1][p2] === undefined) {
         obj[p1][p2] = 1;
