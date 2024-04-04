@@ -11,6 +11,13 @@ import {
 } from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
+
+interface webDatabaseType {
+  name: string;
+  value: string;
+  types: string[];
+}
+
 @Component({
   selector: "app-blast-tab",
   templateUrl: "./blast-tab.component.html",
@@ -22,7 +29,126 @@ export class BlastTabComponent implements OnInit {
   selectedType: string = "Standalone service";
   selectedTypeIdx: number = 0;
 
-  webDatabase: string = "nr";
+  // Web service variables
+  webDatabases: webDatabaseType[] = [
+    {
+      name: "Non-redundant nucleotide sequences (nt)",
+      value: "nt",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Non-redundant protein sequences (nr)",
+      value: "nr",
+      types: ["blastn", "blastp", "blastx", "tblastn", "tblastx"],
+    },
+    {
+      name: "RefSeq Select RNA sequences (refseq_select)",
+      value: "refseq_select",
+      types: ["blastn", "blastp", "blastx", "tblastn", "tblastx"],
+    },
+    {
+      name: "Reference proteins (refseq_protein)",
+      value: "refseq_protein",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Model Organisms (landmark)",
+      value: "landmark",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Swiss-Prot (swissprot)",
+      value: "swissprot",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Patended protein sequences (pataa)",
+      value: "pataa",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Reference RNA sequences (refseq_rna)",
+      value: "refseq_rna",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "RetSeq Representative genomes (retseq_representative_genomes)",
+      value: "retseq_representative_genomes",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "RetSeq Genome Database (retseq_genomes)",
+      value: "retseq_genomes",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Whole-genome shotgun contigs (wgs)",
+      value: "wgs",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Expressed sequence tags (est)",
+      value: "est",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Sequence Read Archive (SRA)",
+      value: "SRA",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Transcriptome Shotgun Assembly (TSA)",
+      value: "TSA",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Targeted Loci (TLS)",
+      value: "TLS",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "High throughput genomic sequences (HTGS)",
+      value: "HTGS",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Patent sequences (pat)",
+      value: "pat",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Protein Data Bank (pdb)",
+      value: "pdb",
+      types: ["blastn", "blastp", "blastx", "tblastn", "tblastx"],
+    },
+    {
+      name: "Metagenomic sequences (env_nr)",
+      value: "env_nr",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Transcriptome Shotgun Assembly proteins (tsa_nr)",
+      value: "tsa_nr",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Human RefSeqGene sequences(RefSeq_Gene)",
+      value: "RefSeq_Gene",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Genomic survey sequences (gss)",
+      value: "gss",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Sequence tagged sites (dbsts)",
+      value: "dbsts",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+  ];
+  webSelectedDatabaseName: string = this.webDatabases[0].name;
+  webSelectedDatabase: webDatabaseType = this.webDatabases[0];
   webPrograms: string[] = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
   webSelectedProgram: string = "blastn";
   webEnableMegaBlast: boolean = false;
@@ -71,6 +197,7 @@ export class BlastTabComponent implements OnInit {
   webResult: string = "";
   webResultTableInput: string = "";
 
+  // Standalone service variables
   standaloneTableOutput: TableViewInput = {
     results: [],
     columns: [
@@ -102,9 +229,8 @@ export class BlastTabComponent implements OnInit {
     tableTitle: "Blast Result",
     isEmphasizeOnHover: true,
     isBlastResultTable: true,
-    allChecked: true
+    allChecked: true,
   };
-
   standaloneQuery: string = "";
   standaloneStatus: string = "";
   standaloneUrl: string = environment.blastStandaloneUrl;
@@ -162,8 +288,8 @@ export class BlastTabComponent implements OnInit {
       );
       return;
     }
-    if (this.webDatabase) {
-      queryParams += "&DATABASE=" + this.webDatabase;
+    if (this.webSelectedDatabaseName) {
+      queryParams += "&DATABASE=" + this.webSelectedDatabase.value;
     } else {
       this._g.showErrorModal(
         "No database selected",
@@ -250,7 +376,7 @@ export class BlastTabComponent implements OnInit {
     });
   }
 
-  fillQueryTextareaWithSelectedSegmentsSequence(isStandalone: boolean = false) {
+  fillQueryTextareaWithSelectedSegmentsSequence() {
     const selectedSegments = this._g.cy.$(":selected");
     if (selectedSegments.length == 0) {
       this._g.showErrorModal(
@@ -269,12 +395,39 @@ export class BlastTabComponent implements OnInit {
     this.query = event.target.value.trim();
   }
 
+  // Set web database for selected program
+  // Set selected database object for selected database name
   onWebDatabaseChange(event: any) {
-    this.webDatabase = event.target.value.trim();
+    this.webSelectedDatabaseName = event.target.value.trim();
+    this.webSelectedDatabase = this.webDatabases.find(
+      (x) => x.name === this.webSelectedDatabaseName
+    );
   }
 
+  // Get web databases for selected program
+  getWebDatabasesNameForSelectedProgram() {
+    return this.webDatabases
+      .filter((x) => x.types.includes(this.webSelectedProgram))
+      .map((x) => x.name);
+  }
+
+  // Set web database for selected program
+  // Set default database for selected program
   onWebProgramChange(event: any) {
     this.webSelectedProgram = event.target.value.trim();
+
+    if (
+      this.webSelectedProgram === "blastp" ||
+      this.webSelectedProgram === "blastx"
+    ) {
+      this.onWebDatabaseChange({
+        target: { value: this.webDatabases[1].name },
+      });
+    } else {
+      this.onWebDatabaseChange({
+        target: { value: this.webDatabases[0].name },
+      });
+    }
   }
 
   onWebMegaBlastChange(event: any) {

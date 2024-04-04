@@ -20,7 +20,7 @@
           <input
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
-            (click)="fillQueryTextareaWithSelectedSegmentsSequence(true)"
+            (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
             value="Get Selected Segment's Sequence"
             title="Get Selected Segment's Sequence"
           />
@@ -38,12 +38,22 @@
 
       <div class="form-inline blast-option">
         <label class="va-text blast-option-label">Database</label>
-        <textarea
+        <select
+          class="form-select tight-select filter-form va-small-text inp-4-char w-auto blast-option-label"
           (change)="onWebDatabaseChange($event)"
-          [(ngModel)]="webDatabase"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
-          placeholder="Database from appendix 2 or one uploaded to blastdb_custom (see appendix 4)"
-        ></textarea>
+          title="Database"
+          [(ngModel)]="webSelectedDatabaseName"
+        >
+          <option
+            *ngFor="
+              let database of getWebDatabasesNameForSelectedProgram();
+              let i = index
+            "
+            [value]="database"
+          >
+            {{ database }}
+          </option>
+        </select>
       </div>
 
       <div class="form-inline blast-option">
@@ -90,6 +100,12 @@
       <div *ngIf="webRtoe" class="form-inline blast-option">
         <label class="va-text blast-option-label"
           >Estimated Request Time of Execution(RTOE): {{ webRtoe }}
+        </label>
+      </div>
+
+      <div *ngIf="webStatus" class="form-inline blast-option">
+        <label class="va-text blast-option-label"
+          >Search Request Status: <strong>{{ webStatus }}</strong>
         </label>
       </div>
 
@@ -404,9 +420,6 @@
       </div>
 
       <div class="va-text">
-        <div *ngIf="webStatus">
-          Last Status: <strong>{{ webStatus }}</strong>
-        </div>
         <div *ngIf="webResult">
           <p>Last Result</p>
           <pre class="result">{{ webResult }}</pre>
@@ -439,7 +452,7 @@
           <input
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
-            (click)="fillQueryTextareaWithSelectedSegmentsSequence(true)"
+            (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
             value="Get Selected Segment's Sequence"
             title="Get Selected Segment's Sequence"
           />

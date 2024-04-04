@@ -161,7 +161,7 @@
     "isAutoIncrementalLayoutOnChange": true,
     "isHighlightOnHover": false,
     "isShowOverviewWindow": false,
-    "isShowEdgeLabels": true,
+    "isShowEdgeLabels": false,
     "isTileDisconnectedOnLayout": true,
     "isIgnoreCaseInText": false,
     "isOnlyHighlight4LatestQuery": true,
