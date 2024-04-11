@@ -16,6 +16,7 @@ import {
   BADGE_DEFAULT_NODE_SIZE,
   EV_MOUSE_OFF,
   EV_MOUSE_ON,
+  TABLE_ALL_CHECK_DELAY,
   debounce,
 } from "../../visuall/constants";
 import { CytoscapeService } from "../../visuall/cytoscape.service";
@@ -120,13 +121,14 @@ export class TableViewComponent implements OnInit, OnDestroy {
       this._extTool.destroyBadgePopper(e.target.id(), -1);
     });
 
+    // If table is loaded with allChecked true, check all checkboxes
     this.checkAll();
   }
 
-  // Checks all in the page if all conditions are met
+  // Checks all in the page if all conditions are met with the help of a delay
   private checkAll() {
     if (this.params.allChecked) {
-      setTimeout(() => this.checkbox4AllChanged(), 50);
+      setTimeout(() => this.checkbox4AllChanged(), TABLE_ALL_CHECK_DELAY);
     }
   }
 
