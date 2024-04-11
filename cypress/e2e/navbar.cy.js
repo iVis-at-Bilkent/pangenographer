@@ -204,7 +204,7 @@ context("Navbar buttons", () => {
     });
 
     navbarAction("Highlight", "Search...");
-    const inpId = "highlight-search-inp";
+    const inpId = "highlight-search-input";
     cy.focused().should("have.attr", "id").and("equal", inpId);
 
     cy.get("#" + inpId).type("a");

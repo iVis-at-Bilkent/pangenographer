@@ -24,7 +24,7 @@ export class TypesViewComponent implements OnInit, OnDestroy {
     willBeShowed: boolean;
   }>();
   @Input() classList: string[];
-  dataModelSubs: Subscription;
+  dataModelSubscription: Subscription;
 
   constructor(private _g: GlobalVariableService) {
     this.nodeClasses = new Set([]);
@@ -32,7 +32,7 @@ export class TypesViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataModelSubs = this._g.dataModel.subscribe((x) => {
+    this.dataModelSubscription = this._g.dataModel.subscribe((x) => {
       if (x) {
         for (const key in x.nodes) {
           if (
@@ -73,8 +73,8 @@ export class TypesViewComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.dataModelSubs) {
-      this.dataModelSubs.unsubscribe();
+    if (this.dataModelSubscription) {
+      this.dataModelSubscription.unsubscribe();
     }
   }
 }

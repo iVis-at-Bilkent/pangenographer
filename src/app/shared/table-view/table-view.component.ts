@@ -19,7 +19,7 @@ import {
   debounce,
 } from "../../visuall/constants";
 import { CytoscapeService } from "../../visuall/cytoscape.service";
-import { GraphElem } from "../../visuall/db-service/data-types";
+import { GraphElement } from "../../visuall/db-service/data-types";
 import { ExternalToolService } from "../../visuall/external-tool.service";
 import { GlobalVariableService } from "../../visuall/global-variable.service";
 import {
@@ -61,21 +61,21 @@ export class TableViewComponent implements OnInit, OnDestroy {
   position: IPosition = { x: 0, y: 0 };
   filterTxt: string = "";
   sortDirection: "asc" | "desc" | "" = "";
-  sortingIdx: number = -1;
+  sortingIndex: number = -1;
   isLoading: boolean = false;
   isShowTable: boolean = false;
   filterTxtChanged: () => void;
   @ViewChild("dynamicDiv", { static: false }) dynamicDiv;
-  checkedIdx: any = {};
+  checkedIndex: any = {};
   emphasizeRowFn: Function;
-  higlightOnHoverSubs: Subscription;
-  tableFillSubs: Subscription;
-  clearFilterSubs: Subscription;
-  tableColumnLimitSubs: Subscription;
-  hoveredElemId = "-";
+  higlightOnHoverSubscription: Subscription;
+  tableFillSubscription: Subscription;
+  clearFilterSubscription: Subscription;
+  tableColumnLimitSubscription: Subscription;
+  hoveredElementId = "-";
   isCheckbox4AllChecked: boolean = false;
 
-  elemBadgeMaxPercentages: any = {};
+  elementBadgeMaxPercentages: any = {};
   badgeColor = "#69D96E";
 
   @Input() params: TableViewInput;
@@ -84,7 +84,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   @Output() onFilteringChanged = new EventEmitter<TableFiltering>();
   @Output() onDataForQueryResult = new EventEmitter<{
     dbIds: string[];
-    tableIdx: number[];
+    tableIndex: number[];
   }>();
 
   constructor(
@@ -95,20 +95,19 @@ export class TableViewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.tableFillSubs = this.tableFilled.subscribe(
+    this.tableFillSubscription = this.tableFilled.subscribe(
       this.onTableFilled.bind(this)
     );
-    this.clearFilterSubs = this.clearFilter.subscribe(
+    this.clearFilterSubscription = this.clearFilter.subscribe(
       this.onClearFilter.bind(this)
     );
-    this.tableColumnLimitSubs = this._g.userPrefs.tableColumnLimit.subscribe(
-      (x) => {
+    this.tableColumnLimitSubscription =
+      this._g.userPreferences.tableColumnLimit.subscribe((x) => {
         this.columnLimit = x;
         if (this.params.columnLimit) {
           this.columnLimit = this.params.columnLimit;
         }
-      }
-    );
+      });
     this.highlighterFn = this._cyService.highlightNeighbors();
     this.position.x = 0;
     this.position.y = 0;
@@ -136,15 +135,14 @@ export class TableViewComponent implements OnInit, OnDestroy {
     if (!this.params.isEmphasizeOnHover) {
       return;
     }
-    this.higlightOnHoverSubs = this._g.userPrefs.isHighlightOnHover.subscribe(
-      (x) => {
+    this.higlightOnHoverSubscription =
+      this._g.userPreferences.isHighlightOnHover.subscribe((x) => {
         if (x) {
           this.bindHoverListener();
         } else {
           this.unbindHoverListener();
         }
-      }
-    );
+      });
   }
 
   private bindHoverListener() {
@@ -152,7 +150,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
       return;
     }
     this.emphasizeRowFn = debounce(
-      this.elemHovered.bind(this),
+      this.elementHovered.bind(this),
       this.EMPHASIZE_DEBOUNCE
     ).bind(this);
     if (this.params.isNodeData) {
@@ -173,42 +171,42 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unbindHiglightOnHovers();
-    if (this.tableColumnLimitSubs) {
-      this.tableColumnLimitSubs.unsubscribe();
+    if (this.tableColumnLimitSubscription) {
+      this.tableColumnLimitSubscription.unsubscribe();
     }
-    if (this.clearFilterSubs) {
-      this.clearFilterSubs.unsubscribe();
+    if (this.clearFilterSubscription) {
+      this.clearFilterSubscription.unsubscribe();
     }
-    if (this.tableFillSubs) {
-      this.tableFillSubs.unsubscribe();
+    if (this.tableFillSubscription) {
+      this.tableFillSubscription.unsubscribe();
     }
   }
 
   unbindHiglightOnHovers() {
-    if (this.higlightOnHoverSubs) {
-      this.higlightOnHoverSubs.unsubscribe();
+    if (this.higlightOnHoverSubscription) {
+      this.higlightOnHoverSubscription.unsubscribe();
     }
     this.unbindHoverListener();
   }
 
-  private elemHovered(e: any) {
+  private elementHovered(e: any) {
     this._ngZone.run(() => {
       if (e.type == "mouseover") {
         if (this.params.isUseCySelector4Highlight) {
-          this.hoveredElemId = "#" + e.target.id();
+          this.hoveredElementId = "#" + e.target.id();
         } else {
-          this.hoveredElemId = e.target.id().substr(1);
+          this.hoveredElementId = e.target.id().substr(1);
         }
       } else {
-        this.hoveredElemId = "-";
+        this.hoveredElementId = "-";
       }
     });
   }
 
   private onTableFilled() {
     this.isLoading = false;
-    this.checkedIdx = {};
-    this.elemBadgeMaxPercentages = {};
+    this.checkedIndex = {};
+    this.elementBadgeMaxPercentages = {};
     this.isCheckbox4AllChecked = this.params.allChecked;
     if (this.params.results && this.params.results.length > 0) {
       this.isShowTable = true;
@@ -221,7 +219,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
   private onClearFilter() {
     this.filterTxt = "";
-    this.sortingIdx = -1;
+    this.sortingIndex = -1;
     this.sortDirection = "";
   }
 
@@ -229,7 +227,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.onFilteringChanged.emit({
       txt: this.filterTxt,
-      orderBy: this.params.columns[this.sortingIdx],
+      orderBy: this.params.columns[this.sortingIndex],
       orderDirection: this.sortDirection,
     });
   }
@@ -237,7 +235,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   onMouseEnter(id: string) {
     if (
       this.params.isDisableHover ||
-      !this._g.userPrefs.isHighlightOnHover.getValue()
+      !this._g.userPreferences.isHighlightOnHover.getValue()
     ) {
       return;
     }
@@ -255,7 +253,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   onMouseExit(id: string) {
     if (
       this.params.isDisableHover ||
-      !this._g.userPrefs.isHighlightOnHover.getValue()
+      !this._g.userPreferences.isHighlightOnHover.getValue()
     ) {
       return;
     }
@@ -273,7 +271,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   pageChanged(newPage: number) {
     this.isCheckbox4AllChecked = this.params.allChecked;
     this.checkAll();
-    let o = this.params.columns[this.sortingIdx];
+    let o = this.params.columns[this.sortingIndex];
     let skip = (newPage - 1) * this.params.pageSize;
     this.onFilteringChanged.emit({
       txt: this.filterTxt,
@@ -304,14 +302,14 @@ export class TableViewComponent implements OnInit, OnDestroy {
       if (this.params.columnLimit) {
         this.columnLimit = this.params.columnLimit;
       } else {
-        this.columnLimit = this._g.userPrefs.tableColumnLimit.getValue();
+        this.columnLimit = this._g.userPreferences.tableColumnLimit.getValue();
       }
     }
   }
 
   columnClicked(i: number) {
     this.isLoading = true;
-    this.sortingIdx = i;
+    this.sortingIndex = i;
     let o = this.params.columns[i];
     if (this.sortDirection == "asc") {
       this.sortDirection = "desc";
@@ -328,21 +326,21 @@ export class TableViewComponent implements OnInit, OnDestroy {
   }
 
   checkboxChanged(
-    idx: number,
+    index: number,
     t: EventTarget = undefined, // undefined for setting checked status
     forceCheck?: boolean
   ) {
     if (t !== undefined) {
       const isChecked = (<HTMLInputElement>t).checked;
       if (isChecked) {
-        this.checkedIdx[idx] = true;
+        this.checkedIndex[index] = true;
       } else {
-        delete this.checkedIdx[idx];
+        delete this.checkedIndex[index];
       }
-    } else if (forceCheck && !this.checkedIdx[idx]) {
-      this.checkedIdx[idx] = true;
-    } else if (!forceCheck && this.checkedIdx[idx]) {
-      delete this.checkedIdx[idx];
+    } else if (forceCheck && !this.checkedIndex[index]) {
+      this.checkedIndex[index] = true;
+    } else if (!forceCheck && this.checkedIndex[index]) {
+      delete this.checkedIndex[index];
     }
 
     if (
@@ -355,17 +353,17 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
   private placeBlastTableResultBadges() {
     this._extTool.destroyCurrentBadgePoppers();
-    this.elemBadgeMaxPercentages = {};
+    this.elementBadgeMaxPercentages = {};
 
-    for (let idx in this.checkedIdx) {
-      let segmentName = this.params.results[idx][2].val;
-      let percentage = this.params.results[idx][3].val;
-      if (!this.elemBadgeMaxPercentages[segmentName]) {
-        this.elemBadgeMaxPercentages[segmentName] = percentage;
+    for (let index in this.checkedIndex) {
+      let segmentName = this.params.results[index][2].value;
+      let percentage = this.params.results[index][3].value;
+      if (!this.elementBadgeMaxPercentages[segmentName]) {
+        this.elementBadgeMaxPercentages[segmentName] = percentage;
       } else {
-        this.elemBadgeMaxPercentages[segmentName] = Math.max(
+        this.elementBadgeMaxPercentages[segmentName] = Math.max(
           percentage,
-          this.elemBadgeMaxPercentages[segmentName]
+          this.elementBadgeMaxPercentages[segmentName]
         );
       }
     }
@@ -382,10 +380,10 @@ export class TableViewComponent implements OnInit, OnDestroy {
       100,
       BADGE_DEFAULT_NODE_SIZE
     );
-    for (let segmentName in this.elemBadgeMaxPercentages) {
+    for (let segmentName in this.elementBadgeMaxPercentages) {
       let badges = [];
-      badges.push(this.elemBadgeMaxPercentages[segmentName]);
-      this._extTool.generateBadge4Elem(
+      badges.push(this.elementBadgeMaxPercentages[segmentName]);
+      this._extTool.generateBadge4Element(
         this._g.cy.nodes(`[segmentName = "${segmentName}"]`)[0],
         badges
       );
@@ -396,36 +394,36 @@ export class TableViewComponent implements OnInit, OnDestroy {
   loadGraph4Checked() {
     // index 0 keeps database IDs
     let dbIds = this.params.results
-      .filter((_, i) => this.checkedIdx[i])
-      .map((x) => x[0].val) as string[];
-    let idxes = [];
-    for (let i in this.checkedIdx) {
-      idxes.push(Number(i) + 1);
+      .filter((_, i) => this.checkedIndex[i])
+      .map((x) => x[0].value) as string[];
+    let indexes = [];
+    for (let i in this.checkedIndex) {
+      indexes.push(Number(i) + 1);
     }
     if (dbIds.length > 0) {
-      this.onDataForQueryResult.emit({ dbIds: dbIds, tableIdx: idxes });
+      this.onDataForQueryResult.emit({ dbIds: dbIds, tableIndex: indexes });
     }
   }
 
   checkbox4AllChanged() {
-    let elems = this.dynamicDiv.nativeElement.querySelectorAll(".row-cb");
-    let elemsArr: HTMLInputElement[] = [];
-    for (let i = 0; i < elems.length; i++) {
-      elemsArr.push(elems[i] as HTMLInputElement);
+    let elements = this.dynamicDiv.nativeElement.querySelectorAll(".row-cb");
+    let elementsArray: HTMLInputElement[] = [];
+    for (let i = 0; i < elements.length; i++) {
+      elementsArray.push(elements[i] as HTMLInputElement);
     }
-    elemsArr = elemsArr.filter((x) => !x.parentElement.hidden);
+    elementsArray = elementsArray.filter((x) => !x.parentElement.hidden);
 
     if (this.isCheckbox4AllChecked) {
       for (let i = 0; i < this.params.results.length; i++) {
         this.checkboxChanged(i, undefined, true);
-        elemsArr[i].checked = true;
-        this.checkedIdx[i] = true;
+        elementsArray[i].checked = true;
+        this.checkedIndex[i] = true;
       }
     } else {
-      for (let i = 0; i < elemsArr.length; i++) {
+      for (let i = 0; i < elementsArray.length; i++) {
         this.checkboxChanged(i, undefined, false);
-        elemsArr[i].checked = false;
-        delete this.checkedIdx[i];
+        elementsArray[i].checked = false;
+        delete this.checkedIndex[i];
       }
     }
   }
@@ -444,13 +442,13 @@ export class TableViewComponent implements OnInit, OnDestroy {
     let rows = this.params.results;
     let cNames = this.params.classNames;
     if (!this.params.isLoadGraph) {
-      rows = rows.filter((_, i) => this.checkedIdx[i]);
+      rows = rows.filter((_, i) => this.checkedIndex[i]);
       if (cNames) {
-        cNames = cNames.filter((_, i) => this.checkedIdx[i]);
+        cNames = cNames.filter((_, i) => this.checkedIndex[i]);
       }
     }
     const props = this._g.dataModel.getValue();
-    let objs: GraphElem[] = [];
+    let objects: GraphElement[] = [];
     let prefix = this.params.isNodeData ? "n" : "e";
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
@@ -466,15 +464,15 @@ export class TableViewComponent implements OnInit, OnDestroy {
       const data = {};
       // first index is for ID
       for (let i = 1; i < r.length; i++) {
-        data[this.params.columns[i - 1]] = r[i].val;
+        data[this.params.columns[i - 1]] = r[i].value;
       }
-      data["id"] = prefix + r[0].val;
+      data["id"] = prefix + r[0].value;
       if (this.params.isUseCySelector4Highlight) {
-        data["id"] = r[0].val.substr(1);
+        data["id"] = r[0].value.substr(1);
       }
-      objs.push({ classes: cName, data: data });
+      objects.push({ classes: cName, data: data });
     }
-    this._cyService.saveAsCSV(objs);
+    this._cyService.saveAsCSV(objects);
   }
 
   truncateData(data: string): string {

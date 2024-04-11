@@ -8,7 +8,7 @@
     [includeBorders]="true"
     [extraWidth]="3"
     type="text"
-    class="form-control va-small-text std-inp-hei"
+    class="form-control va-small-text standart-input-height"
     placeholder="Search..."
     [(ngModel)]="filterTxt"
     (ngModelChange)="filterTxtChanged()"
@@ -120,7 +120,7 @@
               {{
                 params.isReplace_inHeaders ? (col | replace : "[_]" : " ") : col
               }}
-              <span *ngIf="sortingIdx == i">
+              <span *ngIf="sortingIndex == i">
                 <span *ngIf="sortDirection == 'asc'">&#9650;</span>
                 <span *ngIf="sortDirection == 'desc'">&#9660;</span>
               </span>
@@ -146,27 +146,27 @@
       <tbody>
         <tr
           *ngFor="let r of params.results; let i = index"
-          (mouseenter)="onMouseEnter(r[0].val)"
-          (mouseleave)="onMouseExit(r[0].val)"
-          [ngClass]="{ 'highlighted-row': hoveredElemId == r[0].val }"
+          (mouseenter)="onMouseEnter(r[0].value)"
+          (mouseleave)="onMouseExit(r[0].value)"
+          [ngClass]="{ 'highlighted-row': hoveredElementId == r[0].value }"
         >
           <td scope="row">
-            {{ (params.currPage - 1) * params.pageSize + i + 1 }}
+            {{ (params.currentPage - 1) * params.pageSize + i + 1 }}
           </td>
           <td *ngFor="let e of r | slice : 1 : columnLimit + 1; let j = index">
             <span *ngIf="e.type == 0 || e.type == 3">
               <ngb-highlight
-                [result]="e.val"
+                [result]="e.value"
                 [term]="filterTxt"
               ></ngb-highlight>
             </span>
-            <span *ngIf="e.type == 1 && (e.val != 0 || !params.isHide0)">{{
-              e.val | number : "1.0-2"
+            <span *ngIf="e.type == 1 && (e.value != 0 || !params.isHide0)">{{
+              e.value | number : "1.0-2"
             }}</span>
-            <div *ngIf="e.type == 4" [table-tooltip]="e.val">
+            <div *ngIf="e.type == 4" [table-tooltip]="e.value">
               <span>
                 <ngb-highlight
-                  [result]="truncateData(e.val)"
+                  [result]="truncateData(e.value)"
                   [term]="filterTxt"
                 ></ngb-highlight>
               </span>
@@ -188,12 +188,15 @@
       </tbody>
     </table>
   </div>
-  <div class="va-text overflow-auto" *ngIf="params.resultCnt > params.pageSize">
+  <div
+    class="va-text overflow-auto"
+    *ngIf="params.resultCount > params.pageSize"
+  >
     <ngb-pagination
       class="d-flex justify-content-center m-2"
       (pageChange)="pageChanged($event)"
-      [collectionSize]="params.resultCnt"
-      [(page)]="params.currPage"
+      [collectionSize]="params.resultCount"
+      [(page)]="params.currentPage"
       [pageSize]="params.pageSize"
       [maxSize]="2"
       [rotate]="true"

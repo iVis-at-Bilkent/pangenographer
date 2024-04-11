@@ -6,7 +6,7 @@ export enum TableDataType {
 }
 
 export interface TableData {
-  val: any;
+  value: any;
   type: TableDataType;
 }
 
@@ -16,9 +16,9 @@ export interface TableViewInput {
   columns: string[];
   isLoadGraph: boolean;
   isMergeGraph: boolean;
-  currPage: number;
+  currentPage: number;
   pageSize: number;
-  resultCnt: number;
+  resultCount: number;
   isNodeData: boolean;
   isShowExportAsCSV: boolean;
   columnLimit?: number;
@@ -44,14 +44,14 @@ export interface TableFiltering {
 
 export interface TableRowMeta {
   dbIds: string[];
-  tableIdx: number[];
+  tableIndex: number[];
 }
 
 export function property2TableData(
   properties: any,
   enumMapping: any,
   propName: string,
-  propVal: any,
+  propValue: any,
   className: string,
   isEdge: boolean
 ): TableData {
@@ -64,29 +64,29 @@ export function property2TableData(
   }
 
   if (type === undefined || type == null) {
-    return { val: propVal, type: TableDataType.string };
+    return { value: propValue, type: TableDataType.string };
   } else if (type.startsWith("enum")) {
-    const mapping = enumMapping[className][propName][propVal];
+    const mapping = enumMapping[className][propName][propValue];
     if (mapping) {
-      return { val: mapping, type: TableDataType.enum };
+      return { value: mapping, type: TableDataType.enum };
     }
-    return { val: propVal, type: TableDataType.string };
+    return { value: propValue, type: TableDataType.string };
   } else if (type == "string") {
     if (propName === "segmentData") {
-      return { val: propVal, type: TableDataType.data };
+      return { value: propValue, type: TableDataType.data };
     } else {
-      return { val: propVal, type: TableDataType.string };
+      return { value: propValue, type: TableDataType.string };
     }
   } else if (type == "list") {
-    if (typeof propVal === "string") {
-      return { val: propVal, type: TableDataType.string };
+    if (typeof propValue === "string") {
+      return { value: propValue, type: TableDataType.string };
     }
-    return { val: propVal.join(), type: TableDataType.string };
+    return { value: propValue.join(), type: TableDataType.string };
   } else if (type == "float" || type == "int") {
-    return { val: propVal, type: TableDataType.number };
+    return { value: propValue, type: TableDataType.number };
   } else {
     return {
-      val: "see rawData2TableData function",
+      value: "see rawData2TableData function",
       type: TableDataType.string,
     };
   }
@@ -113,16 +113,16 @@ export function getClassNameFromProperties(
 
 export function filterTableDatas(
   filter: TableFiltering,
-  inp: TableViewInput,
+  input: TableViewInput,
   isIgnoreCaseInText: boolean
 ) {
-  let idxHide = [];
+  let indexHide = [];
   // filter by text
-  for (let i = 0; i < inp.results.length; i++) {
+  for (let i = 0; i < input.results.length; i++) {
     let isMatch = false;
     // first column is ID
-    for (let j = 1; j < inp.results[i].length; j++) {
-      let curr = inp.results[i][j].val;
+    for (let j = 1; j < input.results[i].length; j++) {
+      let curr = input.results[i][j].value;
       if (isIgnoreCaseInText) {
         if ((curr + "").toLowerCase().includes(filter.txt.toLowerCase())) {
           isMatch = true;
@@ -136,45 +136,45 @@ export function filterTableDatas(
       }
     }
     if (!isMatch) {
-      idxHide.push(i);
+      indexHide.push(i);
     }
   }
 
-  inp.results = inp.results.filter((_, i) => !idxHide.includes(i));
+  input.results = input.results.filter((_, i) => !indexHide.includes(i));
 
   // order by
   if (filter.orderDirection.length > 0) {
-    let i = inp.columns.findIndex((x) => x == filter.orderBy);
+    let i = input.columns.findIndex((x) => x == filter.orderBy);
     if (i < 0) {
       console.error("i < 0 !");
     }
     i++; // first column is for ID or for highlight
     if (filter.orderDirection == "asc") {
-      inp.results = inp.results.sort((a, b) => {
-        if (a[i].val > b[i].val) return 1;
-        if (b[i].val > a[i].val) return -1;
+      input.results = input.results.sort((a, b) => {
+        if (a[i].value > b[i].value) return 1;
+        if (b[i].value > a[i].value) return -1;
         return 0;
       });
     } else {
-      inp.results = inp.results.sort((a, b) => {
-        if (a[i].val < b[i].val) return 1;
-        if (b[i].val < a[i].val) return -1;
+      input.results = input.results.sort((a, b) => {
+        if (a[i].value < b[i].value) return 1;
+        if (b[i].value < a[i].value) return -1;
         return 0;
       });
     }
   }
   let skip = filter.skip ?? 0;
   if (filter.txt.length > 0) {
-    inp.resultCnt = inp.results.length;
+    input.resultCount = input.results.length;
   }
-  inp.results = inp.results.slice(skip, skip + inp.pageSize);
+  input.results = input.results.slice(skip, skip + input.pageSize);
 }
 
 /** check whether a2 is a subset of a1.
  * @param  {} a1 is an array
  * @param  {} a2 is an array
  */
-export function isSubset(a1, a2) {
+export function isSubset(a1: any, a2: any) {
   let superSet = {};
   for (let i = 0; i < a1.length; i++) {
     const e = a1[i] + typeof a1[i];

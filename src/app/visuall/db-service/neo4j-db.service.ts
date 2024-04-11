@@ -41,7 +41,7 @@ export class Neo4jDb implements DbService {
     const password = conf.password;
     const requestType = responseType == DbResponseType.graph ? "graph" : "row";
     this._g.setLoadingStatus(true);
-    const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
+    const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
     const q = isTimeboxed
       ? `CALL apoc.cypher.run("${query}", null ) YIELD value RETURN value`
       : query;
@@ -120,12 +120,12 @@ export class Neo4jDb implements DbService {
   }
 
   getNeighbors(
-    elemIds: string[] | number[],
+    elementIds: string[] | number[],
     callback: (x: GraphResponse) => any,
     meta?: DbQueryMeta
   ) {
     let isEdgeQuery = meta && meta.isEdgeQuery;
-    const idFilter = this.buildIdFilter(elemIds, false, isEdgeQuery);
+    const idFilter = this.buildIdFilter(elementIds, false, isEdgeQuery);
     let edgeCql = "";
     if (
       meta &&
@@ -184,7 +184,7 @@ export class Neo4jDb implements DbService {
     this.runQuery(query, callback);
   }
 
-  getElems(
+  getElements(
     ids: string[] | number[],
     callback: (x: GraphResponse) => any,
     meta: DbQueryMeta
@@ -260,9 +260,11 @@ export class Neo4jDb implements DbService {
     cb: (x: any) => void
   ) {
     const t = filter.txt ?? "";
-    const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
+    const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
     const pageSize = this.getPageSize4Backend();
-    const currPage = filter.skip ? Math.floor(filter.skip / pageSize) + 1 : 1;
+    const currentPage = filter.skip
+      ? Math.floor(filter.skip / pageSize) + 1
+      : 1;
     const orderBy = filter.orderBy ? `'${filter.orderBy}'` : null;
     let orderDir = 0;
     if (filter.orderDirection == "desc") {
@@ -270,7 +272,7 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
+    const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
       idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
@@ -280,7 +282,7 @@ export class Neo4jDb implements DbService {
       `CALL graphOfInterest([${dbIds
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
-      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
+      ${pageSize}, ${currentPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
       cb,
       type,
       false
@@ -298,9 +300,11 @@ export class Neo4jDb implements DbService {
     cb: (x: any) => void
   ) {
     const t = filter.txt ?? "";
-    const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
+    const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
     const pageSize = this.getPageSize4Backend();
-    const currPage = filter.skip ? Math.floor(filter.skip / pageSize) + 1 : 1;
+    const currentPage = filter.skip
+      ? Math.floor(filter.skip / pageSize) + 1
+      : 1;
     const orderBy = filter.orderBy ? `'${filter.orderBy}'` : null;
     let orderDir = 0;
     if (filter.orderDirection == "desc") {
@@ -308,7 +312,7 @@ export class Neo4jDb implements DbService {
     } else if (filter.orderDirection == "") {
       orderDir = 2;
     }
-    const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
+    const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
     let idf = "null";
     if (idFilter) {
       idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
@@ -326,7 +330,7 @@ export class Neo4jDb implements DbService {
       this.runQuery(
         `CALL commonStream([${dbIds
           .map((element) => `'${element}'`)
-          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currPage},
+          .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currentPage},
        '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
         cb,
         type,
@@ -345,9 +349,11 @@ export class Neo4jDb implements DbService {
     cb: (x: any) => void
   ) {
     const t = filter.txt ?? "";
-    const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
+    const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
     const pageSize = this.getPageSize4Backend();
-    const currPage = filter.skip ? Math.floor(filter.skip / pageSize) + 1 : 1;
+    const currentPage = filter.skip
+      ? Math.floor(filter.skip / pageSize) + 1
+      : 1;
     const orderBy = filter.orderBy ? `'${filter.orderBy}'` : null;
     let orderDir = 0;
     if (filter.orderDirection == "desc") {
@@ -359,12 +365,12 @@ export class Neo4jDb implements DbService {
     if (idFilter) {
       idf = `[${idFilter.map((element) => `'${element}'`).join()}]`;
     }
-    const timeout = this._g.userPrefs.dbTimeout.getValue() * 1000;
+    const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
     this.runQuery(
       `CALL neighborhood([${dbIds
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
-      ${pageSize}, ${currPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
+      ${pageSize}, ${currentPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
       cb,
       DbResponseType.table,
       false
@@ -372,9 +378,9 @@ export class Neo4jDb implements DbService {
   }
 
   private getPageSize4Backend(): number {
-    let pageSize = this._g.userPrefs.dataPageSize.getValue();
-    if (this._g.userPrefs.queryResultPagination.getValue() == "Client") {
-      pageSize = pageSize * this._g.userPrefs.dataPageLimit.getValue();
+    let pageSize = this._g.userPreferences.dataPageSize.getValue();
+    if (this._g.userPreferences.queryResultPagination.getValue() == "Client") {
+      pageSize = pageSize * this._g.userPreferences.dataPageLimit.getValue();
     }
     return pageSize;
   }
@@ -414,12 +420,12 @@ export class Neo4jDb implements DbService {
       return;
     }
     if (isTimeboxed) {
-      const obj = response.results[0].data;
-      if (obj[0] === undefined || obj[0] === null) {
+      const object = response.results[0].data;
+      if (object[0] === undefined || object[0] === null) {
         return { columns: [], data: [] };
       }
-      const cols = Object.keys(obj[0].row[0]);
-      const data = obj.map((x: any) => Object.values(x.row[0]));
+      const cols = Object.keys(object[0].row[0]);
+      const data = object.map((x: any) => Object.values(x.row[0]));
       // put id to first
       const idxId = cols.indexOf("ElementId(x)");
       if (idxId > -1) {
@@ -448,55 +454,55 @@ export class Neo4jDb implements DbService {
       return;
     }
     if (isTimeboxed) {
-      const obj = response.results[0].data[0].row[0];
+      const object = response.results[0].data[0].row[0];
       const r: DbResponse = {
         tableData: { columns: ["elementId(x)", "x"], data: [] },
         graphData: { nodes: [], edges: [] },
-        count: obj.count,
+        count: object.count,
       };
       // response is a node response
-      if (obj.nodeIds) {
-        r.tableData.data = obj.nodeIds.map((x: any, i: number) => [
+      if (object.nodeIds) {
+        r.tableData.data = object.nodeIds.map((x: any, i: number) => [
           x,
-          obj.nodes[i],
+          object.nodes[i],
         ]);
-        r.graphData.nodes = obj.nodeIds.map((x: any, i: number) => {
+        r.graphData.nodes = object.nodeIds.map((x: any, i: number) => {
           return {
-            properties: obj.nodes[i],
-            labels: obj.nodeTypes[i],
+            properties: object.nodes[i],
+            labels: object.nodeTypes[i],
             elementId: x,
           };
         });
       } else {
-        r.tableData.data = obj.edgeIds.map((x: any, i: number) => [
+        r.tableData.data = object.edgeIds.map((x: any, i: number) => [
           x,
-          obj.edges[i],
+          object.edges[i],
         ]);
         r.graphData.nodes = r.graphData.nodes.concat(
-          obj.srcNodeIds.map((x: any, i: number) => {
+          object.srcNodeIds.map((x: any, i: number) => {
             return {
-              properties: obj.srcNodes[i],
-              labels: obj.srcNodeTypes[i],
+              properties: object.srcNodes[i],
+              labels: object.srcNodeTypes[i],
               elementId: x,
             };
           })
         );
         r.graphData.nodes = r.graphData.nodes.concat(
-          obj.tgtNodeIds.map((x: any, i: number) => {
+          object.tgtNodeIds.map((x: any, i: number) => {
             return {
-              properties: obj.tgtNodes[i],
-              labels: obj.tgtNodeTypes[i],
+              properties: object.tgtNodes[i],
+              labels: object.tgtNodeTypes[i],
               elementId: x,
             };
           })
         );
-        r.graphData.edges = obj.edgeIds.map((x: any, i: number) => {
+        r.graphData.edges = object.edgeIds.map((x: any, i: number) => {
           return {
-            properties: obj.edges[i],
-            type: obj.edgeTypes[i],
+            properties: object.edges[i],
+            type: object.edgeTypes[i],
             elementId: x,
-            startNodeElementId: obj.srcNodeIds[i],
-            endNodeElementId: obj.tgtNodeIds[i],
+            startNodeElementId: object.srcNodeIds[i],
+            endNodeElementId: object.tgtNodeIds[i],
           };
         });
       }
@@ -594,13 +600,13 @@ export class Neo4jDb implements DbService {
     let p = this._g.dataModel.getValue()[t][className];
     for (let k in p) {
       if (p[k] !== "list") {
-        if (this._g.userPrefs.isIgnoreCaseInText.getValue()) {
+        if (this._g.userPreferences.isIgnoreCaseInText.getValue()) {
           s += ` LOWER(toString(x.${k})) CONTAINS LOWER('${txt}') OR `;
         } else {
           s += ` toString(x.${k}) CONTAINS '${txt}' OR `;
         }
       } else {
-        if (this._g.userPrefs.isIgnoreCaseInText.getValue()) {
+        if (this._g.userPreferences.isIgnoreCaseInText.getValue()) {
           s += ` LOWER(REDUCE(s='', w IN x.${k} | s + w)) CONTAINS LOWER('${txt}') OR `;
         } else {
           s += ` REDUCE(s = '', w IN x.${k} | s + w) CONTAINS '${txt}' OR `;
@@ -665,7 +671,7 @@ export class Neo4jDb implements DbService {
     } else {
       if (
         rule.propertyType == "string" &&
-        this._g.userPrefs.isIgnoreCaseInText.getValue()
+        this._g.userPreferences.isIgnoreCaseInText.getValue()
       ) {
         inputOp = inputOp.toLowerCase();
         inputOp = this.transformInp(rule, inputOp);

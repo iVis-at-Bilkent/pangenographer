@@ -10,8 +10,8 @@ import { GlobalVariableService } from "../../../global-variable.service";
 export class GroupTabComponent implements OnInit {
   options: { name: string; fn: any }[];
   selectedOption: string;
-  prevGraph: Set<string>;
-  currGraph: Set<string>;
+  previousGraph: Set<string>;
+  currentGraph: Set<string>;
 
   constructor(
     private _cyService: CytoscapeService,
@@ -39,25 +39,25 @@ export class GroupTabComponent implements OnInit {
   }
 
   optionChanged() {
-    const idx = this.options.findIndex((x) => x.name == this.selectedOption);
+    const index = this.options.findIndex((x) => x.name == this.selectedOption);
     this._cyService.expandAllCompounds();
     this._cyService.deleteClusteringNodes();
-    if (idx > -1 && this.options[idx].fn) {
-      this.options[idx].fn();
+    if (index > -1 && this.options[index].fn) {
+      this.options[index].fn();
     }
     this._g.performLayout(false);
     this.setGraphState();
   }
 
   setGraphState() {
-    this.prevGraph = this.currGraph;
-    this.currGraph = this._g.getGraphElemSet();
+    this.previousGraph = this.currentGraph;
+    this.currentGraph = this._g.getGraphElementSet();
   }
 
   public componentOpened() {
     this.setGraphState();
     // set radio to None because graph has changed
-    if (!areSetsEqual(this.prevGraph, this.currGraph)) {
+    if (!areSetsEqual(this.previousGraph, this.currentGraph)) {
       this.selectedOption = this.options[0].name;
     }
   }

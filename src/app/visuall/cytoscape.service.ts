@@ -8,7 +8,7 @@ import {
   CyEdge,
   CyNode,
   GFAData,
-  GraphElem,
+  GraphElement,
   GraphResponse,
 } from "./db-service/data-types";
 import { DbAdapterService } from "./db-service/db-adapter.service";
@@ -19,7 +19,7 @@ import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-m
 import { UserPrefHelper } from "./user-pref-helper";
 import {
   GroupingOptionTypes,
-  MergedElemIndicatorTypes,
+  MergedElementIndicatorTypes,
 } from "./user-preference";
 import { UserProfileService } from "./user-profile.service";
 @Injectable({
@@ -45,13 +45,13 @@ export class CytoscapeService {
     this.louvainClusterer = new LouvainClustering();
   }
 
-  initCy(containerElem: HTMLElement) {
+  initCy(containerElement: HTMLElement) {
     this._cyExtService.registerExtensions();
 
     this._g.layout = this._g.getFcoseOptions();
     this._ngZone.runOutsideAngular(() => {
       this._g.cy = cytoscape({
-        container: containerElem,
+        container: containerElement,
         layout: this._g.layout,
         // initial viewport state:
         zoom: 1,
@@ -89,7 +89,7 @@ export class CytoscapeService {
     (<any>window).cy = this._g.cy;
     this._g.cy.on("select unselect", (e: any) => {
       this._ngZone.run(() => {
-        this.elemSelected(e);
+        this.elementSelected(e);
       });
     });
     this._g.cy.on("select unselect add remove tap", () => {
@@ -105,9 +105,9 @@ export class CytoscapeService {
     this._g.listen4graphEvents();
   }
 
-  private elemSelected(e: any) {
+  private elementSelected(e: any) {
     if (e.type == "select") {
-      if (this._g.isSwitch2ObjTabOnSelect) {
+      if (this._g.isSwitch2ObjectTabOnSelect) {
         this._g.operationTabChanged.next(0);
       }
     }
@@ -176,15 +176,15 @@ export class CytoscapeService {
     const nodes = data.nodes;
     const edges = data.edges;
 
-    let elemIds: string[] = [];
+    let elementIds: string[] = [];
     let cyNodes = [];
     for (let i = 0; i < nodes.length; i++) {
       let cyNodeId = "n" + nodes[i].elementId;
       cyNodes.push(this.createCyNode(nodes[i], cyNodeId));
-      elemIds.push(cyNodeId);
+      elementIds.push(cyNodeId);
     }
 
-    this._g.userPrefs.isAutoIncrementalLayoutOnChange.next(isIncremental);
+    this._g.userPreferences.isAutoIncrementalLayoutOnChange.next(isIncremental);
 
     let cyEdges = [];
     let collapsedEdgeIds = {};
@@ -194,11 +194,11 @@ export class CytoscapeService {
     for (let i = 0; i < edges.length; i++) {
       let cyEdgeId = "e" + edges[i].elementId;
       if (collapsedEdgeIds[cyEdgeId]) {
-        elemIds.push(collapsedEdgeIds[cyEdgeId]);
+        elementIds.push(collapsedEdgeIds[cyEdgeId]);
         continue;
       }
       cyEdges.push(this.createCyEdge(edges[i], cyEdgeId));
-      elemIds.push(cyEdgeId);
+      elementIds.push(cyEdgeId);
     }
 
     this._g.switchLayoutRandomization(!isIncremental);
@@ -206,7 +206,7 @@ export class CytoscapeService {
     if (!isIncremental) {
       this._g.cy.elements().remove();
     }
-    let prevElems = this._g.cy.$(":visible");
+    let previousElements = this._g.cy.$(":visible");
     const wasEmpty = this._g.cy.elements().length < 2;
 
     this._g.cy.add(cyNodes);
@@ -227,19 +227,19 @@ export class CytoscapeService {
     const addedEdges = this._g.cy.add(filteredCyEdges);
 
     let compoundEdgeIds = Object.values(collapsedEdgeIds) as string[];
-    if (this._g.userPrefs.isCollapseMultiEdgesOnLoad.getValue()) {
+    if (this._g.userPreferences.isCollapseMultiEdgesOnLoad.getValue()) {
       this.collapseMultiEdges(addedEdges, false);
     }
     let compoundEdgeIds2 = this._g.cy
       .edges("." + C.COLLAPSED_EDGE_CLASS)
       .map((x: any) => x.id());
-    elemIds.push(...C.arrayDiff(compoundEdgeIds, compoundEdgeIds2));
+    elementIds.push(...C.arrayDiff(compoundEdgeIds, compoundEdgeIds2));
     // elements might already exist but hidden, so show them
-    const elemIdSet = new Set(elemIds);
+    const elementIdSet = new Set(elementIds);
     this._g.viewUtils.show(
       this._g.cy
         .elements()
-        .filter((element: any) => elemIdSet.has(element.id()))
+        .filter((element: any) => elementIdSet.has(element.id()))
     );
 
     if (!isIncremental) {
@@ -269,13 +269,13 @@ export class CytoscapeService {
     }
 
     const shouldRandomize = !isIncremental || wasEmpty;
-    const hasNew = this.hasNewElem(elemIds, prevElems);
+    const hasNew = this.hasNewElement(elementIds, previousElements);
     if (hasNew) {
       this._g.performLayout(shouldRandomize);
     }
 
     if (isIncremental) {
-      this.highlightElems(elemIds);
+      this.highlightElements(elementIds);
     }
 
     this._g.isLoadFromDB = true;
@@ -287,45 +287,46 @@ export class CytoscapeService {
     this.applyStyle4NewElements();
   }
 
-  showUpDownstream(ele: any, length: number, isUp: boolean) {
+  showUpDownstream(element: any, length: number, isUp: boolean) {
     const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true);
     };
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
-      ele.data().segmentName,
+      element.data().segmentName,
       length,
       callback,
       isUp
     );
   }
 
-  hasNewElem(newElemIds: string[], prevElems: any): boolean {
+  hasNewElement(newElementIds: string[], previousElements: any): boolean {
     let d = {};
 
-    for (let i = 0; i < prevElems.length; i++) {
-      d[prevElems[i].id()] = true;
+    for (let i = 0; i < previousElements.length; i++) {
+      d[previousElements[i].id()] = true;
     }
 
-    for (let i = 0; i < newElemIds.length; i++) {
-      if (!d[newElemIds[i]]) {
+    for (let i = 0; i < newElementIds.length; i++) {
+      if (!d[newElementIds[i]]) {
         return true;
       }
     }
     return false;
   }
 
-  collapseMultiEdges(edges2collapse?: any, isSetFlag = true) {
-    if (!edges2collapse) {
-      edges2collapse = this._g.cy.edges(":visible");
+  collapseMultiEdges(edges2Collapse?: any, isSetFlag = true) {
+    if (!edges2Collapse) {
+      edges2Collapse = this._g.cy.edges(":visible");
     }
-    edges2collapse = edges2collapse.filter("[^originalEnds]"); // do not collapse meta-edges
+    edges2Collapse = edges2Collapse.filter("[^originalEnds]"); // do not collapse meta-edges
     let sourceTargetPairs = {};
     let isCollapseBasedOnType =
-      this._g.userPrefs.isCollapseEdgesBasedOnType.getValue();
-    let edgeCollapseLimit = this._g.userPrefs.edgeCollapseLimit.getValue();
-    for (let i = 0; i < edges2collapse.length; i++) {
-      let e = edges2collapse[i];
+      this._g.userPreferences.isCollapseEdgesBasedOnType.getValue();
+    let edgeCollapseLimit =
+      this._g.userPreferences.edgeCollapseLimit.getValue();
+    for (let i = 0; i < edges2Collapse.length; i++) {
+      let e = edges2Collapse[i];
       const s = e.data("source");
       const t = e.data("target");
       let edgeId = s + t;
@@ -351,14 +352,14 @@ export class CytoscapeService {
     }
   }
 
-  expandMultiEdges(edges2expand?: any) {
-    if (!edges2expand) {
-      edges2expand = this._g.cy.edges("." + C.COLLAPSED_EDGE_CLASS);
+  expandMultiEdges(edges2Expand?: any) {
+    if (!edges2Expand) {
+      edges2Expand = this._g.cy.edges("." + C.COLLAPSED_EDGE_CLASS);
     }
-    edges2expand = edges2expand.not("." + C.META_EDGE_CLASS);
+    edges2Expand = edges2Expand.not("." + C.META_EDGE_CLASS);
     this._externalToolService.addTooltips(
       undefined,
-      this._g.expandCollapseApi.expandEdges(edges2expand).edges,
+      this._g.expandCollapseApi.expandEdges(edges2Expand).edges,
       false,
       true
     );
@@ -383,32 +384,33 @@ export class CytoscapeService {
     return collapsedEdgeIds;
   }
 
-  highlightElems(elemIds: string[]) {
+  highlightElements(elementIds: string[]) {
     // remove all existing hightlights before hightlighting new elements
-    const newElemIndicator = this._g.userPrefs.mergedElemIndicator.getValue();
-    if (newElemIndicator == MergedElemIndicatorTypes.none) {
+    const newElementIndicator =
+      this._g.userPreferences.mergedElementIndicator.getValue();
+    if (newElementIndicator == MergedElementIndicatorTypes.none) {
       return;
     }
 
-    if (this._g.userPrefs.isOnlyHighlight4LatestQuery.getValue()) {
-      if (newElemIndicator == MergedElemIndicatorTypes.highlight) {
+    if (this._g.userPreferences.isOnlyHighlight4LatestQuery.getValue()) {
+      if (newElementIndicator == MergedElementIndicatorTypes.highlight) {
         this._g.removeHighlights();
       }
-      if (newElemIndicator == MergedElemIndicatorTypes.selection) {
+      if (newElementIndicator == MergedElementIndicatorTypes.selection) {
         this._g.cy.$().unselect();
       }
     }
 
     let ele2highlight = this._g.cy.collection();
-    const cnt = elemIds.length;
-    for (let i = 0; i < cnt; i++) {
-      ele2highlight.merge(this._g.cy.$id(elemIds.pop()));
+    const count = elementIds.length;
+    for (let i = 0; i < count; i++) {
+      ele2highlight.merge(this._g.cy.$id(elementIds.pop()));
     }
-    if (newElemIndicator == MergedElemIndicatorTypes.selection) {
-      this._g.isSwitch2ObjTabOnSelect = false;
+    if (newElementIndicator == MergedElementIndicatorTypes.selection) {
+      this._g.isSwitch2ObjectTabOnSelect = false;
       ele2highlight.select();
-      this._g.isSwitch2ObjTabOnSelect = true;
-    } else if (newElemIndicator == MergedElemIndicatorTypes.highlight) {
+      this._g.isSwitch2ObjectTabOnSelect = true;
+    } else if (newElementIndicator == MergedElementIndicatorTypes.highlight) {
       this._g.highlightElements(ele2highlight);
     }
   }
@@ -433,7 +435,7 @@ export class CytoscapeService {
   showHideEdgeLabels() {
     this._g.cy.startBatch();
     this._g.cy.edges().removeClass("nolabel");
-    if (!this._g.userPrefs.isShowEdgeLabels.getValue()) {
+    if (!this._g.userPreferences.isShowEdgeLabels.getValue()) {
       this._g.cy.edges().addClass("nolabel");
     }
     setTimeout(() => {
@@ -507,7 +509,7 @@ export class CytoscapeService {
     }.bind(this);
   }
 
-  setOtherElementsOpacity(elements, opacity) {
+  setOtherElementsOpacity(elements: any[], opacity: any) {
     this._g.cy.startBatch();
     this._g.cy.elements().difference(elements).style({ opacity: opacity });
     setTimeout(() => {
@@ -531,7 +533,9 @@ export class CytoscapeService {
 
   removeHighlights() {
     this._g.removeHighlights();
-    this._g.viewUtils.removeHighlights(this._g.filterRemovedElems(() => true));
+    this._g.viewUtils.removeHighlights(
+      this._g.filterRemovedElements(() => true)
+    );
     this._externalToolService.destroyCurrentBadgePoppers();
   }
 
@@ -622,7 +626,7 @@ export class CytoscapeService {
     );
   }
 
-  saveAsCSV(objs: GraphElem[]) {
+  saveAsCSV(objs: GraphElement[]) {
     if (!objs || objs.length < 1) {
       return;
     }
@@ -654,13 +658,13 @@ export class CytoscapeService {
       });
   }
 
-  deleteSelected(event) {
+  deleteSelected(event: any) {
     if (event) {
-      const ele = event.target || event.cyTarget;
-      if (ele.id()[0] === "n") {
-        this._externalToolService.removeExternalTools([ele]);
+      const element = event.target || event.cyTarget;
+      if (element.id()[0] === "n") {
+        this._externalToolService.removeExternalTools([element]);
       }
-      this._g.cy.remove(ele);
+      this._g.cy.remove(element);
     } else {
       this._externalToolService.removeExternalTools(
         this._g.cy.nodes(":selected")
@@ -704,31 +708,31 @@ export class CytoscapeService {
   }
 
   addGroup4Selected() {
-    const elems = this._g.cy.nodes(":selected");
-    if (elems.length < 1) {
+    const elements = this._g.cy.nodes(":selected");
+    if (elements.length < 1) {
       return;
     }
-    const parent = elems[0].parent().id();
-    for (let i = 1; i < elems.length; i++) {
-      if (parent !== elems[i].parent().id()) {
+    const parent = elements[0].parent().id();
+    for (let i = 1; i < elements.length; i++) {
+      if (parent !== elements[i].parent().id()) {
         return;
       }
     }
     if (
-      this._g.userPrefs.groupingOption.getValue() ==
+      this._g.userPreferences.groupingOption.getValue() ==
       GroupingOptionTypes.compound
     ) {
       const id = new Date().getTime();
       this.addParentNode(id, parent);
-      for (let i = 0; i < elems.length; i++) {
-        elems[i].move({ parent: "c" + id });
+      for (let i = 0; i < elements.length; i++) {
+        elements[i].move({ parent: "c" + id });
       }
     } else {
-      const currCluster: string[] = elems.map((x: any) => x.id());
+      const currCluster: string[] = elements.map((x: any) => x.id());
       if (!this._g.layout.clusters || this._g.layout.clusters.length < 1) {
         this._g.layout.clusters = [currCluster];
       } else {
-        this.removeElementsFromCurrentClusters(elems);
+        this.removeElementsFromCurrentClusters(elements);
         this._g.layout.clusters.push(currCluster);
       }
       this.removeEmptyClusters();
@@ -737,17 +741,17 @@ export class CytoscapeService {
     this._g.performLayout(false);
   }
 
-  removeElementsFromCurrentClusters(elems: any) {
+  removeElementsFromCurrentClusters(elements: any) {
     if (!this._g.layout.clusters) {
       return;
     }
-    const currCluster: string[] = elems.map((x: any) => x.id());
+    const currCluster: string[] = elements.map((x: any) => x.id());
     // remove elements from current clusters
     for (const cluster of this._g.layout.clusters) {
       for (const item of currCluster) {
-        const idx = cluster.indexOf(item);
-        if (idx > -1) {
-          cluster.splice(idx, 1);
+        const index = cluster.indexOf(item);
+        if (index > -1) {
+          cluster.splice(index, 1);
         }
       }
     }
@@ -767,40 +771,40 @@ export class CytoscapeService {
   }
 
   removeGroup4Selected(
-    elems = undefined,
+    elements = undefined,
     isRunLayout = true,
     isCompoundGrouping = null
   ) {
     if (isCompoundGrouping === null) {
       isCompoundGrouping =
-        this._g.userPrefs.groupingOption.getValue() ==
+        this._g.userPreferences.groupingOption.getValue() ==
         GroupingOptionTypes.compound;
     }
-    if (!elems) {
-      elems = this._g.cy.nodes(":selected");
+    if (!elements) {
+      elements = this._g.cy.nodes(":selected");
       if (isCompoundGrouping) {
-        elems = elems.filter("." + C.CLUSTER_CLASS);
+        elements = elements.filter("." + C.CLUSTER_CLASS);
       }
     }
-    if (elems.length < 1) {
+    if (elements.length < 1) {
       return;
     }
     if (isCompoundGrouping) {
-      for (let i = 0; i < elems.length; i++) {
+      for (let i = 0; i < elements.length; i++) {
         // expand if collapsed
-        if (elems[i].hasClass(C.COLLAPSED_NODE_CLASS)) {
+        if (elements[i].hasClass(C.COLLAPSED_NODE_CLASS)) {
           this._g.expandCollapseApi.expand(
-            elems[i],
+            elements[i],
             C.EXPAND_COLLAPSE_FAST_OPT
           );
         }
-        const grandParent = elems[i].parent().id() ?? null;
-        const children = elems[i].children();
+        const grandParent = elements[i].parent().id() ?? null;
+        const children = elements[i].children();
         children.move({ parent: grandParent });
-        this._g.cy.remove(elems[i]);
+        this._g.cy.remove(elements[i]);
       }
     } else {
-      this.removeElementsFromCurrentClusters(elems);
+      this.removeElementsFromCurrentClusters(elements);
       this.removeEmptyClusters();
     }
 
@@ -827,11 +831,11 @@ export class CytoscapeService {
       this._g.applyClassFiltering();
       this._g.hideTypesNotToShow();
       this.showCollapsed(null, null);
-      const currVisible = this._g.cy.$(":visible");
-      if (!currVisible.same(prevVisible)) {
+      const currentVisible = this._g.cy.$(":visible");
+      if (!currentVisible.same(prevVisible)) {
         if (prevVisible.length > 0) {
           this._g.layoutUtils.placeNewNodes(
-            currVisible.difference(prevVisible).nodes()
+            currentVisible.difference(prevVisible).nodes()
           );
         }
         this._g.performLayout(false);
@@ -852,7 +856,7 @@ export class CytoscapeService {
     }
   }
 
-  showCollapsed(collapsedNodes, collapsedEdges) {
+  showCollapsed(collapsedNodes: any[], collapsedEdges: any[]) {
     if (!collapsedNodes) {
       collapsedNodes = this._g.cy.$("." + C.COLLAPSED_NODE_CLASS);
     }
@@ -891,14 +895,14 @@ export class CytoscapeService {
   }
 
   // expands all the compound nodes and deletes them recursively
-  hideCompounds(elems: any) {
-    const nodes = elems
+  hideCompounds(elements: any) {
+    const nodes = elements
       .filter("." + C.CLUSTER_CLASS)
       .not("." + C.META_EDGE_CLASS);
-    let collapsedEdgeIds = elems
-      .union(elems.connectedEdges())
+    let collapsedEdgeIds = elements
+      .union(elements.connectedEdges())
       .filter("." + C.COLLAPSED_EDGE_CLASS)
-      .map((x) => x.id());
+      .map((x: any) => x.id());
     const edgeIdDict = {};
     for (const i of collapsedEdgeIds) {
       edgeIdDict[i] = true;
@@ -981,7 +985,7 @@ export class CytoscapeService {
 
     let clusters = this._g.cy.$(":visible").markovClustering(opt);
     if (
-      this._g.userPrefs.groupingOption.getValue() ==
+      this._g.userPreferences.groupingOption.getValue() ==
       GroupingOptionTypes.compound
     ) {
       for (let i = 0; i < clusters.length; i++) {
@@ -989,15 +993,15 @@ export class CytoscapeService {
         clusters[i].move({ parent: "c" + i });
       }
     } else {
-      let arr = [];
+      let array = [];
       for (let i = 0; i < clusters.length; i++) {
         let a = [];
         for (let j = 0; j < clusters[i].length; j++) {
           a.push(clusters[i][j].id());
         }
-        arr.push(a);
+        array.push(a);
       }
-      this._g.layout.clusters = arr;
+      this._g.layout.clusters = array;
     }
   }
 
@@ -1008,7 +1012,7 @@ export class CytoscapeService {
       clusters[clustering[n]] = true;
     }
     if (
-      this._g.userPrefs.groupingOption.getValue() ==
+      this._g.userPreferences.groupingOption.getValue() ==
       GroupingOptionTypes.compound
     ) {
       // generate compound nodes
@@ -1022,14 +1026,14 @@ export class CytoscapeService {
           .move({ parent: "c" + clustering[n] });
       }
     } else {
-      let arr = [];
+      let array = [];
       for (let i in clusters) {
-        arr.push([]);
+        array.push([]);
       }
       for (let i in clustering) {
-        arr[clustering[i]].push(i);
+        array[clustering[i]].push(i);
       }
-      this._g.layout.clusters = arr;
+      this._g.layout.clusters = array;
     }
   }
 
@@ -1048,7 +1052,7 @@ export class CytoscapeService {
   bindComponentSelector() {
     let isSelectionLocked = false;
 
-    this._g.cy.on("taphold", "node, edge", (e) => {
+    this._g.cy.on("taphold", "node, edge", (e: any) => {
       if (!e.originalEvent.shiftKey) {
         return;
       }
@@ -1070,29 +1074,31 @@ export class CytoscapeService {
     });
   }
 
-  private getVisibleComponentOf(e) {
-    const comp = this._g.cy.collection();
+  private getVisibleComponentOf(e: any) {
+    const components = this._g.cy.collection();
     const visited = {};
     const stack = [];
     if (e.isNode()) {
-      comp.merge(e);
+      components.merge(e);
       stack.push(e);
     } else {
-      comp.merge(e);
-      const conn = e.connectedNodes();
-      comp.connectedNodes(conn);
-      for (let i = 0; i < conn.length; i++) {
-        stack.push(conn[i]);
+      components.merge(e);
+      const connectedNodes = e.connectedNodes();
+      components.connectedNodes(connectedNodes);
+      for (let i = 0; i < connectedNodes.length; i++) {
+        stack.push(connectedNodes[i]);
       }
     }
 
     while (stack.length > 0) {
       const curr = stack.pop();
       visited[curr.id()] = true;
-      const connEdges = curr.connectedEdges(":visible");
-      const neigs = connEdges.union(connEdges.connectedNodes(":visible"));
-      comp.merge(neigs);
-      const neigNodes = neigs.nodes();
+      const connectedEdges = curr.connectedEdges(":visible");
+      const neighbors = connectedEdges.union(
+        connectedEdges.connectedNodes(":visible")
+      );
+      components.merge(neighbors);
+      const neigNodes = neighbors.nodes();
       for (let i = 0; i < neigNodes.length; i++) {
         if (!visited[neigNodes[i].id()]) {
           stack.push(neigNodes[i]);
@@ -1100,13 +1106,13 @@ export class CytoscapeService {
       }
     }
 
-    return comp;
+    return components;
   }
 
   bindSelectObjOfThisType() {
     let isSelectionLocked = false;
 
-    this._g.cy.on("taphold", "node, edge", (e) => {
+    this._g.cy.on("taphold", "node, edge", (e: any) => {
       if (!e.originalEvent.ctrlKey) {
         return;
       }
@@ -1176,24 +1182,11 @@ export class CytoscapeService {
     }
   }
 
+  // Transforms the name of the path walk to a human readable format
+  // as it is stored in the database(neo4j) in a format that is not human readable
   pathWalkNameTransform(name: string): string {
     return name.replace(/\$\$\$(\d+)\$\$\$/g, (match, charCode) => {
       return String.fromCharCode(Number(charCode));
     });
-  }
-
-  prepareAllNodesFastaData(nodes: any = this._g.cy.nodes()): string {
-    let fastaData = "";
-    for (let i = 0; i < nodes.length; i++) {
-      if (nodes[i].data("segmentData")) {
-        fastaData +=
-          ">" +
-          nodes[i].data("segmentName") +
-          "\n" +
-          nodes[i].data("segmentData") +
-          "\n";
-      }
-    }
-    return fastaData;
   }
 }

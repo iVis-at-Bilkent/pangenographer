@@ -14,7 +14,7 @@ import { SequenceDataService } from "./sequence-data.service";
 
 interface PoppedData {
   popper: HTMLDivElement;
-  elem: any;
+  element: any;
   fn: Function;
   fn2: Function;
 }
@@ -31,11 +31,11 @@ export class ExternalToolService {
 
   constructor(
     private _g: GlobalVariableService,
-    private _SequenceDataService: SequenceDataService
+    private _sequenceDataService: SequenceDataService
   ) {}
 
   addExternalTools(
-    showUpDownstream: (ele: any, length: number, up: boolean) => void,
+    showUpDownstream: (element: any, length: number, up: boolean) => void,
     nodes: any = undefined,
     edges: any = undefined
   ) {
@@ -74,7 +74,7 @@ export class ExternalToolService {
   }
 
   private addCues(
-    showUpDownstream: (ele: any, length: number, up: boolean) => void,
+    showUpDownstream: (element: any, length: number, up: boolean) => void,
     nodes: any = undefined
   ) {
     if (!nodes) {
@@ -130,7 +130,7 @@ export class ExternalToolService {
           nameSize,
           marginY,
           showUpDownstream,
-          this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.getValue(),
+          this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.getValue(),
           true,
           contentUpstreamLevel,
           "Show Upstream"
@@ -170,7 +170,7 @@ export class ExternalToolService {
           nameSize,
           marginY,
           showUpDownstream,
-          this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.getValue(),
+          this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.getValue(),
           false,
           contentDownstreamLevel,
           "Show Downstream"
@@ -196,10 +196,10 @@ export class ExternalToolService {
     marginXTwo: number,
     nameSize: number,
     marginY: number,
-    showUpDownstream: (ele: any, length: number, up: boolean) => void,
+    showUpDownstream: (element: any, length: number, up: boolean) => void,
     showUpDownstreamSize: number,
     isUp: boolean,
-    htmlElem: any,
+    htmlElement: any,
     tooltip: string
   ) {
     return {
@@ -208,10 +208,10 @@ export class ExternalToolService {
       position: position,
       marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
       marginY: this._g.cy.zoom() * marginY,
-      onCueClicked: (ele: any) => {
-        showUpDownstream(ele, showUpDownstreamSize, isUp);
+      onCueClicked: (element: any) => {
+        showUpDownstream(element, showUpDownstreamSize, isUp);
       },
-      htmlElem: htmlElem,
+      htmlElem: htmlElement,
       isFixedSize: false,
       zIndex: 999,
       cursor: "pointer",
@@ -550,7 +550,7 @@ export class ExternalToolService {
       let thirdThreshold = 20;
       let toAdd = 0;
       let combinedSequence =
-        this._SequenceDataService.prepareCombinedSequence(element);
+        this._sequenceDataService.prepareCombinedSequence(element);
       firstSequence = combinedSequence.firstSequence;
       secondSequence = combinedSequence.secondSequence;
       thirdSequence = combinedSequence.thirdSequence;
@@ -690,7 +690,7 @@ export class ExternalToolService {
 
   destroyBadgePopper(id: string, i: number) {
     if (i < 0) {
-      i = this.poppedData.findIndex((x: any) => x.elem.id() == id);
+      i = this.poppedData.findIndex((x: any) => x.element.id() == id);
       if (i < 0) {
         return;
       }
@@ -698,16 +698,16 @@ export class ExternalToolService {
     this.poppedData[i].popper.remove();
     // unbind previously bound functions
     if (this.poppedData[i].fn) {
-      this.poppedData[i].elem.off("position", this.poppedData[i].fn);
-      this.poppedData[i].elem.off("style", this.poppedData[i].fn2);
+      this.poppedData[i].element.off("position", this.poppedData[i].fn);
+      this.poppedData[i].element.off("style", this.poppedData[i].fn2);
       this._g.cy.off("pan zoom resize", this.poppedData[i].fn);
     }
-    this.poppedData[i].elem.removeClass("badgeDisplay");
-    this.poppedData[i].elem.data("__badgeProp", undefined);
+    this.poppedData[i].element.removeClass("badgeDisplay");
+    this.poppedData[i].element.data("__badgeProp", undefined);
     this.poppedData.splice(i, 1);
   }
 
-  generateBadge4Elem(e: any, badges: number[]) {
+  generateBadge4Element(e: any, badges: number[]) {
     const div = document.createElement("div");
     div.innerHTML = this.badgeGetHtml(badges);
     div.style.position = "absolute";
@@ -729,8 +729,8 @@ export class ExternalToolService {
 
     const positionHandlerFn = debounce2(
       () => {
-        this.setBadgeCoords(e, div);
-        this.setBadgeCoordsOfChildren(e);
+        this.setBadgeCoordinates(e, div);
+        this.setBadgeCoordinatesOfChildren(e);
       },
       BADGE_POPPER_UPDATE_DELAY,
       () => {
@@ -746,7 +746,7 @@ export class ExternalToolService {
     this._g.cy.on("pan zoom resize", positionHandlerFn);
     this.poppedData.push({
       popper: div,
-      elem: e,
+      element: e,
       fn: positionHandlerFn,
       fn2: styleHandlerFn,
     });
@@ -757,7 +757,7 @@ export class ExternalToolService {
       let c = mapColor(
         this.badgeColor,
         this.maxPropValue,
-        this.poppedData[i].elem.data("__badgeProp")
+        this.poppedData[i].element.data("__badgeProp")
       );
 
       for (let j = 0; j < this.poppedData[i].popper.children.length; j++) {
@@ -765,7 +765,10 @@ export class ExternalToolService {
           this.poppedData[i].popper.children[j] as HTMLSpanElement
         ).style.background = c;
       }
-      this.setBadgeCoords(this.poppedData[i].elem, this.poppedData[i].popper);
+      this.setBadgeCoordinates(
+        this.poppedData[i].element,
+        this.poppedData[i].popper
+      );
     }
   }
 
@@ -775,7 +778,7 @@ export class ExternalToolService {
     }
   }
 
-  private setBadgeCoords(e: any, div: HTMLDivElement) {
+  private setBadgeCoordinates(e: any, div: HTMLDivElement) {
     // let the nodes resize first
     setTimeout(() => {
       let ratio = 1;
@@ -817,20 +820,20 @@ export class ExternalToolService {
     div.style.opacity = css;
   }
 
-  private setBadgeCoordsOfChildren(e: any) {
-    const elems = e.children();
-    for (let i = 0; i < elems.length; i++) {
-      const child = elems[i];
+  private setBadgeCoordinatesOfChildren(e: any) {
+    const elements = e.children();
+    for (let i = 0; i < elements.length; i++) {
+      const child = elements[i];
       if (child.isParent()) {
-        this.setBadgeCoordsOfChildren(child);
+        this.setBadgeCoordinatesOfChildren(child);
       } else {
-        const idx = this.poppedData.findIndex(
-          (x: any) => x.elem.id() == child.id()
+        const index = this.poppedData.findIndex(
+          (x: any) => x.element.id() == child.id()
         );
-        if (idx > -1) {
-          this.setBadgeCoords(
-            this.poppedData[idx].elem,
-            this.poppedData[idx].popper
+        if (index > -1) {
+          this.setBadgeCoordinates(
+            this.poppedData[index].element,
+            this.poppedData[index].popper
           );
         }
       }

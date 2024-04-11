@@ -39,7 +39,7 @@
         [(ngModel)]="filterInp"
         [disabled]="isGenericTypeSelected || isShowTxtArea"
         (click)="filterInpClicked()"
-        class="tight-select std-inp-hei form-control filter-form filter-input va-small-text"
+        class="tight-select standart-input-height form-control filter-form filter-input va-small-text"
         placeholder="Filter..."
       />
     </div>
@@ -145,8 +145,8 @@
         [extraWidth]="3"
         type="text"
         title="Name"
-        [(ngModel)]="currListName"
-        class="tight-select filter-form form-control std-inp-hei m-1 va-small-text"
+        [(ngModel)]="currentListName"
+        class="tight-select filter-form form-control standart-input-height m-1 va-small-text"
       />
       <span class="m-1">
         <img
@@ -155,7 +155,7 @@
           (click)="saveCurrList()"
         />
       </span>
-      <span class="m-1" *ngIf="currListName != 'New list'">
+      <span class="m-1" *ngIf="currentListName != 'New list'">
         <img
           src="assets/img/toolbar/delete-simple.svg"
           title="Delete list"

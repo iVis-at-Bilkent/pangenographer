@@ -27,8 +27,10 @@
         }}</label>
       </div>
     </div>
+
+    <!-- Adjusts the length of up/downstream -->
     <div>
-      <label class="va-text">Length of up/downstream</label>
+      <label class="va-text">Length of Up/Downstream</label>
       <div class="form-inline mx-1">
         <input
           type="number"
@@ -37,8 +39,25 @@
           step="any"
           (change)="onlengthOfUpDownstreamSelected($event)"
           [(ngModel)]="lengthOfUpDownstream"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5"
-          placeholder="Length of up/downstream"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
+          placeholder="Length of Up/Downstream"
+        />
+      </div>
+    </div>
+
+    <!-- Adjusts the length of the length of BLAST selected segments path -->
+    <div>
+      <label class="va-text">Length of BLAST Selected Segments Path</label>
+      <div class="form-inline mx-1">
+        <input
+          type="number"
+          max="10"
+          min="1"
+          step="any"
+          (change)="onlengthOfBlastSelectedSegmentsPathSelected($event)"
+          [(ngModel)]="lengthOfBlastSelectedSegmentsPath"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
+          placeholder="Length of BLAST Selected Segments Path"
         />
       </div>
     </div>
@@ -87,20 +106,20 @@
       <div class="form-check-label va-text">Show query results using</div>
       <div
         class="form-check-inline form-check va-text"
-        *ngFor="let str of mergedElemIndicators; let i = index"
+        *ngFor="let m of mergedElementIndicators; let i = index"
       >
         <input
           type="radio"
-          [(ngModel)]="mergedElemIndicator"
+          [(ngModel)]="mergedElementIndicator"
           [value]="i"
           class="form-check-input"
-          (click)="settingChanged(i, 'mergedElemIndicator')"
+          (click)="settingChanged(i, 'mergedElementIndicator')"
           name="optradio1"
-          [id]="'mergedElemIndic' + i"
+          [id]="'mergedElementIndicator' + i"
           title="Show query results using"
         />
-        <label class="form-check-label" [for]="'mergedElemIndic' + i">
-          {{ str }}
+        <label class="form-check-label" [for]="'mergedElementIndicator' + i">
+          {{ m }}
         </label>
       </div>
     </div>
@@ -108,7 +127,7 @@
       <div class="form-check-label va-text">Group using</div>
       <div
         class="form-check-inline form-check va-text"
-        *ngFor="let str of groupingOptions; let i = index"
+        *ngFor="let g of groupingOptions; let i = index"
       >
         <input
           type="radio"
@@ -121,7 +140,7 @@
           title="Group using"
         />
         <label class="form-check-label" [for]="'groupOpt' + i">
-          {{ str }}
+          {{ g }}
         </label>
       </div>
     </div>
@@ -135,7 +154,7 @@
           step="any"
           (change)="onSelWidSelected($event)"
           [(ngModel)]="selectionWidth"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
           placeholder="width"
         />
         <app-color-picker
@@ -149,16 +168,16 @@
       <div class="form-check-label va-text">Highlight style</div>
       <div class="form-inline mx-1">
         <select
-          class="form-select tight-select filter-form va-small-text inp-4-char mx-1"
+          class="form-select tight-select filter-form va-small-text input-4-char mx-1"
           (change)="highlightStyleSelected($event.target)"
           title="Highlight style"
         >
           <option
-            *ngFor="let t of currHighlightStyles; let i = index"
+            *ngFor="let c of currentHighlightStyles; let i = index"
             [selected]="highlightStyleIdx == i"
-            [value]="t"
+            [value]="c"
           >
-            {{ t }}
+            {{ c }}
           </option>
         </select>
         <input
@@ -168,7 +187,7 @@
           step="any"
           (change)="bandPassHighlightWidth()"
           [(ngModel)]="highlightWidth"
-          class="form-control std-inp-hei va-small-text w5-5"
+          class="form-control standart-input-height va-small-text w5-5"
           placeholder="width"
         />
         <app-color-picker
@@ -239,7 +258,7 @@
           min="1"
           (keydown.enter)="settingChanged(dataPageSize, 'dataPageSize')"
           [(ngModel)]="dataPageSize"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Query result page size"
         />
       </div>
@@ -254,7 +273,7 @@
           min="1"
           (keydown.enter)="settingChanged(dataPageLimit, 'dataPageLimit')"
           [(ngModel)]="dataPageLimit"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Query result page limit"
         />
       </div>
@@ -270,7 +289,7 @@
             settingChanged(queryHistoryLimit, 'queryHistoryLimit')
           "
           [(ngModel)]="queryHistoryLimit"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Query history limit"
         />
       </div>
@@ -284,7 +303,7 @@
           min="1"
           (keydown.enter)="settingChanged(dbTimeout, 'dbTimeout')"
           [(ngModel)]="dbTimeout"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Database execution timeout (sec)"
         />
       </div>
@@ -298,7 +317,7 @@
           min="1"
           (keydown.enter)="settingChanged(tableColumnLimit, 'tableColumnLimit')"
           [(ngModel)]="tableColumnLimit"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Maximum number of columns in tables"
         />
       </div>
@@ -314,7 +333,7 @@
             settingChanged(edgeCollapseLimit, 'edgeCollapseLimit')
           "
           [(ngModel)]="edgeCollapseLimit"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Multiple edge collapse limit"
         />
       </div>
@@ -326,7 +345,7 @@
           type="text"
           (keydown.enter)="settingChanged(compoundPadding, 'compoundPadding')"
           [(ngModel)]="compoundPadding"
-          class="form-control inp-3-char std-inp-hei va-small-text"
+          class="form-control input-3-char standart-input-height va-small-text"
           title="Compound padding"
         />
       </div>

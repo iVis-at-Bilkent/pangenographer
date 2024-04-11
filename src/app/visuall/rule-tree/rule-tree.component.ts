@@ -19,19 +19,19 @@ export class RuleTreeComponent implements OnInit {
   @Output() onOperatorAdded = new EventEmitter<RuleNode>();
   currNode: RuleNode;
   isShowChildren = true;
-  editedRuleNodeSubs: Subscription;
+  editedRuleNodeSubscription: Subscription;
 
   ngOnInit(): void {
     if (this.editedRuleNode) {
-      this.editedRuleNodeSubs = this.editedRuleNode.subscribe((x) => {
+      this.editedRuleNodeSubscription = this.editedRuleNode.subscribe((x) => {
         x.isEditing = false;
       });
     }
   }
 
   ngOnDestroy() {
-    if (this.editedRuleNodeSubs) {
-      this.editedRuleNodeSubs.unsubscribe();
+    if (this.editedRuleNodeSubscription) {
+      this.editedRuleNodeSubscription.unsubscribe();
     }
   }
 
@@ -62,8 +62,8 @@ export class RuleTreeComponent implements OnInit {
   deleteNode(node: RuleNode) {
     const parent = node.parent;
     if (parent) {
-      const idx = parent.children.indexOf(node);
-      parent.children.splice(idx, 1);
+      const index = parent.children.indexOf(node);
+      parent.children.splice(index, 1);
     } else {
       this.root = null;
       this.onEmpty.emit(true);
@@ -95,13 +95,13 @@ export class RuleTreeComponent implements OnInit {
     if ((isUp && j == 0) || (!isUp && j == parent.children.length - 1)) {
       return;
     }
-    let idx = j + 1;
+    let index = j + 1;
     if (isUp) {
-      idx = j - 1;
+      index = j - 1;
     }
     let tmp = parent.children[j];
-    parent.children[j] = parent.children[idx];
-    parent.children[idx] = tmp;
+    parent.children[j] = parent.children[index];
+    parent.children[index] = tmp;
   }
 
   clearAllEditings(r: RuleNode) {

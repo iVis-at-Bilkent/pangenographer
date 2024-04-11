@@ -39,31 +39,31 @@ export class UserProfileService {
     }
   }
 
-  private getUserPrefs() {
+  private getUserPreferences() {
     const p = this.getUserProfile();
     if (p) {
-      return p.userPref;
+      return p.userPreference;
     }
     return null;
   }
 
-  private userPref2RawData() {
+  private userPreference2RawData() {
     const o = {};
-    this.mapSubjectProperties(this._g.userPrefs, o);
+    this.mapSubjectProperties(this._g.userPreferences, o);
     return o;
   }
 
-  private mapSubjectProperties(obj, mappedObj) {
-    for (const k in obj) {
-      if (obj[k] instanceof BehaviorSubject) {
-        mappedObj[k] = (obj[k] as BehaviorSubject<any>).getValue();
+  private mapSubjectProperties(object: any, mappedObject: any) {
+    for (const k in object) {
+      if (object[k] instanceof BehaviorSubject) {
+        mappedObject[k] = (object[k] as BehaviorSubject<any>).getValue();
       } else {
-        if (obj[k] instanceof Array) {
-          mappedObj[k] = [];
+        if (object[k] instanceof Array) {
+          mappedObject[k] = [];
         } else {
-          mappedObj[k] = {};
+          mappedObject[k] = {};
         }
-        this.mapSubjectProperties(obj[k], mappedObj[k]);
+        this.mapSubjectProperties(object[k], mappedObject[k]);
       }
     }
   }
@@ -80,7 +80,7 @@ export class UserProfileService {
     const p = this.getUserProfile();
     if (p) {
       if (!isSaveSettings) {
-        p.userPref = undefined;
+        p.userPreference = undefined;
       }
       if (!isSaveQueryRules) {
         p.queryRules = undefined;
@@ -111,13 +111,13 @@ export class UserProfileService {
     const p = this.getUserProfile();
     if (
       !p ||
-      !p.userPref ||
-      p.userPref.isStoreUserProfile === undefined ||
-      p.userPref.isStoreUserProfile == null
+      !p.userPreference ||
+      p.userPreference.isStoreUserProfile === undefined ||
+      p.userPreference.isStoreUserProfile == null
     ) {
-      return this._g.userPrefs.isStoreUserProfile;
+      return this._g.userPreferences.isStoreUserProfile;
     }
-    return p.userPref.isStoreUserProfile;
+    return p.userPreference.isStoreUserProfile;
   }
 
   saveQueryRules(f: QueryRule[]) {
@@ -134,26 +134,32 @@ export class UserProfileService {
     }
   }
 
-  transferUserPrefs() {
-    const p = this.getUserPrefs();
-    this._g.transfer2UserPrefs(p);
+  transferUserPreferences() {
+    const p = this.getUserPreferences();
+    this._g.transfer2UserPreferences(p);
   }
 
   transferIsStoreUserProfile() {
     const p = this.getUserProfile();
-    if (p && p.userPref && typeof p.userPref.isStoreUserProfile === "boolean") {
-      this._g.userPrefs.isStoreUserProfile.next(p.userPref.isStoreUserProfile);
+    if (
+      p &&
+      p.userPreference &&
+      typeof p.userPreference.isStoreUserProfile === "boolean"
+    ) {
+      this._g.userPreferences.isStoreUserProfile.next(
+        p.userPreference.isStoreUserProfile
+      );
     }
   }
 
-  saveUserPrefs() {
+  saveUserPreferences() {
     const p = this.getUserProfile();
     if (p) {
-      p.userPref = this.userPref2RawData();
+      p.userPreference = this.userPreference2RawData();
       localStorage.setItem("profile", JSON.stringify(p));
     } else {
-      const up = this.userPref2RawData();
-      localStorage.setItem("profile", JSON.stringify({ userPref: up }));
+      const up = this.userPreference2RawData();
+      localStorage.setItem("profile", JSON.stringify({ userPreference: up }));
     }
   }
 }

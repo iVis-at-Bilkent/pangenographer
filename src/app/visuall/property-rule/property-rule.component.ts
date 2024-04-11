@@ -59,9 +59,9 @@ export class PropertyRuleComponent implements OnInit {
   isShowTxtArea = false;
   txtAreaSize: { width: number; height: number } = { width: 350, height: 250 };
   position: IPosition = { x: 0, y: 0 };
-  propChangeSubs: Subscription;
+  propChangeSubscription: Subscription;
   option2selected = {};
-  currListName = "New List";
+  currentListName = "New List";
   fittingSavedLists: string[] = [];
   currSelectedList: string;
 
@@ -71,14 +71,14 @@ export class PropertyRuleComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.propChangeSubs = this.propertyChanged.subscribe((x) => {
+    this.propChangeSubscription = this.propertyChanged.subscribe((x) => {
       this.updateView(x.properties, x.isGenericTypeSelected, x.selectedClass);
     });
   }
 
   ngOnDestroy() {
-    if (this.propChangeSubs) {
-      this.propChangeSubs.unsubscribe();
+    if (this.propChangeSubscription) {
+      this.propChangeSubscription.unsubscribe();
     }
   }
 
@@ -235,7 +235,7 @@ export class PropertyRuleComponent implements OnInit {
       this.position = { x: -130, y: 0 };
     }
     this.isShowTxtArea = true;
-    this.currListName = "New list";
+    this.currentListName = "New list";
     this.currSelectedList = null;
     this.fillFittingSavedLists();
     this.currInpType = "text";
@@ -304,25 +304,25 @@ export class PropertyRuleComponent implements OnInit {
       values: BehaviorSubject<string>[];
     }[] = null;
     if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      theLists = this._g.userPrefs.savedLists.enumLists;
+      theLists = this._g.userPreferences.savedLists.enumLists;
     } else if (isNum) {
-      theLists = this._g.userPrefs.savedLists.numberLists;
+      theLists = this._g.userPreferences.savedLists.numberLists;
     } else {
-      theLists = this._g.userPrefs.savedLists.stringLists;
+      theLists = this._g.userPreferences.savedLists.stringLists;
     }
-    const idx = theLists.findIndex(
-      (x) => x.name.getValue() == this.currListName
+    const index = theLists.findIndex(
+      (x) => x.name.getValue() == this.currentListName
     );
-    if (idx > -1) {
-      theLists[idx].values = selectedOptions;
+    if (index > -1) {
+      theLists[index].values = selectedOptions;
     } else {
       theLists.push({
-        name: new BehaviorSubject<string>(this.currListName),
+        name: new BehaviorSubject<string>(this.currentListName),
         values: selectedOptions,
       });
     }
-    this.currSelectedList = this.currListName;
-    this._profile.saveUserPrefs();
+    this.currSelectedList = this.currentListName;
+    this._profile.saveUserPreferences();
     this.fillFittingSavedLists();
   }
 
@@ -334,38 +334,38 @@ export class PropertyRuleComponent implements OnInit {
       values: BehaviorSubject<string>[];
     }[] = null;
     if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      theLists = this._g.userPrefs.savedLists.enumLists;
+      theLists = this._g.userPreferences.savedLists.enumLists;
     } else if (isNum) {
-      theLists = this._g.userPrefs.savedLists.numberLists;
+      theLists = this._g.userPreferences.savedLists.numberLists;
     } else {
-      theLists = this._g.userPrefs.savedLists.stringLists;
+      theLists = this._g.userPreferences.savedLists.stringLists;
     }
-    const idx = theLists.findIndex(
+    const index = theLists.findIndex(
       (x) => x.name.getValue() == this.currSelectedList
     );
-    if (idx > -1) {
-      theLists.splice(idx, 1);
+    if (index > -1) {
+      theLists.splice(index, 1);
     }
-    this.currListName = "";
-    this._profile.saveUserPrefs();
+    this.currentListName = "";
+    this._profile.saveUserPreferences();
     this.fillFittingSavedLists();
   }
 
   changeSelectedSavedList(t: EventTarget) {
     let ev = (<HTMLInputElement>t).value;
-    this.currListName = ev;
+    this.currentListName = ev;
     let savedList: BehaviorSubject<string>[] = [];
     const isNum = this.isNumberProperty();
     if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      savedList = this._g.userPrefs.savedLists.enumLists.find(
+      savedList = this._g.userPreferences.savedLists.enumLists.find(
         (x) => x.name.getValue() === ev
       ).values;
     } else if (isNum) {
-      savedList = this._g.userPrefs.savedLists.numberLists.find(
+      savedList = this._g.userPreferences.savedLists.numberLists.find(
         (x) => x.name.getValue() === ev
       ).values;
     } else {
-      savedList = this._g.userPrefs.savedLists.stringLists.find(
+      savedList = this._g.userPreferences.savedLists.stringLists.find(
         (x) => x.name.getValue() === ev
       ).values;
     }
@@ -383,7 +383,7 @@ export class PropertyRuleComponent implements OnInit {
 
   private fillFittingSavedLists() {
     this.fittingSavedLists.length = 0;
-    const l = this._g.userPrefs.savedLists;
+    const l = this._g.userPreferences.savedLists;
     const isNum = this.isNumberProperty();
     if (this.selectedPropertyCategory === PropertyCategory.finiteSet) {
       this.fittingSavedLists = l.enumLists.map((x) => x.name.getValue());
@@ -436,15 +436,15 @@ export class PropertyRuleComponent implements OnInit {
     if (op === undefined || op === null) {
       return false;
     }
-    const inp = rule.inputOperand;
+    const input = rule.inputOperand;
     // property, operator are selected so an input must be provided
-    if (inp === undefined || inp === null) {
+    if (input === undefined || input === null) {
       return false;
     }
     const t = rule.propertyType;
     if (
       (t == "float" || t == "int") &&
-      !isNumber(inp) &&
+      !isNumber(input) &&
       this.selectedOperatorKey != this.ONE_OF
     ) {
       return false;

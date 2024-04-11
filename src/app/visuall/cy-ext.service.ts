@@ -109,7 +109,7 @@ export class CyExtService {
   }
 
   setNavigatorPosition() {
-    if (!this._g.userPrefs.isShowOverviewWindow.getValue()) {
+    if (!this._g.userPreferences.isShowOverviewWindow.getValue()) {
       return;
     }
     const navSelector = ".cytoscape-navigator-wrapper";
@@ -205,9 +205,9 @@ export class CyExtService {
   private getHighlightStyles(): any[] {
     let r = [];
 
-    for (let i = 0; i < this._g.userPrefs.highlightStyles.length; i++) {
-      let style = this._g.userPrefs.highlightStyles[i];
-      let w, c;
+    for (let i = 0; i < this._g.userPreferences.highlightStyles.length; i++) {
+      let style = this._g.userPreferences.highlightStyles[i];
+      let w: any, c: any;
       try {
         c = style.color.getValue();
         w = style.wid.getValue();

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { BehaviorSubject } from "rxjs";
-import appPref from "../../assets/appPref.json";
+import appPreferences from "../../assets/appPreferences.json";
 import {
   CLUSTER_CLASS,
   COLLAPSED_EDGE_CLASS,
@@ -16,9 +16,9 @@ import {
   debounce,
   isPrimitiveType,
 } from "./constants";
-import { GraphElem, GraphHistoryItem } from "./db-service/data-types";
+import { GraphElement, GraphHistoryItem } from "./db-service/data-types";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
-import { GroupingOptionTypes, UserPref } from "./user-preference";
+import { GroupingOptionTypes, UserPreferences } from "./user-preference";
 
 @Injectable({
   providedIn: "root",
@@ -42,11 +42,11 @@ export class GlobalVariableService {
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
   setLoadingStatus: (boolean: boolean) => void;
-  userPrefs: UserPref = {} as UserPref;
-  userPrefsFromFiles: UserPref = {} as UserPref;
-  shownElemsChanged = new BehaviorSubject<boolean>(true);
+  userPreferences: UserPreferences = {} as UserPreferences;
+  userPreferencesFromFiles: UserPreferences = {} as UserPreferences;
+  shownElementsChanged = new BehaviorSubject<boolean>(true);
   operationTabChanged = new BehaviorSubject<number>(1);
-  isSwitch2ObjTabOnSelect: boolean = true;
+  isSwitch2ObjectTabOnSelect: boolean = true;
   graphHistory: GraphHistoryItem[] = [];
   showHideGraphHistory = new BehaviorSubject<boolean>(false);
   addNewGraphHistoryItem = new BehaviorSubject<boolean>(false);
@@ -81,19 +81,22 @@ export class GlobalVariableService {
   constructor(private _http: HttpClient, private _modalService: NgbModal) {
     this.hiddenClasses = new Set([]);
     // set user preferences staticly (necessary for rendering html initially)
-    this.setUserPrefs(appPref, this.userPrefs);
+    this.setUserPreferences(appPreferences, this.userPreferences);
     // set default values dynamically
-    this._http.get("./assets/appPref.json").subscribe((x) => {
-      this.setUserPrefs(x, this.userPrefs);
-      this.setUserPrefs(x, this.userPrefsFromFiles);
+    this._http.get("./assets/appPreferences.json").subscribe((x) => {
+      this.setUserPreferences(x, this.userPreferences);
+      this.setUserPreferences(x, this.userPreferencesFromFiles);
 
       // set user prefered values. These will be overriden if "Store User Profile" is checked
       this._http
         .get("/app/custom/config/app_description.json")
         .subscribe((x) => {
           this.appDescription.next(x);
-          this.setUserPrefs(x["appPreferences"], this.userPrefs);
-          this.setUserPrefs(x["appPreferences"], this.userPrefsFromFiles);
+          this.setUserPreferences(x["appPreferences"], this.userPreferences);
+          this.setUserPreferences(
+            x["appPreferences"],
+            this.userPreferencesFromFiles
+          );
           this.isUserPrefReady.next(true);
         }, this.showErr.bind(this));
     }, this.showErr.bind(this));
@@ -127,15 +130,15 @@ export class GlobalVariableService {
     this.showErrorModal("Internet Error", e);
   }
 
-  transfer2UserPrefs(u: any) {
+  transfer2UserPreferences(u: any) {
     if (u) {
-      this.setUserPrefs(u, this.userPrefs);
+      this.setUserPreferences(u, this.userPreferences);
     }
   }
 
   runLayout(callback?: Function) {
-    const elems4layout = this.cy.elements().not(":hidden, :transparent"); // also try this
-    if (elems4layout.length < 1) {
+    const elements4layout = this.cy.elements().not(":hidden, :transparent"); // also try this
+    if (elements4layout.length < 1) {
       return;
     }
     if (this.layout.randomize) {
@@ -144,12 +147,12 @@ export class GlobalVariableService {
       this.statusMsg.next("Performing layout...");
     }
     this.setLoadingStatus(true);
-    let layout;
+    let layout: any;
     if (this.layout.clusters && this.layout.clusters.length > 0) {
       this.removeDeletedClusters();
-      layout = elems4layout.layout(this.getCiseOptions());
+      layout = elements4layout.layout(this.getCiseOptions());
     } else {
-      layout = elems4layout.layout(this.layout);
+      layout = elements4layout.layout(this.layout);
     }
     layout.promiseOn("layoutstop", () => {
       callback();
@@ -194,41 +197,45 @@ export class GlobalVariableService {
     this.handleCompoundsOnHideDelete();
   }
 
-  removeHighlights(eles?: any) {
-    eles = eles || this.cy.elements();
-    if (this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()) {
-      eles.forEach((ele: any) => {
+  removeHighlights(elements?: any) {
+    elements = elements || this.cy.elements();
+    if (
+      this.userPreferences.pangenomegrapher.isHighlightInZeroOutZero.getValue()
+    ) {
+      elements.forEach((element: any) => {
         if (
-          this.zeroIncomerAndOutgoerNodes.source.indexOf(ele) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.target.indexOf(ele) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(ele) < 0
+          this.zeroIncomerAndOutgoerNodes.source.indexOf(element) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.target.indexOf(element) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(element) < 0
         ) {
-          this.viewUtils.removeHighlights(ele);
+          this.viewUtils.removeHighlights(element);
         }
       });
     } else {
-      this.viewUtils.removeHighlights(eles);
+      this.viewUtils.removeHighlights(elements);
     }
   }
 
-  highlightElements(eles: any, idx?: number) {
-    if (this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()) {
-      eles.forEach((ele: any) => {
+  highlightElements(elements: any, index?: number) {
+    if (
+      this.userPreferences.pangenomegrapher.isHighlightInZeroOutZero.getValue()
+    ) {
+      elements.forEach((element: any) => {
         if (
-          this.zeroIncomerAndOutgoerNodes.source.indexOf(ele) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.target.indexOf(ele) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(ele) < 0
+          this.zeroIncomerAndOutgoerNodes.source.indexOf(element) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.target.indexOf(element) < 0 &&
+          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(element) < 0
         ) {
           this.viewUtils.highlight(
-            ele,
-            idx ? idx : this.userPrefs.currHighlightIdx.getValue()
+            element,
+            index ? index : this.userPreferences.currHighlightIdx.getValue()
           );
         }
       });
     } else {
       this.viewUtils.highlight(
-        eles,
-        idx ? idx : this.userPrefs.currHighlightIdx.getValue()
+        elements,
+        index ? index : this.userPreferences.currHighlightIdx.getValue()
       );
     }
   }
@@ -239,7 +246,7 @@ export class GlobalVariableService {
     });
   }
 
-  filterByClass(elems: any) {
+  filterByClass(elements: any) {
     let hiddenSelector = "";
     for (let i of this.hiddenClasses) {
       hiddenSelector += "." + i + ",";
@@ -248,12 +255,12 @@ export class GlobalVariableService {
     hiddenSelector = hiddenSelector.substr(0, hiddenSelector.length - 1);
 
     if (hiddenSelector.length < 1) {
-      return elems;
+      return elements;
     }
-    return elems.not(hiddenSelector);
+    return elements.not(hiddenSelector);
   }
 
-  getGraphElemSet() {
+  getGraphElementSet() {
     return new Set<string>(this.cy.elements().map((x: any) => x.id()));
   }
 
@@ -262,8 +269,8 @@ export class GlobalVariableService {
       .style()
       .selector(":selected")
       .style({
-        "overlay-color": this.userPrefs.selectionColor.getValue(),
-        "overlay-padding": this.userPrefs.selectionWidth.getValue(),
+        "overlay-color": this.userPreferences.selectionColor.getValue(),
+        "overlay-padding": this.userPreferences.selectionWidth.getValue(),
         "target-arrow-color": "gray",
         "source-arrow-color": "gray",
       })
@@ -271,7 +278,8 @@ export class GlobalVariableService {
       .style({
         "overlay-padding": (e: any) => {
           return (
-            (this.userPrefs.selectionWidth.getValue() + e.width()) / 2 + "px"
+            (this.userPreferences.selectionWidth.getValue() + e.width()) / 2 +
+            "px"
           );
         },
       })
@@ -283,7 +291,7 @@ export class GlobalVariableService {
     setTimeout(() => {
       if (
         this.graphHistory.length >
-        this.userPrefs.queryHistoryLimit.getValue() - 1
+        this.userPreferences.queryHistoryLimit.getValue() - 1
       ) {
         this.graphHistory.splice(0, 1);
       }
@@ -301,29 +309,31 @@ export class GlobalVariableService {
     }, this.HISTORY_SNAP_DELAY);
   }
 
-  getLabels4Elems(
-    elemIds: string[],
+  getLabels4Elements(
+    elementIds: string[],
     isNode: boolean = true,
-    objDatas: GraphElem[] = null
+    objectDatas: GraphElement[] = null
   ): string {
-    return this.getLabels4ElemsAsArray(elemIds, isNode, objDatas).join(",");
+    return this.getLabels4ElementsAsArray(elementIds, isNode, objectDatas).join(
+      ","
+    );
   }
 
-  getLabels4ElemsAsArray(
-    elemIds: string[],
+  getLabels4ElementsAsArray(
+    elementIds: string[],
     isNode: boolean = true,
-    objDatas: GraphElem[] = null
+    objectDatas: GraphElement[] = null
   ): string[] {
     let cyIds: string[] = [];
     let idChar = "n";
     if (!isNode) {
       idChar = "e";
     }
-    if (objDatas) {
-      cyIds = objDatas.map((x) => x.data.id);
+    if (objectDatas) {
+      cyIds = objectDatas.map((x) => x.data.id);
     } else {
-      for (let i = 0; i < elemIds.length; i++) {
-        cyIds.push(idChar + elemIds[i]);
+      for (let i = 0; i < elementIds.length; i++) {
+        cyIds.push(idChar + elementIds[i]);
       }
     }
 
@@ -333,25 +343,25 @@ export class GlobalVariableService {
       labelParent = this.appDescription.getValue().relations;
     }
     for (let i = 0; i < cyIds.length; i++) {
-      let cName = "";
-      if (!objDatas) {
-        cName = this.cy.elements(`[id = "${cyIds[i]}"]`).className()[0];
+      let className = "";
+      if (!objectDatas) {
+        className = this.cy.elements(`[id = "${cyIds[i]}"]`).className()[0];
       } else {
-        cName = objDatas[i].classes.split(" ")[0];
+        className = objectDatas[i].classes.split(" ")[0];
       }
 
-      let s = labelParent[cName]["style"]["label"] as string;
+      let s = labelParent[className]["style"]["label"] as string;
       if (s.indexOf("(") < 0) {
         labels.push(s);
       } else {
         let propName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
-        if (!objDatas) {
+        if (!objectDatas) {
           labels.push(this.cy.elements(`[id = "${cyIds[i]}"]`).data(propName));
         } else {
-          const currData = objDatas[i].data;
-          let l = currData[propName];
+          const currentData = objectDatas[i].data;
+          let l = currentData[propName];
           if (!l) {
-            l = currData[Object.keys(currData)[0]];
+            l = currentData[Object.keys(currentData)[0]];
           }
           labels.push(l);
         }
@@ -370,8 +380,8 @@ export class GlobalVariableService {
 
   getFcoseOptions() {
     let p = 4;
-    if (this.userPrefsFromFiles.tilingPadding) {
-      p = this.userPrefsFromFiles.tilingPadding.getValue();
+    if (this.userPreferencesFromFiles.tilingPadding) {
+      p = this.userPreferencesFromFiles.tilingPadding.getValue();
     }
     return {
       name: "fcose",
@@ -380,7 +390,7 @@ export class GlobalVariableService {
       animate: true,
       // duration of animation in ms, if enabled
       animationDuration: LAYOUT_ANIM_DUR,
-      fit: !this.userPrefs.isAutoIncrementalLayoutOnChange.getValue(),
+      fit: !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue(),
       // padding around layout
       padding: 10,
       // whether to include labels in node dimensions. Valid in 'proof' quality
@@ -422,14 +432,14 @@ export class GlobalVariableService {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
         if (
-          this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()
+          this.userPreferences.pangenomegrapher.isHighlightInZeroOutZero.getValue()
         ) {
           this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroIndegree); // highlight source nodes
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
         if (
-          this.userPrefs.pangenomegrapher.isHighlightInZeroOutZero.getValue()
+          this.userPreferences.pangenomegrapher.isHighlightInZeroOutZero.getValue()
         ) {
           this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroOutdegree); // highlight target nodes
         }
@@ -622,24 +632,24 @@ export class GlobalVariableService {
   /**
    * @param  {} fn should be a function that takes a cytoscape.js element and returns true or false
    */
-  filterRemovedElems(fn) {
+  filterRemovedElements(fn: any) {
     const r = this.cy.collection();
     const collapsedNodes = this.cy.nodes("." + COLLAPSED_NODE_CLASS);
     for (let i = 0; i < collapsedNodes.length; i++) {
       const ancestors = this.cy.collection();
-      this.filterOnElem(collapsedNodes[i], fn, r, ancestors);
+      this.filterOnElement(collapsedNodes[i], fn, r, ancestors);
     }
     const collapsedEdges = this.cy.edges("." + COLLAPSED_EDGE_CLASS);
     for (let i = 0; i < collapsedEdges.length; i++) {
       const ancestors = this.cy.collection();
-      this.filterOnElem(collapsedEdges[i], fn, r, ancestors);
+      this.filterOnElement(collapsedEdges[i], fn, r, ancestors);
     }
     return r;
   }
 
-  filterOnElem(elem, fn, r, ancestors) {
-    const collapsedChildren = elem.data("collapsedChildren");
-    const collapsedEdges = elem.data("collapsedEdges");
+  filterOnElement(element: any, fn: any, r: any, ancestors: any) {
+    const collapsedChildren = element.data("collapsedChildren");
+    const collapsedEdges = element.data("collapsedEdges");
     let collapsed = this.cy.collection();
     if (collapsedChildren) {
       collapsed.merge(collapsedChildren);
@@ -647,16 +657,16 @@ export class GlobalVariableService {
     if (collapsedEdges) {
       collapsed.merge(collapsedEdges);
     }
-    if (!collapsedChildren && !collapsedEdges && fn(elem)) {
-      r.merge(elem);
+    if (!collapsedChildren && !collapsedEdges && fn(element)) {
+      r.merge(element);
       r.merge(ancestors);
     }
 
     if (collapsed.length > 0) {
-      ancestors = ancestors.union(elem);
+      ancestors = ancestors.union(element);
     }
     for (let i = 0; i < collapsed.length; i++) {
-      this.filterOnElem(collapsed[i], fn, r, ancestors);
+      this.filterOnElement(collapsed[i], fn, r, ancestors);
     }
   }
 
@@ -666,7 +676,7 @@ export class GlobalVariableService {
     animationDuration: number = LAYOUT_ANIM_DUR
   ) {
     if (
-      !this.userPrefs.isAutoIncrementalLayoutOnChange.getValue() &&
+      !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue() &&
       !isRandomize &&
       !isDirectCommand
     ) {
@@ -674,13 +684,15 @@ export class GlobalVariableService {
       return;
     }
     if (
-      this.userPrefs.groupingOption.getValue() != GroupingOptionTypes.clusterId
+      this.userPreferences.groupingOption.getValue() !=
+      GroupingOptionTypes.clusterId
     ) {
       this.prepareConstraints();
       this.layout = this.getFcoseOptions();
     }
     this.layout.animationDuration = animationDuration;
-    this.layout.tile = this.userPrefs.isTileDisconnectedOnLayout.getValue();
+    this.layout.tile =
+      this.userPreferences.isTileDisconnectedOnLayout.getValue();
     this.switchLayoutRandomization(isRandomize);
     this.runLayout(() => {
       this.removeConstraints();
@@ -725,7 +737,7 @@ export class GlobalVariableService {
 
       // Whether to fit the viewport to the repositioned graph
       // true : Fits at end of layout for animate:false or animate:'end'
-      fit: !this.userPrefs.isAutoIncrementalLayoutOnChange.getValue(),
+      fit: !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue(),
 
       // Padding in rendered co-ordinates around the layout
       padding: 30,
@@ -765,27 +777,27 @@ export class GlobalVariableService {
     };
   }
 
-  private setUserPrefs(obj: any, userPref: any) {
-    if (obj === undefined || obj === null) {
+  private setUserPreferences(object: any, userPreferences: any) {
+    if (object === undefined || object === null) {
       return;
     }
-    for (let k in obj) {
-      let prop = obj[k];
+    for (let k in object) {
+      let prop = object[k];
       if (isPrimitiveType(prop)) {
-        if (userPref[k]) {
-          (userPref[k] as BehaviorSubject<any>).next(prop);
+        if (userPreferences[k]) {
+          (userPreferences[k] as BehaviorSubject<any>).next(prop);
         } else {
-          userPref[k] = new BehaviorSubject(prop);
+          userPreferences[k] = new BehaviorSubject(prop);
         }
       } else {
-        if (!userPref[k]) {
+        if (!userPreferences[k]) {
           if (prop instanceof Array) {
-            userPref[k] = [];
+            userPreferences[k] = [];
           } else {
-            userPref[k] = {};
+            userPreferences[k] = {};
           }
         }
-        this.setUserPrefs(obj[k], userPref[k]);
+        this.setUserPreferences(object[k], userPreferences[k]);
       }
     }
   }
@@ -797,10 +809,10 @@ export class GlobalVariableService {
       .style()
       .selector("edge." + COLLAPSED_EDGE_CLASS)
       .style({
-        label: (e) => {
+        label: (e: any) => {
           return "(" + e.data("collapsedEdges").length + ")";
         },
-        width: (e) => {
+        width: (e: any) => {
           let n = e.data("collapsedEdges").length;
           return 3 + Math.log2(n) + "px";
         },
@@ -842,10 +854,10 @@ export class GlobalVariableService {
       .style()
       .selector("edge.LINK")
       .style({
-        "target-arrow-shape": function (e) {
+        "target-arrow-shape": function (e: any) {
           return arrowShape(e.data("targetOrientation"), true);
         },
-        "source-arrow-shape": function (e) {
+        "source-arrow-shape": function (e: any) {
           return arrowShape(e.data("sourceOrientation"), false);
         },
       })
@@ -855,10 +867,10 @@ export class GlobalVariableService {
       .style()
       .selector("edge.JUMP")
       .style({
-        "target-arrow-shape": function (e) {
+        "target-arrow-shape": function (e: any) {
           return arrowShape(e.data("targetOrientation"), true);
         },
-        "source-arrow-shape": function (e) {
+        "source-arrow-shape": function (e: any) {
           return arrowShape(e.data("sourceOrientation"), false);
         },
       })
@@ -868,10 +880,10 @@ export class GlobalVariableService {
       .style()
       .selector("edge.CONTAINMENT")
       .style({
-        "target-arrow-shape": function (e) {
+        "target-arrow-shape": function (e: any) {
           return arrowShape(e.data("targetOrientation"), true);
         },
-        "source-arrow-shape": function (e) {
+        "source-arrow-shape": function (e: any) {
           return arrowShape(e.data("sourceOrientation"), false);
         },
       })
@@ -884,7 +896,7 @@ export class GlobalVariableService {
 
   private addStyle4Emphasize() {
     const color = "#da14ff";
-    const wid = this.userPrefs.highlightStyles[0].wid.getValue();
+    const wid = this.userPreferences.highlightStyles[0].wid.getValue();
     const OPACITY_DIFF = 0.05;
 
     this.cy
@@ -903,38 +915,38 @@ export class GlobalVariableService {
       .style({
         "underlay-color": color,
         "underlay-opacity": HIGHLIGHT_OPACITY + OPACITY_DIFF,
-        "underlay-padding": (e) => {
+        "underlay-padding": (e: any) => {
           return (wid + e.width()) / 2 + "px";
         },
       })
       .update();
   }
 
-  private setColor4CompoundEdge(e) {
+  private setColor4CompoundEdge(e: any) {
     let collapsedEdges = e.data("collapsedEdges");
-    if (this.doElemsMultiClasses(collapsedEdges)) {
+    if (this.doElementsMultiClasses(collapsedEdges)) {
       return "#b3b3b3";
     }
     return collapsedEdges[0].style("line-color");
   }
 
-  private setTargetArrowShape(e) {
+  private setTargetArrowShape(e: any) {
     let collapsedEdges = e.data("collapsedEdges");
-    if (this.doElemsMultiClasses(collapsedEdges)) {
+    if (this.doElementsMultiClasses(collapsedEdges)) {
       return "triangle";
     }
     return collapsedEdges[0].style("target-arrow-shape");
   }
 
-  private doElemsMultiClasses(elems) {
-    let classDict = {};
-    for (let i = 0; i < elems.length; i++) {
-      let classes = elems[i].classes();
+  private doElementsMultiClasses(elements: any) {
+    let classDictionary = {};
+    for (let i = 0; i < elements.length; i++) {
+      let classes = elements[i].classes();
       for (let j = 0; j < classes.length; j++) {
-        classDict[classes[j]] = true;
+        classDictionary[classes[j]] = true;
       }
     }
-    return Object.keys(classDict).length > 1;
+    return Object.keys(classDictionary).length > 1;
   }
 
   refreshCues() {

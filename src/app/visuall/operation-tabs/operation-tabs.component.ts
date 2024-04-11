@@ -19,11 +19,11 @@ export class OperationTabsComponent implements OnDestroy {
     { component: QueryTabComponent, text: "Database" },
     { component: SettingsTabComponent, text: "Settings" },
   ];
-  tabChangeSubs: Subscription;
+  tabChangeSubscription: Subscription;
 
   constructor(private _g: GlobalVariableService) {
     this.currTab = this._g.operationTabChanged.getValue();
-    this.tabChangeSubs = this._g.operationTabChanged.subscribe((x) => {
+    this.tabChangeSubscription = this._g.operationTabChanged.subscribe((x) => {
       this.currTab = x;
     });
   }
@@ -33,8 +33,8 @@ export class OperationTabsComponent implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.tabChangeSubs) {
-      this.tabChangeSubs.unsubscribe();
+    if (this.tabChangeSubscription) {
+      this.tabChangeSubscription.unsubscribe();
     }
   }
 }

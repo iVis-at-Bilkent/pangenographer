@@ -46,9 +46,9 @@ function processCssFile(cssFileName, style) {
 
   let ast = css.parse(cssFile);
 
-  for (let [key, val] of Object.entries(style)) {
-    for (let [cssKey, cssVal] of Object.entries(val)) {
-      updateAST(ast, key, cssKey, cssVal);
+  for (let [key, value] of Object.entries(style)) {
+    for (let [cssKey, cssValue] of Object.entries(value)) {
+      updateAST(ast, key, cssKey, cssValue);
     }
   }
 
@@ -73,7 +73,7 @@ function setFixedStyles(stylesheet, generalStyles) {
   });
 }
 
-function setCyStyles(graphElems, stylesheet, properties, isEdge = true) {
+function setCyStyles(graphElements, stylesheet, properties, isEdge = true) {
   let s = "node.";
   let s2 = "nodes";
   if (isEdge) {
@@ -81,15 +81,15 @@ function setCyStyles(graphElems, stylesheet, properties, isEdge = true) {
     s2 = "edges";
   }
 
-  for (let key in graphElems) {
-    let val = graphElems[key];
+  for (let key in graphElements) {
+    let value = graphElements[key];
     let cyStyle = { selector: s + key, style: {} };
 
-    for (let style_key in val["style"]) {
-      cyStyle["style"][style_key] = val["style"][style_key];
+    for (let style_key in value["style"]) {
+      cyStyle["style"][style_key] = value["style"][style_key];
     }
     stylesheet.push(cyStyle);
-    properties[s2][key] = val["properties"];
+    properties[s2][key] = value["properties"];
   }
 }
 
@@ -118,7 +118,7 @@ function writeFile(filename, content) {
 }
 
 // ast is abstract syntax tree for style.css file
-function updateAST(ast, cssSelector, cssKey, cssVal) {
+function updateAST(ast, cssSelector, cssKey, cssValue) {
   for (let i = 0; i < ast.stylesheet.rules.length; i++) {
     let rule = ast.stylesheet.rules[i];
     if (!rule.selectors) {
@@ -128,7 +128,7 @@ function updateAST(ast, cssSelector, cssKey, cssVal) {
       for (let j = 0; j < rule.declarations.length; j++) {
         let decl = rule.declarations[j];
         if (decl.property === cssKey) {
-          ast.stylesheet.rules[i].declarations[j].value = cssVal;
+          ast.stylesheet.rules[i].declarations[j].value = cssValue;
         }
       }
     }

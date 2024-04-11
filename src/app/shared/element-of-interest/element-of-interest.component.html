@@ -18,7 +18,7 @@
       *ngFor="let n of selectedNodes; let i = index"
       class="rounded va-text m-1 p-1"
       [style.border]="
-        i == clickedNodeIdx ? '2px solid #888888' : '2px solid #dee2e6'
+        i == clickedNodeIndex ? '2px solid #888888' : '2px solid #dee2e6'
       "
     >
       <div class="text-center pointer" (click)="selectedNodeClicked(i)">
@@ -44,13 +44,13 @@
     </button>
     <button
       class="btn btn-sm m-1"
-      [ngClass]="{ 'highlighted-btn': addNodeBtnTxt == 'Complete selection' }"
+      [ngClass]="{ 'highlighted-btn': addNodeButonTxt == 'Complete selection' }"
       type="button"
     >
       <img
-        [src]="addNodeBtnImg"
+        [src]="addNodeButonImage"
         class="img-btn"
-        [title]="addNodeBtnTxt"
+        [title]="addNodeButonTxt"
         (click)="addSelectedNodes()"
         title="Add selected nodes"
       />

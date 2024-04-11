@@ -1,6 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
+import { COLLAPSED_EDGE_CLASS } from "src/app/visuall/constants";
 import { environment } from "src/environments/environment";
 import {
   TableData,
@@ -11,6 +12,10 @@ import {
 } from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { GlobalVariableService } from "../../../global-variable.service";
+import {
+  CombinedSequence,
+  SequenceDataService,
+} from "../../../sequence-data.service";
 
 interface webDatabaseType {
   name: string;
@@ -24,10 +29,15 @@ interface webDatabaseType {
   styleUrls: ["./blast-tab.component.css"],
 })
 export class BlastTabComponent implements OnInit {
-  query: string = "";
-  types: string[] = ["Standalone service", "Web service"];
-  selectedType: string = "Standalone service";
-  selectedTypeIdx: number = 0;
+  query: string = ""; // Query sequence for BLAST
+  types: string[] = ["Standalone service", "Web service"]; // Types of service
+  selectedType: string = "Standalone service"; // Selected type of service
+  selectedTypeIdx: number = 0; // 0: Standalone service, 1: Web service
+
+  // Selected segments path finding variables
+  selectedSegmentMap: any = {}; // Map of selected segments with their ids as keys
+  selectedSegmentPaths: any[] = []; // Array of selected segments' paths
+  currentSelectedSegmentPath: any[] = []; // Current selected segment path
 
   // Web service variables
   webDatabases: webDatabaseType[] = [
@@ -216,9 +226,9 @@ export class BlastTabComponent implements OnInit {
     ],
     isLoadGraph: false,
     isMergeGraph: false,
-    currPage: 1,
+    currentPage: 1,
     pageSize: 15,
-    resultCnt: 0,
+    resultCount: 0,
     isNodeData: false,
     isShowExportAsCSV: false,
     isHide0: false,
@@ -242,10 +252,285 @@ export class BlastTabComponent implements OnInit {
   constructor(
     protected _http: HttpClient,
     private _g: GlobalVariableService,
-    private _cyService: CytoscapeService
+    private _cyService: CytoscapeService,
+    private _sequenceDataService: SequenceDataService
   ) {}
 
   ngOnInit(): void {}
+
+  // Fill query textarea with selected segments sequence
+  fillQueryTextareaWithSelectedSegmentsSequence() {
+    // Get selected segments
+    const selectedSegments = this._g.cy.$(":selected").nodes();
+
+    // Prepare selected segments sequence
+    let selectedSegmentsSequence: string;
+
+    // If no segment is selected, show error modal
+    if (selectedSegments.length == 0) {
+      this._g.showErrorModal(
+        "No segments selected",
+        "Please select segments and try again."
+      );
+      return;
+    }
+    // If segments are selected, prepare selected segments sequence
+    // and prepare fasta data for the selected segments as a query
+    // We prepare fasta data for the selected segment by getting the sequence data
+    // and transforming it to an array of sequence names and sequences
+    else {
+      // Prepare paths for selected segments in dfs manner
+      // We select a random node and find a path in selected segments
+      // that can be reached from the random node or can reach to the random node
+      // in a length of less than or equal to the selected segments path length option value
+      // We repeat this process until there is no selected segment left
+      this.preparePaths4SelectedSegments(selectedSegments);
+
+      // Prepare selected segments sequence
+      let sequencesOfSelectedPaths: string[] = [];
+
+      for (let i = 0; i < this.selectedSegmentPaths.length; i++) {
+        // If the path length is equal to 1, then we have a single segment
+        // and we can directly add the sequence data to the selected segments sequence
+        if (this.selectedSegmentPaths[i].length == 1) {
+          this._sequenceDataService.pushSequenceData2Array(
+            this.selectedSegmentPaths[i][0],
+            sequencesOfSelectedPaths
+          );
+        }
+        // Otherwise, we have multiple segments in the path
+        // and we need to combine the sequence data of the segments in the path
+        // to create a combined sequence for the selected segments path
+        else {
+          this.prepareCombinedSequenceFromPath(i, sequencesOfSelectedPaths);
+        }
+      }
+
+      // Prepare selected segments sequence
+      // by preparing fasta data for the selected segments as a query
+      // We prepare fasta data for the selected segment by getting the sequence data
+      // and transforming it to an array of sequence names and sequences
+      selectedSegmentsSequence =
+        this._sequenceDataService.prepareFastaData4SequenceArray(
+          sequencesOfSelectedPaths
+        );
+    }
+
+    // Set selected segments sequence to query textarea
+    // to be shown to the user and used as a query
+    this.query = selectedSegmentsSequence;
+  }
+
+  // Prepare combined sequence for selected segments path
+  // by combining the sequence data of the segments in the path
+  // to create a combined sequence for the selected segments path
+  private prepareCombinedSequenceFromPath(
+    index: number,
+    sequencesOfSelectedPaths: string[]
+  ) {
+    // Get non-jump expanded edges between first two nodes in the path
+    // as we need edges between nodes to get combined sequence data
+    let edges = this.getNonJumpExpandedEdges(
+      this.selectedSegmentPaths[index][0],
+      this.selectedSegmentPaths[index][1]
+    );
+
+    // Get combined sequence from combined sequence object
+    // which is prepared by combining the sequence data of the first two nodes
+    let combinedSequence = this.getCombinedSequenceFromCombinedSequenceObject(
+      this._sequenceDataService.prepareCombinedSequence(edges[0])
+    );
+
+    // Combine the sequence data of the first two nodes with the sequence data of the rest of the nodes
+    for (let j = 2; j < this.selectedSegmentPaths[index].length; j++) {
+      // Get non-jump expanded edges between current node and previous node
+      // as we need edges between nodes to get combined sequence data
+      edges = this.getNonJumpExpandedEdges(
+        this.selectedSegmentPaths[index][j - 1],
+        this.selectedSegmentPaths[index][j]
+      );
+
+      // Combine the sequence data of the current node with the combined sequence
+      // by preparing a combined sequence object and getting the combined sequence
+      // and updating the combined sequence
+      combinedSequence = this.getCombinedSequenceFromCombinedSequenceObject(
+        this._sequenceDataService.prepareCombinedSequence(
+          edges[0],
+          combinedSequence
+        )
+      );
+    }
+
+    // Prepare selected path name for selected segments path
+    let selectedPathName = "path";
+
+    // Add segment names to selected path name for selected segments path
+    // by concatenating the segment names of the segments in the path
+    for (let i = 0; i < this.selectedSegmentPaths[index].length; i++) {
+      selectedPathName +=
+        "_" + this.selectedSegmentPaths[index][i].data("segmentName");
+    }
+
+    // Add selected path name and combined sequence to sequences of selected paths array
+    sequencesOfSelectedPaths.push(selectedPathName);
+    sequencesOfSelectedPaths.push(combinedSequence);
+  }
+
+  // Get combined sequence from combined sequence object
+  // by concatenating first, second and third sequencess
+  private getCombinedSequenceFromCombinedSequenceObject(
+    combinedSequenceObject: CombinedSequence
+  ): string {
+    return (
+      combinedSequenceObject.firstSequence +
+      combinedSequenceObject.secondSequence +
+      combinedSequenceObject.thirdSequence
+    );
+  }
+
+  // Prepare paths for selected segments in dfs manner
+  // We select a random node and find a path in selected segments
+  // that can be reached from the random node or can reach to the random node
+  // in a length of less than or equal to the selected segments path length option value
+  // We repeat this process until there is no selected segment left
+  private preparePaths4SelectedSegments(selectedSegments: any[]) {
+    this.selectedSegmentMap = {}; // Map of selected segments with their ids as keys
+    this.selectedSegmentPaths = []; // Array of selected segments' paths
+
+    // Add selected segments to selected segment map
+    selectedSegments.forEach((element: any) => {
+      this.selectedSegmentMap[element.id()] = element;
+    });
+
+    // Create selected segments array from selected segment map
+    // to check if there is any selected segment left
+    let selectedSegmentsArray = Object.values(this.selectedSegmentMap);
+
+    // Repeat the process until there is no selected segment left
+    while (selectedSegmentsArray.length > 0) {
+      // Select a random node from selected segments array
+      let element: any = selectedSegmentsArray[0];
+
+      // Prepare selected segments path for the random node
+      this.currentSelectedSegmentPath = [element];
+
+      // Remove the element from selected segment map
+      delete this.selectedSegmentMap[element.id()];
+
+      // Recursively find a path in selected segments in dfs manner
+      // First incomers then outgoers
+
+      // Filter incomers that are not selected segments and recurse
+      // We select the first incomer randomly and recurse
+      let incomers = this.getFilteredNodes(element.incomers());
+      if (incomers.length) {
+        this.recurseSelectedSegmentsPath(incomers[0], false);
+      }
+
+      this.currentSelectedSegmentPath.reverse();
+
+      // Filter outgoers that are not selected segments
+      // We select the first outgoer randomly and recurse
+      let outgoers = this.getFilteredNodes(element.outgoers());
+      if (outgoers.length) {
+        this.recurseSelectedSegmentsPath(outgoers[0], true);
+      }
+
+      // Add the current selected segment path to selected segment paths
+      // This is a path that can be reached from the random node or can reach to the random node
+      // in a length of less than or equal to the selected segments path length option value
+      this.selectedSegmentPaths.push(this.currentSelectedSegmentPath);
+
+      // Update selected segments array to check if there is any selected segment left
+      selectedSegmentsArray = Object.values(this.selectedSegmentMap);
+    }
+  }
+
+  // Recursively find a path in selected segments in dfs manner
+  private recurseSelectedSegmentsPath(element: any, isOutgoer: boolean) {
+    // If the path length is equal to the length of selected segments path option
+    // then we have found a path and we don't need to recurse further
+    if (
+      this.currentSelectedSegmentPath.length ==
+      this._g.userPreferences.pangenomegrapher.lengthOfBlastSelectedSegmentsPath.getValue()
+    ) {
+      return;
+    }
+
+    // Add the element to the current selected segment path
+    this.currentSelectedSegmentPath.push(element);
+    // Remove the element from selected segment map
+    delete this.selectedSegmentMap[element.id()];
+
+    // Get filtered nodes for outgoers or incomers of the element
+    // as we recurse outgoers or incomers of the element
+    // We don't want to include nodes that are not selected segments
+    // or nodes that have jump edges, because jump edges do not have sequence data
+    let nodes: any[];
+    if (isOutgoer) {
+      nodes = this.getFilteredNodes(element.outgoers().nodes());
+    } else {
+      nodes = this.getFilteredNodes(element.incomers().nodes());
+    }
+
+    // Recurse the first node in filtered nodes if there is any
+    if (nodes.length) {
+      this.recurseSelectedSegmentsPath(nodes[0], isOutgoer);
+    }
+  }
+
+  // Get filtered nodes for selected segments
+  // Filtered nodes are nodes that have non-jump edges
+  // and are selected segments
+  // We don't want to include nodes that are not selected segments
+  // or nodes that have jump edges, because jump edges do not have sequence data
+  private getFilteredNodes(nodes: any[]) {
+    return nodes.filter(
+      (node: any) =>
+        this.selectedSegmentMap[node.id()] &&
+        this.getNonJumpExpandedEdges(node).length
+    );
+  }
+
+  // Get non-jump expanded edges between nodes
+  // This function is used for selected segments path finding
+  // If node2 is not provided, get last node of current selected segment path
+  private getNonJumpExpandedEdges(node1: any, node2?: any) {
+    // If node2 is not provided, get non-jump edges of node1
+    // and last node of current selected segment path
+    // because we are looking for non-jump edges between selected segments
+    // Otherwise, get non-jump edges between node1 and node2
+    node2 =
+      node2 ||
+      this.currentSelectedSegmentPath[
+        this.currentSelectedSegmentPath.length - 1
+      ];
+
+    // Get all edges between node1 and node2 and filter non-jump edges
+    let edges = node1
+      .edgesTo(node2)
+      .union(node2.edgesTo(node1))
+      .filter((x: any) => !x.data("distance"));
+
+    // Get collapsed edges in filtered edges
+    let collapsedEdges = edges.filter((x: any) =>
+      x.hasClass(COLLAPSED_EDGE_CLASS)
+    );
+    // Get non-collapsed edges in filtered edges
+    edges = edges.difference(collapsedEdges);
+
+    // Get all edges of collapsed edges and add them to non-collapsed edges
+    for (let edge of collapsedEdges) {
+      edges = edges.union(edge.data("collapsedEdges"));
+    }
+
+    return edges;
+  }
+
+  // Set selected type of service
+  onQueryChange(event: any) {
+    this.query = event.target.value.trim();
+  }
 
   onchangeTypeChange(event: any) {
     this.selectedType = event.target.value;
@@ -374,25 +659,6 @@ export class BlastTabComponent implements OnInit {
       this.webResult = result;
       this._g.statusMsg.next("BLAST query result retrieved successfully");
     });
-  }
-
-  fillQueryTextareaWithSelectedSegmentsSequence() {
-    const selectedSegments = this._g.cy.$(":selected");
-    if (selectedSegments.length == 0) {
-      this._g.showErrorModal(
-        "No segments selected",
-        "Please select segments and try again."
-      );
-      return;
-    }
-    let selectedSegmentSeq =
-      this._cyService.prepareAllNodesFastaData(selectedSegments);
-
-    this.query = selectedSegmentSeq;
-  }
-
-  onQueryChange(event: any) {
-    this.query = event.target.value.trim();
   }
 
   // Set web database for selected program
@@ -530,15 +796,26 @@ export class BlastTabComponent implements OnInit {
     }, errFn);
   }
 
+  // Create database from all nodes in the graph by preparing fasta data for the nodes
   createDatabase() {
+    // Check if there are any nodes in the graph
     if (this._g.cy.nodes().length == 0) {
       this._g.showErrorModal("No nodes", "Please load a graph and try again.");
       return;
     }
+
+    // Run standalone query to create database from all nodes in the graph
     this.runStandaloneQuery(
-      { fastaData: this._cyService.prepareAllNodesFastaData() },
-      true,
+      {
+        // Prepare fasta data for all nodes in the graph
+        //  by preparing fasta data for the sequence array of the nodes in the graph
+        fastaData: this._sequenceDataService.prepareFastaData4SequenceArray(
+          this._sequenceDataService.nodeDatas2SequenceArray(this._g.cy.nodes())
+        ),
+      },
+      true, // Make database flag
       (res) => {
+        // Show status message for the number of sequences added to the database
         this._g.statusMsg.next(
           "Succesfully added " +
             res.results.split("\n")[9].split(" ")[5] +
@@ -589,26 +866,26 @@ export class BlastTabComponent implements OnInit {
       let row: TableData[] = [];
       let cols = lines[i].trim().split("\t");
       if (cols.length == 12) {
-        row.push({ val: id++, type: TableDataType.number });
-        row.push({ val: cols[0], type: TableDataType.number });
-        row.push({ val: cols[1], type: TableDataType.number });
-        row.push({ val: cols[2], type: TableDataType.number });
-        row.push({ val: cols[3], type: TableDataType.number });
-        row.push({ val: cols[4], type: TableDataType.number });
-        row.push({ val: cols[5], type: TableDataType.number });
-        row.push({ val: cols[6], type: TableDataType.number });
-        row.push({ val: cols[7], type: TableDataType.number });
-        row.push({ val: cols[8], type: TableDataType.number });
-        row.push({ val: cols[9], type: TableDataType.number });
-        row.push({ val: cols[10], type: TableDataType.string });
-        row.push({ val: cols[11], type: TableDataType.number });
+        row.push({ value: id++, type: TableDataType.number });
+        row.push({ value: cols[0], type: TableDataType.number });
+        row.push({ value: cols[1], type: TableDataType.number });
+        row.push({ value: cols[2], type: TableDataType.number });
+        row.push({ value: cols[3], type: TableDataType.number });
+        row.push({ value: cols[4], type: TableDataType.number });
+        row.push({ value: cols[5], type: TableDataType.number });
+        row.push({ value: cols[6], type: TableDataType.number });
+        row.push({ value: cols[7], type: TableDataType.number });
+        row.push({ value: cols[8], type: TableDataType.number });
+        row.push({ value: cols[9], type: TableDataType.number });
+        row.push({ value: cols[10], type: TableDataType.string });
+        row.push({ value: cols[11], type: TableDataType.number });
         this.standaloneTableOutput.results.push(row);
       }
     }
     this.standaloneTableOutput.pageSize =
-      this._g.userPrefs.dataPageSize.getValue();
-    this.standaloneTableOutput.currPage = 1;
-    this.standaloneTableOutput.resultCnt =
+      this._g.userPreferences.dataPageSize.getValue();
+    this.standaloneTableOutput.currentPage = 1;
+    this.standaloneTableOutput.resultCount =
       this.standaloneTableOutput.results.length;
 
     this.standaloneIsTableOutputFilled.next(true);
@@ -621,7 +898,7 @@ export class BlastTabComponent implements OnInit {
     filterTableDatas(
       filter,
       this.standaloneTableOutput,
-      this._g.userPrefs.isIgnoreCaseInText.getValue()
+      this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
     setTimeout(() => {
       this.standaloneIsTableOutputFilled.next(true);

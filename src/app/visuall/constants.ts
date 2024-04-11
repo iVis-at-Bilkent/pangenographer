@@ -6,6 +6,8 @@ export const MAX_DATA_PAGE_SIZE = 10000;
 export const MIN_DATA_PAGE_SIZE = 1;
 export const MAX_LENGTH_OF_UP_DOWN_STREAM = 10;
 export const MIN_LENGTH_OF_UP_DOWN_STREAM = 1;
+export const MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH = 10;
+export const MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH = 1;
 export const EXPAND_COLLAPSE_CUE_SIZE = 12;
 export const MAX_TABLE_COLUMN_COUNT = 100;
 export const MIN_TABLE_COLUMN_COUNT = 1;
@@ -28,6 +30,7 @@ export const PATH_WALK_NAME_DISALLOWED_REGEX =
 export const BADGE_ZOOM_THRESHOLD = 0.8;
 export const BADGE_DEFAULT_NODE_SIZE = 40;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
+export const OVERLAP_REGEX = /[MIDNSHPX=]/;
 
 export const EXPAND_COLLAPSE_FAST_OPT = {
   layoutBy: null,
@@ -151,11 +154,11 @@ export function debounce2(fn1: Function, wait: number, fn2: Function) {
 
 // objects is an array of objects, types is an array of strings
 // get propperty names of types. If types does not exists get all
-export function getPropNamesFromObj(objects, types) {
+export function getPropNamesFromObject(objects: any, types: any) {
   let s1 = new Set<string>();
 
-  for (const obj of objects) {
-    for (const [, value] of Object.entries(obj)) {
+  for (const object of objects) {
+    for (const [, value] of Object.entries(object)) {
       for (const [k2, v2] of Object.entries(value)) {
         if (!types) {
           s1.add(k2);
@@ -171,8 +174,8 @@ export function getPropNamesFromObj(objects, types) {
 // return union of 2 sets
 export function union(setA: any, setB: any) {
   let _union = new Set(setA);
-  for (let elem of setB) {
-    _union.add(elem);
+  for (let element of setB) {
+    _union.add(element);
   }
   return _union;
 }
@@ -347,7 +350,7 @@ export function isJson(str: string) {
   return true;
 }
 
-export function mapColor(colorEnd: string, valueEnd: number, val: number) {
+export function mapColor(colorEnd: string, valueEnd: number, value: number) {
   if (colorEnd[0] == "#") {
     colorEnd = colorEnd.slice(1, colorEnd.length);
   }
@@ -355,17 +358,17 @@ export function mapColor(colorEnd: string, valueEnd: number, val: number) {
   let g = parseInt(colorEnd.slice(2, 4), 16);
   let b = parseInt(colorEnd.slice(4, 6), 16);
 
-  let rVal = Math.round(r + (255 - r) * (1 - val / valueEnd)).toString(16);
-  let gVal = Math.round(g + (255 - g) * (1 - val / valueEnd)).toString(16);
-  let bVal = Math.round(b + (255 - b) * (1 - val / valueEnd)).toString(16);
-  if (rVal.length < 2) {
-    rVal = "0" + rVal;
+  let rValue = Math.round(r + (255 - r) * (1 - value / valueEnd)).toString(16);
+  let gValue = Math.round(g + (255 - g) * (1 - value / valueEnd)).toString(16);
+  let bValue = Math.round(b + (255 - b) * (1 - value / valueEnd)).toString(16);
+  if (rValue.length < 2) {
+    rValue = "0" + rValue;
   }
-  if (gVal.length < 2) {
-    gVal = "0" + gVal;
+  if (gValue.length < 2) {
+    gValue = "0" + gValue;
   }
-  if (bVal.length < 2) {
-    bVal = "0" + bVal;
+  if (bValue.length < 2) {
+    bValue = "0" + bValue;
   }
-  return "#" + rVal + gVal + bVal;
+  return "#" + rValue + gValue + bValue;
 }

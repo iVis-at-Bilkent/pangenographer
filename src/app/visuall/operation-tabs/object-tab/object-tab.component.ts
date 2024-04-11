@@ -15,7 +15,7 @@ import {
   TYPES_NOT_TO_SHOW,
   debounce,
   extend,
-  getPropNamesFromObj,
+  getPropNamesFromObject,
 } from "../../constants";
 import { CytoscapeService } from "../../cytoscape.service";
 import { DbAdapterService } from "../../db-service/db-adapter.service";
@@ -43,8 +43,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     columns: ["Type", "Count", "Selected", "Hidden"],
     isHide0: true,
     results: [],
-    resultCnt: 0,
-    currPage: 1,
+    resultCount: 0,
+    currentPage: 1,
     pageSize: 20,
     tableTitle: "Statistics",
     isShowExportAsCSV: true,
@@ -54,15 +54,15 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     isNodeData: false,
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
-    allChecked: false
+    allChecked: false,
   };
 
   multiObjTableInp: TableViewInput = {
     columns: ["Type"],
     isHide0: true,
     results: [],
-    resultCnt: 0,
-    currPage: 1,
+    resultCount: 0,
+    currentPage: 1,
     pageSize: 20,
     isReplace_inHeaders: true,
     tableTitle: "Properties",
@@ -73,30 +73,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     isNodeData: false,
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
-    allChecked: false
+    allChecked: false,
   };
 
   private NODE_TYPE = "_NODE_";
   private EDGE_TYPE = "_EDGE_";
-  shownElemsSubs: Subscription;
-  appDescSubs: Subscription;
-  dataModelSubs: Subscription;
+  shownElementsSubscription: Subscription;
+  appDescSubscription: Subscription;
+  dataModelSubscription: Subscription;
 
   constructor(
     private _g: GlobalVariableService,
     private _dbService: DbAdapterService,
     private _cyService: CytoscapeService,
-    private _SequenceDataService: SequenceDataService
+    private _sequenceDataService: SequenceDataService
   ) {
     this.selectedItemProps = {};
   }
 
   ngOnInit() {
-    this.appDescSubs = this._g.appDescription.subscribe((x) => {
+    this.appDescSubscription = this._g.appDescription.subscribe((x) => {
       if (x === null) {
         return;
       }
-      this.dataModelSubs = this._g.dataModel.subscribe((x2) => {
+      this.dataModelSubscription = this._g.dataModel.subscribe((x2) => {
         if (x2 === null) {
           return;
         }
@@ -111,9 +111,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           this.edgeClasses.add(key);
         }
 
-        this.shownElemsSubs = this._g.shownElemsChanged.subscribe(() => {
-          this.showStats();
-        });
+        this.shownElementsSubscription = this._g.shownElementsChanged.subscribe(
+          () => {
+            this.showStats();
+          }
+        );
         this.showObjectProps();
         this.showStats();
         this._cyService.showObjPropsFn = debounce(
@@ -129,14 +131,14 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.appDescSubs) {
-      this.appDescSubs.unsubscribe();
+    if (this.appDescSubscription) {
+      this.appDescSubscription.unsubscribe();
     }
-    if (this.dataModelSubs) {
-      this.dataModelSubs.unsubscribe();
+    if (this.dataModelSubscription) {
+      this.dataModelSubscription.unsubscribe();
     }
-    if (this.shownElemsSubs) {
-      this.shownElemsSubs.unsubscribe();
+    if (this.shownElementsSubscription) {
+      this.shownElementsSubscription.unsubscribe();
     }
   }
 
@@ -162,7 +164,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     [props, classNames] = this.getCommonObjectProps(selectedNonMeta);
     const properties = this._g.dataModel.getValue();
     // remove undefined but somehow added properties (cuz of extensions)
-    let definedProperties = getPropNamesFromObj(
+    let definedProperties = getPropNamesFromObject(
       [properties.nodes, properties.edges],
       false
     );
@@ -222,20 +224,20 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   private fillMultiObjTable(
-    elems: any,
+    elements: any,
     isNode: boolean,
     idMappingForHighlight: any,
     isNeed2Filter: boolean
   ) {
     this.multiObjTableInp.isNodeData = isNode;
-    let elemTypesArr = elems.map((x: any) => x.classes()[0]);
-    let elemTypes = {};
-    for (let i = 0; i < elemTypesArr.length; i++) {
-      elemTypes[elemTypesArr[i]] = true;
+    let elementTypesArr = elements.map((x: any) => x.classes()[0]);
+    let elementTypes = {};
+    for (let i = 0; i < elementTypesArr.length; i++) {
+      elementTypes[elementTypesArr[i]] = true;
     }
     const properties = this._g.dataModel.getValue();
     let definedProperties = {};
-    for (let type in elemTypes) {
+    for (let type in elementTypes) {
       if (isNode) {
         for (let j in properties.nodes[type]) {
           definedProperties[j] = true;
@@ -251,30 +253,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     );
     this.multiObjTableInp.results = [];
     this.multiObjTableInp.classNames = [];
-    let elemTypeCnt = {};
+    let elementTypeCount = {};
     const enumMapping = this._g.getEnumMapping();
-    for (let i = 0; i < elems.length; i++) {
-      let className = elems[i].classes()[0];
-      if (elemTypeCnt[className]) {
-        elemTypeCnt[className] += 1;
+    for (let i = 0; i < elements.length; i++) {
+      let className = elements[i].classes()[0];
+      if (elementTypeCount[className]) {
+        elementTypeCount[className] += 1;
       } else {
-        elemTypeCnt[className] = 1;
+        elementTypeCount[className] = 1;
       }
       let row: TableData[] = [
         {
           type: TableDataType.string,
-          val: "#" + idMappingForHighlight[elems[i].id()],
+          value: "#" + idMappingForHighlight[elements[i].id()],
         },
-        { type: TableDataType.string, val: className },
+        { type: TableDataType.string, value: className },
       ];
       for (let j in definedProperties) {
-        if (elems[i].data(j)) {
+        if (elements[i].data(j)) {
           row.push(
             property2TableData(
               properties,
               enumMapping,
               j,
-              elems[i].data(j) ?? "",
+              elements[i].data(j) ?? "",
               className,
               !isNode
             )
@@ -284,19 +286,20 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       this.multiObjTableInp.results.push(row);
       this.multiObjTableInp.classNames.push(className);
     }
-    for (let k in elemTypeCnt) {
-      this.selectedClasses += k + "(" + elemTypeCnt[k] + ") ";
+    for (let k in elementTypeCount) {
+      this.selectedClasses += k + "(" + elementTypeCount[k] + ") ";
     }
-    this.multiObjTableInp.pageSize = this._g.userPrefs.dataPageSize.getValue();
-    this.multiObjTableInp.currPage = 1;
-    this.multiObjTableInp.resultCnt = this.multiObjTableInp.results.length;
+    this.multiObjTableInp.pageSize =
+      this._g.userPreferences.dataPageSize.getValue();
+    this.multiObjTableInp.currentPage = 1;
+    this.multiObjTableInp.resultCount = this.multiObjTableInp.results.length;
     // if too many edges need to be shown, we should make pagination
     if (isNeed2Filter) {
       this.clearMultiObjTableFilter.next(true);
       filterTableDatas(
         { orderBy: "", orderDirection: "", txt: "" },
         this.multiObjTableInp,
-        this._g.userPrefs.isIgnoreCaseInText.getValue()
+        this._g.userPreferences.isIgnoreCaseInText.getValue()
       );
     }
     setTimeout(() => {
@@ -357,7 +360,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
         if (renderedKey === "pathNames") {
           this.selectedItemProps[`${renderedKey}`] = {
-            val: renderedValue,
+            value: renderedValue,
           };
           this.selectedItemProps["pathChecked"] = [];
           this.selectedItemProps["pathSegmentNames"] = [];
@@ -369,18 +372,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
           renderedValue.forEach((pathName: string) => {
             let counter = 0;
-            pathNode.data(`p${pathName}`).forEach((pathVal: string) => {
+            pathNode.data(`p${pathName}`).forEach((pathValue: string) => {
               if (counter === 0) {
-                this.selectedItemProps["pathSegmentNames"].push(pathVal);
+                this.selectedItemProps["pathSegmentNames"].push(pathValue);
               } else {
-                this.selectedItemProps["pathOverlaps"].push(pathVal);
+                this.selectedItemProps["pathOverlaps"].push(pathValue);
               }
               counter++;
             });
           });
         } else if (renderedKey === "walkSampleIds") {
           this.selectedItemProps[`${renderedKey}`] = {
-            val: renderedValue,
+            value: renderedValue,
           };
           this.selectedItemProps[`walkChecked`] = [];
           this.selectedItemProps["walkHapIndexes"] = [];
@@ -395,30 +398,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
           renderedValue.forEach((walkName: string) => {
             let counter = 0;
-            walkNode.data(`w${walkName}`).forEach((walkVal: string) => {
+            walkNode.data(`w${walkName}`).forEach((walkValue: string) => {
               if (counter === 0) {
-                this.selectedItemProps["walkHapIndexes"].push(walkVal);
+                this.selectedItemProps["walkHapIndexes"].push(walkValue);
               } else if (counter === 1) {
-                this.selectedItemProps["walkSeqIds"].push(walkVal);
+                this.selectedItemProps["walkSeqIds"].push(walkValue);
               } else if (counter === 2) {
-                this.selectedItemProps["walkSeqStarts"].push(walkVal);
+                this.selectedItemProps["walkSeqStarts"].push(walkValue);
               } else if (counter === 3) {
-                this.selectedItemProps["walkSeqEnds"].push(walkVal);
+                this.selectedItemProps["walkSeqEnds"].push(walkValue);
               } else {
-                this.selectedItemProps["walks"].push(walkVal);
+                this.selectedItemProps["walks"].push(walkValue);
               }
               counter++;
             });
           });
         } else if (renderedKey === "overlap") {
           this.selectedItemProps[`${renderedKey}`] = {
-            val: renderedValue,
+            value: renderedValue,
             overlapIdentifiers: renderedValue.split(/[0-9]+/).slice(1),
             currentIndex: 0,
           };
         } else {
           this.selectedItemProps[`${renderedKey}`] = {
-            val: renderedValue,
+            value: renderedValue,
           };
         }
       }
@@ -428,41 +431,41 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     if (this.selectedItemProps["sourceOrientation"]) {
       this._g.cy.edges(":selected").forEach((element: any) => {
         let combinedSequence =
-          this._SequenceDataService.prepareCombinedSequence(element);
+          this._sequenceDataService.prepareCombinedSequence(element);
 
         if (element.data("pos")) {
           this.selectedItemProps["leftOfTheContainedSequence"] = {
-            val: combinedSequence.firstSequence,
+            value: combinedSequence.firstSequence,
           };
           this.selectedItemProps["containedSequence"] = {
-            val: combinedSequence.secondSequence,
+            value: combinedSequence.secondSequence,
           };
           this.selectedItemProps["rightOfTheContainedSequence"] = {
-            val: combinedSequence.thirdSequence,
+            value: combinedSequence.thirdSequence,
           };
         } else if (element.data("distance")) {
           this.selectedItemProps["sourceSequence"] = {
-            val: combinedSequence.firstSequence,
+            value: combinedSequence.firstSequence,
           };
           this.selectedItemProps["targetSequence"] = {
-            val: combinedSequence.thirdSequence,
+            value: combinedSequence.thirdSequence,
           };
         } else {
           this.selectedItemProps["sourceSequenceWithoutOverlap"] = {
-            val: combinedSequence.firstSequence,
+            value: combinedSequence.firstSequence,
           };
           this.selectedItemProps["overlapSequence"] = {
-            val: combinedSequence.secondSequence,
+            value: combinedSequence.secondSequence,
           };
           this.selectedItemProps["targetSequenceWithoutOverlap"] = {
-            val: combinedSequence.thirdSequence,
+            value: combinedSequence.thirdSequence,
           };
           this.selectedItemProps["overlap"]["overlapNumerics"] =
             combinedSequence.overlapNumerics;
         }
 
         this.selectedItemProps["sequenceLength"] = {
-          val: combinedSequence.sequenceLength,
+          value: combinedSequence.sequenceLength,
         };
       });
     }
@@ -471,11 +474,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   prepareCIGARForIndex(index: number): string {
     if (
       this.selectedItemProps.overlap.currentIndex >=
-      this.selectedItemProps.overlapSequence.val.length
+      this.selectedItemProps.overlapSequence.value.length
     ) {
       this.selectedItemProps.overlap.currentIndex = 0;
     }
-    let s = this.selectedItemProps.overlapSequence.val.substring(
+    let s = this.selectedItemProps.overlapSequence.value.substring(
       this.selectedItemProps.overlap.currentIndex,
       this.selectedItemProps.overlap.currentIndex +
         Number(this.selectedItemProps.overlap.overlapNumerics[index])
@@ -488,15 +491,19 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   getPathsSelected() {
     let segmentNames = [];
-    this.selectedItemProps["pathChecked"].forEach((isChecked, i) => {
-      if (isChecked) {
-        this.selectedItemProps.pathSegmentNames[i]
-          .split(/[;,]/)
-          .forEach((segmentName) => {
-            segmentNames.push(segmentName.substring(0, segmentName.length - 1));
-          });
+    this.selectedItemProps["pathChecked"].forEach(
+      (isChecked: boolean, i: number) => {
+        if (isChecked) {
+          this.selectedItemProps.pathSegmentNames[i]
+            .split(/[;,]/)
+            .forEach((segmentName: string) => {
+              segmentNames.push(
+                segmentName.substring(0, segmentName.length - 1)
+              );
+            });
+        }
       }
-    });
+    );
     if (segmentNames.length === 0) {
       return;
     }
@@ -512,16 +519,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   getWalksSelected() {
     let segmentNames = [];
-    this.selectedItemProps["walkChecked"].forEach((isChecked, i) => {
-      if (isChecked) {
-        this.selectedItemProps.walks[i]
-          .substring(1)
-          .split(/[<>]/)
-          .forEach((segmentName) => {
-            segmentNames.push(segmentName);
-          });
+    this.selectedItemProps["walkChecked"].forEach(
+      (isChecked: boolean, i: number) => {
+        if (isChecked) {
+          this.selectedItemProps.walks[i]
+            .substring(1)
+            .split(/[<>]/)
+            .forEach((segmentName: string) => {
+              segmentNames.push(segmentName);
+            });
+        }
       }
-    });
+    );
     if (segmentNames.length === 0) {
       return;
     }
@@ -556,16 +565,16 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   // get common key-value pairs for non-nested properties
-  getCommonObjectProps(eleList) {
+  getCommonObjectProps(elementList: any[]) {
     let superObj = {};
     let superClassNames = {};
     let commonProps = {};
     let commonClassNames = [];
-    let firstElem = null;
+    let firstElement = null;
 
-    // Assume ele is instance of Cytoscape.js element
-    eleList.forEach((ele) => {
-      const e = ele.json();
+    // Assume element is instance of Cytoscape.js element
+    elementList.forEach((element: any) => {
+      const e = element.json();
       const data = e.data;
       const classes = e.classes;
       const classArray = classes.split(" ");
@@ -580,11 +589,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         }
       }
 
-      if (firstElem === null) {
-        firstElem = extend(firstElem, data);
+      if (firstElement === null) {
+        firstElement = extend(firstElement, data);
       }
 
-      if (eleList.length === 1) {
+      if (elementList.length === 1) {
         commonClassNames = classArray;
         return;
       }
@@ -593,24 +602,24 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       this.countKeyValuePairs(data, superObj);
     });
 
-    if (eleList.length === 1) {
-      return [firstElem, commonClassNames];
+    if (elementList.length === 1) {
+      return [firstElement, commonClassNames];
     }
 
-    const eleCount = eleList.length;
+    const elementCount = elementList.length;
 
     // get common key-value pairs
     for (const [k, v] of Object.entries(superObj)) {
       for (const [, v2] of Object.entries(v)) {
-        if (v2 === eleCount) {
-          commonProps[k] = firstElem[k];
+        if (v2 === elementCount) {
+          commonProps[k] = firstElement[k];
         }
       }
     }
 
     // get common class names
     for (const [k, v] of Object.entries(superClassNames)) {
-      if (v === eleCount) {
+      if (v === elementCount) {
         commonClassNames.push(k);
       }
     }
@@ -620,10 +629,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   hightlightHoveredPath(pathName: string) {
     this.highlightedPathWalk = pathName;
-    this._g.cy.elements().forEach((element) => {
+    this._g.cy.elements().forEach((element: any) => {
       if (element.data("pathNames")) {
-        element.data("pathNames").forEach((pathVal) => {
-          if (pathVal.includes(pathName)) {
+        element.data("pathNames").forEach((pathValue: any) => {
+          if (pathValue.includes(pathName)) {
             this._g.highlightElements(element);
           }
         });
@@ -633,10 +642,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   hightlightHoveredWalk(walkName: string) {
     this.highlightedPathWalk = walkName;
-    this._g.cy.elements().forEach((element) => {
+    this._g.cy.elements().forEach((element: any) => {
       if (element.data("walkSampleIds")) {
-        element.data("walkSampleIds").forEach((walkVal) => {
-          if (walkVal.includes(walkName)) {
+        element.data("walkSampleIds").forEach((walkValue: any) => {
+          if (walkValue.includes(walkName)) {
             this._g.highlightElements(element);
           }
         });
@@ -649,24 +658,24 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     this._g.removeHighlights();
   }
 
-  countKeyValuePairs(data, superObj) {
+  countKeyValuePairs(data: any, superObject: any) {
     for (const [k, v] of Object.entries(data)) {
       const valueProperty = v + "";
-      if (superObj[k]) {
-        if (superObj[k][valueProperty]) {
-          superObj[k][valueProperty] += 1;
+      if (superObject[k]) {
+        if (superObject[k][valueProperty]) {
+          superObject[k][valueProperty] += 1;
         } else {
-          superObj[k][valueProperty] = 1;
+          superObject[k][valueProperty] = 1;
         }
       } else {
         const o2 = {};
         o2[valueProperty] = 1;
-        superObj[k] = o2;
+        superObject[k] = o2;
       }
     }
   }
 
-  orderPropertyKeysIf1Selected(classNames) {
+  orderPropertyKeysIf1Selected(classNames: any) {
     const properties = this._g.dataModel.getValue();
     const nodeProps = properties.nodes[classNames];
     const edgeProps = properties.edges[classNames];
@@ -694,9 +703,9 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     if (!mapping) {
       return propertyValue;
     }
-    const val = enumMap[c][propertyName][propertyValue];
-    if (val != null || val != undefined) {
-      return val;
+    const value = enumMap[c][propertyName][propertyValue];
+    if (value != null || value != undefined) {
+      return value;
     }
     return propertyValue;
   }
@@ -704,10 +713,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   showStats() {
     let stat = {};
     let classSet = new Set<string>();
-    let elems = this._g.cy.$();
-    for (let i = 0; i < elems.length; i++) {
-      let curr = elems[i];
-      let c = curr.classes();
+    let elements = this._g.cy.$();
+    for (let i = 0; i < elements.length; i++) {
+      let current = elements[i];
+      let c = current.classes();
       let pass = false;
       TYPES_NOT_TO_SHOW.forEach((type) => {
         if (c.includes(type)) {
@@ -717,8 +726,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       if (pass) {
         continue;
       }
-      let isSelected = curr.selected();
-      let isVisible = curr.visible();
+      let isSelected = current.selected();
+      let isVisible = current.visible();
       for (let j = 0; j < c.length; j++) {
         if (
           !this.nodeClasses.has(c[j]) &&
@@ -728,27 +737,27 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           continue;
         }
         classSet.add(c[j]);
-        let TYPE_CLASS = curr.isNode() ? this.NODE_TYPE : this.EDGE_TYPE;
-        this.increaseCountInObj(stat, TYPE_CLASS, "total");
-        this.increaseCountInObj(stat, c[j], "total");
+        let TYPE_CLASS = current.isNode() ? this.NODE_TYPE : this.EDGE_TYPE;
+        this.increaseCountInObject(stat, TYPE_CLASS, "total");
+        this.increaseCountInObject(stat, c[j], "total");
 
         if (isSelected) {
-          this.increaseCountInObj(stat, c[j], "selected");
-          this.increaseCountInObj(stat, TYPE_CLASS, "selected");
+          this.increaseCountInObject(stat, c[j], "selected");
+          this.increaseCountInObject(stat, TYPE_CLASS, "selected");
         }
         if (!isVisible) {
-          this.increaseCountInObj(stat, c[j], "hidden");
-          this.increaseCountInObj(stat, TYPE_CLASS, "hidden");
+          this.increaseCountInObject(stat, c[j], "hidden");
+          this.increaseCountInObject(stat, TYPE_CLASS, "hidden");
         }
       }
     }
     classSet.add(this.NODE_TYPE);
     classSet.add(this.EDGE_TYPE);
-    this.setStatStrFromObj(stat, classSet);
-    this.isShowStatsTable = elems.length > 0;
+    this.setStatStrFromObject(stat, classSet);
+    this.isShowStatsTable = elements.length > 0;
   }
 
-  private setStatStrFromObj(stat: any, classSet: Set<string>) {
+  private setStatStrFromObject(stat: any, classSet: Set<string>) {
     this.tableInput.results = [];
     this.tableInput.classNames = [];
     for (let c of classSet) {
@@ -757,50 +766,52 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
       let cySelector = "." + c;
       // first element must be ID, ID is irrelevant here
-      let row: TableData[] = [{ val: cySelector, type: TableDataType.string }];
+      let row: TableData[] = [
+        { value: cySelector, type: TableDataType.string },
+      ];
       if (c == this.NODE_TYPE) {
-        row[0].val = "node";
-        row.push({ val: "Node", type: TableDataType.string });
+        row[0].value = "node";
+        row.push({ value: "Node", type: TableDataType.string });
       } else if (c == this.EDGE_TYPE) {
-        row[0].val = "edge";
-        row.push({ val: "Edge", type: TableDataType.string });
+        row[0].value = "edge";
+        row.push({ value: "Edge", type: TableDataType.string });
       } else if (c == COLLAPSED_EDGE_CLASS) {
-        row[0].val = "." + COLLAPSED_EDGE_CLASS;
-        row.push({ val: "Meta edge", type: TableDataType.string });
+        row[0].value = "." + COLLAPSED_EDGE_CLASS;
+        row.push({ value: "Meta edge", type: TableDataType.string });
       } else {
-        row.push({ val: c, type: TableDataType.string });
+        row.push({ value: c, type: TableDataType.string });
       }
-      row.push({ val: stat[c].total, type: TableDataType.number });
+      row.push({ value: stat[c].total, type: TableDataType.number });
 
       if (stat[c]["selected"]) {
-        row.push({ val: stat[c]["selected"], type: TableDataType.number });
+        row.push({ value: stat[c]["selected"], type: TableDataType.number });
       } else {
-        row.push({ val: 0, type: TableDataType.number });
+        row.push({ value: 0, type: TableDataType.number });
       }
       if (stat[c]["hidden"]) {
-        row.push({ val: stat[c]["hidden"], type: TableDataType.number });
+        row.push({ value: stat[c]["hidden"], type: TableDataType.number });
       } else {
-        row.push({ val: 0, type: TableDataType.number });
+        row.push({ value: 0, type: TableDataType.number });
       }
       this.tableInput.results.push(row);
-      this.tableInput.classNames.push(row[1].val);
+      this.tableInput.classNames.push(row[1].value);
     }
-    this.tableInput.pageSize = this._g.userPrefs.dataPageSize.getValue();
+    this.tableInput.pageSize = this._g.userPreferences.dataPageSize.getValue();
 
     // let tableView ngOnInit finish
     setTimeout(() => this.tableFilled.next(true), 100);
   }
 
-  private increaseCountInObj(obj: any, p1: string, p2: string) {
-    if (obj[p1]) {
-      if (obj[p1][p2] === undefined) {
-        obj[p1][p2] = 1;
+  private increaseCountInObject(object: any, p1: string, p2: string) {
+    if (object[p1]) {
+      if (object[p1][p2] === undefined) {
+        object[p1][p2] = 1;
       } else {
-        obj[p1][p2] += 1;
+        object[p1][p2] += 1;
       }
     } else {
-      obj[p1] = {};
-      obj[p1][p2] = 1;
+      object[p1] = {};
+      object[p1][p2] = 1;
     }
   }
 
@@ -809,7 +820,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     filterTableDatas(
       filter,
       this.tableInput,
-      this._g.userPrefs.isIgnoreCaseInText.getValue()
+      this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
     setTimeout(() => this.tableFilled.next(true), 100);
   }
@@ -826,7 +837,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     filterTableDatas(
       filter,
       this.multiObjTableInp,
-      this._g.userPrefs.isIgnoreCaseInText.getValue()
+      this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
     setTimeout(() => {
       this.multiObjTableFilled.next(true);

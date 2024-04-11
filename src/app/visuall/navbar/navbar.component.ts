@@ -33,7 +33,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   toolLogo: string;
   isLoadFile4Graph: boolean = false;
   isLoadFileGFA: boolean = false;
-  appDescSubs: Subscription;
+  appDescSubscription: Subscription;
 
   constructor(
     private _dbService: DbAdapterService,
@@ -236,7 +236,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.appDescSubs = this._g.appDescription.subscribe((x) => {
+    this.appDescSubscription = this._g.appDescription.subscribe((x) => {
       if (x != null) {
         this.toolName = x.appInfo.name;
         this.toolLogo = x.appInfo.icon;
@@ -246,8 +246,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.appDescSubs) {
-      this.appDescSubs.unsubscribe();
+    if (this.appDescSubscription) {
+      this.appDescSubscription.unsubscribe();
     }
   }
 
@@ -372,7 +372,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   removeAllGroups() {
     if (
-      this._g.userPrefs.groupingOption.getValue() ==
+      this._g.userPreferences.groupingOption.getValue() ==
       GroupingOptionTypes.compound
     ) {
       this._cyService.removeGroup4Selected(
@@ -396,7 +396,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   search2Highlight() {
-    document.getElementById("highlight-search-inp").focus();
+    document.getElementById("highlight-search-input").focus();
   }
 
   highlightSelected() {

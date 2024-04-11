@@ -50,8 +50,8 @@ context("General Queries implemented in the backend side", () => {
     cy.wait(1000);
 
     click2options();
-    cy.get("input.form-control.inp-3-char:visible").clear();
-    cy.get("input.form-control.inp-3-char:visible").type(4);
+    cy.get("input.form-control.input-3-char:visible").clear();
+    cy.get("input.form-control.input-3-char:visible").type(4);
     // uncheck directed
     cy.get('input[type="checkbox"].form-check-input:visible').uncheck();
     click2options();

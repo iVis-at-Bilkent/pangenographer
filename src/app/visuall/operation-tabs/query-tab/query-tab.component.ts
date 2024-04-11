@@ -8,11 +8,11 @@ import { Component, OnInit } from "@angular/core";
 export class QueryTabComponent implements OnInit {
   queries: { component: any; text: string }[];
   selectedQuery: string;
-  selectedIdx: number;
+  selectedIndex: number;
 
   constructor() {
     this.queries = [];
-    this.selectedIdx = -1;
+    this.selectedIndex = -1;
   }
 
   ngOnInit() {
@@ -20,7 +20,7 @@ export class QueryTabComponent implements OnInit {
   }
 
   changeQuery(event: any) {
-    this.selectedIdx = this.queries.findIndex(
+    this.selectedIndex = this.queries.findIndex(
       (x) => x.text == event.target.value
     );
   }

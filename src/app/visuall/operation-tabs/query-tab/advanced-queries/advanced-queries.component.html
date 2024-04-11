@@ -17,12 +17,12 @@
   </select>
 </div>
 
-<div *ngIf="selectedIdx == 0 || selectedIdx == 1 || selectedIdx == 2">
+<div *ngIf="selectedIndex == 0 || selectedIndex == 1 || selectedIndex == 2">
   <div class="panel">
     <div class="panel">
       <div
         class="form-inline va-text m-2 justify-content-center"
-        *ngIf="selectedIdx == 2"
+        *ngIf="selectedIndex == 2"
       >
         <span>Get common &nbsp;</span>
         <input
@@ -49,11 +49,11 @@
     </div>
     <!-- selected nodes -->
     <div class="panel">
-      <app-elem-of-interest
+      <app-element-of-interest
         [header]="'Nodes of Interest'"
-        (selectedElemsChanged)="setSelected($event)"
+        (selectedElementsChanged)="setSelected($event)"
       >
-      </app-elem-of-interest>
+      </app-element-of-interest>
     </div>
 
     <!-- ignored types -->
@@ -94,7 +94,7 @@
               max="10"
               min="1"
               [(ngModel)]="lengthLimit"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Length limit"
             />
           </div>

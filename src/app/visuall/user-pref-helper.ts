@@ -24,8 +24,8 @@ export class UserPrefHelper {
       // bind view utilities after UserPreferences are finalized
       this._cyService.bindViewUtilitiesExtension();
 
-      const up = this._g.userPrefs;
-      const upP = this._g.userPrefs.pangenomegrapher;
+      const up = this._g.userPreferences;
+      const upP = this._g.userPreferences.pangenomegrapher;
 
       up.isAutoIncrementalLayoutOnChange.subscribe((x) => {
         this.changeAutoIncremental(x);
@@ -82,12 +82,12 @@ export class UserPrefHelper {
   private expandCollapseLayout() {
     const l = this._g.getFcoseOptions();
     l.fit = false;
-    const elems4layout = this._g.cy.elements().not(":hidden, :transparent");
-    if (elems4layout.length < 1) {
+    const elements4layout = this._g.cy.elements().not(":hidden, :transparent");
+    if (elements4layout.length < 1) {
       return;
     }
     this._g.isLoadFromExpandCollapse = true;
-    elems4layout.layout(l).run();
+    elements4layout.layout(l).run();
   }
 
   changeCompoundPadding(x: string) {
@@ -97,12 +97,12 @@ export class UserPrefHelper {
   dataPageSizeChanged(x: number) {
     if (x > MAX_DATA_PAGE_SIZE) {
       x = MAX_DATA_PAGE_SIZE;
-      this._g.userPrefs.dataPageSize.next(x);
+      this._g.userPreferences.dataPageSize.next(x);
       return;
     }
     if (x < MIN_DATA_PAGE_SIZE) {
       x = MIN_DATA_PAGE_SIZE;
-      this._g.userPrefs.dataPageSize.next(x);
+      this._g.userPreferences.dataPageSize.next(x);
       return;
     }
   }
@@ -110,12 +110,12 @@ export class UserPrefHelper {
   dataPageLimitChanged(x: number) {
     if (x > MAX_DATA_PAGE_SIZE) {
       x = MAX_DATA_PAGE_SIZE;
-      this._g.userPrefs.dataPageLimit.next(x);
+      this._g.userPreferences.dataPageLimit.next(x);
       return;
     }
     if (x < MIN_DATA_PAGE_SIZE) {
       x = MIN_DATA_PAGE_SIZE;
-      this._g.userPrefs.dataPageLimit.next(x);
+      this._g.userPreferences.dataPageLimit.next(x);
       return;
     }
   }
@@ -123,19 +123,19 @@ export class UserPrefHelper {
   tableColumnLimitChanged(x: number) {
     if (x > MAX_TABLE_COLUMN_COUNT) {
       x = MAX_TABLE_COLUMN_COUNT;
-      this._g.userPrefs.tableColumnLimit.next(x);
+      this._g.userPreferences.tableColumnLimit.next(x);
       return;
     }
     if (x < MIN_TABLE_COLUMN_COUNT) {
       x = MIN_TABLE_COLUMN_COUNT;
-      this._g.userPrefs.tableColumnLimit.next(x);
+      this._g.userPreferences.tableColumnLimit.next(x);
       return;
     }
   }
 
   private loadPrefFromLocalStorage() {
     if (this._profile.isStoreProfile()) {
-      this._profile.transferUserPrefs();
+      this._profile.transferUserPreferences();
     }
     this._profile.transferIsStoreUserProfile();
   }

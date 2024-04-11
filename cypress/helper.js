@@ -69,12 +69,12 @@ export function groupBy(algoName, shouldResultCompounds) {
 /**
  * @param  {string} prop Object type to select
  * @param  {string} op Operator to select
- * @param  {string} inp input value as operand
+ * @param  {string} input input value as operand
  */
-export function addPropertyRule(prop, op, inp) {
+export function addPropertyRule(prop, op, input) {
   cy.get("select.prop").select(prop);
   cy.get("select.prop-op-key").select(op);
   cy.get('input[placeholder="Filter..."]').clear();
-  cy.get('input[placeholder="Filter..."]').type(inp);
+  cy.get('input[placeholder="Filter..."]').type(input);
   cy.get('img[title="Add/Update"]').click();
 }

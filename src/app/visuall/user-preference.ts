@@ -1,7 +1,7 @@
 import { BehaviorSubject } from "rxjs";
 import { QueryRule } from "./operation-tabs/map-tab/query-types";
 
-export interface UserPref {
+export interface UserPreferences {
   // boolean settings
   isAutoIncrementalLayoutOnChange: BehaviorSubject<boolean>;
   isHighlightOnHover: BehaviorSubject<boolean>;
@@ -15,7 +15,7 @@ export interface UserPref {
   isCollapseMultiEdgesOnLoad: BehaviorSubject<boolean>;
 
   // Show query results using 'Selection', 'Highlight'
-  mergedElemIndicator: BehaviorSubject<MergedElemIndicatorTypes>;
+  mergedElementIndicator: BehaviorSubject<MergedElementIndicatorTypes>;
   groupingOption: BehaviorSubject<GroupingOptionTypes>;
   nodeLabelWrap: BehaviorSubject<TextWrapTypes>;
   isLimitDbQueries2range: BehaviorSubject<boolean>;
@@ -39,11 +39,12 @@ export interface UserPref {
   //  PanGenomeGrapher Settings
   pangenomegrapher: {
     lengthOfUpDownstream: BehaviorSubject<number>;
+    lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
     isHighlightInZeroOutZero: BehaviorSubject<boolean>;
   };
 }
 
-export enum MergedElemIndicatorTypes {
+export enum MergedElementIndicatorTypes {
   none = 0,
   selection = 1,
   highlight = 2,
@@ -66,7 +67,7 @@ export interface BoolSetting {
 
 export interface UserProfile {
   queryRules: QueryRule[];
-  userPref: any;
+  userPreference: any;
 }
 
 export interface SavedLists {

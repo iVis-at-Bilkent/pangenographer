@@ -226,7 +226,7 @@ app-operation-tabs {
   content: "\f13a";
 }
 
-#highlight-search-inp {
+#highlight-search-input {
   width: 75px;
   border-radius: 5px;
   height: 23px;
@@ -311,7 +311,7 @@ app-operation-tabs {
   width: auto;
 }
 
-.inp-3-char {
+.input-3-char {
   width: 5.5em;
 }
 
@@ -327,12 +327,12 @@ app-operation-tabs {
   user-select: none;
 }
 
-.std-inp-hei {
+.standart-input-height {
   height: 2em;
   padding: 0.25rem !important;
 }
 
-.std-inp-hei-sec {
+.standart-input-height-sec {
   height: 2.25em;
 }
 

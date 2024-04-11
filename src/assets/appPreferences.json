@@ -42,7 +42,7 @@
     "selectionColor": "#6c757d",
     "selectionWidth": 4.5,
     "groupingOption": 0,
-    "mergedElemIndicator": 2,
+    "mergedElementIndicator": 2,
     "nodeLabelWrap": 0,
     "compoundPadding": "5%",
     "edgeCollapseLimit": 2,
@@ -51,6 +51,7 @@
     "queryResultPagination": "Client",
     "tilingPadding": 4,
     "pangenographer": {
-        "lengthOfUpDownstream": 1
+        "lengthOfUpDownstream": 3,
+        "lengthOfBlastSelectedSegmentsPath": 5
     }
 }

@@ -70,7 +70,7 @@
           type="text"
           title="Name"
           [(ngModel)]="currRuleName"
-          class="tight-select filter-form form-control std-inp-hei name-inp m-1 va-small-text"
+          class="tight-select filter-form form-control standart-input-height name-input m-1 va-small-text"
         />
         <select
           class="form-select tight-select filter-form va-small-text rule-class"
@@ -231,10 +231,13 @@
   </div>
 
   <div class="panel">
+    <!-- On expand BLAST tab is used for disabling switch to object tab
+      upon selecting a node in the graph -->
     <div
       class="panel-heading collapsed"
       data-bs-toggle="collapse"
       data-bs-target="#BLAST"
+      (click)="onExpandBlastTab()"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">BLAST</b></span

@@ -162,18 +162,18 @@ context("Query By Rule", () => {
     cy.get('img[title="Download selected objects"]').click();
 
     cy.window().then((win) => {
-      const cntElem1 = win.cy.$().length;
-      expect(cntElem1 == 15).to.eq(true);
+      const cntElement1 = win.cy.$().length;
+      expect(cntElement1 == 15).to.eq(true);
     });
     cy.get("input.cb-is-load-graph").check();
     cy.get("a.page-link").last().click();
     cy.window().then((win) => {
-      const cntElem2 = win.cy.$().length;
+      const cntElement2 = win.cy.$().length;
       const hasAllToms =
         win.cy.$("[primary_name *= 'T']").length > 0 &&
         win.cy.$("[primary_name *= 'T']").length == win.cy.$().length;
       expect(hasAllToms).to.eq(true);
-      expect(20 == cntElem2).to.eq(true);
+      expect(20 == cntElement2).to.eq(true);
     });
 
     navbarAction("Data", "Clear");
@@ -183,8 +183,8 @@ context("Query By Rule", () => {
     cy.get("a.page-link").first().click();
 
     cy.window().then((win) => {
-      const cntElem3 = win.cy.$().length;
-      expect(cntElem3 == 15).to.eq(true);
+      const cntElement3 = win.cy.$().length;
+      expect(cntElement3 == 15).to.eq(true);
     });
   });
 

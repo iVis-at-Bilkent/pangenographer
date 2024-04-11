@@ -39,7 +39,7 @@
       <div class="form-inline blast-option">
         <label class="va-text blast-option-label">Database</label>
         <select
-          class="form-select tight-select filter-form va-small-text inp-4-char w-auto blast-option-label"
+          class="form-select tight-select filter-form va-small-text input-4-char w-auto blast-option-label"
           (change)="onWebDatabaseChange($event)"
           title="Database"
           [(ngModel)]="webSelectedDatabaseName"
@@ -59,7 +59,7 @@
       <div class="form-inline blast-option">
         <label class="va-text blast-option-label">Program</label>
         <select
-          class="form-select tight-select filter-form va-small-text inp-4-char w-auto blast-option-label"
+          class="form-select tight-select filter-form va-small-text input-4-char w-auto blast-option-label"
           (change)="onWebProgramChange($event)"
           title="Program"
           [(ngModel)]="webSelectedProgram"
@@ -92,7 +92,7 @@
         <textarea
           (change)="onWebRIDChange($event)"
           [(ngModel)]="webRid"
-          class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+          class="form-control standart-input-height va-small-text ms-1 w5-5 h-10"
           placeholder="The Request ID (RID) returned when the search was submitted"
         ></textarea>
       </div>
@@ -112,7 +112,7 @@
       <div class="form-inline blast-option">
         <label class="va-text blast-option-label">Format Type</label>
         <select
-          class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+          class="form-select tight-select filter-form va-small-text input-4-char w-auto"
           (change)="onWebFormatTypeChange($event)"
           title="Format Type"
           [(ngModel)]="webSelectedFormatType"
@@ -140,7 +140,7 @@
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label">NCBI GenInfo</label>
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+              class="form-select tight-select filter-form va-small-text input-4-char w-auto"
               (change)="onWebNCBIGenInfoChange($event)"
               title="NCBI GenInfo"
               [(ngModel)]="webSelectedNCBIGenInfo"
@@ -157,7 +157,7 @@
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label">Format Object</label>
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+              class="form-select tight-select filter-form va-small-text input-4-char w-auto"
               (change)="onWebFormatObjectChange($event)"
               title="Format Object"
               [(ngModel)]="webSelectedFormatObject"
@@ -180,7 +180,7 @@
               min="0"
               (keydown.enter)="onWebHitlistSizeChange($event)"
               [(ngModel)]="webHitlistSize"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Hitlist Size"
             />
           </div>
@@ -200,7 +200,7 @@
               min="0"
               (keydown.enter)="onWebDescriptionsChange($event)"
               [(ngModel)]="webDescriptions"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Descriptions"
             />
           </div>
@@ -220,7 +220,7 @@
               min="0"
               (keydown.enter)="onWebAlignmentsChange($event)"
               [(ngModel)]="webAlignments"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Alignments"
             />
           </div>
@@ -247,7 +247,7 @@
               min="0"
               (keydown.enter)="onWebExpectChange($event)"
               [(ngModel)]="webExpect"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Expect"
             />
           </div>
@@ -261,7 +261,7 @@
               min="0"
               (keydown.enter)="onWebWordSizeChange($event)"
               [(ngModel)]="webWordSize"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Word Size"
             />
           </div>
@@ -271,7 +271,7 @@
             <textarea
               (change)="onWebGapCostChange($event)"
               [(ngModel)]="webGapCost"
-              class="form-control std-inp-hei va-small-text ms-1 w5-5 h-10"
+              class="form-control standart-input-height va-small-text ms-1 w5-5 h-10"
               placeholder="Pair of positive integers separated by a space such as “11 1”."
             ></textarea>
           </div>
@@ -282,7 +282,7 @@
           >
             <label class="va-text blast-option-label">Matrix</label>
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+              class="form-select tight-select filter-form va-small-text input-4-char w-auto"
               (change)="onWebMatrixChange($event)"
               title="Matrix"
               [(ngModel)]="webSelectedMatrixIdx"
@@ -308,7 +308,7 @@
               >Composition Based Statistics (-1 for undefined)</label
             >
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char"
+              class="form-select tight-select filter-form va-small-text input-4-char"
               (change)="onWebCompositionBasedStatisticsChange($event)"
               title="Composition Based Statistics"
               [(ngModel)]="webSelectedCompositionBasedStatistic"
@@ -337,7 +337,7 @@
               min="0"
               (keydown.enter)="onWebThresholdChange($event)"
               [(ngModel)]="webThreshold"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Threshold"
             />
           </div>
@@ -354,7 +354,7 @@
               min="0"
               (keydown.enter)="onWebNucleotideRewardChange($event)"
               [(ngModel)]="webNulceotideReward"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Nucleotide Reward"
             />
           </div>
@@ -371,7 +371,7 @@
               max="0"
               (keydown.enter)="onWebNucleotidePenaltyChange($event)"
               [(ngModel)]="webNulceotideReward"
-              class="form-control inp-3-char std-inp-hei va-small-text"
+              class="form-control input-3-char standart-input-height va-small-text"
               title="Nucleotide Penalty"
             />
           </div>
@@ -379,7 +379,7 @@
           <div class="form-inline blast-option">
             <label class="va-text blast-option-label">Filter and Mask</label>
             <select
-              class="form-select tight-select filter-form va-small-text inp-4-char w-auto"
+              class="form-select tight-select filter-form va-small-text input-4-char w-auto"
               (change)="onWebFilterChange($event)"
               title="Filter"
               [(ngModel)]="webSelectedFilter"
@@ -474,7 +474,7 @@
           <textarea
             (change)="onStandaloneCommandLineArgumentsChange($event)"
             [(ngModel)]="standaloneCommandLineArguments"
-            class="form-control std-inp-hei va-small-text w5-5 h-10"
+            class="form-control standart-input-height va-small-text w5-5 h-10"
             placeholder="Command line arguments for blastn."
           ></textarea>
         </div>

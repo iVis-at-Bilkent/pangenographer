@@ -46,7 +46,7 @@
       </div>
 
       <div *ngFor="let t of queries; let i = index">
-        <div [style.display]="i == selectedIdx ? 'block' : 'none'">
+        <div [style.display]="i == selectedIndex ? 'block' : 'none'">
           <ng-container *ngComponentOutlet="t.component"></ng-container>
         </div>
       </div>

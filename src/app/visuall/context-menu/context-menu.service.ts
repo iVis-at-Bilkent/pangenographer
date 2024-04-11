@@ -115,7 +115,7 @@ export class ContextMenuService {
         id: "deleteElement",
         content: "Delete",
         selector: "node,edge",
-        onClickFunction: this.deleteElem.bind(this),
+        onClickFunction: this.deleteElement.bind(this),
       },
     ];
   }
@@ -135,7 +135,7 @@ export class ContextMenuService {
     });
   }
 
-  deleteElem(event: any) {
+  deleteElement(event: any) {
     this._cyService.deleteSelected(event);
   }
 
@@ -148,12 +148,12 @@ export class ContextMenuService {
   }
 
   selectAllThisType(event: any) {
-    const ele = event.target || event.cyTarget;
-    if (!ele) {
+    const element = event.target || event.cyTarget;
+    if (!element) {
       return;
     }
     const model = this._g.dataModel.getValue();
-    const classes = ele.className();
+    const classes = element.className();
     for (let c of classes) {
       if (model.nodes[c] || model.edges[c]) {
         this._g.cy.$("." + c).select();
@@ -162,19 +162,19 @@ export class ContextMenuService {
   }
 
   collapseEdges(event: any) {
-    const ele = event.target || event.cyTarget;
-    if (!ele) {
+    const element = event.target || event.cyTarget;
+    if (!element) {
       return;
     }
-    this._cyService.collapseMultiEdges(ele.parallelEdges());
+    this._cyService.collapseMultiEdges(element.parallelEdges());
   }
 
   expandEdge(event: any) {
-    const ele = event.target || event.cyTarget;
-    if (!ele) {
+    const element = event.target || event.cyTarget;
+    if (!element) {
       return;
     }
-    this._cyService.expandMultiEdges(ele);
+    this._cyService.expandMultiEdges(element);
   }
 
   showUpstream(event: any) {
@@ -186,13 +186,13 @@ export class ContextMenuService {
   }
 
   showUpDownstream(event: any, isUp: boolean) {
-    const ele = event.target || event.cyTarget;
-    if (!ele) {
+    const element = event.target || event.cyTarget;
+    if (!element) {
       return;
     }
     this._cyService.showUpDownstream(
-      ele,
-      this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.getValue(),
+      element,
+      this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.getValue(),
       isUp
     );
   }
@@ -206,17 +206,17 @@ export class ContextMenuService {
   }
 
   hideUpDownstream(event: any, isUp: boolean) {
-    const ele = event.target || event.cyTarget;
-    if (!ele) {
+    const element = event.target || event.cyTarget;
+    if (!element) {
       return;
     }
     const callback = (data: any) => {
-      this._cyService.deleteElements(data, ele.data().segmentName);
+      this._cyService.deleteElements(data, element.data().segmentName);
     };
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
-      ele.data().segmentName,
-      this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.getValue(),
+      element.data().segmentName,
+      this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.getValue(),
       callback,
       isUp
     );

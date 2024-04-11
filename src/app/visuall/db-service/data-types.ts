@@ -3,11 +3,11 @@ import { ClassBasedRules } from "../operation-tabs/map-tab/query-types";
 
 export interface DbService {
   getNeighbors(
-    elemIds: string[] | number[],
+    elementIds: string[] | number[],
     callback: (x: GraphResponse) => any,
     queryMeta?: DbQueryMeta
   );
-  getElems(
+  getElements(
     ids: string[] | number[],
     callback: (x: GraphResponse) => any,
     meta: DbQueryMeta
@@ -187,12 +187,12 @@ export interface DbQueryMeta {
   isEdgeQuery?: boolean;
 }
 
-export interface GraphElem {
+export interface GraphElement {
   data: any;
   classes: string;
 }
 
-export interface ElemAsQueryParam {
+export interface ElementAsQueryParam {
   dbId: string;
   label: string;
 }

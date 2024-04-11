@@ -29,7 +29,7 @@ export class DbAdapterService {
   }
 
   getNeighbors(
-    elemId: string[],
+    elementId: string[],
     callback: (x: GraphResponse) => any,
     historyMeta?: HistoryMetaData,
     queryMeta?: DbQueryMeta
@@ -38,7 +38,7 @@ export class DbAdapterService {
     if (historyMeta) {
       s = historyMeta.labels;
       if (!historyMeta.labels) {
-        s = this._g.getLabels4Elems(elemId, historyMeta.isNode);
+        s = this._g.getLabels4Elements(elementId, historyMeta.isNode);
       }
     }
 
@@ -50,10 +50,10 @@ export class DbAdapterService {
       callback(x);
       this._g.add2GraphHistory(txt + s);
     };
-    this._db.getNeighbors(elemId, fn, queryMeta);
+    this._db.getNeighbors(elementId, fn, queryMeta);
   }
 
-  getElems(
+  getElements(
     ids: string[],
     callback: (x: GraphResponse) => any,
     queryMeta: DbQueryMeta,
@@ -63,7 +63,7 @@ export class DbAdapterService {
     if (historyMeta) {
       s = historyMeta.labels;
       if (!historyMeta.labels) {
-        s = this._g.getLabels4Elems(ids, historyMeta.isNode);
+        s = this._g.getLabels4Elements(ids, historyMeta.isNode);
       }
     }
 
@@ -71,11 +71,11 @@ export class DbAdapterService {
     if (historyMeta && historyMeta.customTxt) {
       txt = historyMeta.customTxt;
     }
-    let fn = (x) => {
+    let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory(txt + s);
     };
-    this._db.getElems(ids, fn, queryMeta);
+    this._db.getElements(ids, fn, queryMeta);
   }
 
   getElementsUpToCertainDistance(

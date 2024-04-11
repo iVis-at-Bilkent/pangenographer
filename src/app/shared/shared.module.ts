@@ -5,7 +5,7 @@ import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { AngularDraggableModule } from "angular2-draggable";
 import { AutoSizeInputModule } from "ngx-autosize-input";
 import { TableTooltipDirective } from "../shared/table-view/table-tooltip.directive";
-import { ElemOfInterestComponent } from "./elem-of-interest/elem-of-interest.component";
+import { ElementOfInterestComponent } from "./element-of-interest/element-of-interest.component";
 import {
   ReplacePipe,
   TableViewComponent,
@@ -17,7 +17,7 @@ import { TypesViewComponent } from "./types-view/types-view.component";
     TableViewComponent,
     ReplacePipe,
     TypesViewComponent,
-    ElemOfInterestComponent,
+    ElementOfInterestComponent,
     TableTooltipDirective,
   ],
 
@@ -32,7 +32,7 @@ import { TypesViewComponent } from "./types-view/types-view.component";
     TableViewComponent,
     ReplacePipe,
     TypesViewComponent,
-    ElemOfInterestComponent,
+    ElementOfInterestComponent,
   ],
 })
 export class SharedModule {}

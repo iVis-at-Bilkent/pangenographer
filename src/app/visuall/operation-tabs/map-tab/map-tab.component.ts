@@ -23,7 +23,7 @@ import {
 } from "../../db-service/data-types";
 import { DbAdapterService } from "../../db-service/db-adapter.service";
 import { GlobalVariableService } from "../../global-variable.service";
-import { MergedElemIndicatorTypes } from "../../user-preference";
+import { MergedElementIndicatorTypes } from "../../user-preference";
 import { UserProfileService } from "../../user-profile.service";
 import { GroupTabComponent } from "./group-tab/group-tab.component";
 import {
@@ -57,8 +57,8 @@ export class MapTabComponent implements OnInit, OnDestroy {
     columns: [],
     tableTitle: "Query Results",
     results: [],
-    resultCnt: 0,
-    currPage: 1,
+    resultCount: 0,
+    currentPage: 1,
     pageSize: 0,
     isShowExportAsCSV: true,
     isEmphasizeOnHover: true,
@@ -66,7 +66,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
     isMergeGraph: true,
     isNodeData: true,
     isReplace_inHeaders: true,
-    allChecked: false
+    allChecked: false,
   };
   tableFilled = new Subject<boolean>();
   isClassTypeLocked: boolean;
@@ -78,10 +78,10 @@ export class MapTabComponent implements OnInit, OnDestroy {
   changeBtnTxt = "Update";
   currRuleName = "New rule";
   isShowPropertyRule = true;
-  loadFromFileSubs: Subscription;
-  dataPageSizeSubs: Subscription;
-  appDescSubs: Subscription;
-  dataModelSubs: Subscription;
+  loadFromFileSubscription: Subscription;
+  dataPageSizeSubscription: Subscription;
+  appDescSubscription: Subscription;
+  dataModelSubscription: Subscription;
   dbResponse: DbResponse = null;
   clearTableFilter = new Subject<boolean>();
 
@@ -95,24 +95,27 @@ export class MapTabComponent implements OnInit, OnDestroy {
     this.tableInput.isMergeGraph = true;
     this.classOptions = [];
     this.selectedClassProps = [];
-    this.loadFromFileSubs = this._profile.onLoadFromFile.subscribe((x) => {
-      if (!x) {
-        return;
+    this.loadFromFileSubscription = this._profile.onLoadFromFile.subscribe(
+      (x) => {
+        if (!x) {
+          return;
+        }
+        this.setCurrRulesFromLocalStorage();
       }
-      this.setCurrRulesFromLocalStorage();
-    });
+    );
   }
 
   ngOnInit() {
-    this.dataPageSizeSubs = this._g.userPrefs.dataPageSize.subscribe((x) => {
-      this.tableInput.pageSize = x;
-    });
+    this.dataPageSizeSubscription =
+      this._g.userPreferences.dataPageSize.subscribe((x) => {
+        this.tableInput.pageSize = x;
+      });
 
-    this.appDescSubs = this._g.appDescription.subscribe((x) => {
+    this.appDescSubscription = this._g.appDescription.subscribe((x) => {
       if (x === null) {
         return;
       }
-      this.dataModelSubs = this._g.dataModel.subscribe((x2) => {
+      this.dataModelSubscription = this._g.dataModel.subscribe((x2) => {
         if (x2 === null) {
           return;
         }
@@ -144,17 +147,17 @@ export class MapTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.loadFromFileSubs) {
-      this.loadFromFileSubs.unsubscribe();
+    if (this.loadFromFileSubscription) {
+      this.loadFromFileSubscription.unsubscribe();
     }
-    if (this.dataPageSizeSubs) {
-      this.dataPageSizeSubs.unsubscribe();
+    if (this.dataPageSizeSubscription) {
+      this.dataPageSizeSubscription.unsubscribe();
     }
-    if (this.appDescSubs) {
-      this.appDescSubs.unsubscribe();
+    if (this.appDescSubscription) {
+      this.appDescSubscription.unsubscribe();
     }
-    if (this.dataModelSubs) {
-      this.dataModelSubs.unsubscribe();
+    if (this.dataModelSubscription) {
+      this.dataModelSubscription.unsubscribe();
     }
   }
 
@@ -293,20 +296,21 @@ export class MapTabComponent implements OnInit, OnDestroy {
       " return true; return false;";
 
     const filterFn = new Function("x", fnStr2);
-    let satisfyingElems = this._g.cy.filter(filterFn);
-    satisfyingElems = satisfyingElems.union(
-      this._g.filterRemovedElems(filterFn)
+    let satisfyingElements = this._g.cy.filter(filterFn);
+    satisfyingElements = satisfyingElements.union(
+      this._g.filterRemovedElements(filterFn)
     );
-    const newElemIndicator = this._g.userPrefs.mergedElemIndicator.getValue();
+    const newElementIndicator =
+      this._g.userPreferences.mergedElementIndicator.getValue();
     if (
-      newElemIndicator == MergedElemIndicatorTypes.highlight ||
-      newElemIndicator == MergedElemIndicatorTypes.none
+      newElementIndicator == MergedElementIndicatorTypes.highlight ||
+      newElementIndicator == MergedElementIndicatorTypes.none
     ) {
-      this._g.highlightElements(satisfyingElems);
-    } else if (newElemIndicator == MergedElemIndicatorTypes.selection) {
-      this._g.isSwitch2ObjTabOnSelect = false;
-      satisfyingElems.select();
-      this._g.isSwitch2ObjTabOnSelect = true;
+      this._g.highlightElements(satisfyingElements);
+    } else if (newElementIndicator == MergedElementIndicatorTypes.selection) {
+      this._g.isSwitch2ObjectTabOnSelect = false;
+      satisfyingElements.select();
+      this._g.isSwitch2ObjectTabOnSelect = true;
     }
     this._g.applyClassFiltering();
   }
@@ -318,17 +322,17 @@ export class MapTabComponent implements OnInit, OnDestroy {
     }
 
     const isClientSidePagination =
-      this._g.userPrefs.queryResultPagination.getValue() == "Client";
-    const skip = (this.tableInput.currPage - 1) * this.tableInput.pageSize;
+      this._g.userPreferences.queryResultPagination.getValue() == "Client";
+    const skip = (this.tableInput.currentPage - 1) * this.tableInput.pageSize;
     const limit4clientSidePaginated =
-      this._g.userPrefs.dataPageSize.getValue() *
-      this._g.userPrefs.dataPageLimit.getValue();
+      this._g.userPreferences.dataPageSize.getValue() *
+      this._g.userPreferences.dataPageLimit.getValue();
     const limit = isClientSidePagination
       ? limit4clientSidePaginated
       : this.tableInput.pageSize;
     const isMerge =
       this.tableInput.isMergeGraph && this._g.cy.elements().length > 0;
-    this.tableInput.currPage = 1;
+    this.tableInput.currentPage = 1;
     this.clearTableFilter.next(true);
     const cb2 = (x: DbResponse) => {
       this.dbResponse = x;
@@ -354,12 +358,12 @@ export class MapTabComponent implements OnInit, OnDestroy {
         }
       }
       if (isClientSidePagination) {
-        this.tableInput.resultCnt = Math.min(
+        this.tableInput.resultCount = Math.min(
           x.count,
           limit4clientSidePaginated
         );
       } else {
-        this.tableInput.resultCnt = x.count;
+        this.tableInput.resultCount = x.count;
       }
     };
     this._dbService.getFilteringResult(
@@ -374,9 +378,9 @@ export class MapTabComponent implements OnInit, OnDestroy {
 
   // used for client-side filtering, assumes tableData and graphData arrays are parallel (index i corresponds to the same element)
   private filterDbResponse(d: DbResponse, filter: TableFiltering): DbResponse {
-    const pageSize = this._g.userPrefs.dataPageSize.getValue();
-    const pageLimit = this._g.userPrefs.dataPageLimit.getValue();
-    const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
+    const pageSize = this._g.userPreferences.dataPageSize.getValue();
+    const pageLimit = this._g.userPreferences.dataPageLimit.getValue();
+    const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
     const r: DbResponse = {
       count: pageSize * pageLimit,
       graphData: { nodes: [], edges: [] },
@@ -427,13 +431,13 @@ export class MapTabComponent implements OnInit, OnDestroy {
     if (this.queryRule.isEdge) {
       r.graphData.edges = tmpData.map((x) => x.graph);
       for (let i = 0; i < r.graphData.edges.length; i++) {
-        const srcId = r.graphData.edges[i].startNodeElementId;
-        const tgtId = r.graphData.edges[i].endNodeElementId;
+        const sourceId = r.graphData.edges[i].startNodeElementId;
+        const targetId = r.graphData.edges[i].endNodeElementId;
         r.graphData.nodes.push(
-          d.graphData.nodes.find((x) => x.elementId == srcId)
+          d.graphData.nodes.find((x) => x.elementId == sourceId)
         );
         r.graphData.nodes.push(
-          d.graphData.nodes.find((x) => x.elementId == tgtId)
+          d.graphData.nodes.find((x) => x.elementId == targetId)
         );
       }
     } else {
@@ -472,13 +476,13 @@ export class MapTabComponent implements OnInit, OnDestroy {
       }
       // first column is ID
       let d: TableData[] = [
-        { val: data.data[i][0], type: TableDataType.string },
+        { value: data.data[i][0], type: TableDataType.string },
       ];
       for (let [k, v] of Object.entries(data.data[i][1])) {
-        let idx = this.tableInput.columns.indexOf(k);
-        if (idx > -1) {
+        let index = this.tableInput.columns.indexOf(k);
+        if (index > -1) {
           const enumMapping = this._g.getEnumMapping();
-          d[idx + 1] = property2TableData(
+          d[index + 1] = property2TableData(
             properties,
             enumMapping,
             k,
@@ -490,7 +494,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
       }
       for (let j = 0; j < this.tableInput.columns.length + 1; j++) {
         if (!d[j]) {
-          d[j] = { val: "", type: TableDataType.string };
+          d[j] = { value: "", type: TableDataType.string };
         }
       }
       this.tableInput.results.push(d);
@@ -516,7 +520,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
       this._g.viewUtils.hide(this._g.cy.$("." + e.className));
     }
     this.filter4Collapsed(e.className, e.willBeShowed);
-    this._g.shownElemsChanged.next(true);
+    this._g.shownElementsChanged.next(true);
     this._g.performLayout(false);
   }
 
@@ -585,10 +589,10 @@ export class MapTabComponent implements OnInit, OnDestroy {
     let historyMeta: HistoryMetaData = {
       customTxt: "Loaded from table: ",
       isNode: !this.queryRule.isEdge,
-      labels: e.tableIdx.join(","),
+      labels: e.tableIndex.join(","),
     };
     if (
-      this._g.userPrefs.queryResultPagination.getValue() == "Client" &&
+      this._g.userPreferences.queryResultPagination.getValue() == "Client" &&
       this.dbResponse
     ) {
       const isMerge =
@@ -617,7 +621,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
       }
       this._cyService.loadElementsFromDatabase(r, isMerge);
     } else {
-      this._dbService.getElems(
+      this._dbService.getElements(
         e.dbIds,
         fn,
         { isEdgeQuery: this.queryRule.isEdge },
@@ -632,8 +636,8 @@ export class MapTabComponent implements OnInit, OnDestroy {
       columns: [],
       tableTitle: "Query Results",
       results: [],
-      resultCnt: 0,
-      currPage: 1,
+      resultCount: 0,
+      currentPage: 1,
       pageSize: this.tableInput.pageSize,
       isShowExportAsCSV: true,
       isEmphasizeOnHover: true,
@@ -665,10 +669,10 @@ export class MapTabComponent implements OnInit, OnDestroy {
           isMerge
         );
       }
-      this.tableInput.resultCnt = x.count;
+      this.tableInput.resultCount = x.count;
     };
-    this.tableInput.currPage = 1;
-    if (this._g.userPrefs.queryResultPagination.getValue() == "Client") {
+    this.tableInput.currentPage = 1;
+    if (this._g.userPreferences.queryResultPagination.getValue() == "Client") {
       cb2(this.filterDbResponse(this.dbResponse, filter));
     } else {
       const limit = this.tableInput.pageSize;
@@ -741,16 +745,16 @@ export class MapTabComponent implements OnInit, OnDestroy {
   }
 
   private updateRule() {
-    let idx = this.getEditingRuleIdx();
-    this.currRules[idx].rules = {
+    let index = this.getEditingRuleIdx();
+    this.currRules[index].rules = {
       className: this.queryRule.className,
       isEdge: this.queryRule.isEdge,
       rules: deepCopyRuleNode(this.queryRule.rules),
     };
-    this.currRules[idx].name = this.currRuleName;
-    this.currRules[idx].isLoadGraph = this.tableInput.isLoadGraph;
-    this.currRules[idx].isMergeGraph = this.tableInput.isMergeGraph;
-    this.currRules[idx].isOnDb = this.isQueryOnDb;
+    this.currRules[index].name = this.currRuleName;
+    this.currRules[index].isLoadGraph = this.tableInput.isLoadGraph;
+    this.currRules[index].isMergeGraph = this.tableInput.isMergeGraph;
+    this.currRules[index].isOnDb = this.isQueryOnDb;
   }
 
   private getEditingRuleIdx(): number {
@@ -790,5 +794,11 @@ export class MapTabComponent implements OnInit, OnDestroy {
       this.updateRule();
     }
     this._profile.saveQueryRules(this.currRules);
+  }
+
+  // This is for disabling the switch to object tab on select
+  // when the user is in the BLAST tab
+  onExpandBlastTab() {
+    this._g.isSwitch2ObjectTabOnSelect = !this._g.isSwitch2ObjectTabOnSelect;
   }
 }

@@ -37,7 +37,7 @@ export class GraphHistoryComponent implements OnInit, OnDestroy {
       })
     );
     this.subs.push(
-      this._g.userPrefs.queryHistoryLimit.subscribe((x) => {
+      this._g.userPreferences.queryHistoryLimit.subscribe((x) => {
         while (this._g.graphHistory.length > x) {
           this._g.graphHistory.splice(0, 1);
           this.activeItemIdx = this.activeItemIdx - 1;

@@ -9,8 +9,10 @@ import { BehaviorSubject, Subscription } from "rxjs";
 import {
   HIGHLIGHT_NAMES,
   MAX_HIGHTLIGHT_WIDTH,
+  MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH,
   MAX_LENGTH_OF_UP_DOWN_STREAM,
   MIN_HIGHTLIGHT_WIDTH,
+  MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH,
   MIN_LENGTH_OF_UP_DOWN_STREAM,
   getCyStyleFromColorAndWid,
 } from "../../constants";
@@ -18,7 +20,7 @@ import { GlobalVariableService } from "../../global-variable.service";
 import {
   BoolSetting,
   GroupingOptionTypes,
-  MergedElemIndicatorTypes,
+  MergedElementIndicatorTypes,
 } from "../../user-preference";
 import { UserProfileService } from "../../user-profile.service";
 
@@ -41,35 +43,38 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   dbTimeout: number;
   tableColumnLimit: number;
   edgeCollapseLimit: number;
-  mergedElemIndicators: string[] = ["None", "Selection", "Highlight"];
+  mergedElementIndicators: string[] = ["None", "Selection", "Highlight"];
   groupingOptions: string[] = ["Compounds", "Circles"];
   // multiple choice settings
   queryResultPagination: "Client" | "Server";
-  mergedElemIndicator: MergedElemIndicatorTypes;
+  mergedElementIndicator: MergedElementIndicatorTypes;
   groupingOption: GroupingOptionTypes;
   nodeLabelWrap: number = 0;
   isInit: boolean = false;
-  currHighlightStyles: string[] = [];
+  currentHighlightStyles: string[] = [];
   highlightStyleIdx = 0;
   isStoreUserProfile = true;
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
-  lengthOfUpDownstream: number = 3;
-  loadFromFileSubs: Subscription;
-  tabChangeSubs: Subscription;
+  lengthOfUpDownstream: number;
+  lengthOfBlastSelectedSegmentsPath: number;
+  loadFromFileSubscription: Subscription;
+  tabChangeSubscription: Subscription;
 
   constructor(
     private _g: GlobalVariableService,
     private _profile: UserProfileService
   ) {
-    this.loadFromFileSubs = this._profile.onLoadFromFile.subscribe((x) => {
-      if (!x) {
-        return;
+    this.loadFromFileSubscription = this._profile.onLoadFromFile.subscribe(
+      (x) => {
+        if (!x) {
+          return;
+        }
+        this._profile.transferUserPreferences();
+        this.setViewUtilsStyle();
+        this.fillUIFromMemory();
       }
-      this._profile.transferUserPrefs();
-      this.setViewUtilsStyle();
-      this.fillUIFromMemory();
-    });
+    );
   }
 
   ngOnInit() {
@@ -131,7 +136,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
     this.isInit = true;
 
-    this.tabChangeSubs = this._g.operationTabChanged.subscribe((x) => {
+    this.tabChangeSubscription = this._g.operationTabChanged.subscribe((x) => {
       if (x == 3) {
         // check if my tab is opened
         this.fillUIFromMemory();
@@ -140,18 +145,18 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.loadFromFileSubs) {
-      this.loadFromFileSubs.unsubscribe();
+    if (this.loadFromFileSubscription) {
+      this.loadFromFileSubscription.unsubscribe();
     }
-    if (this.tabChangeSubs) {
-      this.tabChangeSubs.unsubscribe();
+    if (this.tabChangeSubscription) {
+      this.tabChangeSubscription.unsubscribe();
     }
   }
 
   private fillUIFromMemory() {
     // reference variables for shorter text
-    const up = this._g.userPrefs;
-    const up_p = this._g.userPrefs.pangenomegrapher;
+    const up = this._g.userPreferences;
+    const up_p = this._g.userPreferences.pangenomegrapher;
 
     this.generalBoolSettings[0].isEnable =
       up.isAutoIncrementalLayoutOnChange.getValue();
@@ -169,7 +174,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up.isTileDisconnectedOnLayout.getValue();
 
     this.nodeLabelWrap = up.nodeLabelWrap.getValue();
-    this.mergedElemIndicator = up.mergedElemIndicator.getValue();
+    this.mergedElementIndicator = up.mergedElementIndicator.getValue();
     this.groupingOption = up.groupingOption.getValue();
     this.dataPageSize = up.dataPageSize.getValue();
     this.dataPageLimit = up.dataPageLimit.getValue();
@@ -178,17 +183,17 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.tableColumnLimit = up.tableColumnLimit.getValue();
     this.edgeCollapseLimit = up.edgeCollapseLimit.getValue();
 
-    this.currHighlightStyles = up.highlightStyles.map((_, i) => {
+    this.currentHighlightStyles = up.highlightStyles.map((_, i) => {
       return this.getHighlightStyleName(i);
     });
     this.highlightStyleIdx = up.currHighlightIdx.getValue();
     this.highlightColor =
       up.highlightStyles[
-        this._g.userPrefs.currHighlightIdx.getValue()
+        this._g.userPreferences.currHighlightIdx.getValue()
       ].color.getValue();
     this.highlightWidth =
       up.highlightStyles[
-        this._g.userPrefs.currHighlightIdx.getValue()
+        this._g.userPreferences.currHighlightIdx.getValue()
       ].wid.getValue();
 
     this.selectionColor = up.selectionColor.getValue();
@@ -202,35 +207,39 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.queryResultPagination = up.queryResultPagination.getValue();
 
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
+    this.lengthOfBlastSelectedSegmentsPath =
+      up_p.lengthOfBlastSelectedSegmentsPath.getValue();
     this.pangenomegrapherBoolSettings[0].isEnable =
       up_p.isHighlightInZeroOutZero.getValue();
 
     this.setHighlightStyles();
-    this.highlightStyleSelected(this._g.userPrefs.currHighlightIdx.getValue());
+    this.highlightStyleSelected(
+      this._g.userPreferences.currHighlightIdx.getValue()
+    );
   }
 
   private setHighlightStyles() {
     if (!this._g.viewUtils) {
       return;
     }
-    this.currHighlightStyles = [];
+    this.currentHighlightStyles = [];
     let styles = this._g.viewUtils.getHighlightStyles();
     for (let i = 0; i < styles.length; i++) {
-      this.currHighlightStyles.push(this.getHighlightStyleName(i));
+      this.currentHighlightStyles.push(this.getHighlightStyleName(i));
       let c = styles[i].node["underlay-color"];
       let w = styles[i].node["underlay-padding"];
-      if (this._g.userPrefs.highlightStyles[i]) {
-        this._g.userPrefs.highlightStyles[i].color.next(c);
-        this._g.userPrefs.highlightStyles[i].wid.next(w);
+      if (this._g.userPreferences.highlightStyles[i]) {
+        this._g.userPreferences.highlightStyles[i].color.next(c);
+        this._g.userPreferences.highlightStyles[i].wid.next(w);
       } else {
-        this._g.userPrefs.highlightStyles[i] = {
+        this._g.userPreferences.highlightStyles[i] = {
           wid: new BehaviorSubject<number>(w),
           color: new BehaviorSubject<string>(c),
         };
       }
     }
-    this._g.userPrefs.highlightStyles.splice(styles.length);
-    this._profile.saveUserPrefs();
+    this._g.userPreferences.highlightStyles.splice(styles.length);
+    this._profile.saveUserPreferences();
   }
 
   private getHighlightStyleName(i: number) {
@@ -241,9 +250,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  // set view utils extension highlight styles from memory (_g.userPrefs)
+  // set view utils extension highlight styles from memory (_g.userPreferences)
   private setViewUtilsStyle() {
-    const styles = this._g.userPrefs.highlightStyles;
+    const styles = this._g.userPreferences.highlightStyles;
     let vuStyles = this._g.viewUtils.getHighlightStyles();
     for (let i = 0; i < vuStyles.length; i++) {
       let cyStyle = getCyStyleFromColorAndWid(
@@ -261,14 +270,14 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  settingChanged(val: any, userPref: string) {
-    let path = userPref.split(".");
-    let obj = this._g.userPrefs[path[0]];
+  settingChanged(value: any, userPreference: string) {
+    let path = userPreference.split(".");
+    let object = this._g.userPreferences[path[0]];
     for (let i = 1; i < path.length; i++) {
-      obj = obj[path[i]];
+      object = object[path[i]];
     }
-    obj.next(val);
-    this._profile.saveUserPrefs();
+    object.next(value);
+    this._profile.saveUserPreferences();
   }
 
   onColorSelected(c: string) {
@@ -276,7 +285,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   onSelColorSelected(c: string) {
-    this._g.userPrefs.selectionColor.next(c);
+    this._g.userPreferences.selectionColor.next(c);
     this.selectionColor = c;
     this._g.cy
       .style()
@@ -287,7 +296,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       .selector(":selected")
       .style({ "overlay-color": this.selectionColor })
       .update();
-    this._profile.saveUserPrefs();
+    this._profile.saveUserPreferences();
   }
 
   onSelWidSelected(w: any) {
@@ -295,7 +304,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (Number(width)) {
       if (width < 0) width = 1;
       else if (width > 20) width = 20;
-      this._g.userPrefs.selectionWidth.next(width);
+      this._g.userPreferences.selectionWidth.next(width);
       this.selectionWidth = width;
       this._g.cy
         .style()
@@ -308,10 +317,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
           },
         })
         .update();
-      this._profile.saveUserPrefs();
+      this._profile.saveUserPreferences();
     } else {
-      this._g.userPrefs.selectionWidth.next(1);
-      this.selectionWidth = this._g.userPrefs.selectionWidth.getValue();
+      this._g.userPreferences.selectionWidth.next(1);
+      this.selectionWidth = this._g.userPreferences.selectionWidth.getValue();
       w.target.valueAsNumber = this.selectionWidth;
     }
   }
@@ -324,8 +333,22 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
       length = MIN_LENGTH_OF_UP_DOWN_STREAM;
     }
-    this._g.userPrefs.pangenomegrapher.lengthOfUpDownstream.next(length);
+    this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.next(length);
     this.lengthOfUpDownstream = length;
+  }
+
+  onlengthOfBlastSelectedSegmentsPathSelected(x: any) {
+    let length = parseInt(x.target.value);
+    if (length > MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH) {
+      length = MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH;
+    }
+    if (length < MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH) {
+      length = MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH;
+    }
+    this._g.userPreferences.pangenomegrapher.lengthOfBlastSelectedSegmentsPath.next(
+      length
+    );
+    this.lengthOfBlastSelectedSegmentsPath = length;
   }
 
   // used to change border width or color. One of them should be defined. (exclusively)
@@ -365,7 +388,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     );
     this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     this.setHighlightStyles();
-    this.highlightStyleIdx = this.currHighlightStyles.length - 1;
+    this.highlightStyleIdx = this.currentHighlightStyles.length - 1;
     this.highlightStyleSelected(this.highlightStyleIdx);
     this._g.updateSelectionCyStyle();
   }
@@ -378,11 +401,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       i = (<HTMLSelectElement>t).selectedIndex;
     }
     this.highlightStyleIdx = i;
-    this._g.userPrefs.currHighlightIdx.next(i);
+    this._g.userPreferences.currHighlightIdx.next(i);
     let style = this._g.viewUtils.getHighlightStyles()[i];
     this.highlightColor = style.node["underlay-color"];
     this.highlightWidth = style.node["underlay-padding"];
-    this._profile.saveUserPrefs();
+    this._profile.saveUserPreferences();
   }
 
   bandPassHighlightWidth() {
@@ -395,9 +418,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   resetGeneralSettings() {
-    this.transferSubjectValues(this._g.userPrefsFromFiles, this._g.userPrefs, [
-      "pangenographer",
-    ]);
+    this.transferSubjectValues(
+      this._g.userPreferencesFromFiles,
+      this._g.userPreferences,
+      ["pangenographer"]
+    );
     this.setViewUtilsStyle();
     this.fillUIFromMemory();
     this._g.updateSelectionCyStyle();
@@ -405,8 +430,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   resetPangenographerSettings() {
     this.transferSubjectValues(
-      this._g.userPrefsFromFiles.pangenomegrapher,
-      this._g.userPrefs.pangenomegrapher
+      this._g.userPreferencesFromFiles.pangenomegrapher,
+      this._g.userPreferences.pangenomegrapher
     );
     this.fillUIFromMemory();
   }

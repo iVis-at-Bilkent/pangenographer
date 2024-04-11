@@ -88,9 +88,9 @@ export class LouvainClustering {
     }
   }
 
-  private makeAdj(edge_list) {
+  private makeAdj(edge_list: any) {
     const adj = {};
-    edge_list.forEach(function (edge) {
+    edge_list.forEach(function (edge: any) {
       adj[edge.source] = adj[edge.source] || {};
       adj[edge.source][edge.target] = edge.weight;
       adj[edge.target] = adj[edge.target] || {};
@@ -106,13 +106,13 @@ export class LouvainClustering {
     graph.adj[edge.target][edge.source] = edge.weight;
   }
 
-  private clone(obj: any) {
-    if (obj === null || typeof obj !== "object") {
-      return obj;
+  private clone(object: any) {
+    if (object === null || typeof object !== "object") {
+      return object;
     }
-    let temp = obj.constructor();
-    for (let key in obj) {
-      temp[key] = this.clone(obj[key]);
+    let temp = object.constructor();
+    for (let key in object) {
+      temp[key] = this.clone(object[key]);
     }
     return temp;
   }
@@ -406,9 +406,9 @@ export class LouvainClustering {
   }
 
   /**
-   * @param  {} elems is a cytoscape.js collection https://js.cytoscape.org/#cy.collection
+   * @param  {} elements is a cytoscape.js collection https://js.cytoscape.org/#cy.collection
    */
-  cluster(elems: any, options: ClusterOptions = null) {
+  cluster(elements: any, options: ClusterOptions = null) {
     let weightFn = (x: any) => {
       return 1;
     };
@@ -423,8 +423,8 @@ export class LouvainClustering {
         weightFn = options.weightFn;
       }
     }
-    const nodes = elems.filter("node").map((x: any) => x.id());
-    const edges = elems.filter("edge").map((x: any) => {
+    const nodes = elements.filter("node").map((x: any) => x.id());
+    const edges = elements.filter("edge").map((x: any) => {
       return {
         source: x.source().id(),
         target: x.target().id(),

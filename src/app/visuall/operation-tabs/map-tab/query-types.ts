@@ -218,11 +218,11 @@ function getJsExpressionForMetricRule(r: Rule) {
 
 function r2str(curr: Rule) {
   let s = "";
-  let inp = "" + curr.inputOperand;
+  let input = "" + curr.inputOperand;
   if (curr.propertyType == "string") {
-    inp = `"${inp}"`;
+    input = `"${input}"`;
   }
-  s += ` (<b>${curr.propertyOperand}</b> ${curr.operator} <b>${inp}</b>) `;
+  s += ` (<b>${curr.propertyOperand}</b> ${curr.operator} <b>${input}</b>) `;
   return s;
 }
 

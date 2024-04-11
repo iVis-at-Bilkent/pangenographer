@@ -13,8 +13,8 @@ import { getCyStyleFromColorAndWid, isJson } from "../../../constants";
 import { CytoscapeService } from "../../../cytoscape.service";
 import {
   DbResponseType,
-  ElemAsQueryParam,
-  GraphElem,
+  ElementAsQueryParam,
+  GraphElement,
   Neo4jEdgeDirection,
 } from "../../../db-service/data-types";
 import { DbAdapterService } from "../../../db-service/db-adapter.service";
@@ -29,29 +29,29 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   @ViewChild("file", { static: false }) file: any;
   queries: string[];
   selectedQuery: string;
-  selectedIdx: number;
+  selectedIndex: number;
   nodeEdgeClasses: string[] = [];
   ignoredTypes: string[] = [];
   lengthLimit = 2;
   isDirected = true;
-  selectedNodes: ElemAsQueryParam[] = [];
+  selectedNodes: ElementAsQueryParam[] = [];
   selectedClass = "";
   targetOrRegulator = 0;
-  clickedNodeIdx = -1;
-  addNodeBtnTxt = "Select Nodes to Add";
+  clickedNodeIndex = -1;
+  addNodeButonTxt = "Select Nodes to Add";
   tableInput: TableViewInput = {
     columns: ["Title"],
     results: [],
     isEmphasizeOnHover: true,
     tableTitle: "Query Results",
     isShowExportAsCSV: true,
-    resultCnt: 0,
-    currPage: 1,
+    resultCount: 0,
+    currentPage: 1,
     pageSize: 0,
     isLoadGraph: false,
     isMergeGraph: true,
     isNodeData: true,
-    allChecked: false
+    allChecked: false,
   };
   tableFilter: TableFiltering = {
     orderBy: null,
@@ -60,8 +60,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     skip: null,
   };
   tableFilled = new Subject<boolean>();
-  dataPageSizeSubs: Subscription;
-  dataModelSubs: Subscription;
+  dataPageSizeSubscription: Subscription;
+  dataModelSubscription: Subscription;
   dbResponse = null;
 
   constructor(
@@ -75,11 +75,11 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       "Get graph of interest",
       "Get common targets/regulators",
     ];
-    this.selectedIdx = -1;
+    this.selectedIndex = -1;
   }
 
   ngOnInit(): void {
-    this.dataModelSubs = this._g.dataModel.subscribe((x) => {
+    this.dataModelSubscription = this._g.dataModel.subscribe((x) => {
       if (x) {
         for (const n in x.nodes) {
           this.nodeEdgeClasses.push(n);
@@ -90,40 +90,41 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       }
     });
     this.selectedQuery = "";
-    this.dataPageSizeSubs = this._g.userPrefs.dataPageSize.subscribe((x) => {
-      this.tableInput.pageSize = x;
-      this.tableInput.currPage = 1;
-      this.tableFilter.skip = 0;
-    });
+    this.dataPageSizeSubscription =
+      this._g.userPreferences.dataPageSize.subscribe((x) => {
+        this.tableInput.pageSize = x;
+        this.tableInput.currentPage = 1;
+        this.tableFilter.skip = 0;
+      });
   }
 
   ngOnDestroy(): void {
-    if (this.dataModelSubs) {
-      this.dataModelSubs.unsubscribe();
+    if (this.dataModelSubscription) {
+      this.dataModelSubscription.unsubscribe();
     }
-    if (this.dataPageSizeSubs) {
-      this.dataPageSizeSubs.unsubscribe();
+    if (this.dataPageSizeSubscription) {
+      this.dataPageSizeSubscription.unsubscribe();
     }
   }
 
   changeAdvancedQuery(event: any) {
-    this.selectedIdx = this.queries.findIndex((x) => x == event.target.value);
+    this.selectedIndex = this.queries.findIndex((x) => x == event.target.value);
   }
 
   addSelectedNodes() {
-    if (this._g.isSwitch2ObjTabOnSelect) {
-      this._g.isSwitch2ObjTabOnSelect = false;
-      this.addNodeBtnTxt = "Complete Selection";
+    if (this._g.isSwitch2ObjectTabOnSelect) {
+      this._g.isSwitch2ObjectTabOnSelect = false;
+      this.addNodeButonTxt = "Complete Selection";
       return;
     }
-    this.addNodeBtnTxt = "Select Nodes to Add";
-    this._g.isSwitch2ObjTabOnSelect = true;
+    this.addNodeButonTxt = "Select Nodes to Add";
+    this._g.isSwitch2ObjectTabOnSelect = true;
     const selectedNodes = this._g.cy.nodes(":selected");
     if (selectedNodes.length < 1) {
       return;
     }
     const dbIds = selectedNodes.map((x: any) => x.id().slice(1));
-    const labels = this._g.getLabels4ElemsAsArray(dbIds);
+    const labels = this._g.getLabels4ElementsAsArray(dbIds);
     const types = selectedNodes.map((x: any) => x.classes()[0]);
     for (let i = 0; i < labels.length; i++) {
       if (this.selectedNodes.findIndex((x) => x.dbId == dbIds[i]) < 0) {
@@ -136,33 +137,33 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   removeSelected(i: number) {
-    if (i == this.clickedNodeIdx) {
-      this.clickedNodeIdx = -1;
+    if (i == this.clickedNodeIndex) {
+      this.clickedNodeIndex = -1;
       const idSelector = "n" + this.selectedNodes[i].dbId;
       this._g.cy.$id(idSelector).unselect();
-    } else if (i < this.clickedNodeIdx) {
-      this.clickedNodeIdx--;
+    } else if (i < this.clickedNodeIndex) {
+      this.clickedNodeIndex--;
     }
     this.selectedNodes.splice(i, 1);
   }
 
   removeAllSelectedNodes() {
     this.selectedNodes = [];
-    this.clickedNodeIdx = -1;
+    this.clickedNodeIndex = -1;
   }
 
   runQuery(isFromFilter: boolean, idFilter: (string | number)[] | null) {
     if (!isFromFilter && !idFilter) {
       this.tableFilter.skip = 0;
-      this.tableInput.currPage = 1;
+      this.tableInput.currentPage = 1;
     }
     const dbIds = this.selectedNodes.map((x) => x.dbId);
     if (dbIds.length < 1) {
       return;
     }
     const isClientSidePagination =
-      this._g.userPrefs.queryResultPagination.getValue() == "Client";
-    const prepareDataFn = (x) => {
+      this._g.userPreferences.queryResultPagination.getValue() == "Client";
+    const prepareDataFn = (x: any) => {
       if (!idFilter && !isFromFilter) {
         this.dbResponse = x;
       }
@@ -187,12 +188,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
             idFilter
           );
           this._cyService.loadElementsFromDatabase(
-            this.prepareElems4Cy(clientSideX),
+            this.prepareElements4Cy(clientSideX),
             this.tableInput.isMergeGraph
           );
         } else {
           this._cyService.loadElementsFromDatabase(
-            this.prepareElems4Cy(x),
+            this.prepareElements4Cy(x),
             this.tableInput.isMergeGraph
           );
         }
@@ -204,7 +205,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       prepareDataFn(this.dbResponse);
     } else {
       const types = this.ignoredTypes.map((x) => `'${x}'`);
-      if (this.selectedIdx == 1) {
+      if (this.selectedIndex == 1) {
         this._dbService.getGraphOfInterest(
           dbIds,
           types,
@@ -215,7 +216,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           idFilter,
           prepareDataFn
         );
-      } else if (this.selectedIdx == 2) {
+      } else if (this.selectedIndex == 2) {
         let dir: Neo4jEdgeDirection = this.targetOrRegulator;
         if (!this.isDirected) {
           dir = Neo4jEdgeDirection.BOTH;
@@ -230,7 +231,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           idFilter,
           prepareDataFn
         );
-      } else if (this.selectedIdx == 0) {
+      } else if (this.selectedIndex == 0) {
         this._dbService.getNeighborhood(
           dbIds,
           types,
@@ -244,7 +245,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     }
   }
 
-  setSelected(x: ElemAsQueryParam[]) {
+  setSelected(x: ElementAsQueryParam[]) {
     this.selectedNodes = x;
   }
 
@@ -258,35 +259,35 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       columns: x.columns,
       data: [[null, null, null, null, null, null, null, null]],
     };
-    const idxNodes = x.columns.indexOf("nodes");
-    const idxNodeId = x.columns.indexOf("nodeElementId");
-    const idxNodeClass = x.columns.indexOf("nodeClass");
-    const idxEdges = x.columns.indexOf("edges");
-    const idxEdgeId = x.columns.indexOf("edgeElementId");
-    const idxEdgeClass = x.columns.indexOf("edgeClass");
-    const idxEdgeSrcTgt = x.columns.indexOf("edgeSourceTargets");
+    const indexNodes = x.columns.indexOf("nodes");
+    const indexNodeId = x.columns.indexOf("nodeElementId");
+    const indexNodeClass = x.columns.indexOf("nodeClass");
+    const indexEdges = x.columns.indexOf("edges");
+    const indexEdgeId = x.columns.indexOf("edgeElementId");
+    const indexEdgeClass = x.columns.indexOf("edgeClass");
+    const indexEdgeSourceTarget = x.columns.indexOf("edgeSourceTargets");
     const idxTotalCnt = x.columns.indexOf("totalNodeCount");
     const maxResultCnt =
-      this._g.userPrefs.dataPageLimit.getValue() *
-      this._g.userPrefs.dataPageSize.getValue();
+      this._g.userPreferences.dataPageLimit.getValue() *
+      this._g.userPreferences.dataPageSize.getValue();
 
-    const nodes = x.data[0][idxNodes];
-    const nodeClass = x.data[0][idxNodeClass];
-    const nodeId = x.data[0][idxNodeId];
-    const edges = x.data[0][idxEdges];
-    const edgeClass = x.data[0][idxEdgeClass];
-    const edgeId = x.data[0][idxEdgeId];
-    const edgeSrcTgt = x.data[0][idxEdgeSrcTgt];
-    r.data[0][idxEdges] = edges;
-    r.data[0][idxEdgeClass] = edgeClass;
-    r.data[0][idxEdgeId] = edgeId;
-    r.data[0][idxEdgeSrcTgt] = edgeSrcTgt;
+    const nodes = x.data[0][indexNodes];
+    const nodeClass = x.data[0][indexNodeClass];
+    const nodeId = x.data[0][indexNodeId];
+    const edges = x.data[0][indexEdges];
+    const edgeClass = x.data[0][indexEdgeClass];
+    const edgeId = x.data[0][indexEdgeId];
+    const edgeSourceTarget = x.data[0][indexEdgeSourceTarget];
+    r.data[0][indexEdges] = edges;
+    r.data[0][indexEdgeClass] = edgeClass;
+    r.data[0][indexEdgeId] = edgeId;
+    r.data[0][indexEdgeSourceTarget] = edgeSourceTarget;
     r.data[0][idxTotalCnt] =
       x.data[0][idxTotalCnt] > maxResultCnt
         ? maxResultCnt
         : x.data[0][idxTotalCnt];
 
-    const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
+    const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
 
     let tempNodes: { node: any; cls: string; elementId: string }[] = [];
     const srcNodeIds = this.selectedNodes.map((x) => x.dbId);
@@ -347,25 +348,25 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     }
     const skip = filter && filter.skip ? filter.skip : 0;
     for (let i = 0; i < srcNodeIds.length; i++) {
-      const idx = tempNodes.findIndex((x) => x.elementId == srcNodeIds[i]);
+      const index = tempNodes.findIndex((x) => x.elementId == srcNodeIds[i]);
       // move src node to the beginning
-      if (idx > -1) {
-        const tmp = tempNodes[idx];
-        tempNodes[idx] = tempNodes[i];
+      if (index > -1) {
+        const tmp = tempNodes[index];
+        tempNodes[index] = tempNodes[i];
         tempNodes[i] = tmp;
       }
     }
     if (filter && !idFilter) {
-      this.tableInput.resultCnt = tempNodes.length;
+      this.tableInput.resultCount = tempNodes.length;
     }
 
     tempNodes = tempNodes.slice(
       skip,
-      skip + this._g.userPrefs.dataPageSize.getValue()
+      skip + this._g.userPreferences.dataPageSize.getValue()
     );
-    r.data[0][idxNodes] = tempNodes.map((x) => x.node);
-    r.data[0][idxNodeClass] = tempNodes.map((x) => x.cls);
-    r.data[0][idxNodeId] = tempNodes.map((x) => x.elementId);
+    r.data[0][indexNodes] = tempNodes.map((x) => x.node);
+    r.data[0][indexNodeClass] = tempNodes.map((x) => x.cls);
+    r.data[0][indexNodeId] = tempNodes.map((x) => x.elementId);
     return r;
   }
 
@@ -375,15 +376,15 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     isRefreshColumns = true,
     isClientSidePagination = true
   ) {
-    const idxNodes = data.columns.indexOf("nodes");
-    const idxNodeId = data.columns.indexOf("nodeElementId");
-    const idxNodeClass = data.columns.indexOf("nodeClass");
+    const indexNodes = data.columns.indexOf("nodes");
+    const indexNodeId = data.columns.indexOf("nodeElementId");
+    const indexNodeClass = data.columns.indexOf("nodeClass");
     const idxTotalCnt = data.columns.indexOf("totalNodeCount");
-    const nodes = data.data[0][idxNodes];
-    const nodeClass = data.data[0][idxNodeClass];
-    const nodeId = data.data[0][idxNodeId];
+    const nodes = data.data[0][indexNodes];
+    const nodeClass = data.data[0][indexNodeClass];
+    const nodeId = data.data[0][indexNodeId];
     if (isRefreshColumns || !isClientSidePagination) {
-      this.tableInput.resultCnt = data.data[0][idxTotalCnt];
+      this.tableInput.resultCount = data.data[0][idxTotalCnt];
     }
 
     this.tableInput.results = [];
@@ -398,10 +399,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       delete d["tconst"];
       delete d["nconst"];
       const propNames = Object.keys(d);
-      const row: TableData[] = [{ type: TableDataType.string, val: nodeId[i] }];
+      const row: TableData[] = [
+        { type: TableDataType.string, value: nodeId[i] },
+      ];
       for (const n of propNames) {
-        const idx = this.tableInput.columns.indexOf(n);
-        if (idx == -1) {
+        const index = this.tableInput.columns.indexOf(n);
+        if (index == -1) {
           this.tableInput.columns.push(n);
           row[this.tableInput.columns.length] = property2TableData(
             props,
@@ -412,7 +415,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
             false
           );
         } else {
-          row[idx + 1] = property2TableData(
+          row[index + 1] = property2TableData(
             props,
             enumMapping,
             n,
@@ -425,7 +428,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       // fill empty columns
       for (let j = 0; j < this.tableInput.columns.length + 1; j++) {
         if (!row[j]) {
-          row[j] = { val: "", type: TableDataType.string };
+          row[j] = { value: "", type: TableDataType.string };
         }
       }
       this.tableInput.classNames.push(nodeClass[i]);
@@ -436,7 +439,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.tableInput.results.length; i++) {
       for (let j = this.tableInput.results[i].length; j < maxColCnt; j++) {
         this.tableInput.results[i].push({
-          val: "",
+          value: "",
           type: TableDataType.string,
         });
       }
@@ -450,11 +453,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       .nodes()
       .filter((node: any) => dbIds.has(node.id().substring(1)));
     // add a new higlight style
-    if (this._g.userPrefs.highlightStyles.length < 2) {
+    if (this._g.userPreferences.highlightStyles.length < 2) {
       const cyStyle = getCyStyleFromColorAndWid("#0b9bcd", 4.5);
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     }
-    const currHighlightIdx = this._g.userPrefs.currHighlightIdx.getValue();
+    const currHighlightIdx =
+      this._g.userPreferences.currHighlightIdx.getValue();
     if (currHighlightIdx == 0) {
       this._g.viewUtils.highlight(seedNodes, 1);
     } else {
@@ -470,10 +474,10 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     }
     const cyNodes = this._g.cy
       .nodes()
-      .filter((node) => dbIds.has(node.id().substring(1)));
+      .filter((node: any) => dbIds.has(node.id().substring(1)));
 
     // add a new higlight style
-    if (this._g.userPrefs.highlightStyles.length < 3) {
+    if (this._g.userPreferences.highlightStyles.length < 3) {
       const cyStyle = getCyStyleFromColorAndWid("#04f06a", 4.5);
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     }
@@ -489,7 +493,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     this._fileReaderService.readTxtFile(
       this.file.nativeElement.files[0],
       (txt) => {
-        let elems: GraphElem[] = [];
+        let elements: GraphElement[] = [];
         if (!isJson(txt)) {
           const arr = txt.split("\n").map((x) => x.split("|"));
           if (arr.length < 0) {
@@ -509,24 +513,26 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
             for (let j = 1; j < arr[0].length; j++) {
               o[arr[0][j]] = arr[i][j];
             }
-            elems.push({ classes: arr[i][0], data: o });
+            elements.push({ classes: arr[i][0], data: o });
           }
         } else {
-          elems = JSON.parse(txt) as GraphElem[];
+          elements = JSON.parse(txt) as GraphElement[];
           const fn1 = (x: any) =>
             this.selectedNodes.find(
               (y) => y.dbId === x.data.id.substring(1)
             ) === undefined;
-          if (!(elems instanceof Array)) {
-            elems = (JSON.parse(txt).nodes as any[]).filter(fn1);
+          if (!(elements instanceof Array)) {
+            elements = (JSON.parse(txt).nodes as any[]).filter(fn1);
           } else {
-            elems = elems.filter((x) => x.data.id.startsWith("n") && fn1(x));
+            elements = elements.filter(
+              (x) => x.data.id.startsWith("n") && fn1(x)
+            );
           }
         }
 
-        const labels = this._g.getLabels4ElemsAsArray(null, true, elems);
+        const labels = this._g.getLabels4ElementsAsArray(null, true, elements);
         this.selectedNodes = this.selectedNodes.concat(
-          elems.map((x, i) => {
+          elements.map((x, i) => {
             return {
               dbId: x.data.id.substring(1),
               label: x.classes.split(" ")[0] + ":" + labels[i],
@@ -539,9 +545,9 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
   addRemoveType(e: { className: string; willBeShowed: boolean }) {
     if (e.willBeShowed) {
-      const idx = this.ignoredTypes.findIndex((x) => x === e.className);
-      if (idx > -1) {
-        this.ignoredTypes.splice(idx, 1);
+      const index = this.ignoredTypes.findIndex((x) => x === e.className);
+      if (index > -1) {
+        this.ignoredTypes.splice(index, 1);
       }
     } else {
       if (!this.ignoredTypes.includes(e.className)) {
@@ -551,12 +557,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   selectedNodeClicked(i: number) {
-    this._g.isSwitch2ObjTabOnSelect = false;
-    this.clickedNodeIdx = i;
+    this._g.isSwitch2ObjectTabOnSelect = false;
+    this.clickedNodeIndex = i;
     const idSelector = "n" + this.selectedNodes[i].dbId;
     this._g.cy.$().unselect();
     this._g.cy.elements(`[id = "${idSelector}"]`).select();
-    this._g.isSwitch2ObjTabOnSelect = true;
+    this._g.isSwitch2ObjectTabOnSelect = true;
   }
 
   getDataForQueryResult(e: TableRowMeta) {
@@ -569,52 +575,52 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     this.runQuery(true, null);
   }
 
-  prepareElems4Cy(data) {
-    const idxNodes = data.columns.indexOf("nodes");
-    const idxNodeId = data.columns.indexOf("nodeElementId");
-    const idxNodeClass = data.columns.indexOf("nodeClass");
-    const idxEdges = data.columns.indexOf("edges");
-    const idxEdgeId = data.columns.indexOf("edgeElementId");
-    const idxEdgeClass = data.columns.indexOf("edgeClass");
-    const idxEdgeSrcTgt = data.columns.indexOf("edgeSourceTargets");
+  prepareElements4Cy(data: any) {
+    const indexNodes = data.columns.indexOf("nodes");
+    const indexNodeId = data.columns.indexOf("nodeElementId");
+    const indexNodeClass = data.columns.indexOf("nodeClass");
+    const indexEdges = data.columns.indexOf("edges");
+    const indexEdgeId = data.columns.indexOf("edgeElementId");
+    const indexEdgeClass = data.columns.indexOf("edgeClass");
+    const indexEdgeSourceTarget = data.columns.indexOf("edgeSourceTargets");
 
-    const nodes = data.data[0][idxNodes];
-    const nodeClass = data.data[0][idxNodeClass];
-    const nodeId = data.data[0][idxNodeId];
-    const edges = data.data[0][idxEdges];
-    const edgeClass = data.data[0][idxEdgeClass];
-    const edgeId = data.data[0][idxEdgeId];
-    const edgeSrcTgt = data.data[0][idxEdgeSrcTgt];
+    const nodes = data.data[0][indexNodes];
+    const nodeClass = data.data[0][indexNodeClass];
+    const nodeId = data.data[0][indexNodeId];
+    const edges = data.data[0][indexEdges];
+    const edgeClass = data.data[0][indexEdgeClass];
+    const edgeId = data.data[0][indexEdgeId];
+    const edgeSourceTarget = data.data[0][indexEdgeSourceTarget];
 
     const cyData = { nodes: [], edges: [] };
-    const nodeIdsDict = {};
+    const nodeIdsDictionary = {};
     for (let i = 0; i < nodes.length; i++) {
       cyData.nodes.push({
         elementId: nodeId[i],
         labels: [nodeClass[i]],
         properties: nodes[i],
       });
-      nodeIdsDict[nodeId[i]] = true;
+      nodeIdsDictionary[nodeId[i]] = true;
     }
 
     for (let i = 0; i < edges.length; i++) {
-      const srcId = edgeSrcTgt[i][0];
-      const tgtId = edgeSrcTgt[i][1];
+      const sourceId = edgeSourceTarget[i][0];
+      const targetId = edgeSourceTarget[i][1];
       // check if src and target exist in cy or current data.
-      const isSrcLoaded = this.tableInput.isMergeGraph
-        ? this._g.cy.elements(`[id = "n${srcId}"]`).length > 0
+      const isSourceLoaded = this.tableInput.isMergeGraph
+        ? this._g.cy.elements(`[id = "n${sourceId}"]`).length > 0
         : false;
       const isTgtLoaded = this.tableInput.isMergeGraph
-        ? this._g.cy.elements(`[id = "n${tgtId}"]`).length > 0
+        ? this._g.cy.elements(`[id = "n${targetId}"]`).length > 0
         : false;
       if (
-        (nodeIdsDict[srcId] || isSrcLoaded) &&
-        (nodeIdsDict[tgtId] || isTgtLoaded)
+        (nodeIdsDictionary[sourceId] || isSourceLoaded) &&
+        (nodeIdsDictionary[targetId] || isTgtLoaded)
       ) {
         cyData.edges.push({
           properties: edges[i],
-          startNodeElementId: srcId,
-          endNodeElementId: tgtId,
+          startNodeElementId: sourceId,
+          endNodeElementId: targetId,
           elementId: edgeId[i],
           type: edgeClass[i],
         });

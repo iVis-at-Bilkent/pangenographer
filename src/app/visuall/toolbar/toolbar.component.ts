@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
-import { getPropNamesFromObj } from "../constants";
+import { getPropNamesFromObject } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GlobalVariableService } from "../global-variable.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
@@ -29,8 +29,8 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   statusMsg = "";
   statusMsgQueue: string[] = [];
   MIN_MSG_DURATION = 500;
-  statusMsgSubs: Subscription;
-  userPrefSubs: Subscription;
+  statusMsgSubscription: Subscription;
+  userPreferenceSubscription: Subscription;
   msgStarted2show: number = 0;
   isLimitDbQueries2range: boolean;
   @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
@@ -167,20 +167,20 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    if (this.statusMsgSubs) {
-      this.statusMsgSubs.unsubscribe();
+    if (this.statusMsgSubscription) {
+      this.statusMsgSubscription.unsubscribe();
     }
-    if (this.userPrefSubs) {
-      this.userPrefSubs.unsubscribe();
+    if (this.userPreferenceSubscription) {
+      this.userPreferenceSubscription.unsubscribe();
     }
   }
 
   ngOnInit() {
-    this.statusMsgSubs = this._g.statusMsg.subscribe((x) => {
+    this.statusMsgSubscription = this._g.statusMsg.subscribe((x) => {
       this.statusMsgQueue.push(x);
       this.processMsgQueue();
     });
-    this.userPrefSubs = this._g.isUserPrefReady.subscribe((x) => {
+    this.userPreferenceSubscription = this._g.isUserPrefReady.subscribe((x) => {
       if (!x) {
         return;
       }
@@ -248,18 +248,19 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   highlightSearch() {
-    const filterFn = (x) => {
+    const filterFn = (x: any) => {
       const entityMap = this._g.dataModel.getValue();
-      const propNames = getPropNamesFromObj(
+      const propNames = getPropNamesFromObject(
         [entityMap.nodes, entityMap.edges],
         false
       );
-      const isIgnoreCase = this._g.userPrefs.isIgnoreCaseInText.getValue();
+      const isIgnoreCase =
+        this._g.userPreferences.isIgnoreCaseInText.getValue();
       let s = "";
       for (const propName of propNames) {
-        const val = x.data(propName);
-        if (val != undefined && val != null) {
-          s += val;
+        const value = x.data(propName);
+        if (value != undefined && value != null) {
+          s += value;
         }
       }
       if (isIgnoreCase) {
@@ -267,11 +268,11 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       return s.includes(this.searchTxt);
     };
-    let satisfyingElems = this._g.cy.filter(filterFn);
-    satisfyingElems = satisfyingElems.union(
-      this._g.filterRemovedElems(filterFn)
+    let satisfyingElements = this._g.cy.filter(filterFn);
+    satisfyingElements = satisfyingElements.union(
+      this._g.filterRemovedElements(filterFn)
     );
-    this._g.highlightElements(satisfyingElems);
+    this._g.highlightElements(satisfyingElements);
   }
 
   highlightSelected() {

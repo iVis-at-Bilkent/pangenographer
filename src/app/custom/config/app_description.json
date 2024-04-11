@@ -218,6 +218,7 @@
     "queryResultPagination": "Client",
     "tilingPadding": 4,
     "pangenomegrapher": {
+      "lengthOfBlastSelectedSegmentsPath": 5,
       "lengthOfUpDownstream": 3,
       "isHighlightInZeroOutZero": true
     }
