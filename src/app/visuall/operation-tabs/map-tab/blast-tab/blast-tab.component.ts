@@ -32,7 +32,7 @@ export class BlastTabComponent implements OnInit {
   query: string = ""; // Query sequence for BLAST
   types: string[] = ["Standalone service", "Web service"]; // Types of service
   selectedType: string = "Standalone service"; // Selected type of service
-  selectedTypeIdx: number = 0; // 0: Standalone service, 1: Web service
+  selectedTypeIndex: number = 0; // 0: Standalone service, 1: Web service, -1: Invalid type
 
   // Selected segments path finding variables
   selectedSegmentMap: any = {}; // Map of selected segments with their ids as keys
@@ -242,7 +242,7 @@ export class BlastTabComponent implements OnInit {
     allChecked: true,
   };
   standaloneQuery: string = "";
-  standaloneStatus: string = "";
+  standaloneResult: string = "";
   standaloneUrl: string = environment.blastStandaloneUrl;
   standaloneCommandLineArguments: string = "-outfmt 6";
   standaloneIsTableOutput: boolean = false;
@@ -530,20 +530,41 @@ export class BlastTabComponent implements OnInit {
     return edges;
   }
 
-  // Set selected type of service
+  // Set the query sequence for BLAST
   onQueryChange(event: any) {
     this.query = event.target.value.trim();
   }
 
+  // Set the selected type of service for BLAST
   onchangeTypeChange(event: any) {
+    // Set the selected type of service
     this.selectedType = event.target.value;
     if (this.selectedType === "Standalone service") {
-      this.selectedTypeIdx = 0;
+      this.selectedTypeIndex = 0;
     } else if (this.selectedType === "Web service") {
-      this.selectedTypeIdx = 1;
+      this.selectedTypeIndex = 1;
     } else {
-      this.selectedTypeIdx = -1;
+      this.selectedTypeIndex = -1; // Invalid type
     }
+
+    // Clear the blast tab
+    this.clearTheBlastTab();
+  }
+
+  // Clear the blast tab by clearing the standalone and web outputs and query sequence
+  private clearTheBlastTab() {
+    // Clear the standalone output
+    this.standaloneResult = "";
+    // Close the table output if it is open
+    this.standaloneIsTableOutput = false;
+    this.standaloneIsTableOutputFilled.next(false);
+    this.standaloneClearTableOutputFilter.next(true);
+    this.standaloneTableOutput.results = [];
+
+    // Clear the web output
+    this.webResult = "";
+
+    // Reset the query sequence
     this.query = "";
   }
 
@@ -843,7 +864,7 @@ export class BlastTabComponent implements OnInit {
       },
       false,
       (res) => {
-        this.standaloneStatus = res.results;
+        this.standaloneResult = res.results;
         this.standaloneIsTableOutput = res.isFormat6;
 
         if (this.standaloneIsTableOutput) {
@@ -861,7 +882,7 @@ export class BlastTabComponent implements OnInit {
   }
 
   fillStandaloneTableOutput() {
-    let lines = this.standaloneStatus.split("\n");
+    let lines = this.standaloneResult.split("\n");
     this.standaloneTableOutput.results = [];
     let id = 0;
 
@@ -931,12 +952,13 @@ export class BlastTabComponent implements OnInit {
     this.standaloneCommandLineArguments = event.target.value.trim();
   }
 
+  // Save the results of the BLAST as a text file with the name blast_<web/standalone>_result.txt
   saveResults() {
-    if (this.selectedTypeIdx) {
+    if (this.selectedTypeIndex) {
       this._cyService.saveAsTxt(this.webResult, "blast_web_result.txt");
     } else {
       this._cyService.saveAsTxt(
-        this.standaloneStatus,
+        this.standaloneResult,
         "blast_standalone_result.txt"
       );
     }

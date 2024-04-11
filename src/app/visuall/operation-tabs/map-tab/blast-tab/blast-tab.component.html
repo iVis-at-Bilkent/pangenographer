@@ -14,7 +14,7 @@
       </select>
     </div>
 
-    <div *ngIf="selectedTypeIdx === 1" class="panel">
+    <div *ngIf="selectedTypeIndex === 1" class="panel">
       <div>
         <div class="top-button">
           <input
@@ -436,7 +436,7 @@
       </div>
     </div>
 
-    <div *ngIf="selectedTypeIdx === 0" class="panel">
+    <div *ngIf="selectedTypeIndex === 0" class="panel">
       <div class="top-button">
         <input
           class="btn btn-sm btn-dark va-text m-2 center float-left"
@@ -492,9 +492,9 @@
 
       <div>
         <pre
-          *ngIf="standaloneStatus && !standaloneIsTableOutput"
+          *ngIf="standaloneResult && !standaloneIsTableOutput"
           class="result"
-          >{{ standaloneStatus }}</pre
+          >{{ standaloneResult }}</pre
         >
         <app-table-view
           *ngIf="standaloneTableOutput && standaloneIsTableOutput"
@@ -506,7 +506,7 @@
         </app-table-view>
       </div>
 
-      <div *ngIf="standaloneStatus" class="save">
+      <div *ngIf="standaloneResult" class="save">
         <input
           class="btn btn-sm btn-dark va-text m-2 center"
           type="button"
