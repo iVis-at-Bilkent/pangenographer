@@ -362,14 +362,17 @@ export class BlastTabComponent implements OnInit {
     }
 
     // Prepare selected path name for selected segments path
-    let selectedPathName = "path";
+    let selectedPathName = "";
 
     // Add segment names to selected path name for selected segments path
     // by concatenating the segment names of the segments in the path
     for (let i = 0; i < this.selectedSegmentPaths[index].length; i++) {
       selectedPathName +=
-        "_" + this.selectedSegmentPaths[index][i].data("segmentName");
+        this.selectedSegmentPaths[index][i].data("segmentName") + "_";
     }
+
+    // Remove the last underscore from the selected path name
+    selectedPathName = selectedPathName.slice(0, -1);
 
     // Add selected path name and combined sequence to sequences of selected paths array
     sequencesOfSelectedPaths.push(selectedPathName);
@@ -863,22 +866,41 @@ export class BlastTabComponent implements OnInit {
     let id = 0;
 
     for (let i = 0; i < lines.length; i++) {
+      // Prepare row for the table output
       let row: TableData[] = [];
+      // Split the line by tab to get columns of the row
       let cols = lines[i].trim().split("\t");
+      // If the number of columns is equal to 12, then add the row to the table output
+      // Otherwise, ignore the row as it is not a valid row
       if (cols.length == 12) {
+        // Id for the row
         row.push({ value: id++, type: TableDataType.number });
-        row.push({ value: cols[0], type: TableDataType.number });
-        row.push({ value: cols[1], type: TableDataType.number });
+        // Query name
+        row.push({ value: cols[0], type: TableDataType.string });
+        // Source name
+        row.push({ value: cols[1], type: TableDataType.string });
+        // Percent identity
         row.push({ value: cols[2], type: TableDataType.number });
+        // Alignment length
         row.push({ value: cols[3], type: TableDataType.number });
+        // Mis-matches
         row.push({ value: cols[4], type: TableDataType.number });
+        // Gap opens
         row.push({ value: cols[5], type: TableDataType.number });
+        // Query start
         row.push({ value: cols[6], type: TableDataType.number });
+        // Query end
         row.push({ value: cols[7], type: TableDataType.number });
+        // Source start
         row.push({ value: cols[8], type: TableDataType.number });
+        // Source end
         row.push({ value: cols[9], type: TableDataType.number });
+        // E-value
         row.push({ value: cols[10], type: TableDataType.string });
+        // Bit score
         row.push({ value: cols[11], type: TableDataType.number });
+
+        // Add the row to the table output
         this.standaloneTableOutput.results.push(row);
       }
     }
