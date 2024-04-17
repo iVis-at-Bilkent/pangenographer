@@ -63,13 +63,13 @@ td {
 }
 
 .path-walk-text-container {
-  padding: 0% 0% 1.5% 0%;
+  padding: 0% 0% 1% 0%;
   max-height: 200px;
   overflow-wrap: break-word;
   text-align: left;
   font-family: Inconsolata, monospace;
   overflow-y: auto;
-  line-height: 20px;
+  line-height: 15px;
 }
 
 .isHoveredPathWalk {
