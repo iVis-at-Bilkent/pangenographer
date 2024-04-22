@@ -84,6 +84,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         isEnable: true,
         path2userPref: "pangenographer.isHighlightInZeroOutZero",
       },
+      {
+        text: "Enable/Disable show up/downstream cues",
+        isEnable: true,
+        path2userPref: "pangenographer.isShowUpDownstreamCues",
+      },
     ];
 
     this.generalBoolSettings = [
@@ -211,6 +216,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up_p.lengthOfBlastSelectedSegmentsPath.getValue();
     this.pangenographerBoolSettings[0].isEnable =
       up_p.isHighlightInZeroOutZero.getValue();
+    this.pangenographerBoolSettings[1].isEnable =
+      up_p.isShowUpDownstreamCues.getValue();
 
     this.setHighlightStyles();
     this.highlightStyleSelected(

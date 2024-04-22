@@ -219,7 +219,8 @@
     "pangenographer": {
       "lengthOfBlastSelectedSegmentsPath": 5,
       "lengthOfUpDownstream": 3,
-      "isHighlightInZeroOutZero": true
+      "isHighlightInZeroOutZero": true,
+      "isShowUpDownstreamCues": true
     }
   },
   "cssStyle": {

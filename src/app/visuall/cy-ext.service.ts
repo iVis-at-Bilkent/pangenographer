@@ -91,6 +91,7 @@ export class CyExtService {
     window.addEventListener("scroll", this._g.cyNaviPositionSetter);
     // to render navigator, fire zoom event
     this._g.cy.zoom(this._g.cy.zoom() + 0.00001);
+    this._g.cy.zoom(this._g.cy.zoom() - 0.00001);
     // to prevent expandCollapse extension's blocking
     (
       document.getElementsByClassName(cyNaviClass)[0] as HTMLElement

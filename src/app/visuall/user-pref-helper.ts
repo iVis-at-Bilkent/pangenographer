@@ -58,8 +58,15 @@ export class UserPrefHelper {
         this._cyService.changeGroupingOption(x);
       });
 
+      // PanGenoGrapher Settings
+      // Change the length of upstream/downstream function
       upP.isHighlightInZeroOutZero.subscribe(() => {
         this._g.changeHighlightInZeroOutZero();
+      });
+
+      // Change the show upstream/downstream cues function
+      upP.isShowUpDownstreamCues.subscribe(() => {
+        this._cyService.changeShowUpDownstreamCues();
       });
     });
   }

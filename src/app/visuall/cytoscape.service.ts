@@ -1189,4 +1189,17 @@ export class CytoscapeService {
       return String.fromCharCode(Number(charCode));
     });
   }
+
+  // Changes the visibility of the up and down stream cues
+  changeShowUpDownstreamCues() {
+    if (
+      this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
+    ) {
+      this._externalToolService.addExternalTools(
+        this.showUpDownstream.bind(this)
+      );
+    } else {
+      this._externalToolService.removeExternalTools();
+    }
+  }
 }

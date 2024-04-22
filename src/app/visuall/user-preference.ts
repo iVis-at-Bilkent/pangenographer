@@ -41,6 +41,7 @@ export interface UserPreferences {
     lengthOfUpDownstream: BehaviorSubject<number>;
     lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
     isHighlightInZeroOutZero: BehaviorSubject<boolean>;
+    isShowUpDownstreamCues: BehaviorSubject<boolean>;
   };
 }
 

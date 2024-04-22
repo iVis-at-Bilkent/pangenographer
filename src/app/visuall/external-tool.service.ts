@@ -34,53 +34,60 @@ export class ExternalToolService {
     private _sequenceDataService: SequenceDataService
   ) {}
 
+  // Add external tools to the graph
+  // Tooltips show some part of the element's data when hovered over
+  // Cues show arrows on the top left and top right of the element to show upstream and downstream elements
   addExternalTools(
     showUpDownstream: (element: any, length: number, up: boolean) => void,
     nodes: any = undefined,
     edges: any = undefined
   ) {
+    this._g.cy.startBatch();
+
+    // Add tooltips
     this.addTooltips(nodes, edges);
-    this.addCues(showUpDownstream, nodes);
-  }
 
-  removeExternalTools(nodes: any = undefined) {
-    this.removeCues(nodes);
-  }
-
-  private removeCues(nodes: any = undefined) {
-    if (nodes) {
-      nodes.forEach((node: any) => {
-        this._g.cy.removeListener("pan", this._g.cueUpdaters[`${node.id()}`]);
-        this._g.cy.removeListener("zoom", this._g.cueUpdaters[`${node.id()}`]);
-        this._g.cy.removeListener(
-          "resize",
-          this._g.cueUpdaters[`${node.id()}`]
-        );
-        delete this._g.cueUpdaters[`${node.id()}`];
-        node.removeCue();
-      });
-    } else {
-      this._g.cy.nodes().forEach((node: any) => {
-        this._g.cy.removeListener("pan", this._g.cueUpdaters[`${node.id()}`]);
-        this._g.cy.removeListener("zoom", this._g.cueUpdaters[`${node.id()}`]);
-        this._g.cy.removeListener(
-          "resize",
-          this._g.cueUpdaters[`${node.id()}`]
-        );
-        delete this._g.cueUpdaters[`${node.id()}`];
-        node.removeCue();
-      });
+    // Add cues only if the user preference is set to show them
+    if (
+      this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
+    ) {
+      this.addCues(showUpDownstream, nodes);
     }
+
+    // Make the graph zoom in and out to trigger the cues to show
+    this._g.cy.zoom(this._g.cy.zoom() + 0.00001);
+    this._g.cy.zoom(this._g.cy.zoom() - 0.00001);
+
+    this._g.cy.endBatch();
+  }
+
+  // Remove external tools from the graph
+  // Cues that show upstream and downstream elements are removed
+  removeExternalTools(nodes: any = undefined) {
+    this._g.cy.startBatch();
+
+    // Remove cues
+    this.removeCues(nodes);
+
+    this._g.cy.endBatch();
+  }
+
+  // Removes all or provided nodes' cues
+  private removeCues(nodes: any = this._g.cy.nodes()) {
+    nodes.forEach((node: any) => {
+      this._g.cy.removeListener(
+        "pan zoom resize",
+        this._g.cueUpdaters[`${node.id()}`]
+      );
+      delete this._g.cueUpdaters[`${node.id()}`];
+      node.removeCue();
+    });
   }
 
   private addCues(
     showUpDownstream: (element: any, length: number, up: boolean) => void,
-    nodes: any = undefined
+    nodes: any = this._g.cy.nodes()
   ) {
-    if (!nodes) {
-      nodes = this._g.cy.nodes();
-    }
-
     let marginY = 6;
     let marginX = 9;
     let marginXTwo = 6;
@@ -238,6 +245,7 @@ export class ExternalToolService {
         marginXTwo
       )
     );
+
     node.updateCue(
       this.updateCuePrep(
         node.id(),
@@ -249,6 +257,7 @@ export class ExternalToolService {
         1
       )
     );
+
     node.updateCue(
       this.updateCuePrep(
         node.id(),
@@ -261,6 +270,7 @@ export class ExternalToolService {
         marginXTwo
       )
     );
+
     node.updateCue(
       this.updateCuePrep(
         node.id(),
