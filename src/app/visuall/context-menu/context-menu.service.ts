@@ -192,7 +192,7 @@ export class ContextMenuService {
     }
     this._cyService.showUpDownstream(
       element,
-      this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.getValue(),
+      this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
       isUp
     );
   }
@@ -216,7 +216,7 @@ export class ContextMenuService {
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
       element.data().segmentName,
-      this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.getValue(),
+      this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
       callback,
       isUp
     );

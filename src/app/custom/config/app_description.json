@@ -1,10 +1,9 @@
 {
   "appInfo": {
-    "name": "PanGenomeGrapher",
-    "html_header": "PanGenomeGrapher",
+    "name": "PanGenoGrapher",
+    "html_header": "PanGenoGrapher",
     "icon": "app/custom/assets/logo.png",
     "version": "1.0.0 beta",
-    "company_name": "A collaborative project by i-Vis Research Lab and Alkan Lab at Bilkent University",
     "company_contact": "ivis@cs.bilkent.edu.tr"
   },
   "objects": {
@@ -217,7 +216,7 @@
     "objectInclusionType": 0,
     "queryResultPagination": "Client",
     "tilingPadding": 4,
-    "pangenomegrapher": {
+    "pangenographer": {
       "lengthOfBlastSelectedSegmentsPath": 5,
       "lengthOfUpDownstream": 3,
       "isHighlightInZeroOutZero": true

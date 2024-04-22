@@ -25,7 +25,7 @@ export class UserPrefHelper {
       this._cyService.bindViewUtilitiesExtension();
 
       const up = this._g.userPreferences;
-      const upP = this._g.userPreferences.pangenomegrapher;
+      const upP = this._g.userPreferences.pangenographer;
 
       up.isAutoIncrementalLayoutOnChange.subscribe((x) => {
         this.changeAutoIncremental(x);

@@ -31,7 +31,7 @@ import { UserProfileService } from "../../user-profile.service";
 })
 export class SettingsTabComponent implements OnInit, OnDestroy {
   generalBoolSettings: BoolSetting[];
-  pangenomegrapherBoolSettings: BoolSetting[];
+  pangenographerBoolSettings: BoolSetting[];
   highlightWidth: number;
   highlightColor: string;
   compoundPadding: string;
@@ -78,11 +78,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.pangenomegrapherBoolSettings = [
+    this.pangenographerBoolSettings = [
       {
         text: "Highlight in/out-degree zero nodes",
         isEnable: true,
-        path2userPref: "pangenomegrapher.isHighlightInZeroOutZero",
+        path2userPref: "pangenographer.isHighlightInZeroOutZero",
       },
     ];
 
@@ -156,7 +156,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   private fillUIFromMemory() {
     // reference variables for shorter text
     const up = this._g.userPreferences;
-    const up_p = this._g.userPreferences.pangenomegrapher;
+    const up_p = this._g.userPreferences.pangenographer;
 
     this.generalBoolSettings[0].isEnable =
       up.isAutoIncrementalLayoutOnChange.getValue();
@@ -209,7 +209,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
     this.lengthOfBlastSelectedSegmentsPath =
       up_p.lengthOfBlastSelectedSegmentsPath.getValue();
-    this.pangenomegrapherBoolSettings[0].isEnable =
+    this.pangenographerBoolSettings[0].isEnable =
       up_p.isHighlightInZeroOutZero.getValue();
 
     this.setHighlightStyles();
@@ -333,7 +333,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
       length = MIN_LENGTH_OF_UP_DOWN_STREAM;
     }
-    this._g.userPreferences.pangenomegrapher.lengthOfUpDownstream.next(length);
+    this._g.userPreferences.pangenographer.lengthOfUpDownstream.next(length);
     this.lengthOfUpDownstream = length;
   }
 
@@ -345,7 +345,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH) {
       length = MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH;
     }
-    this._g.userPreferences.pangenomegrapher.lengthOfBlastSelectedSegmentsPath.next(
+    this._g.userPreferences.pangenographer.lengthOfBlastSelectedSegmentsPath.next(
       length
     );
     this.lengthOfBlastSelectedSegmentsPath = length;
@@ -430,8 +430,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   resetPangenographerSettings() {
     this.transferSubjectValues(
-      this._g.userPreferencesFromFiles.pangenomegrapher,
-      this._g.userPreferences.pangenomegrapher
+      this._g.userPreferencesFromFiles.pangenographer,
+      this._g.userPreferences.pangenographer
     );
     this.fillUIFromMemory();
   }

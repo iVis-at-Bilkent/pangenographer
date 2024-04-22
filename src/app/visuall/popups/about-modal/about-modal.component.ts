@@ -38,7 +38,6 @@ export class AboutModalComponent
         this.toolName = x.appInfo.name;
         this.softwareVersion = x.appInfo.version;
         this.toolLogo = x.appInfo.icon;
-        this.companyName = x.appInfo.company_name;
         this.companyContact = x.appInfo.company_contact;
         this.buildTime = x.appInfo.build_time;
       }
