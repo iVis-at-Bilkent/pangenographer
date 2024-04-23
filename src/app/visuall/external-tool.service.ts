@@ -1,10 +1,10 @@
 import { formatNumber } from "@angular/common";
 import { Injectable } from "@angular/core";
 import {
-  BADGE_DEFAULT_NODE_SIZE,
   BADGE_POPPER_UPDATE_DELAY,
   BADGE_ZOOM_THRESHOLD,
   COLLAPSED_EDGE_CLASS,
+  DEFAULT_NODE_WIDTH,
   debounce,
   debounce2,
   mapColor,
@@ -26,6 +26,7 @@ export class ExternalToolService {
   isMapNodeSizes: boolean;
   isMapBadgeSizes: boolean;
   currNodeSize: number;
+  ratioCurrentNodeSize2Default: number;
   maxPropValue: number;
   badgeColor: string;
 
@@ -34,46 +35,11 @@ export class ExternalToolService {
     private _sequenceDataService: SequenceDataService
   ) {}
 
-  // Add external tools to the graph
-  // Tooltips show some part of the element's data when hovered over
-  // Cues show arrows on the top left and top right of the element to show upstream and downstream elements
-  addExternalTools(
-    showUpDownstream: (element: any, length: number, up: boolean) => void,
-    nodes: any = undefined,
-    edges: any = undefined
-  ) {
+  // Removes all or provided nodes' cues that show upstream and downstream elements
+  removeCues(nodes: any = this._g.cy.nodes()) {
     this._g.cy.startBatch();
 
-    // Add tooltips
-    this.addTooltips(nodes, edges);
-
-    // Add cues only if the user preference is set to show them
-    if (
-      this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
-    ) {
-      this.addCues(showUpDownstream, nodes);
-    }
-
-    // Make the graph zoom in and out to trigger the cues to show
-    this._g.cy.zoom(this._g.cy.zoom() + 0.00001);
-    this._g.cy.zoom(this._g.cy.zoom() - 0.00001);
-
-    this._g.cy.endBatch();
-  }
-
-  // Remove external tools from the graph
-  // Cues that show upstream and downstream elements are removed
-  removeExternalTools(nodes: any = undefined) {
-    this._g.cy.startBatch();
-
-    // Remove cues
-    this.removeCues(nodes);
-
-    this._g.cy.endBatch();
-  }
-
-  // Removes all or provided nodes' cues
-  private removeCues(nodes: any = this._g.cy.nodes()) {
+    // Remove cues from the provided nodes
     nodes.forEach((node: any) => {
       this._g.cy.removeListener(
         "pan zoom resize",
@@ -82,12 +48,25 @@ export class ExternalToolService {
       delete this._g.cueUpdaters[`${node.id()}`];
       node.removeCue();
     });
+
+    this._g.cy.endBatch();
   }
 
-  private addCues(
+  // Add cues to the graph
+  // Cues show arrows on the top left and top right of the element to show upstream and downstream elements
+  addCues(
     showUpDownstream: (element: any, length: number, up: boolean) => void,
     nodes: any = this._g.cy.nodes()
   ) {
+    // If the cues are not set to be shown, return
+    if (
+      !this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
+    ) {
+      return;
+    }
+
+    this._g.cy.startBatch();
+
     let marginY = 6;
     let marginX = 9;
     let marginXTwo = 6;
@@ -108,7 +87,7 @@ export class ExternalToolService {
       contentUpstream1.src = "assets/img/cue-left.svg";
       contentUpstream1.width = width;
       node.addCue(
-        this.addCuePrep(
+        this.addCuePreparation(
           node.id(),
           "1",
           "top-left",
@@ -128,7 +107,7 @@ export class ExternalToolService {
       contentUpstreamLevel.src = "assets/img/cue-left-double.svg";
       contentUpstreamLevel.width = width;
       node.addCue(
-        this.addCuePrep(
+        this.addCuePreparation(
           node.id(),
           "level",
           "top-left",
@@ -148,7 +127,7 @@ export class ExternalToolService {
       contentDownstream1.src = "assets/img/cue-right.svg";
       contentDownstream1.width = width;
       node.addCue(
-        this.addCuePrep(
+        this.addCuePreparation(
           node.id(),
           "1",
           "top-right",
@@ -168,7 +147,7 @@ export class ExternalToolService {
       contentDownstreamLevel.src = "assets/img/cue-right-double.svg";
       contentDownstreamLevel.width = width;
       node.addCue(
-        this.addCuePrep(
+        this.addCuePreparation(
           node.id(),
           "level",
           "top-right",
@@ -193,9 +172,21 @@ export class ExternalToolService {
       node.on("position", update);
       this._g.cy.on("pan zoom resize", update);
     });
+
+    this._g.cy.endBatch();
+
+    // Update the cues to make sure they are shown when the graph is loaded
+    this.updateCues();
   }
 
-  private addCuePrep(
+  // Make the graph zoom in and out to trigger the cues to show
+  // This is done to make sure the cues are shown when the graph is loaded
+  updateCues() {
+    this._g.cy.zoom(this._g.cy.zoom() + 0.00001);
+    this._g.cy.zoom(this._g.cy.zoom() - 0.00001);
+  }
+
+  private addCuePreparation(
     id: string,
     type: string,
     position: string,
@@ -235,7 +226,7 @@ export class ExternalToolService {
   ) {
     node.updateCue(
       this.updateCuePrep(
-        node.id(),
+        node,
         marginX,
         marginY,
         nameSize,
@@ -247,20 +238,12 @@ export class ExternalToolService {
     );
 
     node.updateCue(
-      this.updateCuePrep(
-        node.id(),
-        marginX,
-        marginY,
-        nameSize,
-        "level",
-        "up",
-        1
-      )
+      this.updateCuePrep(node, marginX, marginY, nameSize, "level", "up", 1)
     );
 
     node.updateCue(
       this.updateCuePrep(
-        node.id(),
+        node,
         marginX,
         marginY,
         nameSize,
@@ -272,20 +255,12 @@ export class ExternalToolService {
     );
 
     node.updateCue(
-      this.updateCuePrep(
-        node.id(),
-        marginX,
-        marginY,
-        nameSize,
-        "level",
-        "down",
-        -1
-      )
+      this.updateCuePrep(node, marginX, marginY, nameSize, "level", "down", -1)
     );
   }
 
   private updateCuePrep(
-    id: string,
+    node: any,
     marginX: number,
     marginY: number,
     nameSize: number,
@@ -294,20 +269,37 @@ export class ExternalToolService {
     marginXNeg: number,
     marginXTwo: number = 0
   ) {
+    // Calculate the new margin y
+    let newMarginY = this._g.cy.zoom() * marginY;
+    let newMarginX =
+      this._g.cy.zoom() * (marginX + marginXTwo + nameSize) * marginXNeg;
+
+    // Calculate the new margin y again if the node size is changed
+    // This is done to keep the cues in the same position relative to the node
+    // Get the width of the node and calculate the new margins
+    let width = node.style("width");
+    width = Number(node.style("width").substring(0, width.length - 2));
+    if (width !== DEFAULT_NODE_WIDTH) {
+      newMarginY *= (2.5 * width) / DEFAULT_NODE_WIDTH;
+    }
+
     return {
-      id: `node-cue-${id}-${direction}-stream-${type}`,
-      marginY: this._g.cy.zoom() * marginY,
-      marginX:
-        this._g.cy.zoom() * (marginX + marginXTwo + nameSize) * marginXNeg,
+      id: `node-cue-${node.id()}-${direction}-stream-${type}`,
+      marginY: newMarginY,
+      marginX: newMarginX,
     };
   }
 
+  // Add tooltips to the graph
+  // Tooltips show some part of the element's data when hovered over
   addTooltips(
-    nodes: any = undefined,
-    edges: any = undefined,
+    nodes: any = this._g.cy.nodes(),
+    edges: any = this._g.cy.edges(),
     isNode: boolean = true,
     isEdge: boolean = true
   ) {
+    this._g.cy.startBatch();
+
     let widthOffset = 11;
     let fontSize = "15";
     let fontWeight = "700";
@@ -315,10 +307,6 @@ export class ExternalToolService {
     let fontStyle = "normal";
 
     if (isNode) {
-      if (!nodes) {
-        nodes = this._g.cy.nodes();
-      }
-
       nodes.unbind("mouseover");
       nodes.forEach((node: any) => {
         node.bind("mouseover", (event: any) => {
@@ -373,10 +361,6 @@ export class ExternalToolService {
     }
 
     if (isEdge) {
-      if (!edges) {
-        edges = this._g.cy.edges();
-      }
-
       edges.unbind("mouseover");
       edges.forEach((edge: any) => {
         if (!edge.hasClass(COLLAPSED_EDGE_CLASS)) {
@@ -518,6 +502,8 @@ export class ExternalToolService {
         }
       });
     }
+
+    this._g.cy.endBatch();
   }
 
   private edgeTooltipInnerTextSize(size: number): number {
@@ -791,18 +777,22 @@ export class ExternalToolService {
   private setBadgeCoordinates(e: any, div: HTMLDivElement) {
     // let the nodes resize first
     setTimeout(() => {
-      let ratio = 1;
       if (this.isMapBadgeSizes) {
         let b = this.currNodeSize + 20;
         let a = Math.max(5, this.currNodeSize - 20);
         let x = e.data("__badgeProp");
-        ratio = (((b - a) * x) / this.maxPropValue + a) / this.currNodeSize;
+        this.ratioCurrentNodeSize2Default =
+          (((b - a) * x) / this.maxPropValue + a) / this.currNodeSize;
       } else {
-        ratio = this.currNodeSize / BADGE_DEFAULT_NODE_SIZE;
+        this.ratioCurrentNodeSize2Default =
+          this.currNodeSize / DEFAULT_NODE_WIDTH;
       }
-      ratio = ratio < BADGE_ZOOM_THRESHOLD ? BADGE_ZOOM_THRESHOLD : ratio;
+      this.ratioCurrentNodeSize2Default =
+        this.ratioCurrentNodeSize2Default < BADGE_ZOOM_THRESHOLD
+          ? BADGE_ZOOM_THRESHOLD
+          : this.ratioCurrentNodeSize2Default;
 
-      let z1 = (this._g.cy.zoom() / 2) * ratio;
+      let z1 = (this._g.cy.zoom() / 2) * this.ratioCurrentNodeSize2Default;
       const bb = e.renderedBoundingBox({
         includeLabels: false,
         includeOverlays: false,

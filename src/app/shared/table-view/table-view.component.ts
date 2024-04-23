@@ -13,7 +13,7 @@ import {
 import { IPosition } from "angular2-draggable";
 import { Subject, Subscription } from "rxjs";
 import {
-  BADGE_DEFAULT_NODE_SIZE,
+  DEFAULT_NODE_WIDTH,
   EV_MOUSE_OFF,
   EV_MOUSE_ON,
   TABLE_ALL_CHECK_DELAY,
@@ -327,42 +327,74 @@ export class TableViewComponent implements OnInit, OnDestroy {
     });
   }
 
+  // This function is called when a checkbox is clicked in the table
+  // It updates the checkedIndex object and calls the function to place badges on the graph
+  // if the table is a blast result table and the user has selected to use cytoscape selector for highlighting
+  // forceCheck is used to set the checked status of the checkbox
   checkboxChanged(
     index: number,
     t: EventTarget = undefined, // undefined for setting checked status
     forceCheck?: boolean
   ) {
+    // t is the target HTML element of the event
+    // if t is undefined, it means that the function is called to set the checked status of the checkbox
+    // if t is defined, it means that the function is called by the checkbox click event
     if (t !== undefined) {
+      // Get the checked status of the checkbox
       const isChecked = (<HTMLInputElement>t).checked;
+
+      // Update the checkedIndex object according to the checked status of the checkbox
       if (isChecked) {
         this.checkedIndex[index] = true;
-      } else {
+      }
+      // If the checkbox is unchecked, remove the index from the checkedIndex object
+      else {
         delete this.checkedIndex[index];
       }
-    } else if (forceCheck && !this.checkedIndex[index]) {
+    }
+    // If the function is called to set the checked status of the checkbox
+    else if (forceCheck && !this.checkedIndex[index]) {
       this.checkedIndex[index] = true;
-    } else if (!forceCheck && this.checkedIndex[index]) {
+    }
+    // If the function is called to set the checked status of the checkbox
+    else if (!forceCheck && this.checkedIndex[index]) {
       delete this.checkedIndex[index];
     }
 
+    // If the table is a blast result table and the user has selected to use cytoscape selector for highlighting
+    // place percentage badges on the graph nodes for the checked rows
+    // and update the cues for the checked rows
     if (
       this.params.isBlastResultTable &&
       this.params.isUseCySelector4Highlight
     ) {
+      // Place percentage badges on the graph nodes for the checked rows
       this.placeBlastTableResultBadges();
+
+      // The cues need to be updated after the badges are placed on the graph
+      // as the nodes are resized according to the maximum percentage values
+      this._extTool.updateCues();
     }
   }
 
+  // This function is called to place percentage badges on the graph nodes for the checked rows
   private placeBlastTableResultBadges() {
+    // Destroy the existing badges on the graph
     this._extTool.destroyCurrentBadgePoppers();
+    // Reset the elementBadgeMaxPercentages object
     this.elementBadgeMaxPercentages = {};
 
+    // Get the maximum percentage value for each segment name
     for (let index in this.checkedIndex) {
       let segmentName = this.params.results[index][2].value;
       let percentage = this.params.results[index][3].value;
+
+      // If the segment name is not in the elementBadgeMaxPercentages object, add it
       if (!this.elementBadgeMaxPercentages[segmentName]) {
         this.elementBadgeMaxPercentages[segmentName] = percentage;
-      } else {
+      }
+      // If the segment name is in the elementBadgeMaxPercentages object, update the maximum percentage value
+      else {
         this.elementBadgeMaxPercentages[segmentName] = Math.max(
           percentage,
           this.elementBadgeMaxPercentages[segmentName]
@@ -370,26 +402,37 @@ export class TableViewComponent implements OnInit, OnDestroy {
       }
     }
 
+    // Set the badge popper values for the graph nodes
+    // Set the badge color to the badgeColor
+    // Set the badge size to DEFAULT_NODE_WIDTH
+    // isMapNodeSizes is set to true
+    // isMapBadgeSizes is set to false
+    // Set the maximum percentage value as the maximum property value as 100
     this._extTool.setBadgePopperValues(
       true,
       false,
-      BADGE_DEFAULT_NODE_SIZE,
+      DEFAULT_NODE_WIDTH,
       100,
       this.badgeColor
     );
 
-    this._cyService.setNodeSizeOnGraphTheoreticProp(
-      100,
-      BADGE_DEFAULT_NODE_SIZE
-    );
+    // Set the badge size on the graph nodes according to the maximum percentage values
+    this._cyService.setNodeSizeOnGraphTheoreticProp(100, DEFAULT_NODE_WIDTH);
+
+    // Generate badges for the graph nodes
     for (let segmentName in this.elementBadgeMaxPercentages) {
+      // Create the badges array to store the maximum percentage value
       let badges = [];
       badges.push(this.elementBadgeMaxPercentages[segmentName]);
+
+      // Generate the badge for the graph node
       this._extTool.generateBadge4Element(
         this._g.cy.nodes(`[segmentName = "${segmentName}"]`)[0],
         badges
       );
     }
+
+    // Set the badge colors and coordinates
     this._extTool.setBadgeColorsAndCoords();
   }
 

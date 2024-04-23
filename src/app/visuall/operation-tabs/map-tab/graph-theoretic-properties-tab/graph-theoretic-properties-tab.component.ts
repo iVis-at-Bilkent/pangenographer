@@ -1,9 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
-import {
-  BADGE_DEFAULT_NODE_SIZE,
-  COLLAPSED_EDGE_CLASS,
-} from "../../../constants";
+import { COLLAPSED_EDGE_CLASS, DEFAULT_NODE_WIDTH } from "../../../constants";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { ExternalToolService } from "../../../external-tool.service";
 import { GlobalVariableService } from "../../../global-variable.service";
@@ -56,7 +53,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
   badgeColor = "#007bff";
   isBadgeVisible = true;
   maxPropValue = 0;
-  currNodeSize = BADGE_DEFAULT_NODE_SIZE;
+  currNodeSize = DEFAULT_NODE_WIDTH;
   appDescSubscription: Subscription;
 
   constructor(

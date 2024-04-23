@@ -6,7 +6,6 @@ import { CLUSTER_CLASS } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GFAData } from "../db-service/data-types";
 import { DbAdapterService } from "../db-service/db-adapter.service";
-import { ExternalToolService } from "../external-tool.service";
 import { FileReaderService } from "../file-reader.service";
 import { GlobalVariableService } from "../global-variable.service";
 import { URLLoadService } from "../load-from-url.service";
@@ -42,8 +41,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _g: GlobalVariableService,
     private _profile: UserProfileService,
     private _urlload: URLLoadService,
-    private _fileReaderService: FileReaderService,
-    private _ExternalToolService: ExternalToolService
+    private _fileReaderService: FileReaderService
   ) {
     this.menu = [
       {
@@ -455,7 +453,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   clearData() {
-    this._ExternalToolService.removeExternalTools();
+    this._cyService.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
     this._dbService.clearData(() => {});

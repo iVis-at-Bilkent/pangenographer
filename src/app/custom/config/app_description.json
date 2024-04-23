@@ -212,7 +212,7 @@
     "nodeLabelWrap": 0,
     "compoundPadding": "5%",
     "edgeCollapseLimit": 2,
-    "avgNodeSize": 40,
+    "avgNodeSize": 36,
     "objectInclusionType": 0,
     "queryResultPagination": "Client",
     "tilingPadding": 4,

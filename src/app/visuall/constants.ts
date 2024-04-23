@@ -24,12 +24,12 @@ export const HIGHLIGHT_WAIT_DUR = 1500;
 export const EV_MOUSE_ON = "mouseover";
 export const EV_MOUSE_OFF = "mouseout";
 export const CY_BATCH_END_DELAY = 100;
-export const TABLE_ALL_CHECK_DELAY = 150;
+export const TABLE_ALL_CHECK_DELAY = 100;
 export const OBJ_INFO_UPDATE_DELAY = 200;
 export const PATH_WALK_NAME_DISALLOWED_REGEX =
   /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
 export const BADGE_ZOOM_THRESHOLD = 0.8;
-export const BADGE_DEFAULT_NODE_SIZE = 40;
+export const DEFAULT_NODE_WIDTH = 36;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
 export const OVERLAP_REGEX = /[MIDNSHPX=]/;
 

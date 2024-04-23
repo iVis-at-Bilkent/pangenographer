@@ -280,17 +280,38 @@ export class CytoscapeService {
 
     this._g.isLoadFromDB = true;
 
-    this._externalToolService.removeExternalTools();
-    this._externalToolService.addExternalTools(
-      this.showUpDownstream.bind(this)
-    );
+    this.removeExternalTools();
+    this.addExternalTools(this.showUpDownstream.bind(this));
     this.applyStyle4NewElements();
+  }
+
+  // Add external tools to the graph
+  // Tooltips show some part of the element's data when hovered over
+  // Cues show arrows on the top left and top right of the element to show upstream and downstream elements
+  addExternalTools(
+    showUpDownstream: (element: any, length: number, up: boolean) => void,
+    nodes: any = undefined,
+    edges: any = undefined
+  ) {
+    // Add tooltips
+    this._externalToolService.addTooltips(nodes, edges);
+
+    // Add cues only if the user preference is set to show them
+    this._externalToolService.addCues(showUpDownstream, nodes);
+  }
+
+  // Remove external tools from the graph
+  // Cues that show upstream and downstream elements are removed
+  removeExternalTools(nodes: any = undefined) {
+    // Remove cues
+    this._externalToolService.removeCues(nodes);
   }
 
   showUpDownstream(element: any, length: number, isUp: boolean) {
     const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true);
     };
+
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
       element.data().segmentName,
@@ -564,7 +585,7 @@ export class CytoscapeService {
       try {
         if (this._g.cy.$().length == 0) {
           this._g.expandCollapseApi.loadJson(txt, false);
-          this._externalToolService.addExternalTools(this.showUpDownstream);
+          this.addExternalTools(this.showUpDownstream);
         } else {
           const modal = this._modalService.open(
             LoadGraphFromFileModalComponent
@@ -662,13 +683,11 @@ export class CytoscapeService {
     if (event) {
       const element = event.target || event.cyTarget;
       if (element.id()[0] === "n") {
-        this._externalToolService.removeExternalTools([element]);
+        this.removeExternalTools([element]);
       }
       this._g.cy.remove(element);
     } else {
-      this._externalToolService.removeExternalTools(
-        this._g.cy.nodes(":selected")
-      );
+      this.removeExternalTools(this._g.cy.nodes(":selected"));
       this._g.cy.remove(":selected");
     }
     this._g.handleCompoundsOnHideDelete();
@@ -683,7 +702,7 @@ export class CytoscapeService {
           data.nodes[i].properties.segmentName ===
             this._g.cy.nodes()[j].data().segmentName
         ) {
-          this._externalToolService.removeExternalTools(this._g.cy.nodes()[j]);
+          this.removeExternalTools(this._g.cy.nodes()[j]);
           this._g.cy.remove(this._g.cy.nodes()[j]);
         }
       }
@@ -1195,11 +1214,9 @@ export class CytoscapeService {
     if (
       this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
     ) {
-      this._externalToolService.addExternalTools(
-        this.showUpDownstream.bind(this)
-      );
+      this.addExternalTools(this.showUpDownstream.bind(this));
     } else {
-      this._externalToolService.removeExternalTools();
+      this.removeExternalTools();
     }
   }
 }
