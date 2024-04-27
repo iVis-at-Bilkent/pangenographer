@@ -22,6 +22,10 @@ A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/
 
 `cd src/app/blast` and `node blast.js` to run the BLAST server. This setup allows the application to process BLAST queries. Note that the BLAST standalone must be installed beforehand.
 
+## User Guide
+
+A User Guide for the sample application of PanGenoGrapher can be found [here](https://docs.google.com/document/d/1mcU4-yAy6IvdUOxchygTyjTWp144sjvDrJE_gzmAbmA).
+
 ## Credits
 
 Icons made by [Freepik](http://www.freepik.com), 
