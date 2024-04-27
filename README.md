@@ -6,6 +6,22 @@ A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/
 
 ![image](https://github.com/iVis-at-Bilkent/pangenographer/assets/3874988/49608774-9b00-4f7d-a710-d434209d7dda)
 
+## Running a local instance
+
+`npm install` for loading dependencies
+
+`npm run ng serve` for development and debugging
+
+`npm run serve-public` for making development server accesible on network
+
+`npm run ng build` to generate a production build, `npm run build-prod` to generate a minified, uglified production build
+
+`npm run ng build` and `npm run build-prod` commands generate files inside ***dist\ng-visuall*** folder. An HTTP server should serve these files. You should use [server.js](server.js) file to run a server with command `node server.js`.
+
+`cd src` and `node style-generator.js {application description filename}` to generate customized application, this changes [styles.css](src/styles.css) and [index.html](src/index.html). Notice that the application description file is inside the `assets` folder.
+
+`cd src/app/blast` and `node blast.js` to run the BLAST server. This setup allows the application to process BLAST queries. Note that the BLAST standalone must be installed beforehand.
+
 ## Credits
 
 Icons made by [Freepik](http://www.freepik.com), 
