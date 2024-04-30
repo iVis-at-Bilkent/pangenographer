@@ -524,6 +524,9 @@ export class ExternalToolService {
     return context.measureText(text).width;
   }
 
+  // Generates the tooltip text for the given element.
+  // Nodes have their segment data as the tooltip text.
+  // Edges have their overlap data (distance for jumps) prioritized as the tooltip text.
   private tooltipText(element: any): {
     text: string;
     lengths: {
@@ -533,39 +536,50 @@ export class ExternalToolService {
       overlapNumerics: number[];
     };
   } {
-    let textData = "";
-    let text = "";
-    let firstSequence = "";
-    let secondSequence = "";
-    let thirdSequence = "";
-    let overlapNumerics = [];
+    let textData = ""; // The text data to be shown in the tooltip
+    let text = ""; // final text to be shown in the tooltip
+    let firstSequence = ""; // The first sequence of the edge before the overlap
+    let secondSequence = ""; // The second sequence of the edge after the overlap
+    let thirdSequence = ""; // The third sequence of the edge after the overlap
+    let overlapNumerics = []; // The individual overlap numerics of the edge
 
+    // If the element is an edge
     if (element.data("sourceOrientation")) {
-      let firstThreshold = 20;
-      let secondThreshold = 200;
-      let thirdThreshold = 20;
-      let toAdd = 0;
+      let firstThreshold = 20; // The maximum length of the first sequence to be shown in the tooltip
+      let secondThreshold = 200; // The maximum length of the second sequence to be shown in the tooltip
+      let thirdThreshold = 20; // The maximum length of the third sequence to be shown in the tooltip
+      let toAdd = 0; // The number of characters to be added to the sequences to reach the thresholds
       let combinedSequence =
-        this._sequenceDataService.prepareCombinedSequence(element);
-      firstSequence = combinedSequence.firstSequence;
-      secondSequence = combinedSequence.secondSequence;
-      thirdSequence = combinedSequence.thirdSequence;
-      overlapNumerics = combinedSequence.overlapNumerics;
+        this._sequenceDataService.prepareCombinedSequence(element); // The combined sequence of the edge
 
+      firstSequence = combinedSequence.firstSequence; // The first sequence of the edge before the overlap
+      secondSequence = combinedSequence.secondSequence; // The second sequence of the edge after the overlap
+      thirdSequence = combinedSequence.thirdSequence; // The third sequence of the edge after the overlap
+      overlapNumerics = combinedSequence.overlapNumerics; // The individual overlap numerics of the edge
+
+      // If the sequences are shorter than the thresholds, add the necessary characters to reach the thresholds
       if (firstSequence.length <= firstThreshold) {
         toAdd += firstThreshold - firstSequence.length;
         firstThreshold = firstSequence.length;
       }
+
+      // If the sequences are shorter than the thresholds, add the necessary characters to reach the thresholds
       if (secondSequence.length <= secondThreshold) {
         toAdd += secondThreshold - secondSequence.length;
         secondThreshold = secondSequence.length;
       }
+
+      // If the sequences are shorter than the thresholds, add the necessary characters to reach the thresholds
       if (thirdSequence.length <= thirdThreshold) {
         toAdd += thirdThreshold - thirdSequence.length;
         thirdThreshold = thirdSequence.length;
       }
 
+      // As we prioritize the second sequence (overlap data), add the remaining characters to the second sequence
+      // If the second sequence higher than the threshold,
+      // check if the remaining characters to be added is higher than the length of the second sequence after the threshold
       if (secondSequence.length > secondThreshold) {
+        // Adjust the threshold and the remaining characters to be added
         if (toAdd > secondSequence.length - secondThreshold) {
           toAdd -= secondSequence.length - secondThreshold;
           secondThreshold += secondSequence.length - secondThreshold;
@@ -574,6 +588,11 @@ export class ExternalToolService {
           toAdd = 0;
         }
       }
+
+      // We secondly prioritize the first sequence,
+      // If the first sequence higher than the threshold,
+      // check if the remaining characters to be added is higher than the length of the first sequence after the threshold
+      // Adjust the threshold and the remaining characters to be added
       if (firstSequence.length > firstThreshold) {
         if (toAdd > firstSequence.length - firstThreshold) {
           toAdd -= firstSequence.length - firstThreshold;
@@ -583,6 +602,10 @@ export class ExternalToolService {
           toAdd = 0;
         }
       }
+
+      // If the third sequence higher than the threshold,
+      // check if the remaining characters to be added is higher than the length of the third sequence after the threshold
+      // Adjust the threshold and the remaining characters to be added
       if (thirdSequence.length > thirdThreshold) {
         if (toAdd > thirdSequence.length - thirdThreshold) {
           toAdd -= thirdSequence.length - thirdThreshold;
@@ -593,11 +616,16 @@ export class ExternalToolService {
         }
       }
 
+      // If the first sequence is longer than the threshold, add ellipsis to the beginning
+      // then add the last characters of the first sequence to reach the threshold
       if (firstSequence.length > firstThreshold) {
         firstSequence =
           ".." +
           firstSequence.substring(firstSequence.length - firstThreshold + 2);
       }
+
+      // If the second sequence (overlap data) is longer than the threshold, add ellipsis to the middle of the sequence
+      // then add the first and last characters of the second sequence to reach the threshold
       if (secondSequence.length > secondThreshold) {
         secondSequence =
           secondSequence.substring(0, Math.ceil(secondThreshold / 2) - 1) +
@@ -606,17 +634,23 @@ export class ExternalToolService {
             secondSequence.length - Math.floor(secondThreshold / 2) + 1
           );
       }
+
+      // If the third sequence is longer than the threshold, add ellipsis to the end
+      // then add the first characters of the third sequence to reach the threshold
       if (thirdSequence.length > thirdThreshold) {
         thirdSequence = thirdSequence.substring(0, thirdThreshold - 2) + "..";
       }
 
+      // Combine the sequences to create the tooltip text
       textData = firstSequence + secondSequence + thirdSequence;
-    } else {
+    }
+    // If the element is a node text data is just the segment data
+    else {
       textData = element.data("segmentData");
     }
 
+    // Split the text data into lines of 40 characters
     let startIndex: number;
-
     for (startIndex = 0; startIndex < 200; startIndex += 40) {
       if (startIndex >= textData.length) {
         break;
@@ -631,9 +665,12 @@ export class ExternalToolService {
         ) + "\n";
     }
 
+    // If the text data is longer than 240 characters, add ellipsis to the end
     if (textData.length > 240) {
       text += textData.substring(startIndex, startIndex + 38) + "..";
-    } else if (textData.length >= startIndex) {
+    }
+    // If the text data is shorter than 240 characters, add the last characters
+    else if (textData.length >= startIndex) {
       text += textData.substring(
         startIndex,
         startIndex +
@@ -643,6 +680,7 @@ export class ExternalToolService {
       );
     }
 
+    // Return the tooltip text and the lengths of the sequences
     let lengths = {
       firstSequence: firstSequence.length,
       secondSequence: secondSequence.length,
