@@ -43,7 +43,7 @@ Third-party libraries:
 [Angular](https://angular.io/),
 [Google Charts](https://developers.google.com/chart/) and npm dependencies inside package.json file.
 
-For the database, it uses the free and openly available Neo4j movie database. It can be installed using `:play movies` on **Neo4j Browser**.
+For the database, it uses the free and openly available Neo4j database.
 
 ## Team
 
