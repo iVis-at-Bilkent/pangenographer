@@ -110,7 +110,7 @@
       </div>
 
       <div class="form-inline blast-option">
-        <label class="va-text blast-option-label">Format Type</label>
+        <label class="va-text blast-option-label">Output Format Type</label>
         <select
           class="form-select tight-select filter-form va-small-text input-4-char w-auto"
           (change)="onWebFormatTypeChange($event)"
@@ -421,7 +421,6 @@
 
       <div class="va-text">
         <div *ngIf="webResult">
-          <p>Lastest Result</p>
           <pre class="result">{{ webResult }}</pre>
         </div>
         <div *ngIf="webResult" class="save">
