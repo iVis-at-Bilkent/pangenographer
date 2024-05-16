@@ -289,7 +289,7 @@ export class CytoscapeService {
   // Tooltips show some part of the element's data when hovered over
   // Cues show arrows on the top left and top right of the element to show upstream and downstream elements
   addExternalTools(
-    showUpDownstream: (element: any, length: number, up: boolean) => void,
+    showUpDownstream: (nodeId: any, length: number, up: boolean) => void,
     nodes: any = undefined,
     edges: any = undefined
   ) {
@@ -310,48 +310,76 @@ export class CytoscapeService {
   // Get neighbors of the selected element and show them on the graph
   // Length is the distance from the selected element
   // isUp is a boolean that determines whether to show upstream or downstream elements
-  showUpDownstream(element: any, length: number, isUp: boolean) {
+  // nodeId is the id of the selected element, nodeId should not contain the 'n' prefix that is added to the id
+  showUpDownstream(nodeId: string, length: number, isUp: boolean) {
     const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true); // isIncremental = true
     };
 
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
-      element.data().segmentName,
+      nodeId,
       length,
       callback,
       isUp
     );
   }
 
+  // Show upstream or downstream elements asynchronously
+  // This is used to show elements one by one in a loop
+  async showUpDownstremAsync(
+    nodeId: string,
+    length: number,
+    isUp: boolean
+  ): Promise<void> {
+    return new Promise<void>((resolve) => {
+      this.showUpDownstream(nodeId, length, isUp);
+      resolve();
+    });
+  }
+
+  // Get all upstream and downstream nodes of the selected elements one by one
+  async getAllUpDownstreamNodes(elements: any, length: number) {
+    for (let i = 0; i < elements.length; i++) {
+      await this.showUpDownstremAsync(elements[i].elementId, length, true); // Show upstream nodes
+      await this.showUpDownstremAsync(elements[i].elementId, length, false); // Show downstream nodes
+    }
+  }
+
   // Get all nodes with zero degree from the database
   getAllZeroDegreeNodes() {
-    const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true); // isIncremental = true
-    };
-
     this._g.layout.clusters = null;
-    this._dbService.getAllZeroDegreeNodes(callback);
+    this._dbService.getAllZeroDegreeNodes(this.getZeroDegreeNodesLoad());
   }
 
   // Get all nodes with zero incoming degree from the database
   getAllZeroIncomingDegreeNodes() {
-    const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true); // isIncremental = true
-    };
-
     this._g.layout.clusters = null;
-    this._dbService.getAllZeroIncomingDegreeNodes(callback);
+    this._dbService.getAllZeroIncomingDegreeNodes(
+      this.getZeroDegreeNodesLoad()
+    );
   }
 
   // Get all nodes with zero outgoing degree from the database
   getAllZeroOutgoingDegreeNodes() {
-    const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true); // isIncremental = true
-    };
-
     this._g.layout.clusters = null;
-    this._dbService.getAllZeroOutgoingDegreeNodes(callback);
+    this._dbService.getAllZeroOutgoingDegreeNodes(
+      this.getZeroDegreeNodesLoad()
+    );
+  }
+
+  // Helper function to load elements from the database incrementally
+  // Then get all upstream or downstream nodes of the selected nodes
+  private getZeroDegreeNodesLoad() {
+    return (data: any) => {
+      this.loadElementsFromDatabase(data, true); // isIncremental = true
+      this.getAllUpDownstreamNodes(
+        data.nodes,
+        this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue()
+      ).then(() => {
+        this.removeHighlights(); // Remove highlights after showing all upstream and downstream nodes as the last gathered nodes are highlighted
+      });
+    };
   }
 
   hasNewElement(newElementIds: string[], previousElements: any): boolean {

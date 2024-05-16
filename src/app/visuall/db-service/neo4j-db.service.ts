@@ -171,7 +171,10 @@ export class Neo4jDb implements DbService {
     callback: (x: GraphResponse) => any,
     isUp: boolean
   ) {
-    var query = `MATCH (startNode { segmentName: '${nodeId}' }) MATCH path = (startNode)`;
+    var query = `
+      MATCH (startNode)
+      WHERE elementId(startNode) = '${nodeId}' 
+      MATCH path = (startNode)`;
     if (isUp) {
       query += "<";
     }

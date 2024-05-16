@@ -215,7 +215,7 @@ export class ContextMenuService {
       return;
     }
     this._cyService.showUpDownstream(
-      element,
+      element.id().substring(1), // remove the first character which is 'n' or 'e' to get the id stored in the database
       this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
       isUp
     );
@@ -239,7 +239,7 @@ export class ContextMenuService {
     };
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
-      element.data().segmentName,
+      element.id().substring(1), // remove the first character which is 'n' or 'e' to get the id stored in the database
       this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
       callback,
       isUp

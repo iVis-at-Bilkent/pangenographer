@@ -55,7 +55,7 @@ export class ExternalToolService {
   // Add cues to the graph
   // Cues show arrows on the top left and top right of the element to show upstream and downstream elements
   addCues(
-    showUpDownstream: (element: any, length: number, up: boolean) => void,
+    showUpDownstream: (nodeId: any, length: number, up: boolean) => void,
     nodes: any = this._g.cy.nodes()
   ) {
     // If the cues are not set to be shown, return
@@ -194,7 +194,7 @@ export class ExternalToolService {
     marginXTwo: number,
     nameSize: number,
     marginY: number,
-    showUpDownstream: (element: any, length: number, up: boolean) => void,
+    showUpDownstream: (nodeId: any, length: number, up: boolean) => void,
     showUpDownstreamSize: number,
     isUp: boolean,
     htmlElement: any,
@@ -207,7 +207,11 @@ export class ExternalToolService {
       marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
       marginY: this._g.cy.zoom() * marginY,
       onCueClicked: (element: any) => {
-        showUpDownstream(element, showUpDownstreamSize, isUp);
+        showUpDownstream(
+          element.id().substring(1), // remove the first character which is 'n' or 'e' to get the id stored in the database
+          showUpDownstreamSize,
+          isUp
+        );
       },
       htmlElem: htmlElement,
       isFixedSize: false,
