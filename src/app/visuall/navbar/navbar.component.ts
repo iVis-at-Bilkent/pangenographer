@@ -226,8 +226,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
       {
         dropdown: "Data",
         actions: [
-          { txt: "Sample Data", id: "nbi60", fn: "getSampleData" },
-          { txt: "Clear Data", id: "nbi62", fn: "clearData" },
+          {
+            txt: "Get All Zero Degree Nodes",
+            id: "nbi60",
+            fn: "getAllZeroDegreeNodes",
+          },
+          {
+            txt: "Get All Zero Incoming Degree Nodes",
+            id: "nbi61",
+            fn: "getAllZeroIncomingDegreeNodes",
+          },
+          {
+            txt: "Get All Zero Outgoing Degree Nodes",
+            id: "nbi62",
+            fn: "getAllZeroOutgoingDegreeNodes",
+          },
+          { txt: "Sample Data", id: "nbi63", fn: "getSampleData" },
+          { txt: "Clear Data", id: "nbi64", fn: "clearDatabase" },
         ],
       },
     ];
@@ -247,6 +262,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
     if (this.appDescSubscription) {
       this.appDescSubscription.unsubscribe();
     }
+  }
+
+  triggerAct(act: NavbarAction) {
+    this[act.fn]();
+  }
+
+  preventDropdownClose(event: Event) {
+    event.stopPropagation();
   }
 
   fileSelected() {
@@ -280,16 +303,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  triggerAct(act: NavbarAction) {
-    this[act.fn]();
-  }
-
-  preventDropdownClose(event: Event) {
-    event.stopPropagation();
-  }
-
   prepareGFALoad() {
-    this.clearData();
+    this.clearDatabase();
     this.isLoadFile4Graph = true;
     this.isLoadFileGFA = true;
   }
@@ -323,7 +338,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   loadFile() {
-    this.clearData();
+    this.clearDatabase();
     this.isLoadFile4Graph = true;
     this.isLoadFileGFA = false;
     this.openFileInput();
@@ -445,6 +460,34 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this._cyService.expandAllCompounds();
   }
 
+  showHideGraphHistory() {
+    const v = this._g.showHideGraphHistory.getValue();
+    this._g.showHideGraphHistory.next(!v);
+  }
+
+  // Get all nodes with zero degree
+  // Uses cytoscape service to get all nodes with zero degree
+  getAllZeroDegreeNodes() {
+    this._cyService.getAllZeroDegreeNodes();
+  }
+
+  // Get all nodes with zero incoming degree
+  // Uses cytoscape service to get all nodes with zero incoming degree
+  getAllZeroIncomingDegreeNodes() {
+    this._cyService.getAllZeroIncomingDegreeNodes();
+  }
+
+  // Get all nodes with zero outgoing degree
+  // Uses cytoscape service to get all nodes with zero outgoing degree
+  getAllZeroOutgoingDegreeNodes() {
+    this._cyService.getAllZeroOutgoingDegreeNodes();
+  }
+
+  // Get all nodes with zero degree
+  // Sets the layout clusters to null to remove the clusters from the graph
+  // Uses the database service to get all nodes with zero degree
+  // Gives the callback function to the database service to get the data in the form of a graph response,
+  // cytoscape service is used to load the elements from the database
   getSampleData() {
     this._g.layout.clusters = null;
     this._dbService.getSampleData((x) => {
@@ -452,16 +495,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  clearData() {
+  // Clear database and cytoscape graph
+  // Remove external tools, clear graph history, and remove all elements from cytoscape graph
+  clearDatabase() {
     this._cyService.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
-    this._dbService.clearData(() => {});
-  }
-
-  showHideGraphHistory() {
-    const v = this._g.showHideGraphHistory.getValue();
-    this._g.showHideGraphHistory.next(!v);
+    this._dbService.clearDatabase(() => {});
   }
 
   private openFileInput() {

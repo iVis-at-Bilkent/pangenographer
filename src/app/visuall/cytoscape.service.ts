@@ -307,9 +307,12 @@ export class CytoscapeService {
     this._externalToolService.removeCues(nodes);
   }
 
+  // Get neighbors of the selected element and show them on the graph
+  // Length is the distance from the selected element
+  // isUp is a boolean that determines whether to show upstream or downstream elements
   showUpDownstream(element: any, length: number, isUp: boolean) {
     const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true);
+      this.loadElementsFromDatabase(data, true); // isIncremental = true
     };
 
     this._g.layout.clusters = null;
@@ -319,6 +322,36 @@ export class CytoscapeService {
       callback,
       isUp
     );
+  }
+
+  // Get all nodes with zero degree from the database
+  getAllZeroDegreeNodes() {
+    const callback = (data: any) => {
+      this.loadElementsFromDatabase(data, true); // isIncremental = true
+    };
+
+    this._g.layout.clusters = null;
+    this._dbService.getAllZeroDegreeNodes(callback);
+  }
+
+  // Get all nodes with zero incoming degree from the database
+  getAllZeroIncomingDegreeNodes() {
+    const callback = (data: any) => {
+      this.loadElementsFromDatabase(data, true); // isIncremental = true
+    };
+
+    this._g.layout.clusters = null;
+    this._dbService.getAllZeroIncomingDegreeNodes(callback);
+  }
+
+  // Get all nodes with zero outgoing degree from the database
+  getAllZeroOutgoingDegreeNodes() {
+    const callback = (data: any) => {
+      this.loadElementsFromDatabase(data, true); // isIncremental = true
+    };
+
+    this._g.layout.clusters = null;
+    this._dbService.getAllZeroOutgoingDegreeNodes(callback);
   }
 
   hasNewElement(newElementIds: string[], previousElements: any): boolean {

@@ -177,7 +177,11 @@
               <b class="va-text">Target orientation</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.targetOrientation.value }}
+              {{
+                selectedItemProps.targetOrientation.value === "+"
+                  ? "forward"
+                  : "reverse"
+              }}
             </td>
           </tr>
           <tr *ngIf="selectedItemProps.sourceOrientation">
@@ -185,7 +189,11 @@
               <b class="va-text">Source orientation</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.sourceOrientation.value }}
+              {{
+                selectedItemProps.targetOrientation.value === "+"
+                  ? "forward"
+                  : "reverse"
+              }}
             </td>
           </tr>
           <tr *ngIf="selectedItemProps.mappingQuality">

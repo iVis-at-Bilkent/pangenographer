@@ -199,20 +199,6 @@ export class Neo4jDb implements DbService {
     );
   }
 
-  getSampleData(callback: (x: GraphResponse) => any) {
-    const query = `MATCH (n)-[e]-() RETURN n,e limit 150`;
-    this.runQuery(query, callback);
-  }
-
-  getPathWalkData(callback: (x: GraphResponse) => any) {
-    const query = `
-      MATCH (p:PATHS) RETURN p AS nn
-      UNION
-      MATCH (w:WALKS) RETURN w AS nn
-    `;
-    this.runQuery(query, callback);
-  }
-
   getConsecutiveNodes(
     properties: (string | number)[],
     propertyType: string,
@@ -513,12 +499,76 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
+  // Import GFA data to the database by converting it to CQL
   importGFA(GFAData: GFAData, cb: () => void) {
     this.runQuery(this.GFAdata2CQL(GFAData), cb, 0, false);
   }
 
-  clearData(cb: () => void) {
-    this.runQuery("MATCH (n) DETACH DELETE n", cb, 0, false);
+  // Clear the database
+  clearDatabase(cb: () => void) {
+    this.runQuery(
+      `
+      MATCH (n) 
+      DETACH 
+      DELETE n
+    `,
+      cb,
+      0,
+      false
+    );
+  }
+
+  // Get sample data up to 150 nodes and edges
+  getSampleData(callback: (x: GraphResponse) => any) {
+    const query = `
+      MATCH (n)-[e]-() 
+      RETURN n,e limit 150
+    `;
+    this.runQuery(query, callback);
+  }
+
+  // Get path and walk nodes/data
+  getPathWalkData(callback: (x: GraphResponse) => any) {
+    const query = `
+      MATCH (p:PATHS) RETURN p AS nn
+      UNION
+      MATCH (w:WALKS) RETURN w AS nn
+    `;
+    this.runQuery(query, callback);
+  }
+
+  // Get all nodes with zero degree
+  getAllZeroDegreeNodes(callback: (x: GraphResponse) => any) {
+    const query = `
+      MATCH (source: SEGMENT)
+      WHERE NOT (source)<-[]-()
+      RETURN source AS node, 'source' AS type
+      UNION
+      MATCH (target: SEGMENT)
+      WHERE NOT (target)-[]->()
+      RETURN target AS node, 'target' AS type
+    `;
+    this.runQuery(query, callback);
+  }
+
+  // Get all nodes with zero incoming degree
+  getAllZeroIncomingDegreeNodes(callback: (x: GraphResponse) => any) {
+    const query = `
+      MATCH (n: SEGMENT) 
+      WHERE NOT (n)<-[]-() 
+      RETURN n
+    `;
+    this.runQuery(query, callback);
+  }
+
+  // Get all nodes with zero outgoing degree
+  getAllZeroOutgoingDegreeNodes(callback: (x: GraphResponse) => any) {
+    const query = `
+      MATCH (n: SEGMENT) 
+      WHERE NOT (n)-[]->() 
+      RETURN n
+    `;
+    this.runQuery(query, callback);
   }
 
   // ------------------------------------------------- methods for conversion to CQL -------------------------------------------------

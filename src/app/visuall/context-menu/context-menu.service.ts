@@ -20,6 +20,30 @@ export class ContextMenuService {
   ) {
     this.menu = [
       {
+        id: "getAllZeroDegreeNodes",
+        content: "Get All Zero Degree Nodes",
+        coreAsWell: true,
+        onClickFunction: () => {
+          this._cyService.getAllZeroDegreeNodes();
+        },
+      },
+      {
+        id: "getAllZeroIncomingDegreeNodes",
+        content: "Get All Zero Incoming Degree Nodes",
+        coreAsWell: true,
+        onClickFunction: () => {
+          this._cyService.getAllZeroIncomingDegreeNodes();
+        },
+      },
+      {
+        id: "getAllZeroOutgoingDegreeNodes",
+        content: "Get All Zero Outgoing Degree Nodes",
+        coreAsWell: true,
+        onClickFunction: () => {
+          this._cyService.getAllZeroOutgoingDegreeNodes();
+        },
+      },
+      {
         id: "collapseAllNodes",
         content: "Collapse All Nodes",
         coreAsWell: true,

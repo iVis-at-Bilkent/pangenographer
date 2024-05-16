@@ -91,22 +91,6 @@ export class DbAdapterService {
     this._db.getElementsUpToCertainDistance(nodeId, distance, fn, isUp);
   }
 
-  getSampleData(callback: (x: GraphResponse) => any) {
-    let fn = (x: any) => {
-      callback(x);
-      this._g.add2GraphHistory("Get sample data");
-    };
-    this._db.getSampleData(fn);
-  }
-
-  getPathWalkData(callback: (x: GraphResponse) => any) {
-    let fn = (x: any) => {
-      callback(x);
-      this._g.add2GraphHistory("Get path walk data");
-    };
-    this._db.getPathWalkData(fn);
-  }
-
   getConsecutiveNodes(
     properties: (string | number)[],
     propertyType: string,
@@ -223,8 +207,54 @@ export class DbAdapterService {
     this._db.importGFA(GFAData, cb);
   }
 
-  clearData(cb: () => void) {
-    this._g.add2GraphHistory(`Clear Data`);
-    this._db.clearData(cb);
+  // Adapter function to clear database
+  clearDatabase(cb: () => void) {
+    this._g.add2GraphHistory(`Clear Database`);
+    this._db.clearDatabase(cb);
+  }
+
+  // Adapter function to get sample data
+  getSampleData(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get sample data");
+    };
+    this._db.getSampleData(fn);
+  }
+
+  // Adapter function to get path walk data
+  getPathWalkData(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get path walk data");
+    };
+    this._db.getPathWalkData(fn);
+  }
+
+  // Adapter function to get all nodes with zero degree
+  getAllZeroDegreeNodes(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get all nodes with zero degree");
+    };
+    this._db.getAllZeroDegreeNodes(fn);
+  }
+
+  // Adapter function to get all nodes with zero incoming degree
+  getAllZeroIncomingDegreeNodes(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get all nodes with zero incoming degree");
+    };
+    this._db.getAllZeroIncomingDegreeNodes(fn);
+  }
+
+  // Adapter function to get all nodes with zero outgoing degree
+  getAllZeroOutgoingDegreeNodes(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get all nodes with zero outgoing degree");
+    };
+    this._db.getAllZeroOutgoingDegreeNodes(fn);
   }
 }
