@@ -163,7 +163,11 @@ export class CytoscapeService {
     this._cyExtService.setNavigatorPosition();
   }
 
-  loadElementsFromDatabase(data: GraphResponse, isIncremental: boolean) {
+  loadElementsFromDatabase(
+    data: GraphResponse,
+    isIncremental: boolean,
+    isShowUpDownStream: boolean = false
+  ) {
     if (!isIncremental) {
       this._g.cy.panBy({ x: 2000, y: 2000 }); // Remove the flash effect
     }
@@ -271,7 +275,12 @@ export class CytoscapeService {
     const shouldRandomize = !isIncremental || wasEmpty;
     const hasNew = this.hasNewElement(elementIds, previousElements);
     if (hasNew) {
-      this._g.performLayout(shouldRandomize);
+      this._g.performLayout(
+        shouldRandomize,
+        false, // animate
+        C.LAYOUT_ANIMATION_DURATION,
+        isShowUpDownStream
+      );
     }
 
     if (isIncremental) {
@@ -280,6 +289,7 @@ export class CytoscapeService {
 
     this._g.isLoadFromDB = true;
 
+    // TODO: make this incrementally, not all at once
     this.removeExternalTools();
     this.addExternalTools(this.showUpDownstream.bind(this));
     this.applyStyle4NewElements();
@@ -313,7 +323,7 @@ export class CytoscapeService {
   // nodeId is the id of the selected element, nodeId should not contain the 'n' prefix that is added to the id
   showUpDownstream(nodeId: string, length: number, isUp: boolean) {
     const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true); // isIncremental = true
+      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, isShowUpDownStream = true
     };
 
     this._g.layout.clusters = null;
@@ -372,7 +382,7 @@ export class CytoscapeService {
   // Then get all upstream or downstream nodes of the selected nodes
   private getZeroDegreeNodesLoad() {
     return (data: any) => {
-      this.loadElementsFromDatabase(data, true); // isIncremental = true
+      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, isShowUpDownStream = true
       this.getAllUpDownstreamNodes(
         data.nodes,
         this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue()

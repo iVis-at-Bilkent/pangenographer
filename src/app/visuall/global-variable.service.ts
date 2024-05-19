@@ -11,7 +11,7 @@ import {
   EXPAND_COLLAPSE_FAST_OPT,
   HIGHLIGHT_INDEX,
   HIGHLIGHT_OPACITY,
-  LAYOUT_ANIM_DUR,
+  LAYOUT_ANIMATION_DURATION,
   TYPES_NOT_TO_SHOW,
   debounce,
   isPrimitiveType,
@@ -38,6 +38,7 @@ export class GlobalVariableService {
     tilingPaddingVertical: number;
     tilingPaddingHorizontal: number;
     idealEdgeLength: number;
+    fit: boolean;
   };
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
@@ -104,9 +105,10 @@ export class GlobalVariableService {
     let isGraphEmpty = () => {
       return this.cy.elements().not(":hidden, :transparent").length > 0;
     };
+
     this.performLayout = debounce(
       this.performLayoutFn,
-      LAYOUT_ANIM_DUR,
+      LAYOUT_ANIMATION_DURATION,
       false,
       isGraphEmpty
     );
@@ -141,23 +143,29 @@ export class GlobalVariableService {
     if (elements4layout.length < 1) {
       return;
     }
+
     if (this.layout.randomize) {
       this.statusMsg.next("Recalculating layout...");
     } else {
       this.statusMsg.next("Performing layout...");
     }
+
     this.setLoadingStatus(true);
     let layout: any;
+
     if (this.layout.clusters && this.layout.clusters.length > 0) {
       this.removeDeletedClusters();
       layout = elements4layout.layout(this.getCiseOptions());
     } else {
       layout = elements4layout.layout(this.layout);
     }
+
     layout.promiseOn("layoutstop", () => {
       callback();
     });
+
     layout.run();
+
     this.statusMsg.next("Rendering graph...");
   }
 
@@ -389,7 +397,7 @@ export class GlobalVariableService {
       // whether or not to animate the layout
       animate: true,
       // duration of animation in ms, if enabled
-      animationDuration: LAYOUT_ANIM_DUR,
+      animationDuration: LAYOUT_ANIMATION_DURATION,
       fit: !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue(),
       // padding around layout
       padding: 10,
@@ -452,7 +460,6 @@ export class GlobalVariableService {
   }
 
   prepareConstraints() {
-    this.removeConstraints();
     this.changeHighlightInZeroOutZero();
     let longestPath = -1;
 
@@ -549,16 +556,24 @@ export class GlobalVariableService {
     }
   }
 
-  removeConstraints() {
+  // remove constraints and pseudo nodes after layout is done
+  // if isShowUpstream is then don't fit the graph to the viewport
+  removeConstraints(isShowUpstream: boolean = false) {
+    // remove pseudo nodes
     this.cy.remove("node[id^='PSEUDOSOURCENODE']");
     this.cy.remove("node[id^='PSEUDOTARGETNODE']");
 
+    // reset constraints after layout is done
     this.constraints = {
       relativePlacementConstraints: [],
       fixedNodeConstraints: [],
     };
+
+    // fit the graph to the viewport after layout is done if isShowUpstream is false
     setTimeout(() => {
-      this.cy.fit();
+      if (!isShowUpstream) {
+        this.cy.fit();
+      }
     }, CY_BATCH_END_DELAY);
   }
 
@@ -673,7 +688,8 @@ export class GlobalVariableService {
   private performLayoutFn(
     isRandomize: boolean,
     isDirectCommand: boolean = false,
-    animationDuration: number = LAYOUT_ANIM_DUR
+    animationDuration: number = LAYOUT_ANIMATION_DURATION,
+    isShowUpstream: boolean = false
   ) {
     if (
       !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue() &&
@@ -683,6 +699,7 @@ export class GlobalVariableService {
       this.cy.fit();
       return;
     }
+
     if (
       this.userPreferences.groupingOption.getValue() !=
       GroupingOptionTypes.clusterId
@@ -690,12 +707,18 @@ export class GlobalVariableService {
       this.prepareConstraints();
       this.layout = this.getFcoseOptions();
     }
+
     this.layout.animationDuration = animationDuration;
     this.layout.tile =
       this.userPreferences.isTileDisconnectedOnLayout.getValue();
     this.switchLayoutRandomization(isRandomize);
+
+    // if isShowUpstream is true, then don't fit the graph to the viewport
+    this.layout.fit = this.layout.fit && !isShowUpstream;
+    console.log(this.layout.fit);
+
     this.runLayout(() => {
-      this.removeConstraints();
+      this.removeConstraints(isShowUpstream);
     });
   }
 
@@ -730,7 +753,7 @@ export class GlobalVariableService {
       refresh: 10,
 
       // Animation duration used for animate:'end'
-      animationDuration: LAYOUT_ANIM_DUR,
+      animationDuration: LAYOUT_ANIMATION_DURATION,
 
       // Easing for animate:'end'
       animationEasing: undefined,
