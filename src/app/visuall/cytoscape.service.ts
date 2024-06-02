@@ -166,7 +166,7 @@ export class CytoscapeService {
   loadElementsFromDatabase(
     data: GraphResponse,
     isIncremental: boolean,
-    isShowUpDownStream: boolean = false
+    dontFit: boolean = false
   ) {
     if (!isIncremental) {
       this._g.cy.panBy({ x: 2000, y: 2000 }); // Remove the flash effect
@@ -279,7 +279,7 @@ export class CytoscapeService {
         shouldRandomize,
         false, // animate
         C.LAYOUT_ANIMATION_DURATION,
-        isShowUpDownStream
+        dontFit
       );
     }
 
@@ -321,9 +321,14 @@ export class CytoscapeService {
   // Length is the distance from the selected element
   // isUp is a boolean that determines whether to show upstream or downstream elements
   // nodeId is the id of the selected element, nodeId should not contain the 'n' prefix that is added to the id
-  showUpDownstream(nodeId: string, length: number, isUp: boolean) {
+  showUpDownstream(
+    nodeId: string,
+    length: number,
+    isUp: boolean,
+    dontFit: boolean = true
+  ) {
     const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, isShowUpDownStream = true
+      this.loadElementsFromDatabase(data, true, dontFit); // isIncremental = true
     };
 
     this._g.layout.clusters = null;
@@ -343,7 +348,7 @@ export class CytoscapeService {
     isUp: boolean
   ): Promise<void> {
     return new Promise<void>((resolve) => {
-      this.showUpDownstream(nodeId, length, isUp);
+      this.showUpDownstream(nodeId, length, isUp, false); // dontFit = true
       resolve();
     });
   }
@@ -382,7 +387,7 @@ export class CytoscapeService {
   // Then get all upstream or downstream nodes of the selected nodes
   private getZeroDegreeNodesLoad() {
     return (data: any) => {
-      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, isShowUpDownStream = true
+      this.loadElementsFromDatabase(data, true, false); // isIncremental = true, dontFit = false
       this.getAllUpDownstreamNodes(
         data.nodes,
         this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue()
@@ -762,7 +767,7 @@ export class CytoscapeService {
       this._g.cy.remove(":selected");
     }
     this._g.handleCompoundsOnHideDelete();
-    this._g.performLayout(false);
+    this._g.performLayout(false); // animate = false
   }
 
   deleteElements(data: GraphResponse, sourceNodeName: string) {

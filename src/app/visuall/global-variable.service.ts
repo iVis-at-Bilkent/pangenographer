@@ -109,7 +109,7 @@ export class GlobalVariableService {
     this.performLayout = debounce(
       this.performLayoutFn,
       LAYOUT_ANIMATION_DURATION,
-      false,
+      false, // immediate call is not needed
       isGraphEmpty
     );
 
@@ -557,8 +557,8 @@ export class GlobalVariableService {
   }
 
   // remove constraints and pseudo nodes after layout is done
-  // if isShowUpstream is then don't fit the graph to the viewport
-  removeConstraints(isShowUpstream: boolean = false) {
+  // if dontFit is then don't fit the graph to the viewport
+  removeConstraints(dontFit: boolean = false) {
     // remove pseudo nodes
     this.cy.remove("node[id^='PSEUDOSOURCENODE']");
     this.cy.remove("node[id^='PSEUDOTARGETNODE']");
@@ -569,9 +569,9 @@ export class GlobalVariableService {
       fixedNodeConstraints: [],
     };
 
-    // fit the graph to the viewport after layout is done if isShowUpstream is false
+    // fit the graph to the viewport after layout is done if dontFit is false
     setTimeout(() => {
-      if (!isShowUpstream) {
+      if (!dontFit) {
         this.cy.fit();
       }
     }, CY_BATCH_END_DELAY);
@@ -689,7 +689,7 @@ export class GlobalVariableService {
     isRandomize: boolean,
     isDirectCommand: boolean = false,
     animationDuration: number = LAYOUT_ANIMATION_DURATION,
-    isShowUpstream: boolean = false
+    dontFit: boolean = false
   ) {
     if (
       !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue() &&
@@ -713,12 +713,11 @@ export class GlobalVariableService {
       this.userPreferences.isTileDisconnectedOnLayout.getValue();
     this.switchLayoutRandomization(isRandomize);
 
-    // if isShowUpstream is true, then don't fit the graph to the viewport
-    this.layout.fit = this.layout.fit && !isShowUpstream;
-    console.log(this.layout.fit);
+    // if dontFit is true, then don't fit the graph to the viewport
+    this.layout.fit = this.layout.fit && !dontFit;
 
     this.runLayout(() => {
-      this.removeConstraints(isShowUpstream);
+      this.removeConstraints(dontFit); // remove constraints after layout is done
     });
   }
 
