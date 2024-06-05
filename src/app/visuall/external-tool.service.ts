@@ -4,6 +4,7 @@ import {
   BADGE_POPPER_UPDATE_DELAY,
   BADGE_ZOOM_THRESHOLD,
   COLLAPSED_EDGE_CLASS,
+  CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER,
   DEFAULT_NODE_WIDTH,
   debounce,
   debounce2,
@@ -263,6 +264,7 @@ export class ExternalToolService {
     );
   }
 
+  // Prepare the new margins for the cues for the given node
   private updateCuePrep(
     node: any,
     marginX: number,
@@ -278,13 +280,16 @@ export class ExternalToolService {
     let newMarginX =
       this._g.cy.zoom() * (marginX + marginXTwo + nameSize) * marginXNeg;
 
-    // Calculate the new margin y again if the node size is changed
+    // Calculate the new margin y again if the node size is changed from the default size
+    // Node size is changed when the BLAST result badges are shown
     // This is done to keep the cues in the same position relative to the node
     // Get the width of the node and calculate the new margins
     let width = node.style("width");
     width = Number(node.style("width").substring(0, width.length - 2));
     if (width !== DEFAULT_NODE_WIDTH) {
-      newMarginY *= (2.5 * width) / DEFAULT_NODE_WIDTH;
+      newMarginY *=
+        (CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER * width) /
+        DEFAULT_NODE_WIDTH;
     }
 
     return {
@@ -304,6 +309,8 @@ export class ExternalToolService {
   ) {
     this._g.cy.startBatch();
 
+    // Set tootip constants for the nodes and edges in the graph
+    // These constants are used to set the tooltip's font size, weight, family, style, and width
     let widthOffset = 11;
     let fontSize = "15";
     let fontWeight = "700";
