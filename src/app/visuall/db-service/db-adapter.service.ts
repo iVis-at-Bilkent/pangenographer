@@ -78,17 +78,21 @@ export class DbAdapterService {
     this._db.getElements(ids, fn, queryMeta);
   }
 
+  // Adapter function to get elements in a path up to certain distance from a node
   getElementsUpToCertainDistance(
-    nodeId: string,
+    nodeIds: string[],
     distance: number,
     callback: (x: GraphResponse) => any,
     isUp: boolean
   ) {
+    // Callback function to add history
     let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory("Show up/downstream");
     };
-    this._db.getElementsUpToCertainDistance(nodeId, distance, fn, isUp);
+
+    // Call the database service function
+    this._db.getElementsUpToCertainDistance(nodeIds, distance, fn, isUp);
   }
 
   getConsecutiveNodes(

@@ -55,24 +55,33 @@ export interface DbService {
     objectType: string,
     callback: (x: GraphResponse) => any
   );
+
+  // Definition for getting elements up to a certain distance
   getElementsUpToCertainDistance(
-    nodeId: string,
+    nodeIds: string[],
     distance: number,
     callback: (x: GraphResponse) => any,
     isUp: boolean
   );
+
   // Definition for importing GFA data
   importGFA(GFAData: GFAData, cb: () => void);
+
   // Definition for clearing data from the database
   clearDatabase(cb: () => void);
+
   // Definition for getting sample data
   getSampleData(callback: (x: GraphResponse) => any);
+
   // Definition for getting path and walk nodes/data
   getPathWalkData(callback: (x: GraphResponse) => any);
+
   // Definition for getting all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any);
+
   // Definition for getting all nodes with zero incoming degree
   getAllZeroIncomingDegreeNodes(callback: (x: GraphResponse) => any);
+
   // Definition for getting all nodes with zero outgoing degree
   getAllZeroOutgoingDegreeNodes(callback: (x: GraphResponse) => any);
 }

@@ -165,26 +165,71 @@ export class Neo4jDb implements DbService {
     );
   }
 
+  // Gets a path is a sequence of nodes and relationships that connect two nodes up to a certain length and direction in a graph.
   getElementsUpToCertainDistance(
-    nodeId: string,
+    nodeIds: string[],
     distance: number,
     callback: (x: GraphResponse) => any,
-    isUp: boolean
+    isUp: boolean // if undefined, it is a bidirectional query
   ) {
-    var query = `
-      MATCH (startNode)
-      WHERE elementId(startNode) = '${nodeId}' 
-      MATCH path = (startNode)`;
-    if (isUp) {
-      query += "<";
+    // Get all paths for given nodes
+
+    // Check type of nodeIds, if it is a string, convert it to an array of string
+    if (typeof nodeIds === "string") {
+      nodeIds = [nodeIds];
     }
-    query += `-[*1..${distance}]-`;
-    if (!isUp) {
-      query += ">";
+
+    let queries = nodeIds.length
+      ? nodeIds.map((nodeId) => {
+          let query = `
+          MATCH (startNode)
+          WHERE elementId(startNode) = '${nodeId}' 
+          MATCH path = (startNode)`;
+
+          if (isUp) {
+            query += "<";
+          }
+
+          query += `-[*1..${distance}]-`;
+
+          if (!isUp) {
+            query += ">";
+          }
+
+          query +=
+            "(endNode) RETURN '${nodeId}' AS nodeId, nodes(path) AS nodes, relationships(path) AS relationships";
+
+          return query;
+        })
+      : [];
+
+    // If isUp is undefined, add a query for the reverse direction as well
+    if (isUp === undefined) {
+      queries = queries.concat(
+        nodeIds.length
+          ? nodeIds.map((nodeId) => {
+              let query = `
+              MATCH (startNode)
+              WHERE elementId(startNode) = '${nodeId}' 
+              MATCH path = (startNode)`;
+
+              query += "<"; // Reverse direction
+
+              query += `-[*1..${distance}]-`;
+
+              query +=
+                "(endNode) RETURN '${nodeId}' AS nodeId, nodes(path) AS nodes, relationships(path) AS relationships";
+
+              return query;
+            })
+          : []
+      );
     }
-    query +=
-      "(endNode) RETURN nodes(path) AS nodes, relationships(path) AS relationships";
-    this.runQuery(query, callback);
+
+    // Combine all queries with UNION ALL
+    let combinedQuery = queries.join(" UNION ALL ");
+
+    this.runQuery(combinedQuery, callback);
   }
 
   getElements(

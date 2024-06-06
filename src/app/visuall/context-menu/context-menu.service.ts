@@ -234,10 +234,13 @@ export class ContextMenuService {
     if (!element) {
       return;
     }
+
     const callback = (data: any) => {
       this._cyService.deleteElements(data, element.data().segmentName);
     };
+
     this._g.layout.clusters = null;
+
     this._dbService.getElementsUpToCertainDistance(
       element.id().substring(1), // remove the first character which is 'n' or 'e' to get the id stored in the database
       this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),

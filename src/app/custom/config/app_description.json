@@ -180,7 +180,7 @@
     "dataPageSize": 15,
     "dataPageLimit": 15,
     "queryHistoryLimit": 10,
-    "dbTimeout": 10,
+    "dbTimeout": 60,
     "tableColumnLimit": 3,
     "highlightStyles": [
       {

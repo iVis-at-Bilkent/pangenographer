@@ -166,7 +166,8 @@ export class CytoscapeService {
   loadElementsFromDatabase(
     data: GraphResponse,
     isIncremental: boolean,
-    dontFit: boolean = false
+    dontFit: boolean = false,
+    dontHighlight: boolean = false
   ) {
     if (!isIncremental) {
       this._g.cy.panBy({ x: 2000, y: 2000 }); // Remove the flash effect
@@ -283,7 +284,7 @@ export class CytoscapeService {
       );
     }
 
-    if (isIncremental) {
+    if (isIncremental && !dontHighlight) {
       this.highlightElements(elementIds);
     }
 
@@ -322,18 +323,19 @@ export class CytoscapeService {
   // isUp is a boolean that determines whether to show upstream or downstream elements
   // nodeId is the id of the selected element, nodeId should not contain the 'n' prefix that is added to the id
   showUpDownstream(
-    nodeId: string,
+    nodeIds: string[],
     length: number,
     isUp: boolean,
-    dontFit: boolean = true
+    dontFit: boolean = true,
+    dontHighlight: boolean = false
   ) {
     const callback = (data: any) => {
-      this.loadElementsFromDatabase(data, true, dontFit); // isIncremental = true
+      this.loadElementsFromDatabase(data, true, dontFit, dontHighlight); // isIncremental = true
     };
 
     this._g.layout.clusters = null;
     this._dbService.getElementsUpToCertainDistance(
-      nodeId,
+      nodeIds,
       length,
       callback,
       isUp
@@ -342,23 +344,24 @@ export class CytoscapeService {
 
   // Show upstream or downstream elements asynchronously
   // This is used to show elements one by one in a loop
-  async showUpDownstremAsync(
-    nodeId: string,
+  async showUpDownstreamAsync(
+    nodeIds: string[],
     length: number,
     isUp: boolean
   ): Promise<void> {
     return new Promise<void>((resolve) => {
-      this.showUpDownstream(nodeId, length, isUp, false); // dontFit = true
+      this.showUpDownstream(nodeIds, length, isUp, false, true); // dontFit = false, dontHighlight = true
       resolve();
     });
   }
 
   // Get all upstream and downstream nodes of the selected elements one by one
   async getAllUpDownstreamNodes(elements: any, length: number) {
-    for (let i = 0; i < elements.length; i++) {
-      await this.showUpDownstremAsync(elements[i].elementId, length, true); // Show upstream nodes
-      await this.showUpDownstremAsync(elements[i].elementId, length, false); // Show downstream nodes
-    }
+    await this.showUpDownstreamAsync(
+      elements.map((x: any) => x.elementId),
+      length,
+      undefined // Show both upstream and downstream nodes
+    );
   }
 
   // Get all nodes with zero degree from the database
@@ -387,13 +390,12 @@ export class CytoscapeService {
   // Then get all upstream or downstream nodes of the selected nodes
   private getZeroDegreeNodesLoad() {
     return (data: any) => {
-      this.loadElementsFromDatabase(data, true, false); // isIncremental = true, dontFit = false
+      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, dontFit = false
+      this._g.cy.zoom(this._g.cy.zoom() + 10000); // Zoom in to do not show the zero degree nodes which are brought from the database
       this.getAllUpDownstreamNodes(
         data.nodes,
         this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue()
-      ).then(() => {
-        this.removeHighlights(); // Remove highlights after showing all upstream and downstream nodes as the last gathered nodes are highlighted
-      });
+      );
     };
   }
 
