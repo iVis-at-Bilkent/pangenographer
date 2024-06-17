@@ -12,8 +12,8 @@
       "pathNames": "string[]",
       "walkSampleIds": "string[]"
     },
-    "WALKS": {},
-    "PATHS": {}
+    "WALK": {},
+    "PATH": {}
   },
   "edges": {
     "LINK": {

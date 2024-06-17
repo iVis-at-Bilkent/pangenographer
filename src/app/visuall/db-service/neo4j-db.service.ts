@@ -2,7 +2,11 @@ import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { TableFiltering } from "../../shared/table-view/table-view-types";
-import { GENERIC_TYPE, PATH_WALK_NAME_DISALLOWED_REGEX } from "../constants";
+import {
+  CQL_QUERY_CHANGE_MARKER,
+  GENERIC_TYPE,
+  PATH_WALK_NAME_DISALLOWED_REGEX,
+} from "../constants";
 import { GlobalVariableService } from "../global-variable.service";
 import {
   ClassBasedRules,
@@ -15,6 +19,8 @@ import {
   DbResponseType,
   DbService,
   GFAData,
+  GFAPathEdge,
+  GFAWalkEdge,
   GraphResponse,
   Neo4jEdgeDirection,
   TableResponse,
@@ -42,6 +48,9 @@ export class Neo4jDb implements DbService {
     const requestType = responseType == DbResponseType.graph ? "graph" : "row";
     this._g.setLoadingStatus(true);
     const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
+
+    // If the query is timeboxed, wrap it in a CALL apoc.cypher.run() procedure to allow for timeout
+    // Otherwise, execute the query directly
     const q = isTimeboxed
       ? `CALL apoc.cypher.run("${query}", null ) YIELD value RETURN value`
       : query;
@@ -75,7 +84,9 @@ export class Neo4jDb implements DbService {
       isTimeout = false;
       // Handle errors
       if (err.message.includes("Timeout occurred! It takes longer than")) {
-        this._g.statusMsg.next("");
+        this._g.statusMsg.next(
+          "Timeout occurred! It takes longer than expected! See the error message for more details."
+        );
         this._g.showErrorModal(
           "Database Timeout",
           "Your query took too long!  <br> Consider adjusting timeout setting."
@@ -104,7 +115,11 @@ export class Neo4jDb implements DbService {
           errFn(x["errors"][0]);
           return;
         }
-        this._g.statusMsg.next("");
+
+        this._g.statusMsg.next(
+          "The database query has been executed successfully!"
+        );
+
         if (responseType == DbResponseType.graph) {
           callback(this.extractGraph(x));
         } else if (
@@ -117,6 +132,127 @@ export class Neo4jDb implements DbService {
         }
         this._g.refreshCues();
       }, errFn);
+  }
+
+  runQueryPromised(
+    query: string,
+    responseType: DbResponseType = 0,
+    isTimeboxed = true
+  ): Promise<any> {
+    return new Promise((resolve, reject) => {
+      const conf = environment.dbConfig;
+      const url = conf.getSampleUrl;
+      const username = conf.username;
+      const password = conf.password;
+      const requestType =
+        responseType == DbResponseType.graph ? "graph" : "row";
+      this._g.setLoadingStatus(true);
+      const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
+
+      // If the query is timeboxed, wrap it in a CALL apoc.cypher.run() procedure to allow for timeout
+      // Otherwise, execute the query directly
+      const q = isTimeboxed
+        ? `CALL apoc.cypher.run("${query}", null ) YIELD value RETURN value`
+        : query;
+      console.log(q);
+
+      this._g.statusMsg.next("Executing database query...");
+      const requestBody = {
+        statements: [
+          {
+            statement: q,
+            parameters: null,
+            resultDataContents: [requestType],
+          },
+        ],
+      };
+
+      let isTimeout = true;
+      let timeoutId: any = null;
+
+      if (isTimeboxed) {
+        timeoutId = setTimeout(() => {
+          isTimeout = true;
+          this._g.showErrorModal(
+            "Database Timeout",
+            "Your query took too long! <br> Consider adjusting timeout setting."
+          );
+          reject(new Error("Database Timeout"));
+        }, timeout);
+      }
+
+      const errFn = (err: any) => {
+        if (isTimeout) {
+          clearTimeout(timeoutId); // Clear the timeout if the request has already timed out
+        }
+
+        isTimeout = false;
+
+        // Handle errors
+        if (err.message.includes("Timeout occurred! It takes longer than")) {
+          this._g.statusMsg.next(
+            "Timeout occurred! It takes longer than expected! See the error message for more details."
+          );
+          this._g.showErrorModal(
+            "Database Timeout",
+            "Your query took too long!  <br> Consider adjusting timeout setting."
+          );
+        } else {
+          this._g.statusMsg.next("Database query execution raised an error!");
+          this._g.showErrorModal("Database Query Execution Error", err.message);
+        }
+
+        this._g.setLoadingStatus(false);
+        reject(err);
+      };
+
+      this._http
+        .post(url, requestBody, {
+          headers: {
+            Accept: "application/json; charset=UTF-8",
+            "Content-Type": "application/json",
+            Authorization: "Basic " + btoa(username + ":" + password),
+          },
+        })
+        .toPromise()
+        .then((x: any) => {
+          if (isTimeout) {
+            clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
+          }
+
+          isTimeout = false;
+          this._g.setLoadingStatus(false);
+
+          if (x["errors"] && x["errors"].length > 0) {
+            errFn(x["errors"][0]);
+            return;
+          }
+
+          this._g.statusMsg.next(
+            "The database query has been executed successfully!"
+          );
+
+          let result: any = null;
+
+          if (responseType == DbResponseType.graph) {
+            result = this.extractGraph(x);
+          } else if (
+            responseType == DbResponseType.table ||
+            responseType == DbResponseType.count
+          ) {
+            result = this.extractTable(x, isTimeboxed);
+          } else if (responseType == DbResponseType.generic) {
+            result = this.extractGenericData(x, isTimeboxed);
+          }
+
+          this._g.refreshCues();
+          resolve(result);
+        })
+        .catch((err) => {
+          errFn(err);
+          reject(err);
+        });
+    });
   }
 
   getNeighbors(
@@ -291,7 +427,7 @@ export class Neo4jDb implements DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    callback: (x: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -317,7 +453,7 @@ export class Neo4jDb implements DbService {
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
       ${pageSize}, ${currentPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
-      cb,
+      callback,
       type,
       false
     );
@@ -331,7 +467,7 @@ export class Neo4jDb implements DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    callback: (x: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -356,7 +492,7 @@ export class Neo4jDb implements DbService {
         `CALL commonStreamCount([${dbIds
           .map((element) => `'${element}'`)
           .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, '${t}', ${isIgnoreCase}, {}, 0, 0, 0, ${timeout}, ${idf})`,
-        cb,
+        callback,
         type,
         false
       );
@@ -366,7 +502,7 @@ export class Neo4jDb implements DbService {
           .map((element) => `'${element}'`)
           .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currentPage},
        '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
-        cb,
+        callback,
         type,
         false
       );
@@ -380,7 +516,7 @@ export class Neo4jDb implements DbService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    callback: (x: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -405,7 +541,7 @@ export class Neo4jDb implements DbService {
         .map((element) => `'${element}'`)
         .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${isDirected},
       ${pageSize}, ${currentPage}, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
-      cb,
+      callback,
       DbResponseType.table,
       false
     );
@@ -548,19 +684,24 @@ export class Neo4jDb implements DbService {
   }
 
   // Import GFA data to the database by converting it to CQL
-  importGFA(GFAData: GFAData, cb: () => void) {
-    this.runQuery(this.GFAdata2CQL(GFAData), cb, 0, false);
+  importGFA(GFAData: GFAData, callback: () => void) {
+    this.runQuery(this.GFAdata2CQL(GFAData), callback, 0, false); // 0 is for generic response type, false is for isTimeboxed
+  }
+
+  // Import GFA data to the database by converting it to CQL and return a promise
+  importGFAPromised(GFAData: GFAData): Promise<any> {
+    return this.runQueryPromised(this.GFAdata2CQL(GFAData), 0, false);
   }
 
   // Clear the database
-  clearDatabase(cb: () => void) {
+  clearDatabase(callback: () => void) {
     this.runQuery(
       `
       MATCH (n) 
       DETACH 
       DELETE n
     `,
-      cb,
+      callback,
       0,
       false
     );
@@ -578,9 +719,9 @@ export class Neo4jDb implements DbService {
   // Get path and walk nodes/data
   getPathWalkData(callback: (x: GraphResponse) => any) {
     const query = `
-      MATCH (p:PATHS) RETURN p AS nn
+      MATCH (p:PATH) RETURN p AS nn
       UNION
-      MATCH (w:WALKS) RETURN w AS nn
+      MATCH (w:WALK) RETURN w AS nn
     `;
     this.runQuery(query, callback);
   }
@@ -853,196 +994,327 @@ export class Neo4jDb implements DbService {
     return cql;
   }
 
+  // This function converts the property name to a CQL compatible format
+  // by replacing disallowed characters with their ASCII code
   private propertyName2CQL(propertyName: string): string {
     return propertyName.replace(PATH_WALK_NAME_DISALLOWED_REGEX, (match) => {
-      return `$$$${match.charCodeAt(0)}$$$`;
+      return `${CQL_QUERY_CHANGE_MARKER}${match.charCodeAt(
+        0
+      )}${CQL_QUERY_CHANGE_MARKER}`;
     });
   }
 
+  // This function converts the GFAPath/WalkEdge object to string
+  private createEdgeKey(edge: GFAPathEdge | GFAWalkEdge): string {
+    return (
+      edge.source +
+      CQL_QUERY_CHANGE_MARKER +
+      edge.target +
+      CQL_QUERY_CHANGE_MARKER +
+      edge.sourceOrientation +
+      CQL_QUERY_CHANGE_MARKER +
+      edge.targetOrientation
+    );
+  }
+
+  // This function converts the GFAData object to a CQL query
   private GFAdata2CQL(GFAData: GFAData): string {
-    let nodeMap = {};
-    let query = "CREATE\n";
-    let node2Create = "";
-    // creating walk node and path node
+    let query = "";
+    let element2Create = "";
 
-    if (GFAData.paths.length) {
-      node2Create = `(nPATHS :PATHS {`;
-      GFAData.paths.forEach((path) => {
-        node2Create += `p${this.propertyName2CQL(path.pathName)}: ['${
-          path.segmentNames
-        }', `;
-        node2Create += `'${path.overlaps}'], `;
-      });
-      query += node2Create.substring(0, node2Create.length - 2) + "}),\n";
-    }
-    if (GFAData.walks.length) {
-      node2Create = `(nWALKS :WALKS {`;
-      GFAData.walks.forEach((walk) => {
-        node2Create += `w${this.propertyName2CQL(walk.sampleId)}: ['${
-          walk.hapIndex
-        }', `;
-        node2Create += `'${walk.seqId}', '${walk.seqStart}', '${walk.seqEnd}', `;
-        node2Create += `'${walk.walk}'], `;
-      });
-      query += node2Create.substring(0, node2Create.length - 2) + "}),\n";
+    // Creating new elements starts here
+
+    // Initialize the query if there is edge or node to be created
+    if (
+      GFAData.paths ||
+      GFAData.walks ||
+      GFAData.segments ||
+      GFAData.links ||
+      GFAData.jumps ||
+      GFAData.containments
+    ) {
+      query += "CREATE\n";
     }
 
-    let segmentsToPathMap = {}; // segmentName -> [pathName1, pathName2, ...]
-
+    // creating path nodes
     GFAData.paths.forEach((path) => {
-      let segmentNames = path.segmentNames.split(/[;,]/);
+      // Convert the pathName to CQL as it may contain special characters
       path.pathName = this.propertyName2CQL(path.pathName);
-      segmentNames.forEach((segmentName) => {
-        segmentName = segmentName.substring(0, segmentName.length - 1);
-        if (segmentsToPathMap.hasOwnProperty(segmentName)) {
-          segmentsToPathMap[`${segmentName}`].push(path.pathName);
-        } else {
-          segmentsToPathMap[`${segmentName}`] = [];
-          segmentsToPathMap[`${segmentName}`].push(path.pathName);
-        }
-      });
+
+      // Create the path node
+      element2Create = `(p${path.pathName} :PATH {pathName: '${path.pathName}', segmentNames: '${path.segmentNames}'`;
+      if (path.hasOwnProperty("overlaps")) {
+        element2Create += `, overlaps: '${path.overlaps}'`;
+      }
+      element2Create += "}),\n";
+
+      query += element2Create;
     });
 
-    let segmentsToWalkMap = {}; // segmentName -> [sampleId1, sampleId2, ...]
-
+    // creating walk nodes
     GFAData.walks.forEach((walk) => {
-      let segmentNames = walk.walk.substring(1).split(/[<>]/);
-      walk.sampleId = this.propertyName2CQL(walk.sampleId);
-      segmentNames.forEach((segmentName) => {
-        if (segmentsToWalkMap.hasOwnProperty(segmentName)) {
-          segmentsToWalkMap[`${segmentName}`].push(walk.sampleId);
-        } else {
-          segmentsToWalkMap[`${segmentName}`] = [];
-          segmentsToWalkMap[`${segmentName}`].push(walk.sampleId);
-        }
-      });
+      // Convert the sampleIdentifier to CQL as it may contain special characters
+      walk.sampleIdentifier = this.propertyName2CQL(walk.sampleIdentifier);
+
+      // Create the walk node
+      element2Create = `(w${walk.sampleIdentifier} :WALK {sampleIdentifier: '${walk.sampleIdentifier}', walk: '${walk.walk}'`;
+      element2Create += `, haplotypeIndex: ${walk.haplotypeIndex}, sequenceIdentifier: '${walk.sequenceIdentifier}'`;
+      if (walk.hasOwnProperty("sequenceStart")) {
+        element2Create += `, sequenceStart: ${walk.sequenceStart}`;
+      }
+      if (walk.hasOwnProperty("sequenceEnd")) {
+        element2Create += `, sequenceEnd: ${walk.sequenceEnd}`;
+      }
+      element2Create += "}),\n";
+
+      query += element2Create;
     });
 
+    // Get segments to be matched with the paths
+    // This is used to add pathNames to the segments
+    let segmentsToPathNamesMap = {};
+    GFAData.pathSegments.forEach((pathSegment) => {
+      if (!segmentsToPathNamesMap[`${pathSegment.segmentName}`]) {
+        segmentsToPathNamesMap[`${pathSegment.segmentName}`] = [];
+      }
+      segmentsToPathNamesMap[`${pathSegment.segmentName}`].push(
+        pathSegment.pathName
+      );
+    });
+
+    // Get segments to be matched with the walks
+    // This is used to add walkSampleIdentifiers to the segments
+    let segmentsToWalkSampleIdentifiersMap = {};
+    GFAData.walkSegments.forEach((walkSegment) => {
+      if (!segmentsToWalkSampleIdentifiersMap[`${walkSegment.segmentName}`]) {
+        segmentsToWalkSampleIdentifiersMap[`${walkSegment.segmentName}`] = [];
+      }
+      segmentsToWalkSampleIdentifiersMap[`${walkSegment.segmentName}`].push(
+        walkSegment.sampleIdentifier
+      );
+    });
+
+    // Create a segment map to store the segment objects given in GFAData.segments
+    // This is used to avoid matching the same segment multiple times in the query
+    // segmentName -> segment object given in GFAData.segments
+    let segmentMap = {};
+
+    // creating segment nodes
     GFAData.segments.forEach((segment) => {
+      // Convert the segmentName to CQL as it may contain special characters
       segment.segmentName = this.propertyName2CQL(segment.segmentName);
-      let node2Create = `(n${segment.segmentName} :SEGMENT {segmentData: 
-        '${segment.segmentData}', segmentName: '${segment.segmentName}'
-        , segmentLength: ${segment.segmentLength}`;
+
+      // Create the segment node
+      element2Create = `(n${segment.segmentName} :SEGMENT {segmentData: '${segment.segmentData}', `;
+      element2Create += `segmentName: '${segment.segmentName}', segmentLength: ${segment.segmentLength}`;
       if (segment.hasOwnProperty("readCount")) {
-        node2Create += `, readCount: ${segment.readCount}`;
+        element2Create += `, readCount: ${segment.readCount}`;
       }
       if (segment.hasOwnProperty("fragmentCount")) {
-        node2Create += `, fragmentCount: ${segment.fragmentCount}`;
+        element2Create += `, fragmentCount: ${segment.fragmentCount}`;
       }
       if (segment.hasOwnProperty("kmerCount")) {
-        node2Create += `, kmerCount: ${segment.kmerCount}`;
+        element2Create += `, kmerCount: ${segment.kmerCount}`;
       }
       if (segment.hasOwnProperty("SHA256Checksum")) {
-        node2Create += `, SHA256Checksum: '${segment.SHA256Checksum}'`;
+        element2Create += `, SHA256Checksum: '${segment.SHA256Checksum}'`;
       }
       if (segment.hasOwnProperty("URIorLocalSystemPath")) {
-        node2Create += `, URIorLocalSystemPath: '${segment.URIorLocalSystemPath}'`;
+        element2Create += `, URIorLocalSystemPath: '${segment.URIorLocalSystemPath}'`;
       }
-      if (segmentsToPathMap[`${segment.segmentName}`]) {
-        node2Create += ", pathNames: [";
-        segmentsToPathMap[`${segment.segmentName}`].forEach((pathName) => {
-          node2Create += `'${pathName}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+
+      // Check if the segment is in the segmentsToPathNamesMap
+      // If it is, add the pathNames to the segment
+      if (segmentsToPathNamesMap[`${segment.segmentName}`]) {
+        element2Create += ", pathNames: [";
+        segmentsToPathNamesMap[`${segment.segmentName}`].forEach(
+          (pathName: string) => {
+            element2Create += `'${pathName}', `;
+          }
+        );
+
+        // Remove the last comma and space and add the closing bracket
+        element2Create =
+          element2Create.substring(0, element2Create.length - 2) + "]";
+
+        // Remove the segment from the segmentsToPathNamesMap to avoid adding the same pathNames multiple times
+        delete segmentsToPathNamesMap[`${segment.segmentName}`];
       }
-      if (segmentsToWalkMap[`${segment.segmentName}`]) {
-        node2Create += ", walkSampleIds: [";
-        segmentsToWalkMap[`${segment.segmentName}`].forEach((sampleId) => {
-          node2Create += `'${sampleId}', `;
-        });
-        node2Create = node2Create.substring(0, node2Create.length - 2) + "]";
+      // Initialize an empty array if there is no paths to match
+      else {
+        element2Create += ", pathNames: []";
       }
-      query += node2Create + "}),\n";
-      nodeMap[`${segment.segmentName}`] = segment;
+
+      // Check if the segment is in the segmentsToWalkSampleIdentifiersMap
+      // If it is, add the walkSampleIdentifiers to the segment
+      if (segmentsToWalkSampleIdentifiersMap[`${segment.segmentName}`]) {
+        element2Create += ", walkSampleIdentifiers: [";
+        segmentsToWalkSampleIdentifiersMap[`${segment.segmentName}`].forEach(
+          (sampleIdentifier: string) => {
+            element2Create += `'${sampleIdentifier}', `;
+          }
+        );
+
+        // Remove the last comma and space and add the closing bracket
+        element2Create =
+          element2Create.substring(0, element2Create.length - 2) + "]";
+
+        // Remove the segment from the segmentsToWalkSampleIdentifiersMap to avoid adding the same walkSampleIdentifiers multiple times
+        delete segmentsToWalkSampleIdentifiersMap[`${segment.segmentName}`];
+      }
+      // Initialize an empty array if there is no walks to match
+      else {
+        element2Create += ", walkSampleIdentifiers: []";
+      }
+
+      // Add the segment to the query
+      query += element2Create + "}),\n";
+
+      // Add the segment to the segmentMap
+      segmentMap[`${segment.segmentName}`] = segment;
     });
 
-    query = query.substring(0, query.length - 2) + "\nCREATE\n";
+    // This is used to match from the databases the nodes that were created
+    let segmentsToMatch = {};
 
+    // Create link edges
     GFAData.links.forEach((link) => {
+      // Convert the source and target property names to CQL as they may contain special characters
       link.source = this.propertyName2CQL(link.source);
       link.target = this.propertyName2CQL(link.target);
-      let edge2Create = `(n${link.source})-[:LINK
-        {sourceOrientation: '${link.sourceOrientation}', source: '${link.source}'
-        , targetOrientation: '${link.targetOrientation}', target: '${link.target}'`;
+
+      // If the segment is not in the segmentMap, add it to the segmentsToMatch
+      // This is used to match from the databases the nodes that were created
+      if (segmentMap[`${link.source}`] === undefined) {
+        segmentsToMatch[`${link.source}`] = true;
+      }
+      if (segmentMap[`${link.target}`] === undefined) {
+        segmentsToMatch[`${link.target}`] = true;
+      }
+
+      // The edge creation
+      element2Create = `(n${link.source})-[:LINK {sourceOrientation: '${link.sourceOrientation}', source: '${link.source}' , `;
+      element2Create += `targetOrientation: '${link.targetOrientation}', target: '${link.target}'`;
       if (link.hasOwnProperty("overlap")) {
-        edge2Create += `, overlap: '${link.overlap}'`;
+        element2Create += `, overlap: '${link.overlap}'`;
       }
       if (link.hasOwnProperty("mappingQuality")) {
-        edge2Create += `, mappingQuality: ${link.mappingQuality}`;
+        element2Create += `, mappingQuality: ${link.mappingQuality}`;
       }
       if (link.hasOwnProperty("numberOfMismatchesOrGaps")) {
-        edge2Create += `, numberOfMismatchesOrGaps: ${link.numberOfMismatchesOrGaps}`;
+        element2Create += `, numberOfMismatchesOrGaps: ${link.numberOfMismatchesOrGaps}`;
       }
       if (link.hasOwnProperty("readCount")) {
-        edge2Create += `, readCount: ${link.readCount}`;
+        element2Create += `, readCount: ${link.readCount}`;
       }
       if (link.hasOwnProperty("fragmentCount")) {
-        edge2Create += `, fragmentCount: ${link.fragmentCount}`;
+        element2Create += `, fragmentCount: ${link.fragmentCount}`;
       }
       if (link.hasOwnProperty("kmerCount")) {
-        edge2Create += `, kmerCount: ${link.kmerCount}`;
+        element2Create += `, kmerCount: ${link.kmerCount}`;
       }
-      if (
-        segmentsToPathMap[`${link.source}`] &&
-        segmentsToPathMap[`${link.target}`]
-      ) {
-        let paths2Edge = "";
-        segmentsToPathMap[`${link.source}`].forEach((pathName1) => {
-          segmentsToPathMap[`${link.target}`].forEach((pathName2) => {
-            if (pathName1 === pathName2) {
-              if (paths2Edge.length === 0) {
-                paths2Edge += ", pathNames: [";
-              }
-              paths2Edge += `'${pathName1}', `;
-            }
-          });
-        });
-        if (paths2Edge.length) {
-          edge2Create += paths2Edge;
-          edge2Create = edge2Create.substring(0, edge2Create.length - 2) + "]";
+
+      // Create a list of sample identifiers to add to the link edge
+      element2Create += `, walkSampleIdentifiers: [`;
+
+      // Create an array to hold added walkSampleIdentifiers to avoid adding the same sampleIdentifier multiple times
+      // by removing the sampleIdentifier from the walkSampleIdentifiers
+      let addedWalkEdges = [];
+
+      // Add the sample identifier to the link edge if the edge is contained in walk
+      // Loop through the GFAWalkEdges to find if there is link to match
+      GFAData.walkEdges.forEach((walkEdge) => {
+        if (
+          walkEdge.source === link.source &&
+          walkEdge.target === link.target &&
+          walkEdge.sourceOrientation === link.sourceOrientation &&
+          walkEdge.targetOrientation === link.targetOrientation
+        ) {
+          element2Create += `'${walkEdge.sampleIdentifier}', `;
+
+          // Add the walkEdge to the addedWalkEdges
+          addedWalkEdges.push(walkEdge);
         }
+      });
+
+      // Remove the last comma and space
+      if (element2Create.endsWith(", ")) {
+        element2Create = element2Create.substring(0, element2Create.length - 2);
       }
-      if (
-        segmentsToWalkMap[`${link.source}`] &&
-        segmentsToWalkMap[`${link.target}`]
-      ) {
-        let walks2Edge = "";
-        segmentsToWalkMap[`${link.source}`].forEach((sampleId1) => {
-          segmentsToWalkMap[`${link.target}`].forEach((sampleId2) => {
-            if (sampleId1 === sampleId2) {
-              if (walks2Edge.length === 0) {
-                walks2Edge += ", walkSampleIds: [";
-              }
-              walks2Edge += `'${sampleId1}', `;
-            }
-          });
-        });
-        if (walks2Edge.length > 0) {
-          edge2Create += walks2Edge;
-          edge2Create = edge2Create.substring(0, edge2Create.length - 2) + "]";
+
+      // Close the walkSampleIdentifiers creation
+      element2Create += `]`;
+
+      // Create a list of path names to add to the link edge
+      element2Create += `, pathNames: [`;
+
+      // Create an array to hold added pathEdges to avoid adding the same pathName multiple times
+      // by removing the pathEdge from the pathEdges
+      let addedPathEdges = [];
+
+      // Add the path names to the link edge if the edge is contained in path
+      // Loop through the GFAPathEdges to find if there is link to match
+      GFAData.pathEdges.forEach((pathEdge) => {
+        if (
+          pathEdge.source === link.source &&
+          pathEdge.target === link.target &&
+          pathEdge.sourceOrientation === link.sourceOrientation &&
+          pathEdge.targetOrientation === link.targetOrientation
+        ) {
+          element2Create += `'${pathEdge.pathName}', `;
+
+          // Add the pathEdge to the addedPathEdges
+          addedPathEdges.push(pathEdge);
         }
+      });
+
+      // Remove the last comma and space
+      if (element2Create.endsWith(", ")) {
+        element2Create = element2Create.substring(0, element2Create.length - 2);
       }
-      edge2Create += `}]->(n${link.target}),\n`;
-      query += edge2Create;
+
+      // Close the pathNames creation
+      element2Create += `]`;
+
+      // Close the edge creation
+      element2Create += `}]->(n${link.target}),\n`;
+
+      // Add the edge to the query
+      query += element2Create;
+
+      // Remove the added walkEdges from the GFAWalkEdges
+      addedWalkEdges.forEach((walkEdge) => {
+        GFAData.walkEdges.splice(GFAData.walkEdges.indexOf(walkEdge), 1);
+      });
+
+      // Remove the added pathEdges from the GFAPathEdges
+      addedPathEdges.forEach((pathEdge) => {
+        GFAData.pathEdges.splice(GFAData.pathEdges.indexOf(pathEdge), 1);
+      });
     });
 
+    // Create jump edges
     GFAData.jumps.forEach((jump) => {
+      // Convert the source and target property names to CQL as they may contain special characters
       jump.source = this.propertyName2CQL(jump.source);
       jump.target = this.propertyName2CQL(jump.target);
-      let edge2Create = `(n${jump.source})-[:JUMP
-        {sourceOrientation: '${jump.sourceOrientation}', source: '${jump.source}'
-        , targetOrientation: '${jump.targetOrientation}', target: '${jump.target}'`;
-      edge2Create += `, distance: '${jump.distance}'`;
+
+      // The edge creation
+      element2Create = `(n${jump.source})-[:JUMP {sourceOrientation: '${jump.sourceOrientation}', source: '${jump.source}', `;
+      element2Create += `targetOrientation: '${jump.targetOrientation}', target: '${jump.target}', distance: '${jump.distance}'`;
       if (jump.hasOwnProperty("indirectShortcutConnections")) {
-        edge2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
+        element2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
       }
-      if (
-        segmentsToPathMap[`${jump.source}`] &&
-        segmentsToPathMap[`${jump.target}`]
+
+      // Add the pathNames to the edge
+      // TODO THIS NEEDS TO BE UPDATED TO MATCH THE NEW DATA STRUCTURE
+      /* if (
+        segmentsToPathNamesMap[`${jump.source}`] &&
+        segmentsToPathNamesMap[`${jump.target}`]
       ) {
         let paths2Edge = "";
-        segmentsToPathMap[`${jump.source}`].forEach((pathName1) => {
-          segmentsToPathMap[`${jump.target}`].forEach((pathName2) => {
+        segmentsToPathNamesMap[`${jump.source}`].forEach((pathName1: string) => {
+          segmentsToPathNamesMap[`${jump.target}`].forEach((pathName2: string) => {
             if (pathName1 === pathName2) {
               if (paths2Edge.length === 0) {
                 paths2Edge += ", pathNames: [";
@@ -1052,35 +1324,222 @@ export class Neo4jDb implements DbService {
           });
         });
         if (paths2Edge.length > 0) {
-          edge2Create += paths2Edge;
-          edge2Create = edge2Create.substring(0, edge2Create.length - 2) + "]";
+          element2Create += paths2Edge;
+          element2Create =
+            element2Create.substring(0, element2Create.length - 2) + "]";
         }
-      }
-      edge2Create += `}]->(n${jump.target}),\n`;
-      query += edge2Create;
+      } */
+
+      // Close the edge creation
+      element2Create += `}]->(n${jump.target}),\n`;
+
+      // Add the edge to the query
+      query += element2Create;
     });
 
+    // Create containment edges
     GFAData.containments.forEach((containment) => {
+      // Convert the source and target property names to CQL as they may contain special characters
       containment.source = this.propertyName2CQL(containment.source);
       containment.target = this.propertyName2CQL(containment.target);
-      let edge2Create = `(n${containment.source})-[:CONTAINMENT
-        {sourceOrientation: '${containment.sourceOrientation}', source: '${containment.source}'
-        , targetOrientation: '${containment.targetOrientation}', target: '${containment.target}'`;
-      edge2Create += `, overlap: '${containment.overlap}'`;
-      edge2Create += `, pos: ${containment.pos}`;
+
+      // The edge creation
+      element2Create = `(n${containment.source})-[:CONTAINMENT {sourceOrientation: '${containment.sourceOrientation}', `;
+      element2Create += `source: '${containment.source}', targetOrientation: '${containment.targetOrientation}', `;
+      element2Create += `target: '${containment.target}', overlap: '${containment.overlap}', pos: ${containment.pos}`;
       if (containment.hasOwnProperty("numberOfMismatchesOrGaps")) {
-        edge2Create += `, numberOfMismatchesOrGaps: ${containment.numberOfMismatchesOrGaps}`;
+        element2Create += `, numberOfMismatchesOrGaps: ${containment.numberOfMismatchesOrGaps}`;
       }
       if (containment.hasOwnProperty("readCount")) {
-        edge2Create += `, readCount: ${containment.readCount}`;
+        element2Create += `, readCount: ${containment.readCount}`;
       }
-      edge2Create += `}]->(n${containment.target}),\n`;
-      query += edge2Create;
+
+      // Close the edge creation
+      element2Create += `}]->(n${containment.target}),\n`;
+
+      // Add the edge to the query
+      query += element2Create;
     });
 
-    query = query.substring(0, query.length - 2);
+    // Trim the last comma and newline if there are elements to create
+    if (
+      GFAData.paths ||
+      GFAData.walks ||
+      GFAData.segments ||
+      GFAData.links ||
+      GFAData.jumps ||
+      GFAData.containments
+    ) {
+      query = query.substring(0, query.length - 2);
+    }
+
+    // Adding new properties to existing elements starts here
+
+    // Extract the segment names of the segments to add pathNames and walkSampleIdentifiers
+    let segmentNamesOfSegmentsToPathMap = Object.keys(segmentsToPathNamesMap);
+    let segmentNamesOfSegmentsToWalkMap = Object.keys(
+      segmentsToWalkSampleIdentifiersMap
+    );
+
+    // If there are segments to add pathNames or walkSampleIdentifiers
+    if (
+      segmentNamesOfSegmentsToPathMap.length ||
+      segmentNamesOfSegmentsToWalkMap.length ||
+      GFAData.pathEdges.length ||
+      GFAData.walkEdges.length
+    ) {
+      // Add the SET clause to add the pathNames and walkSampleIdentifiers to the segments
+      query += "\nSET\n";
+    }
+
+    // Add the pathNames to the segments
+    segmentNamesOfSegmentsToPathMap.forEach((segmentName: string) => {
+      query += `n${segmentName}.pathNames = [`;
+      segmentsToPathNamesMap[`${segmentName}`].forEach((pathName: string) => {
+        query += `'${pathName}', `;
+      });
+
+      // Remove the last comma and space and add the closing bracket
+      query = query.substring(0, query.length - 2) + "],\n";
+
+      // Add the segment to the segmentToMatch map
+      segmentsToMatch[`${segmentName}`] = true;
+    });
+
+    // Add the walkSampleIdentifiers to the segments
+    segmentNamesOfSegmentsToWalkMap.forEach((segmentName: string) => {
+      query += `n${segmentName}.walkSampleIdentifiers = [`;
+      segmentsToWalkSampleIdentifiersMap[`${segmentName}`].forEach(
+        (sampleIdentifier: string) => {
+          query += `'${sampleIdentifier}', `;
+        }
+      );
+
+      // Remove the last comma and space and add the closing bracket
+      query = query.substring(0, query.length - 2) + "],\n";
+
+      // Add the segment to the segmentToMatch map
+      segmentsToMatch[`${segmentName}`] = true;
+    });
+
+    // Add the walkSampleIdentifiers to the edges
+
+    // If there are two or more walk sample identifiers to add to the same edge,
+    // create a map to store the walkSampleIdentifiers with the same edge key
+    let edgesToWalkSampleIdentifiersMap = {};
+    GFAData.walkEdges.forEach((walkEdge) => {
+      // Create an unique key for the edge
+      let edgeKey = this.createEdgeKey(walkEdge);
+
+      // If the edge key is not in the map, create an empty array
+      if (!edgesToWalkSampleIdentifiersMap[`${edgeKey}`]) {
+        edgesToWalkSampleIdentifiersMap[`${edgeKey}`] = [];
+      }
+      // Add the walkSampleIdentifier to the map
+      edgesToWalkSampleIdentifiersMap[`${edgeKey}`].push(
+        walkEdge.sampleIdentifier
+      );
+    });
+
+    // Add the walkSampleIdentifiers to the edges
+    for (let edgeKey in edgesToWalkSampleIdentifiersMap) {
+      // Add the walkSampleIdentifiers to the edge
+      query += `e${edgeKey}.walkSampleIdentifiers = [`;
+      edgesToWalkSampleIdentifiersMap[`${edgeKey}`].forEach(
+        (sampleIdentifier: string) => {
+          query += `'${sampleIdentifier}', `;
+        }
+      );
+
+      // Remove the last comma and space and add the closing bracket
+      query = query.substring(0, query.length - 2) + "],\n";
+    }
+
+    // Add the pathNames to the edges
+
+    // If there are two or more path names to add to the same edge,
+    // create a map to store the pathNames with the same edge key
+    let edgesToPathNamesMap = {};
+    GFAData.pathEdges.forEach((pathEdge) => {
+      // Create an unique key for the edge
+      let edgeKey = this.createEdgeKey(pathEdge);
+
+      // If the edge key is not in the map, create an empty array
+      if (!edgesToPathNamesMap[`${edgeKey}`]) {
+        edgesToPathNamesMap[`${edgeKey}`] = [];
+      }
+      // Add the pathName to the map
+      edgesToPathNamesMap[`${edgeKey}`].push(pathEdge.pathName);
+    });
+
+    // Add the pathNames to the edges
+    for (let edgeKey in edgesToPathNamesMap) {
+      // Add the pathNames to the edge
+      query += `e${edgeKey}.pathNames = [`;
+      edgesToPathNamesMap[`${edgeKey}`].forEach((pathName: string) => {
+        query += `'${pathName}', `;
+      });
+
+      // Remove the last comma and space and add the closing bracket
+      query = query.substring(0, query.length - 2) + "],\n";
+    }
+
+    // Trim the last comma and newline
+    if (
+      segmentNamesOfSegmentsToPathMap.length ||
+      segmentNamesOfSegmentsToWalkMap.length ||
+      GFAData.pathEdges.length ||
+      GFAData.walkEdges.length
+    ) {
+      query = query.substring(0, query.length - 2);
+    }
+
+    // Matching previosly created elements starts here
+
+    // If there are edges to match
+    let edgesToMatch = {};
+    GFAData.pathEdges.forEach((pathEdge) => {
+      // Create an unique key for the edge
+      let edgeKey = this.createEdgeKey(pathEdge);
+
+      // add the edge to edgesToMatch
+      edgesToMatch[`${edgeKey}`] = true;
+    });
+    GFAData.walkEdges.forEach((walkEdge) => {
+      // Create an unique key for the edge
+      let edgeKey = this.createEdgeKey(walkEdge);
+
+      // add the edge to edgesToMatch
+      edgesToMatch[`${edgeKey}`] = true;
+    });
+
+    // If there are nodes to match, add the match clause to *** the beginning of the query ***
+    if (
+      Object.keys(segmentsToMatch).length > 0 ||
+      Object.keys(edgesToMatch).length > 0
+    ) {
+      // First create the match clause
+      let matchClause = "MATCH\n";
+
+      // Add the segments to match
+      for (let segmentName in segmentsToMatch) {
+        matchClause += `(n${segmentName}:SEGMENT {segmentName: '${segmentName}'}),\n`;
+      }
+
+      // Add the edges to match
+      for (let edgeKey in edgesToMatch) {
+        let edge = edgeKey.split(CQL_QUERY_CHANGE_MARKER);
+
+        // Add the match clause for the edge link
+        matchClause += `()-[e${edgeKey}:LINK {source: '${edge[0]}', target: '${edge[1]}', `;
+        matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
+      }
+
+      // Add the match clause to the beginning of the query by removing the last comma and newline
+      matchClause = matchClause.substring(0, matchClause.length - 2);
+      query = matchClause + "\n" + query;
+    }
+
     return query;
   }
-
-  // ------------------------------------------------- end of methods for conversion to CQL -------------------------------------------------
 }

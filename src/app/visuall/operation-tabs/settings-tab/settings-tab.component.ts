@@ -57,6 +57,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
   lengthOfUpDownstream: number;
+  sizeOfNeo4jQueryBatchesInLines: number; // size of Neo4j query batches in lines
   lengthOfBlastSelectedSegmentsPath: number;
   loadFromFileSubscription: Subscription;
   tabChangeSubscription: Subscription;
@@ -211,7 +212,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.isStoreUserProfile = up.isStoreUserProfile.getValue();
     this.queryResultPagination = up.queryResultPagination.getValue();
 
-    this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue();
+    this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue(); // get the length of the upstream and downstream
+    this.sizeOfNeo4jQueryBatchesInLines =
+      up_p.sizeOfNeo4jQueryBatchesInLines.getValue(); // get the size of the Neo4j query batches in lines
     this.lengthOfBlastSelectedSegmentsPath =
       up_p.lengthOfBlastSelectedSegmentsPath.getValue();
     this.pangenographerBoolSettings[0].isEnable =
@@ -342,6 +345,21 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
     this._g.userPreferences.pangenographer.lengthOfUpDownstream.next(length);
     this.lengthOfUpDownstream = length;
+  }
+
+  // Used to change the size of the Neo4j query batches in the user preferences and the current component when the user selects a new size
+  onsizeOfNeo4jQueryBatchesInLinesSelected(x: any) {
+    let size = parseInt(x.target.value);
+
+    // if the size is less than 1, set it to 1
+    if (size < 1) {
+      size = 1;
+    }
+
+    this._g.userPreferences.pangenographer.sizeOfNeo4jQueryBatchesInLines.next(
+      size
+    ); // set the size of the Neo4j query batches in the user preferences
+    this.sizeOfNeo4jQueryBatchesInLines = size; // set the size of the Neo4j query batches in the current component
   }
 
   onlengthOfBlastSelectedSegmentsPathSelected(x: any) {

@@ -336,8 +336,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     this.selectedClasses = classNames;
     this.selectedItemProps = {};
     let propKeys: string[];
-    let pathNode = this._g.cy.nodes(".PATHS")[0];
-    let walkNode = this._g.cy.nodes(".WALKS")[0];
+    let pathNode = this._g.cy.nodes(".PATH")[0];
+    let walkNode = this._g.cy.nodes(".WALK")[0];
 
     // get ordered keys if only one item is selected
     if (selectedCount === 1) {

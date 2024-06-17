@@ -104,9 +104,9 @@
     }
   },
   {
-    "selector": "node.WALKS",
+    "selector": "node.WALK",
     "style": {
-      "label": "WALKS",
+      "label": "WALK",
       "color": "black",
       "text-outline-color": "white",
       "text-outline-width": "0px",
@@ -122,9 +122,9 @@
     }
   },
   {
-    "selector": "node.PATHS",
+    "selector": "node.PATH",
     "style": {
-      "label": "PATHS",
+      "label": "PATH",
       "color": "black",
       "text-outline-color": "white",
       "text-outline-width": "0px",

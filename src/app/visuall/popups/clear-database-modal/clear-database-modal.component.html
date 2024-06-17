@@ -1,0 +1,37 @@
+<!-- Modal to ask user action to take when importing a file -->
+<div class="modal-header">
+  <div class="modal-title va-heading1 text-center">Clear the Database</div>
+  <div>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
+  </div>
+</div>
+<div class="modal-body">
+  <div class="va-text">Are you sure you want to clear the database?</div>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-primary va-text"
+    id="clear-db-btn"
+    data-dismiss="modal"
+    (click)="clearDatabase()"
+  >
+    Clear
+  </button>
+  <button
+    type="button"
+    class="btn btn-primary va-text"
+    id="dont-clear-db-btn"
+    data-dismiss="modal"
+    (click)="cancel()"
+  >
+    Dont clear
+  </button>
+</div>

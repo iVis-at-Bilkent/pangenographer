@@ -38,7 +38,8 @@ export interface UserPreferences {
   tilingPadding: BehaviorSubject<number>;
   //  PanGenoGrapher Settings
   pangenographer: {
-    lengthOfUpDownstream: BehaviorSubject<number>;
+    lengthOfUpDownstream: BehaviorSubject<number>; // length of upstream/downstream
+    sizeOfNeo4jQueryBatchesInLines: BehaviorSubject<number>; // size of neo4j query batches in lines
     lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
     isHighlightInZeroOutZero: BehaviorSubject<boolean>;
     isShowUpDownstreamCues: BehaviorSubject<boolean>;

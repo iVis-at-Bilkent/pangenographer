@@ -132,12 +132,12 @@ export class DbAdapterService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    callback: (x: any) => void
   ) {
-    let fn = cb;
+    let fn = callback;
     if (type == DbResponseType.table) {
       fn = (x) => {
-        cb(x);
+        callback(x);
         this._g.add2GraphHistory(`Graph of interest`);
       };
     }
@@ -161,12 +161,12 @@ export class DbAdapterService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    callback: (x: any) => void
   ) {
-    let fn = cb;
+    let fn = callback;
     if (type == DbResponseType.table) {
       fn = (x) => {
-        cb(x);
+        callback(x);
         this._g.add2GraphHistory(`Common target/regulator`);
       };
     }
@@ -189,10 +189,10 @@ export class DbAdapterService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    callback: (x: any) => void
   ) {
     let fn = (x: any) => {
-      cb(x);
+      callback(x);
       this._g.add2GraphHistory(`Common target/regulator`);
     };
     this._db.getNeighborhood(
@@ -206,15 +206,22 @@ export class DbAdapterService {
     );
   }
 
-  getGFAdata2ImportGFA(GFAData: GFAData, cb: () => void) {
-    this._g.add2GraphHistory(`Import GFA`);
-    this._db.importGFA(GFAData, cb);
+  // Adapter function to import GFA data, add to history and call the database service function
+  getGFAData2ImportGFA(GFAData: GFAData, callback: () => void) {
+    this._g.add2GraphHistory("Import GFA");
+    this._db.importGFA(GFAData, callback);
+  }
+
+  // Adapter function to import GFA data and return a promise, add to history and call the database service function
+  getGFAData2ImportGFAPromised(GFAData: GFAData): Promise<any> {
+    this._g.add2GraphHistory("Import GFA");
+    return this._db.importGFAPromised(GFAData);
   }
 
   // Adapter function to clear database
-  clearDatabase(cb: () => void) {
-    this._g.add2GraphHistory(`Clear Database`);
-    this._db.clearDatabase(cb);
+  clearDatabase(callback: () => void) {
+    this._g.add2GraphHistory("Clear Database");
+    this._db.clearDatabase(callback);
   }
 
   // Adapter function to get sample data

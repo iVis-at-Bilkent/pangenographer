@@ -676,11 +676,16 @@ export class CytoscapeService {
     });
   }
 
-  readGFAFile(file: File, cb: (GFAData: GFAData) => void) {
+  // Read GFA file and call the callback function with the GFA data
+  // The callback function is used to load the GFA data to the graph and perform layout afterwards, returns a promise
+  // The GFA data is the parsed data from the GFA file
+  readGFAFile(file: File, callback: (GFAData: GFAData) => Promise<any>) {
     let type = file.name.substring(file.name.lastIndexOf(".") + 1);
+
+    // Check if the file type is suitable
     if (type === "gfa") {
       this._fileReaderService.readGFAFile(file, (GFAData: GFAData) => {
-        cb(GFAData);
+        return callback(GFAData);
       });
     } else {
       this._g.showErrorModal(
@@ -690,10 +695,19 @@ export class CytoscapeService {
     }
   }
 
-  readGFASample(sample: string, cb: (GFAData: GFAData) => void) {
+  readGFASample(sample: string, callback: (GFAData: GFAData) => Promise<any>) {
     this._fileReaderService.readGFASample(sample, (GFAData: GFAData) => {
-      cb(GFAData);
+      callback(GFAData);
     });
+  }
+
+  // Clear database and cytoscape graph
+  // Remove external tools, clear graph history, and remove all elements from cytoscape graph
+  clearDatabase() {
+    this.removeExternalTools();
+    this._g.layout.clusters = null;
+    this._g.cy.remove(this._g.cy.$());
+    this._dbService.clearDatabase(() => {});
   }
 
   private str2file(str: string, fileName: string) {

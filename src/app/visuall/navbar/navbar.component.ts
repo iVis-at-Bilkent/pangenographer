@@ -10,6 +10,7 @@ import { FileReaderService } from "../file-reader.service";
 import { GlobalVariableService } from "../global-variable.service";
 import { URLLoadService } from "../load-from-url.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
+import { ClearDatabaseModalComponent } from "../popups/clear-database-modal/clear-database-modal.component";
 import { LegendModalComponent } from "../popups/legend-modal/legend-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
@@ -272,14 +273,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
     event.stopPropagation();
   }
 
+  // Load file selected by the user from the file input element
+  // If the file is a GFA file, read the GFA file and import the GFA data to the database
+  // If the file is a JSON file, load the JSON file
+  // If the file is a text file, read the text file and set the user profile
   fileSelected() {
     if (this.isLoadFileGFA) {
       this._cyService.readGFAFile(
         this.file.nativeElement.files[0],
         (GFAData: GFAData) => {
-          this._dbService.getGFAdata2ImportGFA(GFAData, () => {
-            this.getSampleData();
-          });
+          return this._dbService.getGFAData2ImportGFAPromised(GFAData); // Import GFA data to the database and return a promise
         }
       );
     } else if (this.isLoadFile4Graph) {
@@ -294,19 +297,26 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Triggered when the user selects a sample from the samples dropdown
   sampleSelected(sample: string) {
-    this.prepareGFALoad();
-    this._cyService.readGFASample(sample, (GFAData: GFAData) => {
-      this._dbService.getGFAdata2ImportGFA(GFAData, () => {
-        this.getSampleData();
-      });
-    });
-  }
+    // If the user selects a sample, open the clear database modal
+    this._modalService
+      // Open the clear database modal to certify that the user wants to clear the database
+      .open(ClearDatabaseModalComponent)
+      .result.then(
+        () => {}, // Execute nothing when the modal is closed
+        (reason) => {
+          // Execute the callback function when the modal is dismissed
 
-  prepareGFALoad() {
-    this.clearDatabase();
-    this.isLoadFile4Graph = true;
-    this.isLoadFileGFA = true;
+          // Prepare the GFA load, set the isLoadFile4Graph and isLoadFileGFA flags to true
+          this.prepareGFALoad();
+
+          // Read the GFA sample name and itself then import the GFA data to the database
+          this._cyService.readGFASample(sample, (GFAData: GFAData) => {
+            return this._dbService.getGFAData2ImportGFAPromised(GFAData); // Import GFA data to the database and return a promise
+          });
+        }
+      );
   }
 
   loadSampleFile1() {
@@ -338,15 +348,34 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   loadFile() {
-    this.clearDatabase();
+    this._cyService.clearDatabase();
     this.isLoadFile4Graph = true;
     this.isLoadFileGFA = false;
     this.openFileInput();
   }
 
+  // Triggered when the user selects the "Import GFA" option from the file dropdown
   loadGFAFile2Db() {
-    this.prepareGFALoad();
-    this.openFileInput();
+    this._modalService
+      // Open the clear database modal to certify that the user wants to clear the database
+      .open(ClearDatabaseModalComponent)
+      .result.then(
+        () => {}, // Execute nothing when the modal is closed
+        (reason) => {
+          // Execute the callback function when the modal is dismissed
+
+          // Prepare the GFA load and set the isLoadFile4Graph and isLoadFileGFA flags to true
+          this.prepareGFALoad();
+
+          // Open the file input to allow the user to select a file
+          this.openFileInput();
+        }
+      );
+  }
+
+  prepareGFALoad() {
+    this.isLoadFile4Graph = true;
+    this.isLoadFileGFA = true;
   }
 
   loadUserProfile() {
@@ -498,10 +527,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Clear database and cytoscape graph
   // Remove external tools, clear graph history, and remove all elements from cytoscape graph
   clearDatabase() {
-    this._cyService.removeExternalTools();
-    this._g.layout.clusters = null;
-    this._g.cy.remove(this._g.cy.$());
-    this._dbService.clearDatabase(() => {});
+    this._modalService.open(ClearDatabaseModalComponent);
   }
 
   private openFileInput() {

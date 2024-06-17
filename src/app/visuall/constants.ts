@@ -28,6 +28,7 @@ export const TABLE_ALL_CHECK_DELAY = 100;
 export const OBJ_INFO_UPDATE_DELAY = 200;
 export const PATH_WALK_NAME_DISALLOWED_REGEX =
   /[.\-+()[\]{} :,\//\\'"\?!;=<>&|%@#^*~`´]/g;
+export const CQL_QUERY_CHANGE_MARKER = "CQL_QUERY_CHANGE_MARKER";
 export const BADGE_ZOOM_THRESHOLD = 0.8;
 export const DEFAULT_NODE_WIDTH = 36;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
@@ -97,7 +98,7 @@ export const NEO4J_2_JS_STR_OPERATORS = {
   "Ends with": "endsWith",
 };
 
-export const TYPES_NOT_TO_SHOW = ["PATHS", "WALKS", "PSEUDO"];
+export const TYPES_NOT_TO_SHOW = ["PATH", "WALK", "PSEUDO"];
 
 /** https://davidwalsh.name/javascript-debounce-function
  * Returns a function, that, as long as it continues to be invoked, will not

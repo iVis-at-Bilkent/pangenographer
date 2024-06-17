@@ -24,6 +24,7 @@ import { QueryTabComponent } from "./operation-tabs/query-tab/query-tab.componen
 import { SettingsTabComponent } from "./operation-tabs/settings-tab/settings-tab.component";
 import { PanelContainerComponent } from "./panel-container/panel-container.component";
 import { AboutModalComponent } from "./popups/about-modal/about-modal.component";
+import { ClearDatabaseModalComponent } from "./popups/clear-database-modal/clear-database-modal.component";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
 import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
 import { QuickHelpModalComponent } from "./popups/quick-help-modal/quick-help-modal.component";
@@ -39,6 +40,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     AppComponent,
     NavbarComponent,
     ToolbarComponent,
+    ClearDatabaseModalComponent,
     OperationTabsComponent,
     CytoscapeComponent,
     SaveAsPngModalComponent,
@@ -79,6 +81,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     QuickHelpModalComponent,
     AboutModalComponent,
     ErrorModalComponent,
+    ClearDatabaseModalComponent,
   ],
 })
 export class AppModule {}

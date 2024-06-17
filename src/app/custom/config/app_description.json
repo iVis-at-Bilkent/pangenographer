@@ -36,10 +36,17 @@
         "height": "18px"
       }
     },
-    "WALKS": {
-      "properties": {},
+    "WALK": {
+      "properties": {
+        "sampleIdentifier": "string",
+        "haplotypeIndex": "number",
+        "sequenceIdentifier": "string",
+        "sequenceStart": "number",
+        "sequenceEnd": "number",
+        "walk": "string"
+      },
       "style": {
-        "label": "WALKS",
+        "label": "WALK",
         "color": "black",
         "text-outline-color": "white",
         "text-outline-width": "0px",
@@ -54,10 +61,14 @@
         "height": "18px"
       }
     },
-    "PATHS": {
-      "properties": {},
+    "PATH": {
+      "properties": {
+        "pathName": "string",
+        "segmentNames": "string",
+        "overlaps": "string"
+      },
       "style": {
-        "label": "PATHS",
+        "label": "PATH",
         "color": "black",
         "text-outline-color": "white",
         "text-outline-width": "0px",
@@ -219,6 +230,7 @@
     "pangenographer": {
       "lengthOfBlastSelectedSegmentsPath": 5,
       "lengthOfUpDownstream": 3,
+      "sizeOfNeo4jQueryBatchesInLines": 10,
       "isHighlightInZeroOutZero": true,
       "isShowUpDownstreamCues": true
     }

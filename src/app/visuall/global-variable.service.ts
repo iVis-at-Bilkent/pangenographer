@@ -382,7 +382,7 @@ export class GlobalVariableService {
   listen4graphEvents() {
     this.cy.on("layoutstop", () => {
       this.setLoadingStatus(false);
-      this.statusMsg.next("");
+      this.statusMsg.next("Layout is done.");
     });
   }
 

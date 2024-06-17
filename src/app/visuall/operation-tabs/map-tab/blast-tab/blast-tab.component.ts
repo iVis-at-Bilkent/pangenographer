@@ -813,7 +813,9 @@ export class BlastTabComponent implements OnInit {
         errFn(x["errors"][0]);
         return;
       }
-      this._g.statusMsg.next("");
+
+      this._g.statusMsg.next("BLAST Query Execution Completed Successfully!");
+
       if (callback) {
         callback(x);
       }

@@ -45,6 +45,23 @@
       </div>
     </div>
 
+    <!-- Adjusts the size of neo4j query batches in lines -->
+    <div>
+      <label class="va-text">Size of Neo4j Query Batches in Lines</label>
+      <div class="form-inline mx-1">
+        <input
+          type="number"
+          max="10"
+          min="1"
+          step="any"
+          (change)="onsizeOfNeo4jQueryBatchesInLinesSelected($event)"
+          [(ngModel)]="sizeOfNeo4jQueryBatchesInLines"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
+          placeholder="Size of Neo4j Query Batches in Lines"
+        />
+      </div>
+    </div>
+
     <!-- Adjusts the length of the length of BLAST selected segments path -->
     <div>
       <label class="va-text">Length of BLAST Selected Segments Path</label>

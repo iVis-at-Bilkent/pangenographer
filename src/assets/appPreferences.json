@@ -52,6 +52,7 @@
     "tilingPadding": 4,
     "pangenographer": {
         "lengthOfUpDownstream": 3,
+        "sizeOfNeo4jQueryBatchesInLines": 10,
         "lengthOfBlastSelectedSegmentsPath": 5
     }
 }

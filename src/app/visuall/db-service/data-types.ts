@@ -67,6 +67,9 @@ export interface DbService {
   // Definition for importing GFA data
   importGFA(GFAData: GFAData, cb: () => void);
 
+  // Definition for importing GFA data with a promise
+  importGFAPromised(GFAData: GFAData): Promise<any>;
+
   // Definition for clearing data from the database
   clearDatabase(cb: () => void);
 
@@ -111,7 +114,11 @@ export interface GFAData {
   jumps: GFAJump[];
   containments: GFAContainment[];
   paths: GFAPath[];
+  pathSegments: GFAPathSegment[];
+  pathEdges: GFAPathEdge[];
   walks: GFAWalk[];
+  walkSegments: GFAWalkSegment[];
+  walkEdges: GFAWalkEdge[];
 }
 
 export interface GFASegment {
@@ -167,13 +174,51 @@ export interface GFAPath {
   overlaps: string;
 }
 
+export interface GFAPathData {
+  path: GFAPath;
+  segments: GFAPathSegment[];
+  edges: GFAPathEdge[];
+}
+
+export interface GFAPathSegment {
+  pathName: string;
+  segmentName: string;
+}
+
+export interface GFAPathEdge {
+  pathName: string;
+  source: string;
+  sourceOrientation: string;
+  target: string;
+  targetOrientation: string;
+}
+
 export interface GFAWalk {
-  sampleId: string;
-  hapIndex: number;
-  seqId: string;
-  seqStart: number;
-  seqEnd: number;
+  sampleIdentifier: string;
+  haplotypeIndex: number;
+  sequenceIdentifier: string;
+  sequenceStart: number;
+  sequenceEnd: number;
   walk: string;
+}
+
+export interface GFAWalkData {
+  walk: GFAWalk;
+  segments: GFAWalkSegment[];
+  edges: GFAWalkEdge[];
+}
+
+export interface GFAWalkSegment {
+  segmentName: string;
+  sampleIdentifier: string;
+}
+
+export interface GFAWalkEdge {
+  sampleIdentifier: string;
+  source: string;
+  sourceOrientation: string;
+  target: string;
+  targetOrientation: string;
 }
 
 export interface TableResponse {
