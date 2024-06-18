@@ -10,10 +10,21 @@
       "SHA256Checksum": "string",
       "URIorLocalSystemPath": "string",
       "pathNames": "string[]",
-      "walkSampleIds": "string[]"
+      "walkSampleIdentifiers": "string[]"
     },
-    "WALK": {},
-    "PATH": {}
+    "WALK": {
+      "sampleIdentifier": "string",
+      "haplotypeIndex": "string",
+      "sequenceIdentifier": "string",
+      "sequenceStart": "string",
+      "sequenceEnd": "string",
+      "walk": "string"
+    },
+    "PATH": {
+      "pathName": "string",
+      "segmentNames": "string",
+      "overlaps": "string"
+    }
   },
   "edges": {
     "LINK": {
@@ -28,7 +39,7 @@
       "kmerCount": "number",
       "edgeIdentifier": "string",
       "pathNames": "string[]",
-      "walkSampleIds": "string[]"
+      "walkSampleIdentifiers": "string[]"
     },
     "JUMP": {
       "sequenceLength": "string",

@@ -1,7 +1,15 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
-import samples from "../../../../sample_gfas/gfa.json";
+import {
+  sample_1,
+  sample_2,
+  sample_3,
+  sample_4,
+  sample_5,
+  sample_6,
+  sample_7,
+} from "../../../../sample_gfas/sample_gfas";
 import { CLUSTER_CLASS } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GFAData } from "../db-service/data-types";
@@ -62,37 +70,37 @@ export class NavbarComponent implements OnInit, OnDestroy {
               {
                 txt: "Sample 1",
                 id: "nbi07-0",
-                fn: "loadSampleFile1",
+                fn: "loadSampleGFAFile1",
               },
               {
                 txt: "Sample 2",
                 id: "nbi07-1",
-                fn: "loadSampleFile2",
+                fn: "loadSampleGFAFile2",
               },
               {
                 txt: "Sample 3",
                 id: "nbi07-2",
-                fn: "loadSampleFile3",
+                fn: "loadSampleGFAFile3",
               },
               {
                 txt: "Sample 4",
                 id: "nbi07-3",
-                fn: "loadSampleFile4",
+                fn: "loadSampleGFAFile4",
               },
               {
                 txt: "Sample 5",
                 id: "nbi07-4",
-                fn: "loadSampleFile5",
+                fn: "loadSampleGFAFile5",
               },
               {
                 txt: "Sample 6",
                 id: "nbi07-5",
-                fn: "loadSampleFile6",
+                fn: "loadSampleGFAFile6",
               },
               {
                 txt: "Sample 7",
                 id: "nbi07-6",
-                fn: "loadSampleFile7",
+                fn: "loadSampleGFAFile7",
               },
             ],
           },
@@ -298,7 +306,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   // Triggered when the user selects a sample from the samples dropdown
-  sampleSelected(sample: string) {
+  sampleGFASelected(sample: string) {
     // If the user selects a sample, open the clear database modal
     this._modalService
       // Open the clear database modal to certify that the user wants to clear the database
@@ -319,39 +327,54 @@ export class NavbarComponent implements OnInit, OnDestroy {
       );
   }
 
-  loadSampleFile1() {
-    this.sampleSelected(samples.sample_1_gfa_1);
+  // Load sample GFA file 1
+  loadSampleGFAFile1() {
+    this.sampleGFASelected(sample_1);
   }
 
-  loadSampleFile2() {
-    this.sampleSelected(samples.sample_2_gfa_1);
+  // Load sample GFA file 2
+  loadSampleGFAFile2() {
+    this.sampleGFASelected(sample_2);
   }
 
-  loadSampleFile3() {
-    this.sampleSelected(samples.sample_3_gfa_1);
+  // Load sample GFA file 3
+  loadSampleGFAFile3() {
+    this.sampleGFASelected(sample_3);
   }
 
-  loadSampleFile4() {
-    this.sampleSelected(samples.sample_4_gfa_1);
+  // Load sample GFA file 4
+  loadSampleGFAFile4() {
+    this.sampleGFASelected(sample_4);
   }
 
-  loadSampleFile5() {
-    this.sampleSelected(samples.sample_5_gfa_1);
+  // Load sample GFA file 5
+  loadSampleGFAFile5() {
+    this.sampleGFASelected(sample_5);
   }
 
-  loadSampleFile6() {
-    this.sampleSelected(samples.sample_6_gfa_1);
+  // Load sample GFA file 6
+  loadSampleGFAFile6() {
+    this.sampleGFASelected(sample_6);
   }
 
-  loadSampleFile7() {
-    this.sampleSelected(samples.sample_7_gfa_1);
+  // Load sample GFA file 7
+  loadSampleGFAFile7() {
+    this.sampleGFASelected(sample_7);
   }
 
+  // Load file selected by the user from the file input element
   loadFile() {
-    this._cyService.clearDatabase();
-    this.isLoadFile4Graph = true;
-    this.isLoadFileGFA = false;
-    this.openFileInput();
+    // Open the clear database modal to certify that the user wants to clear the database
+    this._modalService.open(ClearDatabaseModalComponent).result.then(
+      () => {}, // Execute nothing when the modal is closed
+      (reason) => {
+        // Execute the callback function when the modal is dismissed
+
+        this.isLoadFile4Graph = true; // Set the isLoadFile4Graph flag to true
+        this.isLoadFileGFA = false; // Set the isLoadFileGFA flag to false
+        this.openFileInput(); // Open the file input to allow the user to select a file
+      }
+    );
   }
 
   // Triggered when the user selects the "Import GFA" option from the file dropdown

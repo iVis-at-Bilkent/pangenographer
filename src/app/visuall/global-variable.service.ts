@@ -860,12 +860,12 @@ export class GlobalVariableService {
 
     function arrowShape(orientation: string, isTarget: boolean) {
       if (isTarget) {
-        if (orientation === "+") {
+        if (orientation === "forward") {
           return "triangle";
         }
         return "triangle-tee";
       } else {
-        if (orientation === "+") {
+        if (orientation === "forward") {
           return "none";
         }
         return "tee";

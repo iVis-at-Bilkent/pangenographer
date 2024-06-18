@@ -71,13 +71,13 @@ export class SequenceDataService {
     // Dislpay the distance of the jump as "..(distance).."
     let secondSequence = "..(" + element.data("distance") + ")..";
 
-    // If the source orientation is "-", reverse complement the first sequence
-    if (element.data("sourceOrientation") === "-") {
+    // If the source orientation is "reverse", reverse complement the first sequence
+    if (element.data("sourceOrientation") === "reverse") {
       firstSequence = this.reverseComplementSegmentData(firstSequence);
     }
 
-    // If the target orientation is "-", reverse complement the third sequence
-    if (element.data("targetOrientation") === "-") {
+    // If the target orientation is "reverse", reverse complement the third sequence
+    if (element.data("targetOrientation") === "reverse") {
       thirdSequence = this.reverseComplementSegmentData(thirdSequence);
     }
 
@@ -113,8 +113,8 @@ export class SequenceDataService {
     // container is the sequence that contains the target sequence
     let container = element.source().data("segmentData"); // The sequence that contains the target sequence (source sequence)
 
-    // If the source orientation is "-", reverse complement the container
-    if (element.data("sourceOrientation") === "-") {
+    // If the source orientation is "reverse", reverse complement the container
+    if (element.data("sourceOrientation") === "reverse") {
       container = this.reverseComplementSegmentData(container);
     }
 
@@ -123,8 +123,8 @@ export class SequenceDataService {
 
     let secondSequence = element.target().data("segmentData"); // The target sequence
 
-    // If the target orientation is "-", reverse complement the target sequence
-    if (element.data("targetOrientation") === "-") {
+    // If the target orientation is "reverse", reverse complement the target sequence
+    if (element.data("targetOrientation") === "reverse") {
       secondSequence = this.reverseComplementSegmentData(secondSequence);
     }
 
@@ -166,15 +166,15 @@ export class SequenceDataService {
       firstSequence = element.source().data("segmentData");
     }
 
-    // If the source orientation is "-", reverse complement the first sequence
-    if (element.data("sourceOrientation") === "-") {
+    // If the source orientation is "reverse", reverse complement the first sequence
+    if (element.data("sourceOrientation") === "reverse") {
       firstSequence = this.reverseComplementSegmentData(firstSequence);
     }
 
     let thirdSequence = element.target().data("segmentData"); // The sequence after the overlap
 
-    // If the target orientation is "-", reverse complement the third sequence
-    if (element.data("targetOrientation") === "-") {
+    // If the target orientation is "reverse", reverse complement the third sequence
+    if (element.data("targetOrientation") === "reverse") {
       thirdSequence = this.reverseComplementSegmentData(thirdSequence);
     }
 

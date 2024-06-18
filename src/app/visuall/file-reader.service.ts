@@ -76,6 +76,16 @@ export class FileReaderService {
     return segment;
   }
 
+  // Convert the orientation from GFA format to the format used in the graph
+  // + or > indicates forward orientation, - or < indicates reverse orientation
+  private convertOrientation(orientation: string): string {
+    if (orientation === "+" || orientation === ">") {
+      return "forward";
+    } else {
+      return "reverse";
+    }
+  }
+
   private createJumpFromGFA(jumpLine: string): GFAJump {
     let jumpLineTabSeperated = jumpLine.split(/\t/).map((part) => part.trim());
     let jump: GFAJump = {
@@ -86,9 +96,9 @@ export class FileReaderService {
       distance: "",
     };
     jump.source = jumpLineTabSeperated[1];
-    jump.sourceOrientation = jumpLineTabSeperated[2];
+    jump.sourceOrientation = this.convertOrientation(jumpLineTabSeperated[2]);
     jump.target = jumpLineTabSeperated[3];
-    jump.targetOrientation = jumpLineTabSeperated[4];
+    jump.targetOrientation = this.convertOrientation(jumpLineTabSeperated[4]);
     for (let i = 4; i < jumpLineTabSeperated.length; i++) {
       let optField = (jumpLineTabSeperated[i] as string).trim();
       if (optField.startsWith("SC")) {
@@ -113,9 +123,13 @@ export class FileReaderService {
       overlap: "",
     };
     containment.source = containmentLineTabSeperated[1];
-    containment.sourceOrientation = containmentLineTabSeperated[2];
+    containment.sourceOrientation = this.convertOrientation(
+      containmentLineTabSeperated[2]
+    );
     containment.target = containmentLineTabSeperated[3];
-    containment.targetOrientation = containmentLineTabSeperated[4];
+    containment.targetOrientation = this.convertOrientation(
+      containmentLineTabSeperated[4]
+    );
     containment.pos = Number(containmentLineTabSeperated[5]);
     containment.overlap = containmentLineTabSeperated[6];
     for (let i = 4; i < containmentLineTabSeperated.length; i++) {
@@ -143,9 +157,9 @@ export class FileReaderService {
     };
 
     link.source = linkLineTabSeperated[1];
-    link.sourceOrientation = linkLineTabSeperated[2];
+    link.sourceOrientation = this.convertOrientation(linkLineTabSeperated[2]);
     link.target = linkLineTabSeperated[3];
-    link.targetOrientation = linkLineTabSeperated[4];
+    link.targetOrientation = this.convertOrientation(linkLineTabSeperated[4]);
 
     for (let i = 4; i < linkLineTabSeperated.length; i++) {
       let optField = (linkLineTabSeperated[i] as string).trim();
@@ -177,25 +191,34 @@ export class FileReaderService {
     // Create a new walk object and set its properties
     let walk: GFAWalk = {
       sampleIdentifier: "",
-      haplotypeIndex: 0,
+      haplotypeIndex: "",
       sequenceIdentifier: "",
-      sequenceStart: 0,
-      sequenceEnd: 0,
+      sequenceStart: "",
+      sequenceEnd: "",
       walk: "",
     };
 
     // Set the properties of the walk object from the tab-separated parts of the walk line
     walk.sampleIdentifier = walkLineTabSeperated[1];
-    walk.haplotypeIndex = Number(walkLineTabSeperated[2]);
+    walk.haplotypeIndex = walkLineTabSeperated[2];
     walk.sequenceIdentifier = walkLineTabSeperated[3];
-    walk.sequenceStart = Number(walkLineTabSeperated[4]);
-    walk.sequenceEnd = Number(walkLineTabSeperated[5]);
+    walk.sequenceStart = walkLineTabSeperated[4];
+    walk.sequenceEnd = walkLineTabSeperated[5];
     walk.walk = walkLineTabSeperated[6];
 
     // Extract the segment names from the walk string and split them into an array
     // to be added to particular segments in the graph
     // > indicates the forward orientation and < indicates the reverse orientation
-    let segmentNamesArray: string[] = walk.walk.split(/[<>]/);
+    let segmentNamesArray: string[] = walk.walk
+      .split(/[<>]/)
+      .filter((s) => "" !== s); // Filter out empty strings
+
+    // Extract the segment orientations from the walk string and split them into an array
+    let segmentOrientationsArray: string[] = walk.walk
+      .split(/[^<>]/)
+      .filter((s) => "" !== s) // Filter out empty strings
+      .map((s) => this.convertOrientation(s)); // Map > to forward and < to reverse
+
     // Transform the extracted data to string objects that can be understood by cypher transformer helper function
     let segments: GFAWalkSegment[] = segmentNamesArray.map((segmentName) => {
       return {
@@ -204,28 +227,15 @@ export class FileReaderService {
       };
     });
 
-    // Extract the edges from the walk string and split them into an array
+    // Create the edges from the extracted segment names and orientations
     let edges: GFAWalkEdge[] = [];
     for (let i = 0; i < segmentNamesArray.length - 1; i++) {
-      // Extract the source and target names and orientations from the segment names array
-      let sourceNameWithOrientation = segmentNamesArray[i];
-      let targetNameWithOrientation = segmentNamesArray[i + 1];
-
-      // Extract the source and target names without orientations by removing the '>' or '<' characters
-      let sourceName = sourceNameWithOrientation.replace(/[<>]/, "");
-      let targetName = targetNameWithOrientation.replace(/[<>]/, "");
-
-      // Extract the source and target orientations, which are the first characters of the names
-      let sourceOrientation = sourceNameWithOrientation[0];
-      let targetOrientation = targetNameWithOrientation[0];
-
-      // Add the edge to the edges array
       edges.push({
         sampleIdentifier: walk.sampleIdentifier,
-        source: sourceName,
-        sourceOrientation: sourceOrientation,
-        target: targetName,
-        targetOrientation: targetOrientation,
+        source: segmentNamesArray[i],
+        sourceOrientation: segmentOrientationsArray[i],
+        target: segmentNamesArray[i + 1],
+        targetOrientation: segmentOrientationsArray[i + 1],
       });
     }
 
@@ -251,8 +261,15 @@ export class FileReaderService {
     // Extract the segment names from the path string and split them into an array
     // to be added to particular segments in the graph
     let segmentNamesArray: string[] = path.segmentNames
-      .replace(/[+-]/, "")
-      .split(",");
+      .split(/[+,;\-]/)
+      .filter((s) => "" !== s); // Filter out empty strings
+
+    // Extract the segment orientations from the path string and split them into an array
+    let segmentOrientationsArray: string[] = path.segmentNames
+      .split(/[^+\-]/)
+      .filter((s) => "" !== s) // Filter out empty strings
+      .map((s) => this.convertOrientation(s)); // Map + to forward and - to reverse
+
     // Transform the extracted data to string objects that can be understood by cypher transformer helper function
     let segments: GFAPathSegment[] = segmentNamesArray.map((segmentName) => {
       return {
@@ -261,9 +278,6 @@ export class FileReaderService {
       };
     });
 
-    // Extract the edges from the path string and split them into an array
-    let commaSeperatedNamesWithOrientations: string[] =
-      path.segmentNames.split(",");
     let edges: GFAPathEdge[] = [];
 
     // TODO HANDLE THE CASE WHERE THERE IS A SEMICOLON IN THE SEGMENT NAMES, JUMPS
@@ -276,29 +290,15 @@ export class FileReaderService {
       return { path, segments, edges };
     }
 
-    for (let i = 0; i < commaSeperatedNamesWithOrientations.length - 1; i++) {
-      // Extract the source and target names and orientations from the comma-separated string
-      let sourceNameWithOrientation = commaSeperatedNamesWithOrientations[i];
-      let targetNameWithOrientation =
-        commaSeperatedNamesWithOrientations[i + 1];
-
-      // Extract the source and target names without orientations by removing the '+' or '-' characters
-      let sourceName = sourceNameWithOrientation.replace(/[+-]/, "");
-      let targetName = targetNameWithOrientation.replace(/[+-]/, "");
-
-      // Extract the source and target orientations, which are the last characters of the names
-      let sourceOrientation =
-        sourceNameWithOrientation[sourceNameWithOrientation.length - 1];
-      let targetOrientation =
-        targetNameWithOrientation[targetNameWithOrientation.length - 1];
-
+    // Create the edges from the extracted segment names and orientations
+    for (let i = 0; i < segmentNamesArray.length - 1; i++) {
       // Add the edge to the edges array
       edges.push({
         pathName: path.pathName,
-        source: sourceName,
-        sourceOrientation: sourceOrientation,
-        target: targetName,
-        targetOrientation: targetOrientation,
+        source: segmentNamesArray[i],
+        sourceOrientation: segmentOrientationsArray[i],
+        target: segmentNamesArray[i + 1],
+        targetOrientation: segmentOrientationsArray[i + 1],
       });
     }
 
@@ -644,7 +644,7 @@ export class FileReaderService {
 
   parseGFA(content: string[]): GFAData {
     const lines = content;
-    let GFAdata: GFAData = {
+    let GFAData: GFAData = {
       segments: [],
       links: [],
       jumps: [],
@@ -663,23 +663,23 @@ export class FileReaderService {
       if (!line) {
         console.log("Line " + lineCount + " is empty");
       } else if (line[0] === "S") {
-        GFAdata.segments.push(this.createSegmentFromGFA(line));
+        GFAData.segments.push(this.createSegmentFromGFA(line));
       } else if (line[0] === "L") {
-        GFAdata.links.push(this.createLinkFromGFA(line));
+        GFAData.links.push(this.createLinkFromGFA(line));
       } else if (line[0] === "J") {
-        GFAdata.jumps.push(this.createJumpFromGFA(line));
+        GFAData.jumps.push(this.createJumpFromGFA(line));
       } else if (line[0] === "C") {
-        GFAdata.containments.push(this.createContainmentFromGFA(line));
+        GFAData.containments.push(this.createContainmentFromGFA(line));
       } else if (line[0] === "P") {
         let pathData: GFAPathData = this.createPathFromGFA(line);
-        GFAdata.paths.push(pathData.path);
-        GFAdata.pathSegments.concat(pathData.segments);
-        GFAdata.pathEdges.concat(pathData.edges);
+        GFAData.paths.push(pathData.path);
+        GFAData.pathSegments = GFAData.pathSegments.concat(pathData.segments);
+        GFAData.pathEdges = GFAData.pathEdges.concat(pathData.edges);
       } else if (line[0] === "W") {
         let walkData: GFAWalkData = this.createWalkFromGFA(line);
-        GFAdata.walks.push(walkData.walk);
-        GFAdata.walkSegments.concat(walkData.segments);
-        GFAdata.walkEdges.concat(walkData.edges);
+        GFAData.walks.push(walkData.walk);
+        GFAData.walkSegments = GFAData.walkSegments.concat(walkData.segments);
+        GFAData.walkEdges = GFAData.walkEdges.concat(walkData.edges);
       } else if (line[0] === "H") {
         // version of GFA file
       } else if (line[0] === "#") {
@@ -691,6 +691,6 @@ export class FileReaderService {
       }
     });
 
-    return GFAdata;
+    return GFAData;
   }
 }

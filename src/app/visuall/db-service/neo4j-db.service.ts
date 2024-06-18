@@ -1058,12 +1058,12 @@ export class Neo4jDb implements DbService {
 
       // Create the walk node
       element2Create = `(w${walk.sampleIdentifier} :WALK {sampleIdentifier: '${walk.sampleIdentifier}', walk: '${walk.walk}'`;
-      element2Create += `, haplotypeIndex: ${walk.haplotypeIndex}, sequenceIdentifier: '${walk.sequenceIdentifier}'`;
+      element2Create += `, haplotypeIndex: '${walk.haplotypeIndex}', sequenceIdentifier: '${walk.sequenceIdentifier}'`;
       if (walk.hasOwnProperty("sequenceStart")) {
-        element2Create += `, sequenceStart: ${walk.sequenceStart}`;
+        element2Create += `, sequenceStart: '${walk.sequenceStart}'`;
       }
       if (walk.hasOwnProperty("sequenceEnd")) {
-        element2Create += `, sequenceEnd: ${walk.sequenceEnd}`;
+        element2Create += `, sequenceEnd: '${walk.sequenceEnd}'`;
       }
       element2Create += "}),\n";
 

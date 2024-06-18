@@ -381,7 +381,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
               counter++;
             });
           });
-        } else if (renderedKey === "walkSampleIds") {
+        } else if (renderedKey === "walkSampleIdentifiers") {
           this.selectedItemProps[`${renderedKey}`] = {
             value: renderedValue,
           };
@@ -627,8 +627,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     return [commonProps, commonClassNames];
   }
 
+  // This function is used to highlight the path or walk when hovered over the path name
   hightlightHoveredPath(pathName: string) {
-    this.highlightedPathWalk = pathName;
+    this.highlightedPathWalk = pathName; // Set the highlighted path name
+
+    // Highlight the elements contained in the path
     this._g.cy.elements().forEach((element: any) => {
       if (element.data("pathNames")) {
         element.data("pathNames").forEach((pathValue: any) => {
@@ -640,11 +643,14 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     });
   }
 
+  // This function is used to remove the highlight when the mouse is not hovered over the walk sample identier
   hightlightHoveredWalk(walkName: string) {
-    this.highlightedPathWalk = walkName;
+    this.highlightedPathWalk = walkName; // Set the highlighted walk sample identifier
+
+    // Highlight the elements contained in the walk
     this._g.cy.elements().forEach((element: any) => {
-      if (element.data("walkSampleIds")) {
-        element.data("walkSampleIds").forEach((walkValue: any) => {
+      if (element.data("walkSampleIdentifiers")) {
+        element.data("walkSampleIdentifiers").forEach((walkValue: any) => {
           if (walkValue.includes(walkName)) {
             this._g.highlightElements(element);
           }

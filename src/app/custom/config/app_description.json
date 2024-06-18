@@ -18,7 +18,7 @@
         "SHA256Checksum": "string",
         "URIorLocalSystemPath": "string",
         "pathNames": "string[]",
-        "walkSampleIds": "string[]"
+        "walkSampleIdentifiers": "string[]"
       },
       "style": {
         "label": "Segment",
@@ -39,10 +39,10 @@
     "WALK": {
       "properties": {
         "sampleIdentifier": "string",
-        "haplotypeIndex": "number",
+        "haplotypeIndex": "string",
         "sequenceIdentifier": "string",
-        "sequenceStart": "number",
-        "sequenceEnd": "number",
+        "sequenceStart": "string",
+        "sequenceEnd": "string",
         "walk": "string"
       },
       "style": {
@@ -101,7 +101,7 @@
         "kmerCount": "number",
         "edgeIdentifier": "string",
         "pathNames": "string[]",
-        "walkSampleIds": "string[]"
+        "walkSampleIdentifiers": "string[]"
       },
       "style": {
         "label": "Link",

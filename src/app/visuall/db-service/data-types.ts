@@ -195,10 +195,10 @@ export interface GFAPathEdge {
 
 export interface GFAWalk {
   sampleIdentifier: string;
-  haplotypeIndex: number;
+  haplotypeIndex: string;
   sequenceIdentifier: string;
-  sequenceStart: number;
-  sequenceEnd: number;
+  sequenceStart: string;
+  sequenceEnd: string;
   walk: string;
 }
 
