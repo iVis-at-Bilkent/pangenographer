@@ -328,147 +328,222 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     );
   }
 
+  // This function is used to render the properties of the selected object in the object tab
   renderObjectProps(props: any, classNames: any, selectedCount: number) {
     if (classNames && classNames.length > 0) {
       classNames = classNames.join(" & ");
     }
 
+    // Set the selected classes
     this.selectedClasses = classNames;
+    // Reset the selected item properties
     this.selectedItemProps = {};
-    let propKeys: string[];
-    let pathNode = this._g.cy.nodes(".PATH")[0];
-    let walkNode = this._g.cy.nodes(".WALK")[0];
 
-    // get ordered keys if only one item is selected
+    // Prepare the properties to be rendered in the object tab
+    // Get ordered keys if only one item is selected
+    let properityKeys: string[];
     if (selectedCount === 1) {
-      propKeys = this.orderPropertyKeysIf1Selected(classNames) || propKeys;
+      properityKeys =
+        this.orderPropertyKeysIf1Selected(classNames) || properityKeys;
     } else {
-      propKeys = Object.keys(props);
+      properityKeys = Object.keys(props);
     }
 
-    for (const key of propKeys) {
+    // Iterate through the properties and prepare the object to be rendered in the object tab
+    for (const key of properityKeys) {
       // Replace - and _ with space
       let renderedKey = key.replace(/[_\-]/g, " ");
       let renderedValue = props[key];
 
-      if (renderedValue !== undefined) {
-        renderedValue = this.getMappedProperty(
-          this.selectedClasses,
-          key,
-          renderedValue
+      // If the value is undefined, skip it
+      if (renderedValue === undefined) {
+        continue;
+      }
+
+      renderedValue = this.getMappedProperty(
+        this.selectedClasses,
+        key,
+        renderedValue
+      );
+
+      this.selectedItemProps[`${renderedKey}`] = {
+        value: renderedValue,
+      };
+    }
+
+    // If the object is contained in a path, then process the value further
+    if (this.selectedItemProps["pathNames"]) {
+      this.preparePathData();
+    }
+
+    // If the object contained in a walk, then process the value further
+    if (this.selectedItemProps["walkSampleIdentifiers"]) {
+      this.prepareWalkData();
+    }
+
+    // If the object contains overlap, then process the value further
+    if (
+      this.selectedItemProps["overlap"] &&
+      this.selectedItemProps["overlap"].value !== "*"
+    ) {
+      this.selectedItemProps["overlap"] = {
+        value: this.selectedItemProps["overlap"],
+        overlapIdentifiers: this.selectedItemProps["overlap"]
+          .split(/[0-9]+/)
+          .slice(1),
+        currentIndex: 0,
+      };
+    }
+
+    // Prepare the combined sequence if an edge is selected
+    // Only the edges have associated sourceOrientation
+    if (this.selectedItemProps["sourceOrientation"]) {
+      this.prepareCombinedSequenceData();
+    }
+  }
+
+  // This function is used to prepare the walk data for the selected object in the object tab
+  private prepareWalkData() {
+    // Create the walkChecked array to keep track of the selected walks
+    // Initialize the walkChecked array with false values for each walk
+    this.selectedItemProps["walkChecked"] = [];
+    for (
+      let i = 0;
+      i < this.selectedItemProps["walkSampleIdentifiers"].length;
+      i++
+    ) {
+      this.selectedItemProps["walkChecked"].push(false);
+    }
+
+    // Extract the walk segment names from the walkSampleIdentifiers
+    this.selectedItemProps["walkHaplotypeIndexes"] = [];
+    this.selectedItemProps["walkSequenceIdentifiers"] = [];
+    this.selectedItemProps["walkSequenceStarts"] = [];
+    this.selectedItemProps["walkSequenceEnds"] = [];
+    this.selectedItemProps["walks"] = [];
+
+    // Iterate through the walk sample identifiers and extract the walk segment names
+    this.selectedItemProps["walkSampleIdentifiers"].value.forEach(
+      (walkSampleIdentifier: string) => {
+        // Find the walk node in the graph based on the walk sample identifier
+        let walk = this._g.cy.nodes(
+          `[sampleIdentifier = "${walkSampleIdentifier}"]`
         );
 
-        if (renderedKey === "pathNames") {
-          this.selectedItemProps[`${renderedKey}`] = {
-            value: renderedValue,
-          };
-          this.selectedItemProps["pathChecked"] = [];
-          this.selectedItemProps["pathSegmentNames"] = [];
-          this.selectedItemProps["pathOverlaps"] = [];
-
-          for (let i = 0; i < renderedValue.length; i++) {
-            this.selectedItemProps["pathChecked"].push(false);
-          }
-
-          renderedValue.forEach((pathName: string) => {
-            let counter = 0;
-            pathNode.data(`p${pathName}`).forEach((pathValue: string) => {
-              if (counter === 0) {
-                this.selectedItemProps["pathSegmentNames"].push(pathValue);
-              } else {
-                this.selectedItemProps["pathOverlaps"].push(pathValue);
-              }
-              counter++;
-            });
-          });
-        } else if (renderedKey === "walkSampleIdentifiers") {
-          this.selectedItemProps[`${renderedKey}`] = {
-            value: renderedValue,
-          };
-          this.selectedItemProps[`walkChecked`] = [];
-          this.selectedItemProps["walkHapIndexes"] = [];
-          this.selectedItemProps["walkSeqIds"] = [];
-          this.selectedItemProps["walkSeqStarts"] = [];
-          this.selectedItemProps["walkSeqEnds"] = [];
-          this.selectedItemProps["walks"] = [];
-
-          for (let i = 0; i < renderedValue.length; i++) {
-            this.selectedItemProps[`walkChecked`].push(false);
-          }
-
-          renderedValue.forEach((walkName: string) => {
-            let counter = 0;
-            walkNode.data(`w${walkName}`).forEach((walkValue: string) => {
-              if (counter === 0) {
-                this.selectedItemProps["walkHapIndexes"].push(walkValue);
-              } else if (counter === 1) {
-                this.selectedItemProps["walkSeqIds"].push(walkValue);
-              } else if (counter === 2) {
-                this.selectedItemProps["walkSeqStarts"].push(walkValue);
-              } else if (counter === 3) {
-                this.selectedItemProps["walkSeqEnds"].push(walkValue);
-              } else {
-                this.selectedItemProps["walks"].push(walkValue);
-              }
-              counter++;
-            });
-          });
-        } else if (renderedKey === "overlap") {
-          this.selectedItemProps[`${renderedKey}`] = {
-            value: renderedValue,
-            overlapIdentifiers: renderedValue.split(/[0-9]+/).slice(1),
-            currentIndex: 0,
-          };
-        } else {
-          this.selectedItemProps[`${renderedKey}`] = {
-            value: renderedValue,
-          };
+        // If the node is not found, then push undefined values to the walkSegmentNames
+        if (walk.empty()) {
+          this.selectedItemProps["walkHaplotypeIndexes"].push(undefined);
+          this.selectedItemProps["walkSequenceIdentifiers"].push(undefined);
+          this.selectedItemProps["walkSequenceStarts"].push(undefined);
+          this.selectedItemProps["walkSequenceEnds"].push(undefined);
+          this.selectedItemProps["walks"].push(undefined);
+          return;
         }
+
+        // If the walk node is found, then extract the walk segment names
+        this.selectedItemProps["walkHaplotypeIndexes"].push(
+          walk.data("haplotypeIndex")
+        );
+        this.selectedItemProps["walkSequenceIdentifiers"].push(
+          walk.data("sequenceIdentifier")
+        );
+        this.selectedItemProps["walkSequenceStarts"].push(
+          walk.data("sequenceStart")
+        );
+        this.selectedItemProps["walkSequenceEnds"].push(
+          walk.data("sequenceEnd")
+        );
+        this.selectedItemProps["walks"].push(walk.data("walk"));
       }
+    );
+  }
+
+  // This function is used to prepare the path data for the selected object in the object tab
+  private preparePathData() {
+    // Create the pathChecked array to keep track of the selected paths
+    // Initialize the pathChecked array with false values for each path
+    this.selectedItemProps["pathChecked"] = [];
+    for (let i = 0; i < this.selectedItemProps["pathNames"].length; i++) {
+      this.selectedItemProps["pathChecked"].push(false);
     }
 
-    // for combined sequence if an edge is selected
-    if (this.selectedItemProps["sourceOrientation"]) {
-      this._g.cy.edges(":selected").forEach((element: any) => {
-        let combinedSequence =
-          this._sequenceDataService.prepareCombinedSequence(element);
+    // Extract the path segment names and path overlaps from the pathNames
+    this.selectedItemProps["pathSegmentNames"] = [];
+    this.selectedItemProps["pathOverlaps"] = [];
 
-        if (element.data("pos")) {
-          this.selectedItemProps["leftOfTheContainedSequence"] = {
-            value: combinedSequence.firstSequence,
-          };
-          this.selectedItemProps["containedSequence"] = {
-            value: combinedSequence.secondSequence,
-          };
-          this.selectedItemProps["rightOfTheContainedSequence"] = {
-            value: combinedSequence.thirdSequence,
-          };
-        } else if (element.data("distance")) {
-          this.selectedItemProps["sourceSequence"] = {
-            value: combinedSequence.firstSequence,
-          };
-          this.selectedItemProps["targetSequence"] = {
-            value: combinedSequence.thirdSequence,
-          };
-        } else {
-          this.selectedItemProps["sourceSequenceWithoutOverlap"] = {
-            value: combinedSequence.firstSequence,
-          };
-          this.selectedItemProps["overlapSequence"] = {
-            value: combinedSequence.secondSequence,
-          };
-          this.selectedItemProps["targetSequenceWithoutOverlap"] = {
-            value: combinedSequence.thirdSequence,
-          };
-          this.selectedItemProps["overlap"]["overlapNumerics"] =
-            combinedSequence.overlapNumerics;
-        }
+    // Iterate through the path names and extract the path segment names and path overlaps
+    this.selectedItemProps["pathNames"].value.forEach((pathName: string) => {
+      // Find the path node in the graph based on the path name
+      let path = this._g.cy.nodes(`[pathName = "${pathName}"]`);
 
-        this.selectedItemProps["sequenceLength"] = {
-          value: combinedSequence.sequenceLength,
+      // If the node is not found, then push undefined values to the pathSegmentNames and pathOverlaps
+      if (path.empty()) {
+        this.selectedItemProps["pathSegmentNames"].push(undefined);
+        this.selectedItemProps["pathOverlaps"].push(undefined);
+        return;
+      }
+
+      // If the path node is found, then extract the path segment names and path overlaps
+      this.selectedItemProps["pathSegmentNames"].push(
+        path.data("segmentNames")
+      );
+      this.selectedItemProps["pathOverlaps"].push(path.data("overlaps"));
+    });
+  }
+
+  // This function is used to prepare the combined sequence data for the selected edge in the object tab
+  private prepareCombinedSequenceData() {
+    this._g.cy.edges(":selected").forEach((element: any) => {
+      // First, prepare the combined sequence
+      let combinedSequence =
+        this._sequenceDataService.prepareCombinedSequence(element);
+
+      // Every edge type has sequence length attribute, so add it to the selected item props
+      this.selectedItemProps["sequenceLength"] = {
+        value: combinedSequence.sequenceLength,
+      };
+
+      // Prepare combined sequence for containment edge type
+      // Containment edge type has pos attribute
+      if (element.data("pos")) {
+        this.selectedItemProps["leftOfTheContainedSequence"] = {
+          value: combinedSequence.firstSequence,
         };
-      });
-    }
+        this.selectedItemProps["containedSequence"] = {
+          value: combinedSequence.secondSequence,
+        };
+        this.selectedItemProps["rightOfTheContainedSequence"] = {
+          value: combinedSequence.thirdSequence,
+        };
+      }
+
+      // Prepare combined sequence for jump edge type
+      // Jump edge type has distance attribute
+      else if (element.data("distance")) {
+        this.selectedItemProps["sourceSequence"] = {
+          value: combinedSequence.firstSequence,
+        };
+        this.selectedItemProps["targetSequence"] = {
+          value: combinedSequence.thirdSequence,
+        };
+      }
+
+      // Prepare combined sequence for link edge type
+      // Link edge type has overlap attribute
+      else {
+        this.selectedItemProps["sourceSequenceWithoutOverlap"] = {
+          value: combinedSequence.firstSequence,
+        };
+        this.selectedItemProps["overlapSequence"] = {
+          value: combinedSequence.secondSequence,
+        };
+        this.selectedItemProps["targetSequenceWithoutOverlap"] = {
+          value: combinedSequence.thirdSequence,
+        };
+        this.selectedItemProps["overlap"]["overlapNumerics"] =
+          combinedSequence.overlapNumerics;
+      }
+    });
   }
 
   prepareCIGARForIndex(index: number): string {

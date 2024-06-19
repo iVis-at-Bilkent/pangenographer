@@ -239,7 +239,8 @@
 
       <div
         *ngIf="
-          selectedItemProps.pathNames && selectedItemProps.pathNames.length
+          selectedItemProps.pathNames.value &&
+          selectedItemProps.pathNames.value.length
         "
         class="panel"
       >
@@ -336,8 +337,8 @@
 
       <div
         *ngIf="
-          selectedItemProps.walkSampleIdentifiers &&
-          selectedItemProps.walkSampleIdentifiers.length
+          selectedItemProps.walkSampleIdentifiers.value &&
+          selectedItemProps.walkSampleIdentifiers.value.length
         "
         class="panel"
       >
@@ -405,25 +406,25 @@
                   <div>
                     <span
                       ><b>Haplotype Index: </b>
-                      {{ selectedItemProps.walkHapIndexes[i] }}
+                      {{ selectedItemProps.walkHaplotypeIndexes[i] }}
                     </span>
                   </div>
                   <div>
                     <span
                       ><b>Sequence Identifier: </b>
-                      {{ selectedItemProps.walkSeqIds[i] }}
+                      {{ selectedItemProps.walkSequenceIdentifiers[i] }}
                     </span>
                   </div>
                   <div>
                     <span
                       ><b>Start Position: </b>
-                      {{ selectedItemProps.walkSeqStarts[i] }}
+                      {{ selectedItemProps.walkSequenceStarts[i] }}
                     </span>
                   </div>
                   <div>
                     <span
                       ><b>End Position: </b>
-                      {{ selectedItemProps.walkSeqEnds[i] }}
+                      {{ selectedItemProps.walkSequenceEnds[i] }}
                     </span>
                   </div>
                   <div>
