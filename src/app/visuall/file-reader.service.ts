@@ -326,7 +326,7 @@ export class FileReaderService {
 
     // Process each batch of lines read from the GFA file
     const processBatch = async ({ done, value }) => {
-      if (done) {
+      if (done && this.previousBatchLastLine === "") {
         console.log("GFA file read successfully");
         return;
       }
@@ -340,6 +340,12 @@ export class FileReaderService {
 
       // Save the last line of the current batch to be added to the next batch
       this.previousBatchLastLine = lines.pop() || "";
+
+      // Check if the last line of the current batch is empty
+      if (lines.length === 0) {
+        lines.push(this.previousBatchLastLine);
+        this.previousBatchLastLine = "";
+      }
 
       // Increment the number of lines read from the GFA file
       this.readLineCount += lines.length;

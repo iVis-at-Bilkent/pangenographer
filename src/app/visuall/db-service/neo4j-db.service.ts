@@ -1026,12 +1026,12 @@ export class Neo4jDb implements DbService {
 
     // Initialize the query if there is edge or node to be created
     if (
-      GFAData.paths ||
-      GFAData.walks ||
-      GFAData.segments ||
-      GFAData.links ||
-      GFAData.jumps ||
-      GFAData.containments
+      GFAData.paths.length ||
+      GFAData.walks.length ||
+      GFAData.segments.length ||
+      GFAData.links.length ||
+      GFAData.jumps.length ||
+      GFAData.containments.length
     ) {
       query += "CREATE\n";
     }
@@ -1363,12 +1363,12 @@ export class Neo4jDb implements DbService {
 
     // Trim the last comma and newline if there are elements to create
     if (
-      GFAData.paths ||
-      GFAData.walks ||
-      GFAData.segments ||
-      GFAData.links ||
-      GFAData.jumps ||
-      GFAData.containments
+      GFAData.paths.length ||
+      GFAData.walks.length ||
+      GFAData.segments.length ||
+      GFAData.links.length ||
+      GFAData.jumps.length ||
+      GFAData.containments.length
     ) {
       query = query.substring(0, query.length - 2);
     }
@@ -1394,7 +1394,7 @@ export class Neo4jDb implements DbService {
 
     // Add the pathNames to the segments
     segmentNamesOfSegmentsToPathMap.forEach((segmentName: string) => {
-      query += `n${segmentName}.pathNames = [`;
+      query += `n${segmentName}.pathNames = n${segmentName}.pathNames + [`;
       segmentsToPathNamesMap[`${segmentName}`].forEach((pathName: string) => {
         query += `'${pathName}', `;
       });
@@ -1408,7 +1408,7 @@ export class Neo4jDb implements DbService {
 
     // Add the walkSampleIdentifiers to the segments
     segmentNamesOfSegmentsToWalkMap.forEach((segmentName: string) => {
-      query += `n${segmentName}.walkSampleIdentifiers = [`;
+      query += `n${segmentName}.walkSampleIdentifiers = n${segmentName}.walkSampleIdentifiers + [`;
       segmentsToWalkSampleIdentifiersMap[`${segmentName}`].forEach(
         (sampleIdentifier: string) => {
           query += `'${sampleIdentifier}', `;
@@ -1444,7 +1444,7 @@ export class Neo4jDb implements DbService {
     // Add the walkSampleIdentifiers to the edges
     for (let edgeKey in edgesToWalkSampleIdentifiersMap) {
       // Add the walkSampleIdentifiers to the edge
-      query += `e${edgeKey}.walkSampleIdentifiers = [`;
+      query += `e${edgeKey}.walkSampleIdentifiers = e${edgeKey}.walkSampleIdentifiers + [`;
       edgesToWalkSampleIdentifiersMap[`${edgeKey}`].forEach(
         (sampleIdentifier: string) => {
           query += `'${sampleIdentifier}', `;
@@ -1475,7 +1475,7 @@ export class Neo4jDb implements DbService {
     // Add the pathNames to the edges
     for (let edgeKey in edgesToPathNamesMap) {
       // Add the pathNames to the edge
-      query += `e${edgeKey}.pathNames = [`;
+      query += `e${edgeKey}.pathNames = e${edgeKey}.pathNames + [`;
       edgesToPathNamesMap[`${edgeKey}`].forEach((pathName: string) => {
         query += `'${pathName}', `;
       });
