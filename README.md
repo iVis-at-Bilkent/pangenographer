@@ -43,7 +43,7 @@ Third-party libraries:
 [Angular](https://angular.io/),
 [Google Charts](https://developers.google.com/chart/) and npm dependencies inside package.json file.
 
-For the database, it uses the free and openly available Neo4j database.
+For the database, it uses the free and openly available Neo4j database. To use advanced queries, a plugin in `src/assets/` named `advanced-queries-0.0.1.jar` must be present in the Neo4j plugins folder.
 
 ## Team
 
