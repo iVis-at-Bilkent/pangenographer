@@ -231,6 +231,7 @@
       "lengthOfBlastSelectedSegmentsPath": 5,
       "lengthOfUpDownstream": 3,
       "sizeOfNeo4jQueryBatchesInLines": 10,
+      "sizeOfGetSampleData": 150,
       "isHighlightInZeroOutZero": true,
       "isShowUpDownstreamCues": true
     }

@@ -247,17 +247,8 @@ export class CytoscapeService {
         .filter((element: any) => elementIdSet.has(element.id()))
     );
 
-    if (!isIncremental) {
-      this._dbService.getPathWalkData((data) => {
-        let pathsWalks = [];
-        for (let i = 0; i < data.nodes.length; i++) {
-          let cyNodeId = "n" + data.nodes[i].elementId;
-          pathsWalks.push(this.createCyNode(data.nodes[i], cyNodeId));
-        }
-        this._g.cy.add(pathsWalks);
-        this._g.hideTypesNotToShow();
-      });
-    }
+    // Hide the elements that are not supposed to be shown
+    this._g.hideTypesNotToShow();
 
     this._g.applyClassFiltering();
 

@@ -709,20 +709,9 @@ export class Neo4jDb implements DbService {
 
   // Get sample data up to 150 nodes and edges
   getSampleData(callback: (x: GraphResponse) => any) {
-    const query = `
-      MATCH (n)-[e]-() 
-      RETURN n,e limit 150
-    `;
-    this.runQuery(query, callback);
-  }
-
-  // Get path and walk nodes/data
-  getPathWalkData(callback: (x: GraphResponse) => any) {
-    const query = `
-      MATCH (p:PATH) RETURN p AS nn
-      UNION
-      MATCH (w:WALK) RETURN w AS nn
-    `;
+    let query = `
+      MATCH (n:SEGMENT)-[e]-()
+      RETURN n,e limit ${this._g.userPreferences.pangenographer.sizeOfGetSampleData.getValue()}`;
     this.runQuery(query, callback);
   }
 

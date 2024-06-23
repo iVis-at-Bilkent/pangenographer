@@ -76,9 +76,6 @@ export interface DbService {
   // Definition for getting sample data
   getSampleData(callback: (x: GraphResponse) => any);
 
-  // Definition for getting path and walk nodes/data
-  getPathWalkData(callback: (x: GraphResponse) => any);
-
   // Definition for getting all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any);
 

@@ -43,6 +43,7 @@ export interface UserPreferences {
     lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
     isHighlightInZeroOutZero: BehaviorSubject<boolean>;
     isShowUpDownstreamCues: BehaviorSubject<boolean>;
+    sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
   };
 }
 

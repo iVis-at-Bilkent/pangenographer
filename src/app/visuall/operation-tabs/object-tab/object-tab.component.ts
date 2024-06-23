@@ -619,6 +619,33 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     );
   }
 
+  // This function is used to get the path from the database, if the path data is not already loaded
+  getPathFromDatabase(pathName: string) {
+    // Path is loaded through the pathName using getConsecutiveNodes function
+    this._dbService.getConsecutiveNodes([pathName], "pathName", "PATH", (x) => {
+      // Load the path fetched from the database
+      this._cyService.loadElementsFromDatabase(x, true);
+      // Refresh the object tab
+      this.showObjectProps();
+    });
+  }
+
+  // This function is used to get the walk from the database, if the walk data is not already loaded
+  getWalkFromDatabase(walkSampleIdentifier: string) {
+    // Walk is loaded through the walkSampleIdentifier using getConsecutiveNodes function
+    this._dbService.getConsecutiveNodes(
+      [walkSampleIdentifier],
+      "sampleIdentifier",
+      "WALK",
+      (x) => {
+        // Load the walk fetched from the database
+        this._cyService.loadElementsFromDatabase(x, true);
+        // Refresh the object tab
+        this.showObjectProps();
+      }
+    );
+  }
+
   setOtherPathsFalse(index: number): void {
     for (let i = 0; i < this.selectedItemProps.pathChecked.length; i++) {
       if (i !== index) {

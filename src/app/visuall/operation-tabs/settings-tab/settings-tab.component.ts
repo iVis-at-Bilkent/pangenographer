@@ -58,6 +58,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   selectionWidth = 4.5;
   lengthOfUpDownstream: number;
   sizeOfNeo4jQueryBatchesInLines: number; // size of Neo4j query batches in lines
+  sizeOfGetSampleData: number; // size of get sample data
   lengthOfBlastSelectedSegmentsPath: number;
   loadFromFileSubscription: Subscription;
   tabChangeSubscription: Subscription;
@@ -221,6 +222,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up_p.isHighlightInZeroOutZero.getValue();
     this.pangenographerBoolSettings[1].isEnable =
       up_p.isShowUpDownstreamCues.getValue();
+    this.sizeOfGetSampleData = up_p.sizeOfGetSampleData.getValue(); // get the size of get sample data
 
     this.setHighlightStyles();
     this.highlightStyleSelected(
@@ -360,6 +362,22 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       size
     ); // set the size of the Neo4j query batches in the user preferences
     this.sizeOfNeo4jQueryBatchesInLines = size; // set the size of the Neo4j query batches in the current component
+  }
+
+  // Used to change the size of the get sample data in the user preferences and the current component when the user selects a new size
+  onsizeOfGetSampleDataSelected(x: any) {
+    let size = parseInt(x.target.value);
+
+    // if the size is less than 1, set it to 1
+    if (size < 1) {
+      size = 1;
+    }
+
+    // set the size of the get sample data in the user preferences
+    this._g.userPreferences.pangenographer.sizeOfGetSampleData.next(size);
+
+    // set the size of the get sample data in the current component
+    this.sizeOfGetSampleData = size;
   }
 
   onlengthOfBlastSelectedSegmentsPathSelected(x: any) {

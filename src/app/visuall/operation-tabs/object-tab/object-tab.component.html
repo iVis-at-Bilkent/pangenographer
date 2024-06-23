@@ -305,27 +305,49 @@
                       />
                     </div>
                   </div>
-                  <div>
-                    <div class="path-walk-text-container">
+                  <!-- If there is data for the path, show the path -->
+                  <div *ngIf="selectedItemProps.pathSegmentNames[i]">
+                    <div>
+                      <div class="path-walk-text-container">
+                        <span>
+                          {{
+                            selectedItemProps.pathSegmentNames[i]
+                              .replaceAll(";", " ")
+                              .replaceAll(",", " ")
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
                       <span>
-                        {{
-                          selectedItemProps.pathSegmentNames[i]
-                            .replaceAll(";", " ")
-                            .replaceAll(",", " ")
-                        }}
+                        <b>Overlaps: </b>
                       </span>
+                      <div class="path-walk-text-container">
+                        <span>
+                          {{
+                            selectedItemProps.pathOverlaps[i].replaceAll(
+                              ",",
+                              " "
+                            )
+                          }}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div>
-                    <span>
-                      <b>Overlaps: </b>
-                    </span>
-                    <div class="path-walk-text-container">
-                      <span>
-                        {{
-                          selectedItemProps.pathOverlaps[i].replaceAll(",", " ")
-                        }}
-                      </span>
+                  <!-- Else if there is no data for the path, show a button to get the path -->
+                  <div *ngIf="!selectedItemProps.pathSegmentNames[i]">
+                    <div class="align-center display-flex justify-center">
+                      <input
+                        class="btn btn-sm btn-dark va-text m-2 center"
+                        type="button"
+                        (click)="
+                          getPathFromDatabase(
+                            selectedItemProps.pathNames.value[i]
+                          )
+                        "
+                        value="Get Path's Properities"
+                        title="Get Path's Properities"
+                      />
                     </div>
                   </div>
                 </div>
@@ -403,43 +425,62 @@
                       />
                     </div>
                   </div>
-                  <div>
-                    <span
-                      ><b>Haplotype Index: </b>
-                      {{ selectedItemProps.walkHaplotypeIndexes[i] }}
-                    </span>
-                  </div>
-                  <div>
-                    <span
-                      ><b>Sequence Identifier: </b>
-                      {{ selectedItemProps.walkSequenceIdentifiers[i] }}
-                    </span>
-                  </div>
-                  <div>
-                    <span
-                      ><b>Start Position: </b>
-                      {{ selectedItemProps.walkSequenceStarts[i] }}
-                    </span>
-                  </div>
-                  <div>
-                    <span
-                      ><b>End Position: </b>
-                      {{ selectedItemProps.walkSequenceEnds[i] }}
-                    </span>
-                  </div>
-                  <div>
-                    <span>
-                      <b>Walk </b>
-                    </span>
-                    <div class="path-walk-text-container">
-                      <span>
-                        {{
-                          selectedItemProps.walks[i]
-                            .replaceAll("\<", " \< ")
-                            .replaceAll("\>", " \> ")
-                            .substring(1)
-                        }}
+                  <!-- If there is data for the walk, show the walk -->
+                  <div *ngIf="selectedItemProps.walks[i]">
+                    <div>
+                      <span
+                        ><b>Haplotype Index: </b>
+                        {{ selectedItemProps.walkHaplotypeIndexes[i] }}
                       </span>
+                    </div>
+                    <div>
+                      <span
+                        ><b>Sequence Identifier: </b>
+                        {{ selectedItemProps.walkSequenceIdentifiers[i] }}
+                      </span>
+                    </div>
+                    <div>
+                      <span
+                        ><b>Start Position: </b>
+                        {{ selectedItemProps.walkSequenceStarts[i] }}
+                      </span>
+                    </div>
+                    <div>
+                      <span
+                        ><b>End Position: </b>
+                        {{ selectedItemProps.walkSequenceEnds[i] }}
+                      </span>
+                    </div>
+                    <div>
+                      <span>
+                        <b>Walk </b>
+                      </span>
+                      <div class="path-walk-text-container">
+                        <span>
+                          {{
+                            selectedItemProps.walks[i]
+                              .replaceAll("\<", " \< ")
+                              .replaceAll("\>", " \> ")
+                              .substring(1)
+                          }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Else if there is no data for the walk, show a button to get the walk -->
+                  <div *ngIf="!selectedItemProps.walks[i]">
+                    <div>
+                      <input
+                        class="btn btn-sm btn-dark va-text m-2 center"
+                        type="button"
+                        (click)="
+                          getWalkFromDatabase(
+                            selectedItemProps.walkSampleIdentifiers.value[i]
+                          )
+                        "
+                        value="Get Walk's Properities"
+                        title="Get Walk's Properities"
+                      />
                     </div>
                   </div>
                 </div>

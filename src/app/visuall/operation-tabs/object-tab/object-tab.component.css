@@ -75,3 +75,10 @@ td {
 .isHoveredPathWalk {
   background-color: rgba(255, 255, 0, 0.2);
 }
+
+.path-walk-no-data-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}

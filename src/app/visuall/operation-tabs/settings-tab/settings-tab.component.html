@@ -62,6 +62,22 @@
       </div>
     </div>
 
+    <!-- Adjust the size of the sample data fetched from neo4j -->
+    <div>
+      <label class="va-text">Size of Sample Data Fetched from Neo4j</label>
+      <div class="form-inline mx-1">
+        <input
+          type="number"
+          min="1"
+          step="any"
+          (change)="onsizeOfGetSampleDataSelected($event)"
+          [(ngModel)]="sizeOfGetSampleData"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
+          placeholder="Size of Sample Data Fetched from Neo4j"
+        />
+      </div>
+    </div>
+
     <!-- Adjusts the length of the length of BLAST selected segments path -->
     <div>
       <label class="va-text">Length of BLAST Selected Segments Path</label>
