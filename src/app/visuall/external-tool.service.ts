@@ -61,7 +61,7 @@ export class ExternalToolService {
   ) {
     // If the cues are not set to be shown, return
     if (
-      !this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
+      !this._g.userPreferences.isShowUpDownstreamCues.getValue()
     ) {
       return;
     }
@@ -117,7 +117,7 @@ export class ExternalToolService {
           nameSize,
           marginY,
           showUpDownstream,
-          this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
+          this._g.userPreferences.lengthOfUpDownstream.getValue(),
           true,
           contentUpstreamLevel,
           "Show Upstream"
@@ -157,7 +157,7 @@ export class ExternalToolService {
           nameSize,
           marginY,
           showUpDownstream,
-          this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
+          this._g.userPreferences.lengthOfUpDownstream.getValue(),
           false,
           contentDownstreamLevel,
           "Show Downstream"

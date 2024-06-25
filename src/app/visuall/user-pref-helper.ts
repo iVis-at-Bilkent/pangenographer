@@ -25,7 +25,6 @@ export class UserPrefHelper {
       this._cyService.bindViewUtilitiesExtension();
 
       const up = this._g.userPreferences;
-      const upP = this._g.userPreferences.pangenographer;
 
       up.isAutoIncrementalLayoutOnChange.subscribe((x) => {
         this.changeAutoIncremental(x);
@@ -60,12 +59,12 @@ export class UserPrefHelper {
 
       // PanGenoGrapher Settings
       // Change the length of upstream/downstream function
-      upP.isHighlightInZeroOutZero.subscribe(() => {
+      up.isHighlightInZeroOutZero.subscribe(() => {
         this._g.changeHighlightInZeroOutZero();
       });
 
       // Change the show upstream/downstream cues function
-      upP.isShowUpDownstreamCues.subscribe(() => {
+      up.isShowUpDownstreamCues.subscribe(() => {
         this._cyService.changeShowUpDownstreamCues();
       });
     });

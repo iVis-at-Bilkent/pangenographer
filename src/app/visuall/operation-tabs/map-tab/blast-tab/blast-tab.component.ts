@@ -455,7 +455,7 @@ export class BlastTabComponent implements OnInit {
     // then we have found a path and we don't need to recurse further
     if (
       this.currentSelectedSegmentPath.length ==
-      this._g.userPreferences.pangenographer.lengthOfBlastSelectedSegmentsPath.getValue()
+      this._g.userPreferences.lengthOfBlastSelectedSegmentsPath.getValue()
     ) {
       return;
     }

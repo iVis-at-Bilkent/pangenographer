@@ -41,6 +41,15 @@ export const EXPAND_COLLAPSE_FAST_OPT = {
   animate: false,
 };
 
+export const PANGENOGRAPHER_SETTING_NAMES = [
+  "lengthOfUpDownstream",
+  "sizeOfNeo4jQueryBatchesInLines",
+  "lengthOfBlastSelectedSegmentsPath",
+  "isHighlightInZeroOutZero",
+  "isShowUpDownstreamCues",
+  "sizeOfGetSampleData",
+];
+
 export const HIGHLIGHT_INDEX = {
   zeroIndegree: 0,
   zeroOutdegree: 1,

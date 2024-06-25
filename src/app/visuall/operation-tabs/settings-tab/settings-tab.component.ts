@@ -14,6 +14,7 @@ import {
   MIN_HIGHTLIGHT_WIDTH,
   MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH,
   MIN_LENGTH_OF_UP_DOWN_STREAM,
+  PANGENOGRAPHER_SETTING_NAMES,
   getCyStyleFromColorAndWid,
 } from "../../constants";
 import { GlobalVariableService } from "../../global-variable.service";
@@ -84,12 +85,12 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       {
         text: "Highlight in/out-degree zero nodes",
         isEnable: true,
-        path2userPref: "pangenographer.isHighlightInZeroOutZero",
+        path2userPref: "isHighlightInZeroOutZero",
       },
       {
         text: "Enable/Disable show up/downstream cues",
         isEnable: true,
-        path2userPref: "pangenographer.isShowUpDownstreamCues",
+        path2userPref: "isShowUpDownstreamCues",
       },
     ];
 
@@ -100,7 +101,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         path2userPref: "isAutoIncrementalLayoutOnChange",
       },
       {
-        text: "Emphasize on hover",
+        text: "Highlight on hover",
         isEnable: false,
         path2userPref: "isHighlightOnHover",
       },
@@ -163,7 +164,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   private fillUIFromMemory() {
     // reference variables for shorter text
     const up = this._g.userPreferences;
-    const up_p = this._g.userPreferences.pangenographer;
 
     this.generalBoolSettings[0].isEnable =
       up.isAutoIncrementalLayoutOnChange.getValue();
@@ -213,16 +213,16 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.isStoreUserProfile = up.isStoreUserProfile.getValue();
     this.queryResultPagination = up.queryResultPagination.getValue();
 
-    this.lengthOfUpDownstream = up_p.lengthOfUpDownstream.getValue(); // get the length of the upstream and downstream
+    this.lengthOfUpDownstream = up.lengthOfUpDownstream.getValue(); // get the length of the upstream and downstream
     this.sizeOfNeo4jQueryBatchesInLines =
-      up_p.sizeOfNeo4jQueryBatchesInLines.getValue(); // get the size of the Neo4j query batches in lines
+      up.sizeOfNeo4jQueryBatchesInLines.getValue(); // get the size of the Neo4j query batches in lines
     this.lengthOfBlastSelectedSegmentsPath =
-      up_p.lengthOfBlastSelectedSegmentsPath.getValue();
+      up.lengthOfBlastSelectedSegmentsPath.getValue();
     this.pangenographerBoolSettings[0].isEnable =
-      up_p.isHighlightInZeroOutZero.getValue();
+      up.isHighlightInZeroOutZero.getValue();
     this.pangenographerBoolSettings[1].isEnable =
-      up_p.isShowUpDownstreamCues.getValue();
-    this.sizeOfGetSampleData = up_p.sizeOfGetSampleData.getValue(); // get the size of get sample data
+      up.isShowUpDownstreamCues.getValue();
+    this.sizeOfGetSampleData = up.sizeOfGetSampleData.getValue(); // get the size of get sample data
 
     this.setHighlightStyles();
     this.highlightStyleSelected(
@@ -345,7 +345,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
       length = MIN_LENGTH_OF_UP_DOWN_STREAM;
     }
-    this._g.userPreferences.pangenographer.lengthOfUpDownstream.next(length);
+    this._g.userPreferences.lengthOfUpDownstream.next(length);
     this.lengthOfUpDownstream = length;
   }
 
@@ -358,9 +358,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       size = 1;
     }
 
-    this._g.userPreferences.pangenographer.sizeOfNeo4jQueryBatchesInLines.next(
-      size
-    ); // set the size of the Neo4j query batches in the user preferences
+    this._g.userPreferences.sizeOfNeo4jQueryBatchesInLines.next(size); // set the size of the Neo4j query batches in the user preferences
     this.sizeOfNeo4jQueryBatchesInLines = size; // set the size of the Neo4j query batches in the current component
   }
 
@@ -374,7 +372,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
 
     // set the size of the get sample data in the user preferences
-    this._g.userPreferences.pangenographer.sizeOfGetSampleData.next(size);
+    this._g.userPreferences.sizeOfGetSampleData.next(size);
 
     // set the size of the get sample data in the current component
     this.sizeOfGetSampleData = size;
@@ -388,9 +386,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH) {
       length = MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH;
     }
-    this._g.userPreferences.pangenographer.lengthOfBlastSelectedSegmentsPath.next(
-      length
-    );
+    this._g.userPreferences.lengthOfBlastSelectedSegmentsPath.next(length);
     this.lengthOfBlastSelectedSegmentsPath = length;
   }
 
@@ -464,26 +460,46 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.transferSubjectValues(
       this._g.userPreferencesFromFiles,
       this._g.userPreferences,
-      ["pangenographer"]
+      PANGENOGRAPHER_SETTING_NAMES
     );
     this.setViewUtilsStyle();
     this.fillUIFromMemory();
     this._g.updateSelectionCyStyle();
   }
 
-  resetPangenographerSettings() {
+  // Reset the PanGenoGrapher settings to the default values
+  resetPanGenoGrapherSettings() {
     this.transferSubjectValues(
-      this._g.userPreferencesFromFiles.pangenographer,
-      this._g.userPreferences.pangenographer
+      this._g.userPreferencesFromFiles,
+      this._g.userPreferences,
+      null, // Skipped values
+      PANGENOGRAPHER_SETTING_NAMES // Included values
     );
     this.fillUIFromMemory();
   }
 
-  private transferSubjectValues(from: any, to: any, skip = null) {
+  // Transfer values from one object to another, where the values are BehaviorSubjects
+  // If the value is a BehaviorSubject, then the value of the BehaviorSubject is transferred
+  // Otherwise, the function is called recursively, transferring the values of the nested object
+  // Additionally, if the key is in the skip array, then the value is not transferred
+  // Additionally, If the key is in the include array, then the value is transferred
+  private transferSubjectValues(
+    from: any,
+    to: any,
+    skip = null,
+    include = null
+  ) {
     for (const k in from) {
-      if ((skip && k == skip[0]) || (skip && k == skip[1])) {
+      // if the key is in the skip array, then skip the key
+      if (skip && skip.includes(k)) {
         continue;
       }
+
+      // if the key is in the include array, then include the key
+      if (include && !include.includes(k)) {
+        continue;
+      }
+
       let p1 = from[k];
       let p2 = to[k];
       if (p1 instanceof BehaviorSubject) {

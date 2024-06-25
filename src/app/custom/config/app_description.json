@@ -227,14 +227,12 @@
     "objectInclusionType": 0,
     "queryResultPagination": "Client",
     "tilingPadding": 4,
-    "pangenographer": {
-      "lengthOfBlastSelectedSegmentsPath": 5,
-      "lengthOfUpDownstream": 3,
-      "sizeOfNeo4jQueryBatchesInLines": 10,
-      "sizeOfGetSampleData": 150,
-      "isHighlightInZeroOutZero": true,
-      "isShowUpDownstreamCues": true
-    }
+    "lengthOfUpDownstream": 3,
+    "sizeOfNeo4jQueryBatchesInLines": 10,
+    "sizeOfGetSampleData": 150,
+    "lengthOfBlastSelectedSegmentsPath": 5,
+    "isHighlightInZeroOutZero": true,
+    "isShowUpDownstreamCues": true
   },
   "cssStyle": {
     ".va-title": {

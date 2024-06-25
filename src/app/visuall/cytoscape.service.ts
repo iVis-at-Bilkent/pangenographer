@@ -381,11 +381,15 @@ export class CytoscapeService {
   // Then get all upstream or downstream nodes of the selected nodes
   private getZeroDegreeNodesLoad() {
     return (data: any) => {
-      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, dontFit = false
-      this._g.cy.zoom(this._g.cy.zoom() + 10000); // Zoom in to do not show the zero degree nodes which are brought from the database
+      if (!data.nodes.length && !data.edges.length) {
+        this._g.showErrorModal("Empty Graph", "Empty response from database!");
+        return;
+      }
+
+      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, dontFit = true
       this.getAllUpDownstreamNodes(
         data.nodes,
-        this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue()
+        this._g.userPreferences.lengthOfUpDownstream.getValue()
       );
     };
   }
@@ -688,7 +692,7 @@ export class CytoscapeService {
 
   readGFASample(sample: string, callback: (GFAData: GFAData) => Promise<any>) {
     this._fileReaderService.readGFASample(sample, (GFAData: GFAData) => {
-      callback(GFAData);
+      return callback(GFAData);
     });
   }
 
@@ -1294,9 +1298,7 @@ export class CytoscapeService {
 
   // Changes the visibility of the up and down stream cues
   changeShowUpDownstreamCues() {
-    if (
-      this._g.userPreferences.pangenographer.isShowUpDownstreamCues.getValue()
-    ) {
+    if (this._g.userPreferences.isShowUpDownstreamCues.getValue()) {
       this.addExternalTools(this.showUpDownstream.bind(this));
     } else {
       this.removeExternalTools();

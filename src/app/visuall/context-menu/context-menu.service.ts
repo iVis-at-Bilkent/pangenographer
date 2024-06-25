@@ -216,7 +216,7 @@ export class ContextMenuService {
     }
     this._cyService.showUpDownstream(
       element.id().substring(1), // remove the first character which is 'n' or 'e' to get the id stored in the database
-      this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
+      this._g.userPreferences.lengthOfUpDownstream.getValue(),
       isUp
     );
   }
@@ -243,7 +243,7 @@ export class ContextMenuService {
 
     this._dbService.getElementsUpToCertainDistance(
       element.id().substring(1), // remove the first character which is 'n' or 'e' to get the id stored in the database
-      this._g.userPreferences.pangenographer.lengthOfUpDownstream.getValue(),
+      this._g.userPreferences.lengthOfUpDownstream.getValue(),
       callback,
       isUp
     );

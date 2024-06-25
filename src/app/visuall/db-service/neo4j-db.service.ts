@@ -52,7 +52,7 @@ export class Neo4jDb implements DbService {
     // If the query is timeboxed, wrap it in a CALL apoc.cypher.run() procedure to allow for timeout
     // Otherwise, execute the query directly
     const q = isTimeboxed
-      ? `CALL apoc.cypher.run("${query}", null ) YIELD value RETURN value`
+      ? `CALL apoc.cypher.run("${query}", null) YIELD value RETURN value`
       : query;
     console.log(q);
     this._g.statusMsg.next("Executing database query...");
@@ -152,7 +152,7 @@ export class Neo4jDb implements DbService {
       // If the query is timeboxed, wrap it in a CALL apoc.cypher.run() procedure to allow for timeout
       // Otherwise, execute the query directly
       const q = isTimeboxed
-        ? `CALL apoc.cypher.run("${query}", null ) YIELD value RETURN value`
+        ? `CALL apoc.cypher.run("${query}", null) YIELD value RETURN value`
         : query;
       console.log(q);
 
@@ -711,7 +711,7 @@ export class Neo4jDb implements DbService {
   getSampleData(callback: (x: GraphResponse) => any) {
     let query = `
       MATCH (n:SEGMENT)-[e]-()
-      RETURN n,e limit ${this._g.userPreferences.pangenographer.sizeOfGetSampleData.getValue()}`;
+      RETURN n,e limit ${this._g.userPreferences.sizeOfGetSampleData.getValue()}`;
     this.runQuery(query, callback);
   }
 

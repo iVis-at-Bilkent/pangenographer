@@ -357,7 +357,7 @@ export class FileReaderService {
       // Do not forget Path and Path lines create more than one objects (lines), themselves + amount of segments in them
       // Size of each chunk in lines (default: 30)
       let chunkSize =
-        this._g.userPreferences.pangenographer.sizeOfNeo4jQueryBatchesInLines.getValue();
+        this._g.userPreferences.sizeOfNeo4jQueryBatchesInLines.getValue();
       let GFADataChunks: GFAData[] = [];
 
       // Distribute the GFA data equally into chunks

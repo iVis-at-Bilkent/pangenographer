@@ -208,7 +208,7 @@ export class GlobalVariableService {
   removeHighlights(elements?: any) {
     elements = elements || this.cy.elements();
     if (
-      this.userPreferences.pangenographer.isHighlightInZeroOutZero.getValue()
+      this.userPreferences.isHighlightInZeroOutZero.getValue()
     ) {
       elements.forEach((element: any) => {
         if (
@@ -226,7 +226,7 @@ export class GlobalVariableService {
 
   highlightElements(elements: any, index?: number) {
     if (
-      this.userPreferences.pangenographer.isHighlightInZeroOutZero.getValue()
+      this.userPreferences.isHighlightInZeroOutZero.getValue()
     ) {
       elements.forEach((element: any) => {
         if (
@@ -440,14 +440,14 @@ export class GlobalVariableService {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
         if (
-          this.userPreferences.pangenographer.isHighlightInZeroOutZero.getValue()
+          this.userPreferences.isHighlightInZeroOutZero.getValue()
         ) {
           this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroIndegree); // highlight source nodes
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
         if (
-          this.userPreferences.pangenographer.isHighlightInZeroOutZero.getValue()
+          this.userPreferences.isHighlightInZeroOutZero.getValue()
         ) {
           this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroOutdegree); // highlight target nodes
         }

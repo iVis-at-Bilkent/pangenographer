@@ -2,7 +2,7 @@ import { BehaviorSubject } from "rxjs";
 import { QueryRule } from "./operation-tabs/map-tab/query-types";
 
 export interface UserPreferences {
-  // boolean settings
+  // Boolean settings
   isAutoIncrementalLayoutOnChange: BehaviorSubject<boolean>;
   isHighlightOnHover: BehaviorSubject<boolean>;
   isShowOverviewWindow: BehaviorSubject<boolean>;
@@ -36,15 +36,14 @@ export interface UserPreferences {
   selectionColor: BehaviorSubject<string>;
   selectionWidth: BehaviorSubject<number>;
   tilingPadding: BehaviorSubject<number>;
-  //  PanGenoGrapher Settings
-  pangenographer: {
-    lengthOfUpDownstream: BehaviorSubject<number>; // length of upstream/downstream
-    sizeOfNeo4jQueryBatchesInLines: BehaviorSubject<number>; // size of neo4j query batches in lines
-    lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
-    isHighlightInZeroOutZero: BehaviorSubject<boolean>;
-    isShowUpDownstreamCues: BehaviorSubject<boolean>;
-    sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
-  };
+
+  // PanGenoGrapher Settings
+  lengthOfUpDownstream: BehaviorSubject<number>; // length of upstream/downstream
+  sizeOfNeo4jQueryBatchesInLines: BehaviorSubject<number>; // size of neo4j query batches in lines
+  lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
+  isHighlightInZeroOutZero: BehaviorSubject<boolean>;
+  isShowUpDownstreamCues: BehaviorSubject<boolean>;
+  sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
 }
 
 export enum MergedElementIndicatorTypes {
