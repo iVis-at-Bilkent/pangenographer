@@ -79,15 +79,27 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     }
   }
 
+  // This function is called when the user selects a graph theoretic property
+  // from the dropdown list and runs the selected property function
   runProperty() {
+    // Reset the cySelector to an empty string to select all nodes
     this.cySelector = "";
+
+    // If the selected property is to be run on selected nodes only, set the
+    // cySelector to ":selected"
     if (this.isOnSelected) {
       this.cySelector = ":selected";
     }
+
+    // Destroy the current badge poppers
     this._extTool.destroyCurrentBadgePoppers();
+
+    // If the selected property function is not defined, return
     if (!this[this.selectedPropFn]) {
       return;
     }
+
+    // Set the values for the badge popper
     this._extTool.setBadgePopperValues(
       this.isMapNodeSizes,
       this.isMapBadgeSizes,
@@ -95,14 +107,19 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       this.maxPropValue,
       this.badgeColor
     );
+
+    // Run the selected property function
     this[this.selectedPropFn]();
+
     this.maxPropValue = Math.max(
-      ...this._g.cy.nodes().map((x: any) => x.data("__graphTheoreticProp"))
+      ...this._g.cy.nodes().map((x: any) => x.data("__badgeProp"))
     );
+
     this._cyService.setNodeSizeOnGraphTheoreticProp(
       this.maxPropValue,
       this.currNodeSize
     );
+
     this._extTool.setBadgePopperValues(
       this.isMapNodeSizes,
       this.isMapBadgeSizes,
@@ -110,6 +127,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
       this.maxPropValue,
       this.badgeColor
     );
+
     this._extTool.setBadgeColorsAndCoords();
   }
 
@@ -325,6 +343,13 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
 
   colorSelected(s: string) {
     this.badgeColor = s;
+    this._extTool.setBadgePopperValues(
+      this.isMapNodeSizes,
+      this.isMapBadgeSizes,
+      this.currNodeSize,
+      this.maxPropValue,
+      this.badgeColor
+    );
   }
 
   avgNodeSizeChanged() {

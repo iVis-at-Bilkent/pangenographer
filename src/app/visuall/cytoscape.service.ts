@@ -131,10 +131,12 @@ export class CytoscapeService {
     }, C.CY_BATCH_END_DELAY);
   }
 
+  // Calculate the badge size for each node based on the graph theoretic property
   setNodeSizeOnGraphTheoreticProp(maxVal: number, avgSize: number) {
     if (maxVal <= 0) {
       maxVal = 1;
     }
+
     this._g.cy
       .style()
       .selector("node.badgeDisplay")
