@@ -995,6 +995,15 @@ export class Neo4jDb implements DbService {
 
   // This function converts the GFAPath/WalkEdge object to string
   private createEdgeKey(edge: GFAPathEdge | GFAWalkEdge): string {
+    let key = "";
+
+    // If the edge is path edge and has overlaps, add overlaps to the key
+    if (edge.hasOwnProperty("overlap")) {
+      edge = edge as GFAPathEdge;
+      key += CQL_QUERY_CHANGE_MARKER + edge.overlap;
+    }
+
+    // Add the rest
     return (
       edge.source +
       CQL_QUERY_CHANGE_MARKER +
@@ -1002,7 +1011,8 @@ export class Neo4jDb implements DbService {
       CQL_QUERY_CHANGE_MARKER +
       edge.sourceOrientation +
       CQL_QUERY_CHANGE_MARKER +
-      edge.targetOrientation
+      edge.targetOrientation +
+      key
     );
   }
 
@@ -1248,7 +1258,8 @@ export class Neo4jDb implements DbService {
           pathEdge.source === link.source &&
           pathEdge.target === link.target &&
           pathEdge.sourceOrientation === link.sourceOrientation &&
-          pathEdge.targetOrientation === link.targetOrientation
+          pathEdge.targetOrientation === link.targetOrientation &&
+          !pathEdge.overlap
         ) {
           element2Create += `'${pathEdge.pathName}', `;
 
@@ -1295,35 +1306,48 @@ export class Neo4jDb implements DbService {
         element2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
       }
 
-      // Add the pathNames to the edge
-      // TODO THIS NEEDS TO BE UPDATED TO MATCH THE NEW DATA STRUCTURE
-      /* if (
-        segmentsToPathNamesMap[`${jump.source}`] &&
-        segmentsToPathNamesMap[`${jump.target}`]
-      ) {
-        let paths2Edge = "";
-        segmentsToPathNamesMap[`${jump.source}`].forEach((pathName1: string) => {
-          segmentsToPathNamesMap[`${jump.target}`].forEach((pathName2: string) => {
-            if (pathName1 === pathName2) {
-              if (paths2Edge.length === 0) {
-                paths2Edge += ", pathNames: [";
-              }
-              paths2Edge += `'${pathName1}', `;
-            }
-          });
-        });
-        if (paths2Edge.length > 0) {
-          element2Create += paths2Edge;
-          element2Create =
-            element2Create.substring(0, element2Create.length - 2) + "]";
+      // Create a list of path names to add to the link edge
+      element2Create += `, pathNames: [`;
+
+      // Create an array to hold added pathEdges to avoid adding the same pathName multiple times
+      // by removing the pathEdge from the pathEdges
+      let addedPathEdges = [];
+
+      // Add the path names to the link edge if the edge is contained in path
+      // Loop through the GFAPathEdges to find if there is link to match
+      GFAData.pathEdges.forEach((pathEdge) => {
+        if (
+          pathEdge.source === jump.source &&
+          pathEdge.target === jump.target &&
+          pathEdge.sourceOrientation === jump.sourceOrientation &&
+          pathEdge.targetOrientation === jump.targetOrientation &&
+          pathEdge.overlap === "J"
+        ) {
+          element2Create += `'${pathEdge.pathName}', `;
+
+          // Add the pathEdge to the addedPathEdges
+          addedPathEdges.push(pathEdge);
         }
-      } */
+      });
+
+      // Remove the last comma and space
+      if (element2Create.endsWith(", ")) {
+        element2Create = element2Create.substring(0, element2Create.length - 2);
+      }
+
+      // Close the pathNames creation
+      element2Create += `]`;
 
       // Close the edge creation
       element2Create += `}]->(n${jump.target}),\n`;
 
       // Add the edge to the query
       query += element2Create;
+
+      // Remove the added pathEdges from the GFAPathEdges
+      addedPathEdges.forEach((pathEdge) => {
+        GFAData.pathEdges.splice(GFAData.pathEdges.indexOf(pathEdge), 1);
+      });
     });
 
     // Create containment edges
@@ -1519,9 +1543,17 @@ export class Neo4jDb implements DbService {
       for (let edgeKey in edgesToMatch) {
         let edge = edgeKey.split(CQL_QUERY_CHANGE_MARKER);
 
-        // Add the match clause for the edge link
-        matchClause += `()-[e${edgeKey}:LINK {source: '${edge[0]}', target: '${edge[1]}', `;
-        matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
+        // If the edge is a jump edge
+        if (edge.length === 4) {
+          matchClause += `()-[e${edgeKey}:JUMP {source: '${edge[0]}', target: '${edge[1]}', `;
+          matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
+        }
+        // Else if the edge is a link edge
+        else {
+          // Add the match clause for the edge link
+          matchClause += `()-[e${edgeKey}:LINK {source: '${edge[0]}', target: '${edge[1]}', `;
+          matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
+        }
       }
 
       // Add the match clause to the beginning of the query by removing the last comma and newline

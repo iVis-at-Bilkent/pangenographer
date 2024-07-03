@@ -387,8 +387,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       this.selectedItemProps["overlap"].value !== "*"
     ) {
       this.selectedItemProps["overlap"] = {
-        value: this.selectedItemProps["overlap"],
-        overlapIdentifiers: this.selectedItemProps["overlap"]
+        value: this.selectedItemProps["overlap"].value,
+        overlapIdentifiers: this.selectedItemProps["overlap"].value
           .split(/[0-9]+/)
           .slice(1),
         currentIndex: 0,

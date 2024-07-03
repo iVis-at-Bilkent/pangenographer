@@ -280,13 +280,25 @@ export class FileReaderService {
 
     let edges: GFAPathEdge[] = [];
 
-    // TODO HANDLE THE CASE WHERE THERE IS A SEMICOLON IN THE SEGMENT NAMES, JUMPS
+    // Handle the case where the overlaps are separated by semicolons instead of commas in the path line representing the jumps
     if (pathLineTabSeperated[2].indexOf(";") !== -1) {
-      console.log(
-        "There is a semicolon in the segment names of the path " + path.pathName
-      );
-      let segments: GFAPathSegment[] = [];
-      let edges: GFAPathEdge[] = [];
+      // Split the segment names and overlaps into arrays
+      for (let i = 0; i < segmentNamesArray.length - 1; i++) {
+        // Extract the overlap between the segments
+        let overlap =
+          path.overlaps.split(",")[i].indexOf("J") !== -1 ? "J" : undefined;
+
+        // Add the edge to the edges array
+        edges.push({
+          pathName: path.pathName,
+          source: segmentNamesArray[i],
+          sourceOrientation: segmentOrientationsArray[i],
+          target: segmentNamesArray[i + 1],
+          targetOrientation: segmentOrientationsArray[i + 1],
+          overlap: overlap,
+        });
+      }
+
       return { path, segments, edges };
     }
 

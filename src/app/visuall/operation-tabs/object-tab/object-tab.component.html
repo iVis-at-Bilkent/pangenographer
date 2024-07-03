@@ -239,6 +239,7 @@
 
       <div
         *ngIf="
+          selectedItemProps.pathNames &&
           selectedItemProps.pathNames.value &&
           selectedItemProps.pathNames.value.length
         "
@@ -359,6 +360,7 @@
 
       <div
         *ngIf="
+          selectedItemProps.walkSampleIdentifiers &&
           selectedItemProps.walkSampleIdentifiers.value &&
           selectedItemProps.walkSampleIdentifiers.value.length
         "
