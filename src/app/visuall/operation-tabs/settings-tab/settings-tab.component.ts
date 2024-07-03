@@ -88,7 +88,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         path2userPref: "isHighlightInZeroOutZero",
       },
       {
-        text: "Enable/Disable show up/downstream cues",
+        text: "Enable/disable show up/downstream cues",
         isEnable: true,
         path2userPref: "isShowUpDownstreamCues",
       },
