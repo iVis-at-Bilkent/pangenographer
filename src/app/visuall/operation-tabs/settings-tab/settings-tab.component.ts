@@ -345,8 +345,15 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     if (length < MIN_LENGTH_OF_UP_DOWN_STREAM) {
       length = MIN_LENGTH_OF_UP_DOWN_STREAM;
     }
+
+    // set the length of the upstream and downstream in the user preferences
     this._g.userPreferences.lengthOfUpDownstream.next(length);
+
+    // set the length of the upstream and downstream in the current component
     this.lengthOfUpDownstream = length;
+
+    // save the user preferences
+    this._profile.saveUserPreferences();
   }
 
   // Used to change the size of the Neo4j query batches in the user preferences and the current component when the user selects a new size
@@ -358,8 +365,14 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       size = 1;
     }
 
-    this._g.userPreferences.sizeOfNeo4jQueryBatchesInLines.next(size); // set the size of the Neo4j query batches in the user preferences
-    this.sizeOfNeo4jQueryBatchesInLines = size; // set the size of the Neo4j query batches in the current component
+    // set the size of the Neo4j query batches in the user preferences
+    this._g.userPreferences.sizeOfNeo4jQueryBatchesInLines.next(size);
+
+    // set the size of the Neo4j query batches in the current component
+    this.sizeOfNeo4jQueryBatchesInLines = size;
+
+    // save the user preferences
+    this._profile.saveUserPreferences();
   }
 
   // Used to change the size of the get sample data in the user preferences and the current component when the user selects a new size
@@ -376,6 +389,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
     // set the size of the get sample data in the current component
     this.sizeOfGetSampleData = size;
+
+    // save the user preferences
+    this._profile.saveUserPreferences();
   }
 
   onlengthOfBlastSelectedSegmentsPathSelected(x: any) {
@@ -388,6 +404,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
     this._g.userPreferences.lengthOfBlastSelectedSegmentsPath.next(length);
     this.lengthOfBlastSelectedSegmentsPath = length;
+
+    // save the user preferences
+    this._profile.saveUserPreferences();
   }
 
   // used to change border width or color. One of them should be defined. (exclusively)
