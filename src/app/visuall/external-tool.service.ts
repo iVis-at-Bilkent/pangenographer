@@ -60,9 +60,7 @@ export class ExternalToolService {
     nodes: any = this._g.cy.nodes()
   ) {
     // If the cues are not set to be shown, return
-    if (
-      !this._g.userPreferences.isShowUpDownstreamCues.getValue()
-    ) {
+    if (!this._g.userPreferences.isShowUpDownstreamCues.getValue()) {
       return;
     }
 
@@ -286,10 +284,18 @@ export class ExternalToolService {
     // Get the width of the node and calculate the new margins
     let width = node.style("width");
     width = Number(node.style("width").substring(0, width.length - 2));
+
+    // If the width is different than the default node width, adjust the margin y
     if (width !== DEFAULT_NODE_WIDTH) {
       newMarginY *=
         (CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER * width) /
         DEFAULT_NODE_WIDTH;
+
+      // If the width is less than the default node width, double the margin y
+      if (width < DEFAULT_NODE_WIDTH) {
+        newMarginY *=
+          (DEFAULT_NODE_WIDTH / width) * (DEFAULT_NODE_WIDTH / width);
+      }
     }
 
     return {

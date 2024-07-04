@@ -33,7 +33,7 @@ export const BADGE_ZOOM_THRESHOLD = 0.8;
 export const DEFAULT_NODE_WIDTH = 36;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
 export const OVERLAP_REGEX = /[MIDNSHPX=]/;
-export const CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER = 1.5;
+export const CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER = 1.8;
 
 export const EXPAND_COLLAPSE_FAST_OPT = {
   layoutBy: null,
