@@ -207,9 +207,7 @@ export class GlobalVariableService {
 
   removeHighlights(elements?: any) {
     elements = elements || this.cy.elements();
-    if (
-      this.userPreferences.isHighlightInZeroOutZero.getValue()
-    ) {
+    if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
       elements.forEach((element: any) => {
         if (
           this.zeroIncomerAndOutgoerNodes.source.indexOf(element) < 0 &&
@@ -225,9 +223,7 @@ export class GlobalVariableService {
   }
 
   highlightElements(elements: any, index?: number) {
-    if (
-      this.userPreferences.isHighlightInZeroOutZero.getValue()
-    ) {
+    if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
       elements.forEach((element: any) => {
         if (
           this.zeroIncomerAndOutgoerNodes.source.indexOf(element) < 0 &&
@@ -383,6 +379,10 @@ export class GlobalVariableService {
     this.cy.on("layoutstop", () => {
       this.setLoadingStatus(false);
       this.statusMsg.next("Layout is done.");
+
+      setTimeout(() => {
+        this.statusMsg.next("");
+      }, 2000);
     });
   }
 
@@ -439,16 +439,12 @@ export class GlobalVariableService {
     this.cy.nodes(":visible").forEach((x: any) => {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
-        if (
-          this.userPreferences.isHighlightInZeroOutZero.getValue()
-        ) {
+        if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
           this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroIndegree); // highlight source nodes
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
-        if (
-          this.userPreferences.isHighlightInZeroOutZero.getValue()
-        ) {
+        if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
           this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroOutdegree); // highlight target nodes
         }
       }
