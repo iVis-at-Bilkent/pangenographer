@@ -40,7 +40,7 @@
           (change)="onlengthOfUpDownstreamSelected($event)"
           [(ngModel)]="lengthOfUpDownstream"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
-          placeholder="Length of Up/Downstream"
+          placeholder="Length of up/downstream"
         />
       </div>
     </div>
@@ -57,7 +57,7 @@
           (change)="onsizeOfNeo4jQueryBatchesInLinesSelected($event)"
           [(ngModel)]="sizeOfNeo4jQueryBatchesInLines"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
-          placeholder="Size of Neo4j Query Batches in Lines"
+          placeholder="Size of Neo4j query batches in lines"
         />
       </div>
     </div>
@@ -73,7 +73,7 @@
           (change)="onsizeOfGetSampleDataSelected($event)"
           [(ngModel)]="sizeOfGetSampleData"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
-          placeholder="Size of Sample Data Fetched from Neo4j"
+          placeholder="Size of sample data fetched from Neo4j"
         />
       </div>
     </div>
@@ -90,7 +90,24 @@
           (change)="onlengthOfBlastSelectedSegmentsPathSelected($event)"
           [(ngModel)]="lengthOfBlastSelectedSegmentsPath"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
-          placeholder="Length of BLAST Selected Segments Path"
+          placeholder="Length of BLAST selected segments path"
+        />
+      </div>
+    </div>
+
+    <!-- Adjusts the source/target count of the get some zero degree nodes option -->
+    <div>
+      <div class="form-inline m-1">
+        <label class="va-text">Seed source/target count</label>
+        <input
+          type="number"
+          max="100"
+          min="1"
+          step="any"
+          (change)="onseedSourceTargetCount($event)"
+          [(ngModel)]="seedSourceTargetCount"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
+          placeholder="Seed source/target count"
         />
       </div>
     </div>

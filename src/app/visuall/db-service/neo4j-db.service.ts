@@ -715,6 +715,31 @@ export class Neo4jDb implements DbService {
     this.runQuery(query, callback);
   }
 
+  // Get some zero degree nodes
+  getSomeZeroDegreeNodes(callback: (x: GraphResponse) => any) {
+    // This works incrementally, so add the zero degree nodes brought before and current seed source target count
+    let toGetCount =
+      this._g.userPreferences.seedSourceTargetCount.getValue() +
+      this._g.someZeroDegreeNodesCount.getValue();
+
+    // Update the count of zero degree nodes to get
+    this._g.someZeroDegreeNodesCount.next(toGetCount);
+
+    let query = `
+      CALL {
+        MATCH (source: SEGMENT)
+        WHERE NOT (source)<-[]-()
+        RETURN source AS node, 'source' AS type
+        UNION
+        MATCH (target: SEGMENT)
+        WHERE NOT (target)-[]->()
+        RETURN target AS node, 'target' AS type
+      }
+      RETURN node, type
+      LIMIT ${toGetCount}`;
+    this.runQuery(query, callback);
+  }
+
   // Get all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any) {
     const query = `

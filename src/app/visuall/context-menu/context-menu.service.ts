@@ -20,6 +20,14 @@ export class ContextMenuService {
   ) {
     this.menu = [
       {
+        id: "getSomeZeroDegreeNodes",
+        content: "Get Some Zero Degree Nodes",
+        coreAsWell: true,
+        onClickFunction: () => {
+          this._cyService.getSomeZeroDegreeNodes();
+        },
+      },
+      {
         id: "getAllZeroDegreeNodes",
         content: "Get All Zero Degree Nodes",
         coreAsWell: true,

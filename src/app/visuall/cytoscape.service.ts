@@ -357,6 +357,12 @@ export class CytoscapeService {
     );
   }
 
+  // Get some nodes with zero degree from the database
+  getSomeZeroDegreeNodes() {
+    this._g.layout.clusters = null;
+    this._dbService.getSomeZeroDegreeNodes(this.getZeroDegreeNodesLoad());
+  }
+
   // Get all nodes with zero degree from the database
   getAllZeroDegreeNodes() {
     this._g.layout.clusters = null;

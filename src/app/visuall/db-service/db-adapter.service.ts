@@ -233,6 +233,15 @@ export class DbAdapterService {
     this._db.getSampleData(fn);
   }
 
+  // Adapter function to get some nodes with zero degree
+  getSomeZeroDegreeNodes(callback: (x: GraphResponse) => any) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get some nodes with zero degree");
+    };
+    this._db.getSomeZeroDegreeNodes(fn);
+  }
+
   // Adapter function to get all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any) {
     let fn = (x: any) => {

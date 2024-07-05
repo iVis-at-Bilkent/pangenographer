@@ -60,6 +60,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   lengthOfUpDownstream: number;
   sizeOfNeo4jQueryBatchesInLines: number; // size of Neo4j query batches in lines
   sizeOfGetSampleData: number; // size of get sample data
+  seedSourceTargetCount: number; // seed source target count of the get some zero degree nodes
   lengthOfBlastSelectedSegmentsPath: number;
   loadFromFileSubscription: Subscription;
   tabChangeSubscription: Subscription;
@@ -223,6 +224,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.pangenographerBoolSettings[1].isEnable =
       up.isShowUpDownstreamCues.getValue();
     this.sizeOfGetSampleData = up.sizeOfGetSampleData.getValue(); // get the size of get sample data
+    this.seedSourceTargetCount = up.seedSourceTargetCount.getValue(); // get the seed source target count of the get some zero degree nodes
 
     this.setHighlightStyles();
     this.highlightStyleSelected(
@@ -389,6 +391,26 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
     // set the size of the get sample data in the current component
     this.sizeOfGetSampleData = size;
+
+    // save the user preferences
+    this._profile.saveUserPreferences();
+  }
+
+  // Used to change the seed source target count of the get some zero degree nodes
+  // in the user preferences and the current component when the user selects a new count
+  onseedSourceTargetCount(x: any) {
+    let count = parseInt(x.target.value);
+
+    // if the count is less than 1, set it to 1
+    if (count < 1) {
+      count = 1;
+    }
+
+    // set the seed source target count of the get some zero degree nodes in the user preferences
+    this._g.userPreferences.seedSourceTargetCount.next(count);
+
+    // set the seed source target count of the get some zero degree nodes in the current component
+    this.seedSourceTargetCount = count;
 
     // save the user preferences
     this._profile.saveUserPreferences();

@@ -61,6 +61,9 @@ export class GlobalVariableService {
   appDescription = new BehaviorSubject<any>(null);
   dataModel = new BehaviorSubject<any>(null);
   enums = new BehaviorSubject<any>(null);
+  // Below are for counting the number of nodes with zero indegree and outdegree nodes
+  // that are brought by get some zero degree nodes option
+  someZeroDegreeNodesCount = new BehaviorSubject<number>(0);
   cueUpdaters = {};
   constraints: {
     relativePlacementConstraints: any[];

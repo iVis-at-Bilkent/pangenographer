@@ -76,6 +76,9 @@ export interface DbService {
   // Definition for getting sample data
   getSampleData(callback: (x: GraphResponse) => any);
 
+  // Definition for getting some nodes with zero degree
+  getSomeZeroDegreeNodes(callback: (x: GraphResponse) => any);
+
   // Definition for getting all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any);
 

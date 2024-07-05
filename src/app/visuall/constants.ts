@@ -48,6 +48,7 @@ export const PANGENOGRAPHER_SETTING_NAMES = [
   "isHighlightInZeroOutZero",
   "isShowUpDownstreamCues",
   "sizeOfGetSampleData",
+  "seedSourceTargetCount",
 ];
 
 export const HIGHLIGHT_INDEX = {

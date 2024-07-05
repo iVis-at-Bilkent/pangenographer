@@ -53,6 +53,7 @@
     "lengthOfUpDownstream": 3,
     "sizeOfNeo4jQueryBatchesInLines": 10,
     "sizeOfGetSampleData": 150,
+    "seedSourceTargetCount": 10,
     "lengthOfBlastSelectedSegmentsPath": 5,
     "isHighlightInZeroOutZero": true,
     "isShowUpDownstreamCues": true

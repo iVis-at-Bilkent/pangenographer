@@ -44,6 +44,7 @@ export interface UserPreferences {
   isHighlightInZeroOutZero: BehaviorSubject<boolean>;
   isShowUpDownstreamCues: BehaviorSubject<boolean>;
   sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
+  seedSourceTargetCount: BehaviorSubject<number>; // seed source target count
 }
 
 export enum MergedElementIndicatorTypes {

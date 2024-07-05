@@ -236,22 +236,27 @@ export class NavbarComponent implements OnInit, OnDestroy {
         dropdown: "Data",
         actions: [
           {
-            txt: "Get All Zero Degree Nodes",
+            txt: "Get Some Zero Degree Nodes",
             id: "nbi60",
+            fn: "getSomeZeroDegreeNodes",
+          },
+          {
+            txt: "Get All Zero Degree Nodes",
+            id: "nbi61",
             fn: "getAllZeroDegreeNodes",
           },
           {
             txt: "Get All Zero Incoming Degree Nodes",
-            id: "nbi61",
+            id: "nbi62",
             fn: "getAllZeroIncomingDegreeNodes",
           },
           {
             txt: "Get All Zero Outgoing Degree Nodes",
-            id: "nbi62",
+            id: "nbi63",
             fn: "getAllZeroOutgoingDegreeNodes",
           },
-          { txt: "Sample Data", id: "nbi63", fn: "getSampleData" },
-          { txt: "Clear Data", id: "nbi64", fn: "clearDatabase" },
+          { txt: "Sample Data", id: "nbi64", fn: "getSampleData" },
+          { txt: "Clear Data", id: "nbi65", fn: "clearDatabase" },
         ],
       },
     ];
@@ -515,6 +520,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showHideGraphHistory() {
     const v = this._g.showHideGraphHistory.getValue();
     this._g.showHideGraphHistory.next(!v);
+  }
+
+  // Get some nodes with zero degree
+  // Uses cytoscape service to get some nodes with zero degree
+  getSomeZeroDegreeNodes() {
+    this._cyService.getSomeZeroDegreeNodes();
   }
 
   // Get all nodes with zero degree
