@@ -51,6 +51,20 @@ export const PANGENOGRAPHER_SETTING_NAMES = [
   "seedSourceTargetCount",
 ];
 
+export const TOOLTIP_CONFIG = {
+  widthOffset: 11,
+  fontSize: "15",
+  fontWeight: "700",
+  fontFamily: "Inconsolata, monospace",
+  fontStyle: "normal",
+};
+
+export const COMBINED_SEQUENCE_THRESHOLDS = {
+  firstThreshold: 20,
+  secondThreshold: 200,
+  thirdThreshold: 20,
+};
+
 export const HIGHLIGHT_INDEX = {
   zeroIndegree: 0,
   zeroOutdegree: 1,

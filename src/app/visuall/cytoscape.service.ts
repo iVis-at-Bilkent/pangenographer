@@ -283,6 +283,8 @@ export class CytoscapeService {
 
     this._g.isLoadFromDB = true;
 
+    this._g.statusMsg.next("Loaded elements from database!");
+
     // TODO: make this incrementally, not all at once
     this.removeExternalTools();
     this.addExternalTools(this.showUpDownstream.bind(this));
@@ -687,6 +689,10 @@ export class CytoscapeService {
 
     // Check if the file type is suitable
     if (type === "gfa") {
+      // Status message
+      this._g.statusMsg.next("Importing GFA file...");
+
+      // Read the GFA file and call the callback function with the GFA data
       this._fileReaderService.readGFAFile(file, (GFAData: GFAData) => {
         return callback(GFAData);
       });
@@ -698,7 +704,12 @@ export class CytoscapeService {
     }
   }
 
+  // Read GFA sample and call the callback function with the GFA data
   readGFASample(sample: string, callback: (GFAData: GFAData) => Promise<any>) {
+    // Status message
+    this._g.statusMsg.next("Importing GFA sample...");
+
+    // Read the GFA sample and call the callback function with the GFA data
     this._fileReaderService.readGFASample(sample, (GFAData: GFAData) => {
       return callback(GFAData);
     });
@@ -710,7 +721,10 @@ export class CytoscapeService {
     this.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
-    this._dbService.clearDatabase(() => {});
+    this._dbService.clearDatabase(() => {
+      // Status message after clearing the database
+      this._g.statusMsg.next("Database cleared!");
+    });
   }
 
   private str2file(str: string, fileName: string) {

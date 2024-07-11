@@ -340,6 +340,7 @@ export class FileReaderService {
     const processBatch = async ({ done, value }) => {
       if (done && this.previousBatchLastLine === "") {
         console.log("GFA file read successfully");
+        this._g.statusMsg.next("GFA file read successfully");
         return;
       }
 
@@ -618,9 +619,12 @@ export class FileReaderService {
       await processChunks(GFADataChunks).then(() => {
         console.log("Processed batch " + this.readLineCount + " lines");
         this._g.statusMsg.next(
-          "Processed batch " + this.readLineCount + " lines"
+          "Importing GFA sample, processed batch " +
+            this.readLineCount +
+            " lines..."
         );
-        // End of batch processing if there are no more lines to read
+
+        // Continue reading the GFA file by processing the next batch of lines
         return reader.read().then(processBatch).catch(processError);
       });
     };
@@ -647,6 +651,7 @@ export class FileReaderService {
     // Process any errors that occur while reading the GFA file
     const processError = (reason: any) => {
       console.error("Error reading GFA file", reason);
+      this._g.statusMsg.next("Error reading GFA file");
       reader.cancel();
     };
 
@@ -655,9 +660,17 @@ export class FileReaderService {
   }
 
   // Read a GFA sample and process it synchronously in one go without splitting it into chunks
-  readGFASample(gfaSample: string, callback: (GFAData: GFAData) => void) {
+  readGFASample(
+    gfaSample: string,
+    callback: (GFAData: GFAData) => Promise<void>
+  ) {
     let seperatedGFASample = gfaSample.split(/\n/);
-    callback(this.parseGFA(seperatedGFASample)); // Parse the GFA sample and call the callback function
+
+    // Parse the GFA sample and call the callback function
+    callback(this.parseGFA(seperatedGFASample)).then(() => {
+      console.log("Processed GFA sample");
+      this._g.statusMsg.next("Processed GFA sample");
+    });
   }
 
   parseGFA(content: string[]): GFAData {

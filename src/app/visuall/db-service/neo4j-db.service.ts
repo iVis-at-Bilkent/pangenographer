@@ -55,7 +55,6 @@ export class Neo4jDb implements DbService {
       ? `CALL apoc.cypher.run("${query}", null) YIELD value RETURN value`
       : query;
     console.log(q);
-    this._g.statusMsg.next("Executing database query...");
     const requestBody = {
       statements: [
         {
@@ -116,10 +115,6 @@ export class Neo4jDb implements DbService {
           return;
         }
 
-        this._g.statusMsg.next(
-          "The database query has been executed successfully!"
-        );
-
         if (responseType == DbResponseType.graph) {
           callback(this.extractGraph(x));
         } else if (
@@ -156,7 +151,6 @@ export class Neo4jDb implements DbService {
         : query;
       console.log(q);
 
-      this._g.statusMsg.next("Executing database query...");
       const requestBody = {
         statements: [
           {
@@ -227,10 +221,6 @@ export class Neo4jDb implements DbService {
             errFn(x["errors"][0]);
             return;
           }
-
-          this._g.statusMsg.next(
-            "The database query has been executed successfully!"
-          );
 
           let result: any = null;
 

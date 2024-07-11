@@ -4,11 +4,13 @@ import {
   BADGE_POPPER_UPDATE_DELAY,
   BADGE_ZOOM_THRESHOLD,
   COLLAPSED_EDGE_CLASS,
+  COMBINED_SEQUENCE_THRESHOLDS,
   CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER,
-  DEFAULT_NODE_WIDTH,
   debounce,
   debounce2,
+  DEFAULT_NODE_WIDTH,
   mapColor,
+  TOOLTIP_CONFIG,
 } from "./constants";
 import { GlobalVariableService } from "./global-variable.service";
 import { SequenceDataService } from "./sequence-data.service";
@@ -317,11 +319,11 @@ export class ExternalToolService {
 
     // Set tootip constants for the nodes and edges in the graph
     // These constants are used to set the tooltip's font size, weight, family, style, and width
-    let widthOffset = 11;
-    let fontSize = "15";
-    let fontWeight = "700";
-    let fontFamily = "Inconsolata, monospace";
-    let fontStyle = "normal";
+    let widthOffset = TOOLTIP_CONFIG.widthOffset;
+    let fontSize = TOOLTIP_CONFIG.fontSize;
+    let fontWeight = TOOLTIP_CONFIG.fontWeight;
+    let fontFamily = TOOLTIP_CONFIG.fontFamily;
+    let fontStyle = TOOLTIP_CONFIG.fontStyle;
 
     if (isNode) {
       nodes.unbind("mouseover");
@@ -562,9 +564,9 @@ export class ExternalToolService {
 
     // If the element is an edge
     if (element.data("sourceOrientation")) {
-      let firstThreshold = 20; // The maximum length of the first sequence to be shown in the tooltip
-      let secondThreshold = 200; // The maximum length of the second sequence to be shown in the tooltip
-      let thirdThreshold = 20; // The maximum length of the third sequence to be shown in the tooltip
+      let firstThreshold = COMBINED_SEQUENCE_THRESHOLDS.firstThreshold; // The maximum length of the first sequence to be shown in the tooltip
+      let secondThreshold = COMBINED_SEQUENCE_THRESHOLDS.secondThreshold; // The maximum length of the second sequence to be shown in the tooltip
+      let thirdThreshold = COMBINED_SEQUENCE_THRESHOLDS.thirdThreshold; // The maximum length of the third sequence to be shown in the tooltip
       let toAdd = 0; // The number of characters to be added to the sequences to reach the thresholds
       let combinedSequence =
         this._sequenceDataService.prepareCombinedSequence(element); // The combined sequence of the edge
