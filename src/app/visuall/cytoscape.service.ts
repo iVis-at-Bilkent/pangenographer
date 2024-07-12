@@ -396,7 +396,13 @@ export class CytoscapeService {
         return;
       }
 
-      this.loadElementsFromDatabase(data, true, true); // isIncremental = true, dontFit = true
+      // isIncremental = true, dontFit = true
+      this.loadElementsFromDatabase(data, true, true);
+
+      // Zoom in to do not show the zero degree nodes which are brought from the database
+      this._g.cy.zoom(this._g.cy.zoom() + 10000);
+
+      // Get all upstream or downstream nodes of the selected nodes
       this.getAllUpDownstreamNodes(
         data.nodes,
         this._g.userPreferences.lengthOfUpDownstream.getValue()
