@@ -52,8 +52,8 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
   cySelector = "";
   badgeColor = "#007bff";
   isBadgeVisible = true;
-  maxPropValue = 0;
-  currNodeSize = DEFAULT_NODE_WIDTH;
+  maxPropertyValue = 0;
+  currentNodeSize = DEFAULT_NODE_WIDTH;
   appDescSubscription: Subscription;
 
   constructor(
@@ -68,7 +68,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     });
     this._g.appDescription.subscribe((x) => {
       if (x !== null && x.appPreferences.avgNodeSize) {
-        this.currNodeSize = x.appPreferences.avgNodeSize;
+        this.currentNodeSize = x.appPreferences.avgNodeSize;
       }
     });
   }
@@ -103,28 +103,28 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     this._extTool.setBadgePopperValues(
       this.isMapNodeSizes,
       this.isMapBadgeSizes,
-      this.currNodeSize,
-      this.maxPropValue,
+      this.currentNodeSize,
+      this.maxPropertyValue,
       this.badgeColor
     );
 
     // Run the selected property function
     this[this.selectedPropFn]();
 
-    this.maxPropValue = Math.max(
-      ...this._g.cy.nodes().map((x: any) => x.data("__badgeProp"))
+    this.maxPropertyValue = Math.max(
+      ...this._g.cy.nodes().map((x: any) => x.data("__badgeProperty"))
     );
 
     this._cyService.setNodeSizeOnGraphTheoreticProp(
-      this.maxPropValue,
-      this.currNodeSize
+      this.maxPropertyValue,
+      this.currentNodeSize
     );
 
     this._extTool.setBadgePopperValues(
       this.isMapNodeSizes,
       this.isMapBadgeSizes,
-      this.currNodeSize,
-      this.maxPropValue,
+      this.currentNodeSize,
+      this.maxPropertyValue,
       this.badgeColor
     );
 
@@ -346,15 +346,15 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     this._extTool.setBadgePopperValues(
       this.isMapNodeSizes,
       this.isMapBadgeSizes,
-      this.currNodeSize,
-      this.maxPropValue,
+      this.currentNodeSize,
+      this.maxPropertyValue,
       this.badgeColor
     );
   }
 
   avgNodeSizeChanged() {
-    if (this.currNodeSize < 5) {
-      this.currNodeSize = 5;
+    if (this.currentNodeSize < 5) {
+      this.currentNodeSize = 5;
     }
   }
 }

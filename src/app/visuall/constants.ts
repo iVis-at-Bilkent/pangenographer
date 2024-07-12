@@ -31,9 +31,9 @@ export const PATH_WALK_NAME_DISALLOWED_REGEX =
 export const CQL_QUERY_CHANGE_MARKER = "CQL_QUERY_CHANGE_MARKER";
 export const BADGE_ZOOM_THRESHOLD = 0.8;
 export const DEFAULT_NODE_WIDTH = 36;
+export const MIN_NODE_WIDTH = DEFAULT_NODE_WIDTH * 0.75;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
 export const OVERLAP_REGEX = /[MIDNSHPX=]/;
-export const CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER = 1.8;
 
 export const EXPAND_COLLAPSE_FAST_OPT = {
   layoutBy: null,
@@ -50,6 +50,14 @@ export const PANGENOGRAPHER_SETTING_NAMES = [
   "sizeOfGetSampleData",
   "seedSourceTargetCount",
 ];
+
+export const CUE_CONFIG = {
+  marginY: 6,
+  marginX: 9,
+  marginXTwo: 6,
+  nameSizeModifier: 0.5,
+  width: 12,
+};
 
 export const TOOLTIP_CONFIG = {
   widthOffset: 11,

@@ -5,7 +5,7 @@ import {
   BADGE_ZOOM_THRESHOLD,
   COLLAPSED_EDGE_CLASS,
   COMBINED_SEQUENCE_THRESHOLDS,
-  CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER,
+  CUE_CONFIG,
   debounce,
   debounce2,
   DEFAULT_NODE_WIDTH,
@@ -28,9 +28,9 @@ export class ExternalToolService {
   poppedData: PoppedData[] = [];
   isMapNodeSizes: boolean;
   isMapBadgeSizes: boolean;
-  currNodeSize: number;
+  currentNodeSize: number;
   ratioCurrentNodeSize2Default: number;
-  maxPropValue: number;
+  maxPropertyValue: number;
   badgeColor: string;
 
   constructor(
@@ -68,11 +68,11 @@ export class ExternalToolService {
 
     this._g.cy.startBatch();
 
-    let marginY = 6;
-    let marginX = 9;
-    let marginXTwo = 6;
-    let nameSizeModifier = 0.5;
-    let width = 12;
+    let marginY = CUE_CONFIG.marginY;
+    let marginX = CUE_CONFIG.marginX;
+    let marginXTwo = CUE_CONFIG.marginXTwo;
+    let nameSizeModifier = CUE_CONFIG.nameSizeModifier;
+    let width = CUE_CONFIG.width;
 
     nodes.forEach((node: any) => {
       let nameSize =
@@ -281,23 +281,21 @@ export class ExternalToolService {
       this._g.cy.zoom() * (marginX + marginXTwo + nameSize) * marginXNeg;
 
     // Calculate the new margin y again if the node size is changed from the default size
-    // Node size is changed when the BLAST result badges are shown
+    // Node size is changed when the BLAST result badges or graph theoretic property result badges are shown
     // This is done to keep the cues in the same position relative to the node
     // Get the width of the node and calculate the new margins
     let width = node.style("width");
     width = Number(node.style("width").substring(0, width.length - 2));
 
-    // If the width is different than the default node width, adjust the margin y
+    // If the width is different than the default node width
+    // adjust the marginY so that the cues are shown above the node
     if (width !== DEFAULT_NODE_WIDTH) {
-      newMarginY *=
-        (CUE_NODE_SIZE_CHANGE_MARGIN_Y_WIDTH_MODIFIER * width) /
-        DEFAULT_NODE_WIDTH;
+      let maxRatio = Math.max(
+        width / DEFAULT_NODE_WIDTH,
+        DEFAULT_NODE_WIDTH / width
+      );
 
-      // If the width is less than the default node width, double the margin y
-      if (width < DEFAULT_NODE_WIDTH) {
-        newMarginY *=
-          (DEFAULT_NODE_WIDTH / width) * (DEFAULT_NODE_WIDTH / width);
-      }
+      newMarginY *= maxRatio * -0.5; // -0.5 is used to keep the cues above the node
     }
 
     return {
@@ -724,14 +722,14 @@ export class ExternalToolService {
   setBadgePopperValues(
     isMapNodeSizes: boolean,
     isMapBadgeSizes: boolean,
-    currNodeSize: number,
-    maxPropValue: number,
+    currentNodeSize: number,
+    maxPropertyValue: number,
     badgeColor: string
   ) {
     this.isMapNodeSizes = isMapNodeSizes;
     this.isMapBadgeSizes = isMapBadgeSizes;
-    this.currNodeSize = currNodeSize;
-    this.maxPropValue = maxPropValue;
+    this.currentNodeSize = currentNodeSize;
+    this.maxPropertyValue = maxPropertyValue;
     this.badgeColor = badgeColor;
   }
 
@@ -756,7 +754,7 @@ export class ExternalToolService {
       this._g.cy.off("pan zoom resize", this.poppedData[i].fn);
     }
     this.poppedData[i].element.removeClass("badgeDisplay");
-    this.poppedData[i].element.data("__badgeProp", undefined);
+    this.poppedData[i].element.data("__badgeProperty", undefined);
     this.poppedData.splice(i, 1);
   }
 
@@ -773,7 +771,7 @@ export class ExternalToolService {
       for (let i = 0; i < badges.length; i++) {
         sum += badges[i];
       }
-      e.data("__badgeProp", sum / badges.length);
+      e.data("__badgeProperty", sum / badges.length);
     }
     if (this.isMapNodeSizes) {
       e.removeClass("badgeDisplay");
@@ -809,8 +807,8 @@ export class ExternalToolService {
     for (let i = 0; i < this.poppedData.length; i++) {
       let c = mapColor(
         this.badgeColor,
-        this.maxPropValue,
-        this.poppedData[i].element.data("__badgeProp")
+        this.maxPropertyValue,
+        this.poppedData[i].element.data("__badgeProperty")
       );
 
       for (let j = 0; j < this.poppedData[i].popper.children.length; j++) {
@@ -831,38 +829,44 @@ export class ExternalToolService {
     }
   }
 
+  // Set the coordinates of the badge for the given element
+  // The badge is shown on the top right of the element
+  // The badge is scaled according to the zoom level of the graph
+  // TODO: make this function more readable
   private setBadgeCoordinates(e: any, div: HTMLDivElement) {
-    // let the nodes resize first
-    setTimeout(() => {
-      if (this.isMapBadgeSizes) {
-        let b = this.currNodeSize + 20;
-        let a = Math.max(5, this.currNodeSize - 20);
-        let x = e.data("__badgeProp");
-        this.ratioCurrentNodeSize2Default =
-          (((b - a) * x) / this.maxPropValue + a) / this.currNodeSize;
-      } else {
-        this.ratioCurrentNodeSize2Default =
-          this.currNodeSize / DEFAULT_NODE_WIDTH;
-      }
-      this.ratioCurrentNodeSize2Default =
-        this.ratioCurrentNodeSize2Default < BADGE_ZOOM_THRESHOLD
-          ? BADGE_ZOOM_THRESHOLD
-          : this.ratioCurrentNodeSize2Default;
+    // Change the node size according to the maximum property value
+    if (this.isMapBadgeSizes) {
+      let b = this.currentNodeSize + 20;
+      let a = Math.max(5, this.currentNodeSize - 20);
+      let x = e.data("__badgeProperty");
 
-      let z1 = (this._g.cy.zoom() / 2) * this.ratioCurrentNodeSize2Default;
-      const bb = e.renderedBoundingBox({
-        includeLabels: false,
-        includeOverlays: false,
-      });
-      const w = div.clientWidth;
-      const h = div.clientHeight;
-      const deltaW4Scale = ((1 - z1) * w) / 2;
-      const deltaH4Scale = ((1 - z1) * h) / 2;
-      div.style.transform = `translate(${bb.x2 - deltaW4Scale - w * z1}px, ${
-        bb.y1 - deltaH4Scale
-      }px) scale(${z1})`;
-      this.showHideBadge(e.visible(), div);
-    }, 0);
+      this.ratioCurrentNodeSize2Default =
+        (((b - a) * x) / this.maxPropertyValue + a) / this.currentNodeSize;
+    } else {
+      this.ratioCurrentNodeSize2Default =
+        this.currentNodeSize / DEFAULT_NODE_WIDTH;
+    }
+
+    this.ratioCurrentNodeSize2Default =
+      this.ratioCurrentNodeSize2Default < BADGE_ZOOM_THRESHOLD
+        ? BADGE_ZOOM_THRESHOLD
+        : this.ratioCurrentNodeSize2Default;
+
+    let z1 = (this._g.cy.zoom() / 2) * this.ratioCurrentNodeSize2Default;
+
+    const bb = e.renderedBoundingBox({
+      includeLabels: false,
+      includeOverlays: false,
+    });
+
+    const w = div.clientWidth;
+    const h = div.clientHeight;
+    const deltaW4Scale = ((1 - z1) * w) / 2;
+    const deltaH4Scale = ((1 - z1) * h) / 2;
+    div.style.transform = `translate(${bb.x2 - deltaW4Scale - w * z1}px, ${
+      bb.y1 - deltaH4Scale
+    }px) scale(${z1})`;
+    this.showHideBadge(e.visible(), div);
   }
 
   private showHideBadge(isShow: boolean, div: HTMLDivElement) {

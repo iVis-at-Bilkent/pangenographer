@@ -143,14 +143,14 @@ export class CytoscapeService {
       .style({
         width: (e: any) => {
           let b = avgSize + 20;
-          let a = Math.max(5, avgSize - 20);
-          let x = e.data("__badgeProp");
+          let a = Math.max(C.MIN_NODE_WIDTH, avgSize - 20);
+          let x = e.data("__badgeProperty");
           return ((b - a) * x) / maxVal + a + "px";
         },
         height: (e: any) => {
           let b = avgSize + 20;
-          let a = Math.max(5, avgSize - 20);
-          let x = e.data("__badgeProp");
+          let a = Math.max(C.MIN_NODE_WIDTH, avgSize - 20);
+          let x = e.data("__badgeProperty");
           return ((((b - a) * x) / maxVal + a) * e.height()) / e.width() + "px";
         },
       })
