@@ -288,14 +288,14 @@ export class ExternalToolService {
     width = Number(node.style("width").substring(0, width.length - 2));
 
     // If the width is different than the default node width
-    // adjust the marginY so that the cues are shown above the node
+    // adjust the marginY so that the cues are shown below the node
     if (width !== DEFAULT_NODE_WIDTH) {
       let maxRatio = Math.max(
         width / DEFAULT_NODE_WIDTH,
         DEFAULT_NODE_WIDTH / width
       );
 
-      newMarginY *= maxRatio * -0.5; // -0.5 is used to keep the cues above the node
+      newMarginY *= maxRatio * 3; // * 3 is used to make sure the cues are shown below the node
     }
 
     return {
