@@ -171,8 +171,13 @@ export class CytoscapeService {
     dontFit: boolean = false,
     dontHighlight: boolean = false
   ) {
+    // Show loading spinner
+    this._g.statusMsg.next("Loading elements from database...");
+    this._g.setLoadingStatus(true);
+
     if (!isIncremental) {
       this._g.cy.panBy({ x: 2000, y: 2000 }); // Remove the flash effect
+      this._g.someZeroDegreeNodesCount.next(0);
     }
 
     if (!data || !data.nodes || !data.edges) {
@@ -281,14 +286,14 @@ export class CytoscapeService {
       this.highlightElements(elementIds);
     }
 
-    this._g.isLoadFromDB = true;
-
-    this._g.statusMsg.next("Loaded elements from database!");
-
     // TODO: make this incrementally, not all at once
     this.removeExternalTools();
     this.addExternalTools(this.showUpDownstream.bind(this));
     this.applyStyle4NewElements();
+
+    this._g.isLoadFromDB = true;
+    this._g.statusMsg.next("Loaded elements from database!");
+    this._g.setLoadingStatus(false);
   }
 
   // Add external tools to the graph

@@ -129,6 +129,8 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
     );
 
     this._extTool.setBadgeColorsAndCoords();
+
+    this._extTool.updateCues(); // Update the cues on the graph
   }
 
   private edgeWeightFn(edge: any) {
