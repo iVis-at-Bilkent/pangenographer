@@ -19,7 +19,7 @@ import { GlobalVariableService } from "./global-variable.service";
   providedIn: "root",
 })
 export class FileReaderService {
-  previousBatchLastLine: string; // Save the last line of the previous batch to be added to the next batch
+  previousBatchRemainders: string; // Save the remainder of the previous batch to be added to the next batch
   readLineCount: number = 0; // Count the number of lines read from the GFA file
 
   constructor(private _g: GlobalVariableService) {}
@@ -317,6 +317,50 @@ export class FileReaderService {
     return { path, segments, edges };
   }
 
+  // Handle the previous batch remainders by adding them to the next batch of lines to send
+  // This function gets the combined text of the previous batch and the current batch of lines
+  // and splits the text into lines to be sent by checking the total character length of the lines to send and the last line
+  private handlePreviousBatchRemainders(combinedText: string): string[] {
+    // Split the text into lines as the GFA file is line-based
+    let linesToSend = combinedText.split(/\n/);
+
+    // Calculate the character length of the lines to send
+    // If the total character length of the lines to send exceeds the maximum character length of the batch
+    // then add the remainder of the current batch to the next batch
+    // Do not count the last line as it may be incomplete and should be added to the next batch
+    let totalLength = 0;
+    let okayToSendIndex = 0;
+    for (let i = 0; i < linesToSend.length - 1; i++) {
+      totalLength += linesToSend[i].length;
+
+      // Check if the total character length of the lines to send exceeds the maximum character length of the batch
+      if (
+        totalLength <=
+        this._g.userPreferences.sizeOfNeo4jQueryBatchesInCharacters.getValue()
+      ) {
+        okayToSendIndex = i;
+      } else {
+        break;
+      }
+    }
+
+    // Save the remainder of the current batch to be added to the next batch
+    this.previousBatchRemainders = linesToSend
+      .slice(okayToSendIndex + 1)
+      .join("\n");
+
+    // Update the lines to send by taking only the lines that can be sent
+    linesToSend = linesToSend.slice(0, okayToSendIndex + 1);
+
+    // Check if the lines to send are empty, add the previous batch remainders to the lines to send
+    if (linesToSend.length === 0) {
+      linesToSend = this.previousBatchRemainders.split(/\n/);
+      this.previousBatchRemainders = "";
+    }
+
+    return linesToSend;
+  }
+
   // Read a GFA file and process it in chunks
   // This function reads the GFA file in chunks and processes each chunk asynchronously
   // The GFA file is read line by line and split into chunks of lines
@@ -330,41 +374,32 @@ export class FileReaderService {
     const reader = gfaFile.stream().getReader(); // Get a reader for the stream
     const decoder = new TextDecoder("utf-8"); // Create a new TextDecoder
 
-    // Save the last line of the previous batch to be added to the next batch
-    // This is necessary because the GFA file is line-based and the last line of a batch may be incomplete
-    this.previousBatchLastLine = "";
+    // Save the remainder of the previous batch to be added to the next batch
+    // This is necessary because the GFA file is line-based and the last line and remainder of a batch may be incomplete
+    this.previousBatchRemainders = "";
 
-    this.readLineCount = 0; // Initialize the number of lines read from the GFA file
+    // Initialize the number of lines read from the GFA file
+    this.readLineCount = 0;
 
     // Process each batch of lines read from the GFA file
     const processBatch = async ({ done, value }) => {
-      if (done && this.previousBatchLastLine === "") {
+      if (done && this.previousBatchRemainders === "") {
         console.log("GFA file read successfully");
         this._g.statusMsg.next("GFA file read successfully");
         return;
       }
 
-      // Separate the last line from the previous batch and add it to the current batch
-      let text =
-        this.previousBatchLastLine + decoder.decode(value, { stream: true });
-
-      // Split the text into lines as the GFA file is line-based
-      let lines = text.split(/\n/);
-
-      // Save the last line of the current batch to be added to the next batch
-      this.previousBatchLastLine = lines.pop() || "";
-
-      // Check if the last line of the current batch is empty
-      if (lines.length === 0) {
-        lines.push(this.previousBatchLastLine);
-        this.previousBatchLastLine = "";
-      }
+      // Get the lines to send from the combined text of the previous batch and the current batch of lines
+      // Split the text into lines as the GFA file is line-based and handle the previous batch remainders
+      let linesToSend = this.handlePreviousBatchRemainders(
+        this.previousBatchRemainders + decoder.decode(value, { stream: true })
+      );
 
       // Increment the number of lines read from the GFA file
-      this.readLineCount += lines.length;
+      this.readLineCount += linesToSend.length;
 
       // Parse the lines to create the GFA data
-      let GFAData: GFAData = this.parseGFA(lines);
+      let GFAData: GFAData = this.parseGFA(linesToSend);
 
       // Split the GFAData into chunks, each chunk has equal amount of objects
       // Do not forget Path and Path lines create more than one objects (lines), themselves + amount of segments in them

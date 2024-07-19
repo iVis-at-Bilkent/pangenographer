@@ -31,39 +31,39 @@ import { UserProfileService } from "../../user-profile.service";
   styleUrls: ["./settings-tab.component.css"],
 })
 export class SettingsTabComponent implements OnInit, OnDestroy {
-  generalBoolSettings: BoolSetting[];
-  pangenographerBoolSettings: BoolSetting[];
-  highlightWidth: number;
-  highlightColor: string;
-  compoundPadding: string;
   @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
   @ViewChild("dbQueryDate2", { static: false }) dbQueryDate2: ElementRef;
-  dataPageSize: number;
-  dataPageLimit: number;
-  queryHistoryLimit: number;
-  dbTimeout: number;
-  tableColumnLimit: number;
-  edgeCollapseLimit: number;
-  mergedElementIndicators: string[] = ["None", "Selection", "Highlight"];
-  groupingOptions: string[] = ["Compounds", "Circles"];
-  // multiple choice settings
-  queryResultPagination: "Client" | "Server";
-  mergedElementIndicator: MergedElementIndicatorTypes;
-  groupingOption: GroupingOptionTypes;
-  nodeLabelWrap: number = 0;
-  isInit: boolean = false;
+  compoundPadding: string;
   currentHighlightStyles: string[] = [];
+  dataPageLimit: number;
+  dataPageSize: number;
+  dbTimeout: number;
+  edgeCollapseLimit: number;
+  generalBoolSettings: BoolSetting[];
+  groupingOption: GroupingOptionTypes;
+  groupingOptions: string[] = ["Compounds", "Circles"];
+  highlightColor: string;
   highlightStyleIdx = 0;
-  isStoreUserProfile = true;
+  highlightWidth: number;
+  isInit: boolean = false;
+  isStoreUserProfile: boolean = true;
+  lengthOfBlastSelectedSegmentsPath: number;
+  lengthOfUpDownstream: number;
+  loadFromFileSubscription: Subscription;
+  mergedElementIndicator: MergedElementIndicatorTypes;
+  mergedElementIndicators: string[] = ["None", "Selection", "Highlight"];
+  nodeLabelWrap: number = 0;
+  pangenographerBoolSettings: BoolSetting[];
+  queryHistoryLimit: number;
+  queryResultPagination: "Client" | "Server";
+  seedSourceTargetCount: number; // seed source target count of the get some zero degree nodes
   selectionColor = "#6c757d";
   selectionWidth = 4.5;
-  lengthOfUpDownstream: number;
-  sizeOfNeo4jQueryBatchesInLines: number; // size of Neo4j query batches in lines
   sizeOfGetSampleData: number; // size of get sample data
-  seedSourceTargetCount: number; // seed source target count of the get some zero degree nodes
-  lengthOfBlastSelectedSegmentsPath: number;
-  loadFromFileSubscription: Subscription;
+  sizeOfNeo4jQueryBatchesInCharacters: number; // size of Neo4j query batches in characters
+  sizeOfNeo4jQueryBatchesInLines: number; // size of Neo4j query batches in lines
   tabChangeSubscription: Subscription;
+  tableColumnLimit: number;
 
   constructor(
     private _g: GlobalVariableService,
@@ -203,7 +203,6 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up.highlightStyles[
         this._g.userPreferences.currHighlightIdx.getValue()
       ].wid.getValue();
-
     this.selectionColor = up.selectionColor.getValue();
     this.selectionWidth = up.selectionWidth.getValue();
     this._g.cy
@@ -214,17 +213,19 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.isStoreUserProfile = up.isStoreUserProfile.getValue();
     this.queryResultPagination = up.queryResultPagination.getValue();
 
-    this.lengthOfUpDownstream = up.lengthOfUpDownstream.getValue(); // get the length of the upstream and downstream
-    this.sizeOfNeo4jQueryBatchesInLines =
-      up.sizeOfNeo4jQueryBatchesInLines.getValue(); // get the size of the Neo4j query batches in lines
     this.lengthOfBlastSelectedSegmentsPath =
       up.lengthOfBlastSelectedSegmentsPath.getValue();
+    this.lengthOfUpDownstream = up.lengthOfUpDownstream.getValue(); // get the length of the upstream and downstream
     this.pangenographerBoolSettings[0].isEnable =
       up.isHighlightInZeroOutZero.getValue();
     this.pangenographerBoolSettings[1].isEnable =
       up.isShowUpDownstreamCues.getValue();
-    this.sizeOfGetSampleData = up.sizeOfGetSampleData.getValue(); // get the size of get sample data
     this.seedSourceTargetCount = up.seedSourceTargetCount.getValue(); // get the seed source target count of the get some zero degree nodes
+    this.sizeOfGetSampleData = up.sizeOfGetSampleData.getValue(); // get the size of get sample data
+    this.sizeOfNeo4jQueryBatchesInCharacters =
+      up.sizeOfNeo4jQueryBatchesInCharacters.getValue(); // get the size of the Neo4j query batches in characters
+    this.sizeOfNeo4jQueryBatchesInLines =
+      up.sizeOfNeo4jQueryBatchesInLines.getValue(); // get the size of the Neo4j query batches in lines
 
     this.setHighlightStyles();
     this.highlightStyleSelected(
@@ -358,7 +359,28 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this._profile.saveUserPreferences();
   }
 
-  // Used to change the size of the Neo4j query batches in the user preferences and the current component when the user selects a new size
+  // Used to change the size of the Neo4j query batches in characters in the user preferences
+  // and the current component when the user selects a new size
+  onsizeOfNeo4jQueryBatchesInCharactersSelected(x: any) {
+    let size = parseInt(x.target.value);
+
+    // if the size is less than 1, set it to 1
+    if (size < 1) {
+      size = 1;
+    }
+
+    // set the size of the Neo4j query batches in characters in the user preferences
+    this._g.userPreferences.sizeOfNeo4jQueryBatchesInCharacters.next(size);
+
+    // set the size of the Neo4j query batches in characters in the current component
+    this.sizeOfNeo4jQueryBatchesInCharacters = size;
+
+    // save the user preferences
+    this._profile.saveUserPreferences();
+  }
+
+  // Used to change the size of the Neo4j query batches in the user preferences
+  // and the current component when the user selects a new size
   onsizeOfNeo4jQueryBatchesInLinesSelected(x: any) {
     let size = parseInt(x.target.value);
 

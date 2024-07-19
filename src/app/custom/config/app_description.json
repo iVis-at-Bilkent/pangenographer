@@ -1,243 +1,83 @@
 {
   "appInfo": {
-    "name": "PanGenoGrapher",
+    "company_contact": "ivis@cs.bilkent.edu.tr",
     "html_header": "PanGenoGrapher",
     "icon": "app/custom/assets/logo.png",
-    "version": "1.0.0 beta",
-    "company_contact": "ivis@cs.bilkent.edu.tr"
+    "name": "PanGenoGrapher",
+    "version": "1.0.0 beta"
   },
-  "objects": {
-    "SEGMENT": {
-      "properties": {
-        "segmentName": "string",
-        "segmentData": "string",
-        "segmentLength": "number",
-        "readCount": "number",
-        "fragmentCount": "number",
-        "kmerCount": "number",
-        "SHA256Checksum": "string",
-        "URIorLocalSystemPath": "string",
-        "pathNames": "string[]",
-        "walkSampleIdentifiers": "string[]"
-      },
-      "style": {
-        "label": "Segment",
-        "color": "black",
-        "text-outline-color": "white",
-        "text-outline-width": "0px",
-        "font-size": "7px",
-        "font-family": "Inconsolata, monospace",
-        "shape": "round-rectangle",
-        "background-fit": "contain",
-        "background-color": "white",
-        "border-color": "gray",
-        "border-width": "0.5px",
-        "width": "36px",
-        "height": "18px"
-      }
-    },
-    "WALK": {
-      "properties": {
-        "sampleIdentifier": "string",
-        "haplotypeIndex": "string",
-        "sequenceIdentifier": "string",
-        "sequenceStart": "string",
-        "sequenceEnd": "string",
-        "walk": "string"
-      },
-      "style": {
-        "label": "WALK",
-        "color": "black",
-        "text-outline-color": "white",
-        "text-outline-width": "0px",
-        "font-size": "7px",
-        "font-family": "Inconsolata, monospace",
-        "shape": "round-rectangle",
-        "background-fit": "contain",
-        "background-color": "white",
-        "border-color": "gray",
-        "border-width": "0.5px",
-        "width": "36px",
-        "height": "18px"
-      }
-    },
-    "PATH": {
-      "properties": {
-        "pathName": "string",
-        "segmentNames": "string",
-        "overlaps": "string"
-      },
-      "style": {
-        "label": "PATH",
-        "color": "black",
-        "text-outline-color": "white",
-        "text-outline-width": "0px",
-        "font-size": "7px",
-        "font-family": "Inconsolata, monospace",
-        "shape": "round-rectangle",
-        "background-fit": "contain",
-        "background-color": "white",
-        "border-color": "gray",
-        "border-width": "0.5px",
-        "width": "36px",
-        "height": "18px"
-      }
-    }
-  },
-  "relations": {
-    "LINK": {
-      "source": "SEGMENT",
-      "target": "SEGMENT",
-      "isBidirectional": false,
-      "properties": {
-        "sequenceLength": "number",
-        "overlap": "string",
-        "targetOrientation": "string",
-        "sourceOrientation": "string",
-        "mappingQuality": "number",
-        "numberOfMismatchesOrGaps": "number",
-        "readCount": "number",
-        "fragmentCount": "number",
-        "kmerCount": "number",
-        "edgeIdentifier": "string",
-        "pathNames": "string[]",
-        "walkSampleIdentifiers": "string[]"
-      },
-      "style": {
-        "label": "Link",
-        "width": "1px",
-        "font-size": "5px",
-        "line-color": "gray",
-        "line-style": "solid",
-        "target-arrow-shape": "none",
-        "source-arrow-shape": "none",
-        "text-rotation": "autorotate",
-        "arrow-scale": "0.75"
-      }
-    },
-    "JUMP": {
-      "source": "SEGMENT",
-      "target": "SEGMENT",
-      "isBidirectional": false,
-      "properties": {
-        "sequenceLength": "string",
-        "targetOrientation": "string",
-        "sourceOrientation": "string",
-        "indirectShortcutConnections": "number",
-        "distance": "string",
-        "pathNames": "string[]"
-      },
-      "style": {
-        "label": "Jump",
-        "width": "1px",
-        "font-size": "5px",
-        "line-color": "gray",
-        "line-style": "dotted",
-        "target-arrow-shape": "none",
-        "source-arrow-shape": "none",
-        "text-rotation": "autorotate",
-        "arrow-scale": "0.75"
-      }
-    },
-    "CONTAINMENT": {
-      "source": "SEGMENT",
-      "target": "SEGMENT",
-      "isBidirectional": false,
-      "properties": {
-        "sequenceLength": "string",
-        "pos": "number",
-        "overlap": "string",
-        "targetOrientation": "string",
-        "sourceOrientation": "string",
-        "readCount": "number",
-        "numberOfMismatchesOrGaps": "number",
-        "edgeIdentifier": "string"
-      },
-      "style": {
-        "label": "Containment",
-        "width": "1px",
-        "font-size": "5px",
-        "line-color": "gray",
-        "line-style": "dashed",
-        "target-arrow-shape": "none",
-        "source-arrow-shape": "none",
-        "text-rotation": "autorotate",
-        "arrow-scale": "0.75"
-      }
-    }
-  },
-  "enumMapping": {},
   "appPreferences": {
-    "isAutoIncrementalLayoutOnChange": true,
-    "isHighlightOnHover": false,
-    "isShowOverviewWindow": false,
-    "isShowEdgeLabels": false,
-    "isTileDisconnectedOnLayout": true,
-    "isIgnoreCaseInText": false,
-    "isOnlyHighlight4LatestQuery": true,
-    "isStoreUserProfile": true,
-    "isCollapseEdgesBasedOnType": false,
-    "isCollapseMultiEdgesOnLoad": true,
-    "isLimitDbQueries2range": true,
-    "dbQueryTimeRange": {
-      "start": -5364669352000,
-      "end": 4102434000000
-    },
-    "savedLists": {
-      "numberLists": [],
-      "stringLists": [],
-      "enumLists": []
-    },
-    "dataPageSize": 15,
+    "avgNodeSize": 36,
+    "compoundPadding": "5%",
+    "currHighlightIdx": 2,
     "dataPageLimit": 15,
-    "queryHistoryLimit": 10,
+    "dataPageSize": 15,
+    "dbQueryTimeRange": {
+      "end": 4102434000000,
+      "start": -5364669352000
+    },
     "dbTimeout": 60,
-    "tableColumnLimit": 3,
+    "edgeCollapseLimit": 2,
+    "groupingOption": 0,
     "highlightStyles": [
       {
-        "wid": 5,
-        "color": "#0000ff"
+        "color": "#0000ff",
+        "wid": 5
       },
       {
-        "wid": 5,
-        "color": "#ff0000"
+        "color": "#ff0000",
+        "wid": 5
       },
       {
-        "wid": 3,
-        "color": "#FCE903"
+        "color": "#FCE903",
+        "wid": 3
       },
       {
-        "wid": 3,
-        "color": "#00ffff"
+        "color": "#00ffff",
+        "wid": 3
       },
       {
-        "wid": 3,
-        "color": "#04f06a"
+        "color": "#04f06a",
+        "wid": 3
       }
     ],
-    "currHighlightIdx": 2,
-    "selectionColor": "#6c757d",
-    "selectionWidth": 4.5,
-    "groupingOption": 0,
+    "isAutoIncrementalLayoutOnChange": true,
+    "isCollapseEdgesBasedOnType": false,
+    "isCollapseMultiEdgesOnLoad": true,
+    "isHighlightInZeroOutZero": true,
+    "isHighlightOnHover": false,
+    "isIgnoreCaseInText": false,
+    "isLimitDbQueries2range": true,
+    "isOnlyHighlight4LatestQuery": true,
+    "isShowEdgeLabels": false,
+    "isShowOverviewWindow": false,
+    "isShowUpDownstreamCues": true,
+    "isStoreUserProfile": true,
+    "isTileDisconnectedOnLayout": true,
+    "lengthOfBlastSelectedSegmentsPath": 5,
+    "lengthOfUpDownstream": 3,
     "mergedElemIndicator": 2,
     "nodeLabelWrap": 0,
-    "compoundPadding": "5%",
-    "edgeCollapseLimit": 2,
-    "avgNodeSize": 36,
     "objectInclusionType": 0,
+    "queryHistoryLimit": 10,
     "queryResultPagination": "Client",
-    "tilingPadding": 4,
-    "lengthOfUpDownstream": 3,
-    "sizeOfNeo4jQueryBatchesInLines": 10,
+    "savedLists": {
+      "enumLists": [],
+      "numberLists": [],
+      "stringLists": []
+    },
+    "selectionColor": "#6c757d",
+    "selectionWidth": 4.5,
     "sizeOfGetSampleData": 150,
+    "sizeOfNeo4jQueryBatchesInCharacters": 10000,
+    "sizeOfNeo4jQueryBatchesInLines": 10,
     "sizeSourceTargetCount": 10,
-    "lengthOfBlastSelectedSegmentsPath": 5,
-    "isHighlightInZeroOutZero": true,
-    "isShowUpDownstreamCues": true
+    "tableColumnLimit": 3,
+    "tilingPadding": 4
   },
   "cssStyle": {
-    ".va-title": {
-      "font-size": "20px"
+    ".panel-heading": {
+      "height": "17px"
     },
     ".va-heading1": {
       "font-size": "14px",
@@ -246,17 +86,178 @@
     ".va-heading2": {
       "font-size": "12px"
     },
-    ".panel-heading": {
-      "height": "17px"
-    },
     ".va-heading3": {
-      "font-size": "12px"
-    },
-    ".va-text": {
       "font-size": "12px"
     },
     ".va-small-text": {
       "font-size": "11px"
+    },
+    ".va-text": {
+      "font-size": "12px"
+    },
+    ".va-title": {
+      "font-size": "20px"
+    }
+  },
+  "enumMapping": {},
+  "objects": {
+    "PATH": {
+      "properties": {
+        "overlaps": "string",
+        "pathName": "string",
+        "segmentNames": "string"
+      },
+      "style": {
+        "background-color": "white",
+        "background-fit": "contain",
+        "border-color": "gray",
+        "border-width": "0.5px",
+        "color": "black",
+        "font-family": "Inconsolata, monospace",
+        "font-size": "7px",
+        "height": "18px",
+        "label": "PATH",
+        "shape": "round-rectangle",
+        "text-outline-color": "white",
+        "text-outline-width": "0px",
+        "width": "36px"
+      }
+    },
+    "SEGMENT": {
+      "properties": {
+        "SHA256Checksum": "string",
+        "URIorLocalSystemPath": "string",
+        "fragmentCount": "number",
+        "kmerCount": "number",
+        "pathNames": "string[]",
+        "readCount": "number",
+        "segmentData": "string",
+        "segmentLength": "number",
+        "segmentName": "string",
+        "walkSampleIdentifiers": "string[]"
+      },
+      "style": {
+        "background-color": "white",
+        "background-fit": "contain",
+        "border-color": "gray",
+        "border-width": "0.5px",
+        "color": "black",
+        "font-family": "Inconsolata, monospace",
+        "font-size": "7px",
+        "height": "18px",
+        "label": "Segment",
+        "shape": "round-rectangle",
+        "text-outline-color": "white",
+        "text-outline-width": "0px",
+        "width": "36px"
+      }
+    },
+    "WALK": {
+      "properties": {
+        "haplotypeIndex": "string",
+        "sampleIdentifier": "string",
+        "sequenceEnd": "string",
+        "sequenceIdentifier": "string",
+        "sequenceStart": "string",
+        "walk": "string"
+      },
+      "style": {
+        "background-color": "white",
+        "background-fit": "contain",
+        "border-color": "gray",
+        "border-width": "0.5px",
+        "color": "black",
+        "font-family": "Inconsolata, monospace",
+        "font-size": "7px",
+        "height": "18px",
+        "label": "WALK",
+        "shape": "round-rectangle",
+        "text-outline-color": "white",
+        "text-outline-width": "0px",
+        "width": "36px"
+      }
+    }
+  },
+  "relations": {
+    "CONTAINMENT": {
+      "isBidirectional": false,
+      "properties": {
+        "edgeIdentifier": "string",
+        "numberOfMismatchesOrGaps": "number",
+        "overlap": "string",
+        "pos": "number",
+        "readCount": "number",
+        "sequenceLength": "string",
+        "sourceOrientation": "string",
+        "targetOrientation": "string"
+      },
+      "source": "SEGMENT",
+      "style": {
+        "arrow-scale": "0.75",
+        "font-size": "5px",
+        "label": "Containment",
+        "line-color": "gray",
+        "line-style": "dashed",
+        "source-arrow-shape": "none",
+        "target-arrow-shape": "none",
+        "text-rotation": "autorotate",
+        "width": "1px"
+      },
+      "target": "SEGMENT"
+    },
+    "JUMP": {
+      "isBidirectional": false,
+      "properties": {
+        "distance": "string",
+        "indirectShortcutConnections": "number",
+        "pathNames": "string[]",
+        "sequenceLength": "string",
+        "sourceOrientation": "string",
+        "targetOrientation": "string"
+      },
+      "source": "SEGMENT",
+      "style": {
+        "arrow-scale": "0.75",
+        "font-size": "5px",
+        "label": "Jump",
+        "line-color": "gray",
+        "line-style": "dotted",
+        "source-arrow-shape": "none",
+        "target-arrow-shape": "none",
+        "text-rotation": "autorotate",
+        "width": "1px"
+      },
+      "target": "SEGMENT"
+    },
+    "LINK": {
+      "isBidirectional": false,
+      "properties": {
+        "edgeIdentifier": "string",
+        "fragmentCount": "number",
+        "kmerCount": "number",
+        "mappingQuality": "number",
+        "numberOfMismatchesOrGaps": "number",
+        "overlap": "string",
+        "pathNames": "string[]",
+        "readCount": "number",
+        "sequenceLength": "number",
+        "sourceOrientation": "string",
+        "targetOrientation": "string",
+        "walkSampleIdentifiers": "string[]"
+      },
+      "source": "SEGMENT",
+      "style": {
+        "arrow-scale": "0.75",
+        "font-size": "5px",
+        "label": "Link",
+        "line-color": "gray",
+        "line-style": "solid",
+        "source-arrow-shape": "none",
+        "target-arrow-shape": "none",
+        "text-rotation": "autorotate",
+        "width": "1px"
+      },
+      "target": "SEGMENT"
     }
   }
 }

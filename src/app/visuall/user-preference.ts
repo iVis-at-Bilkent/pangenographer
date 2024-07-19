@@ -2,49 +2,47 @@ import { BehaviorSubject } from "rxjs";
 import { QueryRule } from "./operation-tabs/map-tab/query-types";
 
 export interface UserPreferences {
-  // Boolean settings
-  isAutoIncrementalLayoutOnChange: BehaviorSubject<boolean>;
-  isHighlightOnHover: BehaviorSubject<boolean>;
-  isShowOverviewWindow: BehaviorSubject<boolean>;
-  isShowEdgeLabels: BehaviorSubject<boolean>;
-  isTileDisconnectedOnLayout: BehaviorSubject<boolean>;
-  isIgnoreCaseInText: BehaviorSubject<boolean>;
-  isOnlyHighlight4LatestQuery: BehaviorSubject<boolean>;
-  isStoreUserProfile: BehaviorSubject<boolean>;
-  isCollapseEdgesBasedOnType: BehaviorSubject<boolean>;
-  isCollapseMultiEdgesOnLoad: BehaviorSubject<boolean>;
-
-  // Show query results using 'Selection', 'Highlight'
-  mergedElementIndicator: BehaviorSubject<MergedElementIndicatorTypes>;
-  groupingOption: BehaviorSubject<GroupingOptionTypes>;
-  nodeLabelWrap: BehaviorSubject<TextWrapTypes>;
-  isLimitDbQueries2range: BehaviorSubject<boolean>;
-  savedLists: SavedLists;
-  dataPageSize: BehaviorSubject<number>;
+  compoundPadding: BehaviorSubject<string>;
+  currHighlightIdx: BehaviorSubject<number>;
   dataPageLimit: BehaviorSubject<number>;
-  queryHistoryLimit: BehaviorSubject<number>;
+  dataPageSize: BehaviorSubject<number>;
   dbTimeout: BehaviorSubject<number>;
-  tableColumnLimit: BehaviorSubject<number>;
+  edgeCollapseLimit: BehaviorSubject<number>;
+  groupingOption: BehaviorSubject<GroupingOptionTypes>;
   highlightStyles: {
     wid: BehaviorSubject<number>;
     color: BehaviorSubject<string>;
   }[];
-  currHighlightIdx: BehaviorSubject<number>;
-  compoundPadding: BehaviorSubject<string>;
-  edgeCollapseLimit: BehaviorSubject<number>;
+  isAutoIncrementalLayoutOnChange: BehaviorSubject<boolean>;
+  isCollapseEdgesBasedOnType: BehaviorSubject<boolean>;
+  isCollapseMultiEdgesOnLoad: BehaviorSubject<boolean>;
+  isHighlightOnHover: BehaviorSubject<boolean>;
+  isIgnoreCaseInText: BehaviorSubject<boolean>;
+  isLimitDbQueries2range: BehaviorSubject<boolean>;
+  isOnlyHighlight4LatestQuery: BehaviorSubject<boolean>;
+  isShowEdgeLabels: BehaviorSubject<boolean>;
+  isShowOverviewWindow: BehaviorSubject<boolean>;
+  isStoreUserProfile: BehaviorSubject<boolean>;
+  isTileDisconnectedOnLayout: BehaviorSubject<boolean>;
+  mergedElementIndicator: BehaviorSubject<MergedElementIndicatorTypes>;
+  nodeLabelWrap: BehaviorSubject<TextWrapTypes>;
+  queryHistoryLimit: BehaviorSubject<number>;
   queryResultPagination: BehaviorSubject<"Client" | "Server">;
+  savedLists: SavedLists;
   selectionColor: BehaviorSubject<string>;
   selectionWidth: BehaviorSubject<number>;
+  tableColumnLimit: BehaviorSubject<number>;
   tilingPadding: BehaviorSubject<number>;
 
   // PanGenoGrapher Settings
+  isHighlightInZeroOutZero: BehaviorSubject<boolean>; // highlight in zero out zero
+  isShowUpDownstreamCues: BehaviorSubject<boolean>; // show upstream/downstream cues
   lengthOfUpDownstream: BehaviorSubject<number>; // length of upstream/downstream
-  sizeOfNeo4jQueryBatchesInLines: BehaviorSubject<number>; // size of neo4j query batches in lines
-  lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>;
-  isHighlightInZeroOutZero: BehaviorSubject<boolean>;
-  isShowUpDownstreamCues: BehaviorSubject<boolean>;
-  sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
+  lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>; // length of blast selected segments path
   seedSourceTargetCount: BehaviorSubject<number>; // seed source target count
+  sizeOfNeo4jQueryBatchesInCharacters: BehaviorSubject<number>; // size of neo4j query batches in characters
+  sizeOfNeo4jQueryBatchesInLines: BehaviorSubject<number>; // size of neo4j query batches in lines
+  sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
 }
 
 export enum MergedElementIndicatorTypes {

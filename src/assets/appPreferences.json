@@ -1,60 +1,61 @@
 {
-    "isAutoIncrementalLayoutOnChange": true,
-    "isHighlightOnHover": true,
-    "isShowOverviewWindow": false,
-    "isShowEdgeLabels": true,
-    "isTileDisconnectedOnLayout": true,
-    "isIgnoreCaseInText": false,
-    "isOnlyHighlight4LatestQuery": true,
-    "isStoreUserProfile": true,
-    "isCollapseEdgesBasedOnType": false,
-    "isCollapseMultiEdgesOnLoad": true,
-    "isLimitDbQueries2range": true,
-    "dbQueryTimeRange": {
-        "start": -5364669352000,
-        "end": 4102434000000
-    },
-    "savedLists": {
-        "numberLists": [],
-        "stringLists": [],
-        "enumLists": []
-    },
-    "dataPageSize": 15,
+    "avgNodeSize": 40,
+    "compoundPadding": "5%",
+    "currHighlightIdx": 0,
     "dataPageLimit": 15,
-    "queryHistoryLimit": 10,
+    "dataPageSize": 15,
+    "dbQueryTimeRange": {
+        "end": 4102434000000,
+        "start": -5364669352000
+    },
     "dbTimeout": 10,
-    "tableColumnLimit": 3,
+    "edgeCollapseLimit": 2,
+    "groupingOption": 0,
     "highlightStyles": [
         {
-            "wid": 3,
-            "color": "#FCE903"
+            "color": "#FCE903",
+            "wid": 3
         },
         {
-            "wid": 3,
-            "color": "#00ffff"
+            "color": "#00ffff",
+            "wid": 3
         },
         {
-            "wid": 3,
-            "color": "#04f06a"
+            "color": "#04f06a",
+            "wid": 3
         }
     ],
-    "currHighlightIdx": 0,
-    "selectionColor": "#6c757d",
-    "selectionWidth": 4.5,
-    "groupingOption": 0,
+    "isAutoIncrementalLayoutOnChange": true,
+    "isCollapseEdgesBasedOnType": false,
+    "isCollapseMultiEdgesOnLoad": true,
+    "isHighlightInZeroOutZero": true,
+    "isHighlightOnHover": true,
+    "isIgnoreCaseInText": false,
+    "isLimitDbQueries2range": true,
+    "isOnlyHighlight4LatestQuery": true,
+    "isShowEdgeLabels": true,
+    "isShowOverviewWindow": false,
+    "isShowUpDownstreamCues": true,
+    "isStoreUserProfile": true,
+    "isTileDisconnectedOnLayout": true,
+    "lengthOfBlastSelectedSegmentsPath": 5,
+    "lengthOfUpDownstream": 3,
     "mergedElementIndicator": 2,
     "nodeLabelWrap": 0,
-    "compoundPadding": "5%",
-    "edgeCollapseLimit": 2,
-    "avgNodeSize": 40,
     "objectInclusionType": 0,
+    "queryHistoryLimit": 10,
     "queryResultPagination": "Client",
-    "tilingPadding": 4,
-    "lengthOfUpDownstream": 3,
-    "sizeOfNeo4jQueryBatchesInLines": 10,
-    "sizeOfGetSampleData": 150,
+    "savedLists": {
+        "enumLists": [],
+        "numberLists": [],
+        "stringLists": []
+    },
     "seedSourceTargetCount": 10,
-    "lengthOfBlastSelectedSegmentsPath": 5,
-    "isHighlightInZeroOutZero": true,
-    "isShowUpDownstreamCues": true
+    "selectionColor": "#6c757d",
+    "selectionWidth": 4.5,
+    "sizeOfGetSampleData": 150,
+    "sizeOfNeo4jQueryBatchesInCharacters": 10000,
+    "sizeOfNeo4jQueryBatchesInLines": 10,
+    "tableColumnLimit": 3,
+    "tilingPadding": 4
 }

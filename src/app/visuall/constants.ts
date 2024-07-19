@@ -42,13 +42,14 @@ export const EXPAND_COLLAPSE_FAST_OPT = {
 };
 
 export const PANGENOGRAPHER_SETTING_NAMES = [
-  "lengthOfUpDownstream",
-  "sizeOfNeo4jQueryBatchesInLines",
-  "lengthOfBlastSelectedSegmentsPath",
   "isHighlightInZeroOutZero",
   "isShowUpDownstreamCues",
-  "sizeOfGetSampleData",
+  "lengthOfBlastSelectedSegmentsPath",
+  "lengthOfUpDownstream",
   "seedSourceTargetCount",
+  "sizeOfGetSampleData",
+  "sizeOfNeo4jQueryBatchesInCharacters",
+  "sizeOfNeo4jQueryBatchesInLines",
 ];
 
 export const CUE_CONFIG = {
