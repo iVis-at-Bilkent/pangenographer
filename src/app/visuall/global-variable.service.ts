@@ -970,7 +970,18 @@ export class GlobalVariableService {
     return Object.keys(classDictionary).length > 1;
   }
 
-  refreshCues() {
+  // Move all the elements to the right by 0.000001
+  // and then move them back to the original position
+  // This is done to force the cues to be updated
+  refreshCuesBadges() {
     this.cy.panBy({ x: 0.000001, y: 0.000001 });
+    this.cy.panBy({ x: -0.000001, y: -0.000001 });
+
+    // Move the nodes to the right individually by 0.000001
+    // and then move them back to the original position
+    this.cy.nodes().forEach((node: any) => {
+      node.position("x", node.position("x") + 0.000001);
+      node.position("x", node.position("x") - 0.000001);
+    });
   }
 }

@@ -290,6 +290,7 @@ export class CytoscapeService {
     this.removeExternalTools();
     this.addExternalTools(this.showUpDownstream.bind(this));
     this.applyStyle4NewElements();
+    this._g.refreshCuesBadges();
 
     this._g.isLoadFromDB = true;
     this._g.statusMsg.next("Loaded elements from database!");

@@ -126,7 +126,7 @@ export class Neo4jDb implements DbService {
         } else if (responseType == DbResponseType.generic) {
           callback(this.extractGenericData(x, isTimeboxed));
         }
-        this._g.refreshCues();
+        this._g.refreshCuesBadges();
       }, errFn);
   }
 
@@ -236,7 +236,7 @@ export class Neo4jDb implements DbService {
             result = this.extractGenericData(x, isTimeboxed);
           }
 
-          this._g.refreshCues();
+          this._g.refreshCuesBadges();
           resolve(result);
         })
         .catch((err) => {
