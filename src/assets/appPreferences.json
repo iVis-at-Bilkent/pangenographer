@@ -1,5 +1,5 @@
 {
-    "avgNodeSize": 40,
+    "avgNodeSize": 36,
     "compoundPadding": "5%",
     "currHighlightIdx": 0,
     "dataPageLimit": 15,
@@ -8,7 +8,7 @@
         "end": 4102434000000,
         "start": -5364669352000
     },
-    "dbTimeout": 10,
+    "dbTimeout": 100,
     "edgeCollapseLimit": 2,
     "groupingOption": 0,
     "highlightStyles": [

@@ -71,19 +71,9 @@ export class ExternalToolService {
     let marginY = CUE_CONFIG.marginY;
     let marginX = CUE_CONFIG.marginX;
     let marginXTwo = CUE_CONFIG.marginXTwo;
-    let nameSizeModifier = CUE_CONFIG.nameSizeModifier;
     let width = CUE_CONFIG.width;
 
     nodes.forEach((node: any) => {
-      let nameSize =
-        -this.textWidthCyElement(
-          node.data("segmentName"),
-          node.pstyle("font-size").strValue,
-          node.pstyle("font-family").strValue,
-          node.pstyle("font-weight").strValue,
-          node.pstyle("font-style").strValue
-        ) * nameSizeModifier;
-
       const contentUpstream1 = document.createElement("img");
       contentUpstream1.src = "assets/img/cue-left.svg";
       contentUpstream1.width = width;
@@ -94,7 +84,6 @@ export class ExternalToolService {
           "top-left",
           marginX,
           marginXTwo,
-          nameSize,
           marginY,
           showUpDownstream,
           1,
@@ -114,7 +103,6 @@ export class ExternalToolService {
           "top-left",
           marginX,
           0,
-          nameSize,
           marginY,
           showUpDownstream,
           this._g.userPreferences.lengthOfUpDownstream.getValue(),
@@ -134,7 +122,6 @@ export class ExternalToolService {
           "top-right",
           marginX,
           marginXTwo,
-          nameSize,
           marginY,
           showUpDownstream,
           1,
@@ -154,7 +141,6 @@ export class ExternalToolService {
           "top-right",
           marginX,
           0,
-          nameSize,
           marginY,
           showUpDownstream,
           this._g.userPreferences.lengthOfUpDownstream.getValue(),
@@ -165,7 +151,7 @@ export class ExternalToolService {
       );
 
       let update = () => {
-        this.updateCue(node, nameSize, marginX, marginY, marginXTwo);
+        this.updateCue(node, marginX, marginY, marginXTwo);
       };
 
       this._g.cueUpdaters[`${node.id()}`] = update;
@@ -193,7 +179,6 @@ export class ExternalToolService {
     position: string,
     marginX: number,
     marginXTwo: number,
-    nameSize: number,
     marginY: number,
     showUpDownstream: (nodeId: any, length: number, up: boolean) => void,
     showUpDownstreamSize: number,
@@ -205,7 +190,7 @@ export class ExternalToolService {
       id: `node-cue-${id}-${isUp ? "up" : "down"}-stream-${type}`,
       show: "select",
       position: position,
-      marginX: this._g.cy.zoom() * (marginX + marginXTwo + nameSize),
+      marginX: this._g.cy.zoom() * (marginX + marginXTwo),
       marginY: this._g.cy.zoom() * marginY,
       onCueClicked: (element: any) => {
         showUpDownstream(
@@ -224,43 +209,24 @@ export class ExternalToolService {
 
   private updateCue(
     node: any,
-    nameSize: number,
     marginX: number,
     marginY: number,
     marginXTwo: number
   ) {
     node.updateCue(
-      this.updateCuePrep(
-        node,
-        marginX,
-        marginY,
-        nameSize,
-        "1",
-        "up",
-        1,
-        marginXTwo
-      )
+      this.updateCuePrep(node, marginX, marginY, "1", "up", 1, marginXTwo)
     );
 
     node.updateCue(
-      this.updateCuePrep(node, marginX, marginY, nameSize, "level", "up", 1)
+      this.updateCuePrep(node, marginX, marginY, "level", "up", 1)
     );
 
     node.updateCue(
-      this.updateCuePrep(
-        node,
-        marginX,
-        marginY,
-        nameSize,
-        "1",
-        "down",
-        -1,
-        marginXTwo
-      )
+      this.updateCuePrep(node, marginX, marginY, "1", "down", -1, marginXTwo)
     );
 
     node.updateCue(
-      this.updateCuePrep(node, marginX, marginY, nameSize, "level", "down", -1)
+      this.updateCuePrep(node, marginX, marginY, "level", "down", -1)
     );
   }
 
@@ -269,39 +235,39 @@ export class ExternalToolService {
     node: any,
     marginX: number,
     marginY: number,
-    nameSize: number,
     type: string,
     direction: string,
     marginXNeg: number,
     marginXTwo: number = 0
-  ) {
-    // Calculate the new margin y
-    let newMarginY = this._g.cy.zoom() * marginY;
-    let newMarginX =
-      this._g.cy.zoom() * (marginX + marginXTwo + nameSize) * marginXNeg;
-
-    // Calculate the new margin y again if the node size is changed from the default size
+  ): {
+    id: string;
+    marginY: number;
+    marginX: number;
+  } {
+    // Calculate the new margins again if the node size is changed from the default size
     // Node size is changed when the BLAST result badges or graph theoretic property result badges are shown
     // This is done to keep the cues in the same position relative to the node
-    // Get the width of the node and calculate the new margins
+    // Get the width and height of the node and calculate the new margins
     let width = node.style("width");
     width = Number(node.style("width").substring(0, width.length - 2));
+    let height = node.style("height");
+    height = Number(node.style("height").substring(0, height.length - 2));
 
-    // If the width is different than the default node width
-    // adjust the marginY so that the cues are shown below the node
-    if (width !== DEFAULT_NODE_WIDTH) {
-      let maxRatio = Math.max(
-        width / DEFAULT_NODE_WIDTH,
-        DEFAULT_NODE_WIDTH / width
-      );
-
-      newMarginY *= maxRatio * 3; // * 3 is used to make sure the cues are shown below the node
+    // If the width and height are different than the default node width
+    // adjust the margins so that the cues are shown below the node
+    if (width !== DEFAULT_NODE_WIDTH && height !== DEFAULT_NODE_WIDTH) {
+      marginY *= (height / DEFAULT_NODE_WIDTH) * 2;
+      marginX *= width / DEFAULT_NODE_WIDTH;
     }
+
+    // Adjust the margins according to the zoom level of the graph and the direction of the cue
+    marginY = this._g.cy.zoom() * marginY;
+    marginX = this._g.cy.zoom() * (marginX + marginXTwo) * marginXNeg;
 
     return {
       id: `node-cue-${node.id()}-${direction}-stream-${type}`,
-      marginY: newMarginY,
-      marginX: newMarginX,
+      marginY: marginY,
+      marginX: marginX,
     };
   }
 

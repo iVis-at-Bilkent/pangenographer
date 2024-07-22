@@ -31,6 +31,7 @@ export const PATH_WALK_NAME_DISALLOWED_REGEX =
 export const CQL_QUERY_CHANGE_MARKER = "CQL_QUERY_CHANGE_MARKER";
 export const BADGE_ZOOM_THRESHOLD = 0.8;
 export const DEFAULT_NODE_WIDTH = 36;
+export const DEFAULT_NODE_HEIGHT = 18;
 export const MIN_NODE_WIDTH = DEFAULT_NODE_WIDTH * 0.85;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
 export const OVERLAP_REGEX = /[MIDNSHPX=]/;
@@ -53,10 +54,9 @@ export const PANGENOGRAPHER_SETTING_NAMES = [
 ];
 
 export const CUE_CONFIG = {
-  marginY: 6,
+  marginY: 19,
   marginX: 9,
   marginXTwo: 6,
-  nameSizeModifier: 0.5,
   width: 12,
 };
 
