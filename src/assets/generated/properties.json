@@ -1,63 +1,63 @@
 {
   "nodes": {
+    "PATH": {
+      "overlaps": "string",
+      "pathName": "string",
+      "segmentNames": "string"
+    },
     "SEGMENT": {
-      "segmentName": "string",
-      "segmentData": "string",
-      "segmentLength": "number",
-      "readCount": "number",
-      "fragmentCount": "number",
-      "kmerCount": "number",
       "SHA256Checksum": "string",
       "URIorLocalSystemPath": "string",
+      "fragmentCount": "number",
+      "kmerCount": "number",
       "pathNames": "string[]",
+      "readCount": "number",
+      "segmentData": "string",
+      "segmentLength": "number",
+      "segmentName": "string",
       "walkSampleIdentifiers": "string[]"
     },
     "WALK": {
-      "sampleIdentifier": "string",
       "haplotypeIndex": "string",
+      "sampleIdentifier": "string",
+      "sequenceEnd": "string",
       "sequenceIdentifier": "string",
       "sequenceStart": "string",
-      "sequenceEnd": "string",
       "walk": "string"
-    },
-    "PATH": {
-      "pathName": "string",
-      "segmentNames": "string",
-      "overlaps": "string"
     }
   },
   "edges": {
-    "LINK": {
-      "sequenceLength": "number",
-      "overlap": "string",
-      "targetOrientation": "string",
-      "sourceOrientation": "string",
-      "mappingQuality": "number",
-      "numberOfMismatchesOrGaps": "number",
-      "readCount": "number",
-      "fragmentCount": "number",
-      "kmerCount": "number",
+    "CONTAINMENT": {
       "edgeIdentifier": "string",
-      "pathNames": "string[]",
-      "walkSampleIdentifiers": "string[]"
+      "numberOfMismatchesOrGaps": "number",
+      "overlap": "string",
+      "pos": "number",
+      "readCount": "number",
+      "sequenceLength": "string",
+      "sourceOrientation": "string",
+      "targetOrientation": "string"
     },
     "JUMP": {
-      "sequenceLength": "string",
-      "targetOrientation": "string",
-      "sourceOrientation": "string",
-      "indirectShortcutConnections": "number",
       "distance": "string",
-      "pathNames": "string[]"
-    },
-    "CONTAINMENT": {
+      "indirectShortcutConnections": "number",
+      "pathNames": "string[]",
       "sequenceLength": "string",
-      "pos": "number",
-      "overlap": "string",
-      "targetOrientation": "string",
       "sourceOrientation": "string",
-      "readCount": "number",
+      "targetOrientation": "string"
+    },
+    "LINK": {
+      "edgeIdentifier": "string",
+      "fragmentCount": "number",
+      "kmerCount": "number",
+      "mappingQuality": "number",
       "numberOfMismatchesOrGaps": "number",
-      "edgeIdentifier": "string"
+      "overlap": "string",
+      "pathNames": "string[]",
+      "readCount": "number",
+      "sequenceLength": "number",
+      "sourceOrientation": "string",
+      "targetOrientation": "string",
+      "walkSampleIdentifiers": "string[]"
     }
   }
 }

@@ -55,7 +55,7 @@ export class Neo4jDb implements DbService {
       ? `CALL apoc.cypher.run("${query}", null) YIELD value RETURN value`
       : query;
 
-    // console.log(q);
+    console.log(q);
     const requestBody = {
       statements: [
         {
@@ -97,6 +97,7 @@ export class Neo4jDb implements DbService {
       }
       this._g.setLoadingStatus(false);
     };
+
     this._http
       .post(url, requestBody, {
         headers: {
@@ -105,29 +106,36 @@ export class Neo4jDb implements DbService {
           Authorization: "Basic " + btoa(username + ":" + password),
         },
       })
-      .subscribe((x) => {
-        if (isTimeout) {
-          clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
-        }
-        isTimeout = false;
-        this._g.setLoadingStatus(false);
-        if (x["errors"] && x["errors"].length > 0) {
-          errFn(x["errors"][0]);
-          return;
-        }
+      .subscribe({
+        next: (x) => {
+          if (isTimeout) {
+            clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
+          }
+          isTimeout = false;
+          this._g.setLoadingStatus(false);
+          if (x["errors"] && x["errors"].length > 0) {
+            errFn(x["errors"][0]);
+            return;
+          }
 
-        if (responseType == DbResponseType.graph) {
-          callback(this.extractGraph(x));
-        } else if (
-          responseType == DbResponseType.table ||
-          responseType == DbResponseType.count
-        ) {
-          callback(this.extractTable(x, isTimeboxed));
-        } else if (responseType == DbResponseType.generic) {
-          callback(this.extractGenericData(x, isTimeboxed));
-        }
-        this._g.refreshCuesBadges();
-      }, errFn);
+          if (responseType == DbResponseType.graph) {
+            callback(this.extractGraph(x));
+          } else if (
+            responseType == DbResponseType.table ||
+            responseType == DbResponseType.count
+          ) {
+            callback(this.extractTable(x, isTimeboxed));
+          } else if (responseType == DbResponseType.generic) {
+            callback(this.extractGenericData(x, isTimeboxed));
+          }
+        },
+        error: (err) => {
+          errFn(err);
+        },
+        complete: () => {
+          this._g.refreshCuesBadges();
+        },
+      });
   }
 
   runQueryPromised(
@@ -150,7 +158,7 @@ export class Neo4jDb implements DbService {
       const q = isTimeboxed
         ? `CALL apoc.cypher.run("${query}", null) YIELD value RETURN value`
         : query;
-      // console.log(q);
+      console.log(q);
 
       const requestBody = {
         statements: [

@@ -86,99 +86,99 @@
     }
   },
   {
-    "selector": "node.SEGMENT",
+    "selector": "node.PATH",
     "style": {
-      "label": "Segment",
-      "color": "black",
-      "text-outline-color": "white",
-      "text-outline-width": "0px",
-      "font-size": "7px",
-      "font-family": "Inconsolata, monospace",
-      "shape": "round-rectangle",
-      "background-fit": "contain",
       "background-color": "white",
+      "background-fit": "contain",
       "border-color": "gray",
       "border-width": "0.5px",
-      "width": "36px",
-      "height": "18px"
+      "color": "black",
+      "font-family": "Inconsolata, monospace",
+      "font-size": "7px",
+      "height": "18px",
+      "label": "PATH",
+      "shape": "round-rectangle",
+      "text-outline-color": "white",
+      "text-outline-width": "0px",
+      "width": "36px"
+    }
+  },
+  {
+    "selector": "node.SEGMENT",
+    "style": {
+      "background-color": "white",
+      "background-fit": "contain",
+      "border-color": "gray",
+      "border-width": "0.5px",
+      "color": "black",
+      "font-family": "Inconsolata, monospace",
+      "font-size": "7px",
+      "height": "18px",
+      "label": "Segment",
+      "shape": "round-rectangle",
+      "text-outline-color": "white",
+      "text-outline-width": "0px",
+      "width": "36px"
     }
   },
   {
     "selector": "node.WALK",
     "style": {
+      "background-color": "white",
+      "background-fit": "contain",
+      "border-color": "gray",
+      "border-width": "0.5px",
+      "color": "black",
+      "font-family": "Inconsolata, monospace",
+      "font-size": "7px",
+      "height": "18px",
       "label": "WALK",
-      "color": "black",
+      "shape": "round-rectangle",
       "text-outline-color": "white",
       "text-outline-width": "0px",
-      "font-size": "7px",
-      "font-family": "Inconsolata, monospace",
-      "shape": "round-rectangle",
-      "background-fit": "contain",
-      "background-color": "white",
-      "border-color": "gray",
-      "border-width": "0.5px",
-      "width": "36px",
-      "height": "18px"
-    }
-  },
-  {
-    "selector": "node.PATH",
-    "style": {
-      "label": "PATH",
-      "color": "black",
-      "text-outline-color": "white",
-      "text-outline-width": "0px",
-      "font-size": "7px",
-      "font-family": "Inconsolata, monospace",
-      "shape": "round-rectangle",
-      "background-fit": "contain",
-      "background-color": "white",
-      "border-color": "gray",
-      "border-width": "0.5px",
-      "width": "36px",
-      "height": "18px"
-    }
-  },
-  {
-    "selector": "edge.LINK",
-    "style": {
-      "label": "Link",
-      "width": "1px",
-      "font-size": "5px",
-      "line-color": "gray",
-      "line-style": "solid",
-      "target-arrow-shape": "none",
-      "source-arrow-shape": "none",
-      "text-rotation": "autorotate",
-      "arrow-scale": "0.75"
-    }
-  },
-  {
-    "selector": "edge.JUMP",
-    "style": {
-      "label": "Jump",
-      "width": "1px",
-      "font-size": "5px",
-      "line-color": "gray",
-      "line-style": "dotted",
-      "target-arrow-shape": "none",
-      "source-arrow-shape": "none",
-      "text-rotation": "autorotate",
-      "arrow-scale": "0.75"
+      "width": "36px"
     }
   },
   {
     "selector": "edge.CONTAINMENT",
     "style": {
-      "label": "Containment",
-      "width": "1px",
+      "arrow-scale": "0.75",
       "font-size": "5px",
+      "label": "Containment",
       "line-color": "gray",
       "line-style": "dashed",
-      "target-arrow-shape": "none",
       "source-arrow-shape": "none",
+      "target-arrow-shape": "none",
       "text-rotation": "autorotate",
-      "arrow-scale": "0.75"
+      "width": "1px"
+    }
+  },
+  {
+    "selector": "edge.JUMP",
+    "style": {
+      "arrow-scale": "0.75",
+      "font-size": "5px",
+      "label": "Jump",
+      "line-color": "gray",
+      "line-style": "dotted",
+      "source-arrow-shape": "none",
+      "target-arrow-shape": "none",
+      "text-rotation": "autorotate",
+      "width": "1px"
+    }
+  },
+  {
+    "selector": "edge.LINK",
+    "style": {
+      "arrow-scale": "0.75",
+      "font-size": "5px",
+      "label": "Link",
+      "line-color": "gray",
+      "line-style": "solid",
+      "source-arrow-shape": "none",
+      "target-arrow-shape": "none",
+      "text-rotation": "autorotate",
+      "width": "1px"
     }
   }
 ]

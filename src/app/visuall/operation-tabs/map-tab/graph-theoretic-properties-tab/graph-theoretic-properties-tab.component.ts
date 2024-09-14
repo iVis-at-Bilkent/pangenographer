@@ -1,6 +1,10 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
-import { COLLAPSED_EDGE_CLASS, DEFAULT_NODE_WIDTH } from "../../../constants";
+import {
+  COLLAPSED_EDGE_CLASS,
+  DEFAULT_NODE_WIDTH,
+  GRAPH_THEORETIC_QUERY_NAMES,
+} from "../../../constants";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { ExternalToolService } from "../../../external-tool.service";
 import { GlobalVariableService } from "../../../global-variable.service";
@@ -12,35 +16,47 @@ import { GlobalVariableService } from "../../../global-variable.service";
 })
 export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
   theoreticProps: { text: string; fn: string; arg: any }[] = [
-    { text: "Degree Centrality", fn: "degreeCentrality", arg: "" },
     {
-      text: "Normalized Degree Centrality",
+      text: GRAPH_THEORETIC_QUERY_NAMES.degreeCentrality,
+      fn: "degreeCentrality",
+      arg: "",
+    },
+    {
+      text: GRAPH_THEORETIC_QUERY_NAMES.degreeCentralityNormalized,
       fn: "degreeCentralityNormalized",
       arg: "",
     },
     {
-      text: "Inter-Group Degree Centrality",
+      text: GRAPH_THEORETIC_QUERY_NAMES.interGroupDegreeCentrality,
       fn: "interGroupDegreeCentrality",
       arg: "",
     },
     {
-      text: "Normalized Inter-Group Degree Centrality",
+      text: GRAPH_THEORETIC_QUERY_NAMES.interGroupDegreeCentralityNormalized,
       fn: "interGroupDegreeCentralityNormalized",
       arg: "",
     },
-    { text: "Closeness Centrality", fn: "closenessCentrality", arg: "" },
     {
-      text: "Normalized Closeness Centrality",
+      text: GRAPH_THEORETIC_QUERY_NAMES.closenessCentrality,
+      fn: "closenessCentrality",
+      arg: "",
+    },
+    {
+      text: GRAPH_THEORETIC_QUERY_NAMES.closenessCentralityNormalized,
       fn: "closenessCentralityNormalized",
       arg: "",
     },
-    { text: "Betweenness Centrality", fn: "betweennessCentrality", arg: "" },
     {
-      text: "Normalized Betweenness Centrality",
+      text: GRAPH_THEORETIC_QUERY_NAMES.betweennessCentrality,
+      fn: "betweennessCentrality",
+      arg: "",
+    },
+    {
+      text: GRAPH_THEORETIC_QUERY_NAMES.betweennessCentralityNormalized,
       fn: "betweennessCentralityNormalized",
       arg: "",
     },
-    { text: "Page Rank", fn: "pageRank", arg: "" },
+    { text: GRAPH_THEORETIC_QUERY_NAMES.pageRank, fn: "pageRank", arg: "" },
   ];
   isOnSelected = false;
   isDirectedGraph = false;
@@ -130,7 +146,7 @@ export class GraphTheoreticPropertiesTabComponent implements OnInit, OnDestroy {
 
     this._extTool.setBadgeColorsAndCoords();
 
-    this._extTool.updateCues(); // Update the cues on the graph
+    this._g.refreshCuesBadges();
   }
 
   private edgeWeightFn(edge: any) {

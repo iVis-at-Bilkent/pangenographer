@@ -53,6 +53,19 @@ export const PANGENOGRAPHER_SETTING_NAMES = [
   "sizeOfNeo4jQueryBatchesInLines",
 ];
 
+export const GRAPH_THEORETIC_QUERY_NAMES = {
+  degreeCentrality: "Degree Centrality",
+  degreeCentralityNormalized: "Normalized Degree Centrality",
+  interGroupDegreeCentrality: "Inter-Group Degree Centrality",
+  interGroupDegreeCentralityNormalized:
+    "Normalized Inter-Group Degree Centrality",
+  closenessCentrality: "Closeness Centrality",
+  closenessCentralityNormalized: "Normalized Closeness Centrality",
+  betweennessCentrality: "Betweenness Centrality",
+  betweennessCentralityNormalized: "Normalized Betweenness Centrality",
+  pageRank: "Page Rank",
+};
+
 export const CUE_CONFIG = {
   marginY: 19,
   marginX: 9,

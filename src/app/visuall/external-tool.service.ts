@@ -163,14 +163,7 @@ export class ExternalToolService {
     this._g.cy.endBatch();
 
     // Update the cues to make sure they are shown when the graph is loaded
-    this.updateCues();
-  }
-
-  // Make the graph zoom in and out to trigger the cues to show
-  // This is done to make sure the cues are shown when the graph is loaded
-  updateCues() {
-    this._g.cy.zoom(this._g.cy.zoom() + 0.00001);
-    this._g.cy.zoom(this._g.cy.zoom() - 0.00001);
+    this._g.refreshCuesBadges();
   }
 
   private addCuePreparation(

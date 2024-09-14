@@ -977,6 +977,9 @@ export class GlobalVariableService {
     this.cy.panBy({ x: 0.000001, y: 0.000001 });
     this.cy.panBy({ x: -0.000001, y: -0.000001 });
 
+    this.cy.zoom(this.cy.zoom() + 0.00001);
+    this.cy.zoom(this.cy.zoom() - 0.00001);
+
     // Move the nodes to the right individually by 0.000001
     // and then move them back to the original position
     this.cy.nodes().forEach((node: any) => {

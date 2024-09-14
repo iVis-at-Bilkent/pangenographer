@@ -373,7 +373,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
       // The cues need to be updated after the badges are placed on the graph
       // as the nodes are resized according to the maximum percentage values
-      this._extTool.updateCues();
+      this._g.refreshCuesBadges();
     }
   }
 
