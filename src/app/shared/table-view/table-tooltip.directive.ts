@@ -20,7 +20,11 @@ export class TableTooltipDirective {
   @HostListener("mouseenter") onMouseEnter() {
     this.onHost = true;
     if (!this.tooltip) {
-      this.show();
+      setTimeout(() => {
+        if (this.onHost) {
+          this.show();
+        }
+      }, 400); // delay to show tooltip
     }
   }
 
@@ -55,7 +59,7 @@ export class TableTooltipDirective {
 
     this.renderer.setStyle(this.tooltip, "top", `${top + scrollPos}px`);
     this.renderer.setStyle(this.tooltip, "left", `${left}px`);
-    this.renderer.setStyle(this.tooltip,"z-index", "1900");
+    this.renderer.setStyle(this.tooltip, "z-index", "1900");
 
     this.renderer.listen(this.tooltip, "mouseenter", () => {
       this.onTooltip = true;

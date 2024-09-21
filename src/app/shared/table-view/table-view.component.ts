@@ -520,6 +520,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this._cyService.saveAsCSV(objects);
   }
 
+  // This function is to truncate the data to 240 characters
+  // This data is used in the table tooltip to show the full data
+  // Data can include long strings like segment sequences
   truncateData(data: string): string {
     if (data.length > 240) {
       return data.substring(0, 238) + "...";

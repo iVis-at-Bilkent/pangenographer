@@ -29,7 +29,7 @@
           <textarea
             (change)="onQueryChange($event)"
             [(ngModel)]="query"
-            class="form-control blast-sequence-input va-small-text w5-5"
+            class="form-control blast-sequence-input va-small-text"
             rows="1"
             placeholder="Accession, GI, or FASTA."
           ></textarea>
@@ -39,7 +39,7 @@
       <div class="form-inline blast-option">
         <label class="va-text blast-option-label">Database</label>
         <select
-          class="form-select tight-select filter-form va-small-text input-4-char w5-5 blast-option-label"
+          class="form-select tight-select filter-form va-small-text input-4-char blast-option-label"
           (change)="onWebDatabaseChange($event)"
           title="Database"
           [(ngModel)]="webSelectedDatabaseName"
@@ -92,7 +92,7 @@
         <textarea
           (change)="onWebRIDChange($event)"
           [(ngModel)]="webRid"
-          class="form-control standart-input-height va-small-text ms-1 w5-5 h-10"
+          class="form-control standart-input-height va-small-text ms-1 h-10"
           placeholder="The Request ID (RID) returned when the search was submitted"
         ></textarea>
       </div>
@@ -271,7 +271,7 @@
             <textarea
               (change)="onWebGapCostChange($event)"
               [(ngModel)]="webGapCost"
-              class="form-control standart-input-height va-small-text ms-1 w5-5 h-10"
+              class="form-control standart-input-height va-small-text ms-1 h-10"
               placeholder="Pair of positive integers separated by a space such as “11 1”."
             ></textarea>
           </div>
@@ -460,7 +460,7 @@
           <textarea
             (change)="onQueryChange($event)"
             [(ngModel)]="query"
-            class="form-control blast-sequence-input va-small-text w5-5"
+            class="form-control blast-sequence-input va-small-text"
             rows="1"
             placeholder="Accession, GI, or FASTA."
           ></textarea>
@@ -473,7 +473,7 @@
           <textarea
             (change)="onStandaloneCommandLineArgumentsChange($event)"
             [(ngModel)]="standaloneCommandLineArguments"
-            class="form-control standart-input-height va-small-text w5-5 h-10"
+            class="form-control standart-input-height va-small-text h-10"
             placeholder="Command line arguments for blastn."
           ></textarea>
         </div>

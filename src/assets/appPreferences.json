@@ -4,10 +4,6 @@
     "currHighlightIdx": 0,
     "dataPageLimit": 15,
     "dataPageSize": 15,
-    "dbQueryTimeRange": {
-        "end": 4102434000000,
-        "start": -5364669352000
-    },
     "dbTimeout": 100,
     "edgeCollapseLimit": 2,
     "groupingOption": 0,

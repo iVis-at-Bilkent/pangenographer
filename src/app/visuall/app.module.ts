@@ -20,6 +20,8 @@ import { MapTabComponent } from "./operation-tabs/map-tab/map-tab.component";
 import { ObjectTabComponent } from "./operation-tabs/object-tab/object-tab.component";
 import { OperationTabsComponent } from "./operation-tabs/operation-tabs.component";
 import { AdvancedQueriesComponent } from "./operation-tabs/query-tab/advanced-queries/advanced-queries.component";
+import { SearchSegmentByNameComponent } from "./operation-tabs/query-tab/custom-queries/search-segment-by-name/search-segment-by-name.component";
+import { SearchSegmentByNucleotideSequenceComponent } from "./operation-tabs/query-tab/custom-queries/search-segment-by-nucleotide-sequence/search-segment-by-nucleotide-sequence.component";
 import { QueryTabComponent } from "./operation-tabs/query-tab/query-tab.component";
 import { SettingsTabComponent } from "./operation-tabs/settings-tab/settings-tab.component";
 import { PanelContainerComponent } from "./panel-container/panel-container.component";
@@ -63,6 +65,8 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     PanelContainerComponent,
     LoadGraphFromFileModalComponent,
     BlastTabComponent,
+    SearchSegmentByNameComponent,
+    SearchSegmentByNucleotideSequenceComponent,
   ],
   imports: [
     BrowserModule,

@@ -184,8 +184,6 @@ app-operation-tabs {
   border: 2px solid transparent;
 }
 
-/* CSS Method for adding Font Awesome Chevron Icons  symbol for "opening" panels*/
-
 .accordion-toggle:after {
   font-family: "FontAwesome", sans-serif;
   content: "\f077";
@@ -194,19 +192,13 @@ app-operation-tabs {
   color: inherit;
 }
 
-/* symbol for "collapsed" panels */
-
 .panel-heading.collapsed .accordion-toggle:after {
   content: "\f078";
 }
 
-/* symbol for "collapsed" panels */
-
 .subpanel-heading.collapsed .accordion-toggle:after {
   content: "\f078";
 }
-
-/* borders for navigator and map */
 
 .cytoscape-navigator-wrapper {
   position: fixed;
@@ -231,8 +223,6 @@ app-operation-tabs {
   border-radius: 5px;
   height: 23px;
 }
-
-/* custom css for context-menu extension */
 
 .vall-ctx-menu-item:hover {
   color: #16181b !important;
@@ -319,11 +309,8 @@ app-operation-tabs {
   cursor: pointer;
   cursor: pointer;
   -webkit-user-select: none;
-  /* Safari 3.1+ */
   -moz-user-select: none;
-  /* Firefox 2+ */
   -ms-user-select: none;
-  /* IE 10+ */
   user-select: none;
 }
 

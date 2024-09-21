@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-
+import { SearchSegmentByNameComponent } from "./custom-queries/search-segment-by-name/search-segment-by-name.component";
+import { SearchSegmentByNucleotideSequenceComponent } from "./custom-queries/search-segment-by-nucleotide-sequence/search-segment-by-nucleotide-sequence.component";
 @Component({
   selector: "app-query-tab",
   templateUrl: "./query-tab.component.html",
@@ -11,7 +12,16 @@ export class QueryTabComponent implements OnInit {
   selectedIndex: number;
 
   constructor() {
-    this.queries = [];
+    this.queries = [
+      {
+        component: SearchSegmentByNameComponent,
+        text: "Search Segment by Name",
+      },
+      {
+        component: SearchSegmentByNucleotideSequenceComponent,
+        text: "Search Segment by Sequence",
+      },
+    ];
     this.selectedIndex = -1;
   }
 

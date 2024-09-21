@@ -2,7 +2,7 @@ export enum TableDataType {
   string = 0,
   number = 1,
   enum = 3,
-  data = 4,
+  data = 4, // for segmentData like sequences
 }
 
 export interface TableData {
