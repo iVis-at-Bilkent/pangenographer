@@ -37,7 +37,7 @@ export class Neo4jDb implements DbService {
 
   runQuery(
     query: string,
-    callback: (x: any) => any,
+    callback: (response: any) => any,
     responseType: DbResponseType = 0,
     isTimeboxed = true
   ) {
@@ -107,26 +107,26 @@ export class Neo4jDb implements DbService {
         },
       })
       .subscribe({
-        next: (x) => {
+        next: (response) => {
           if (isTimeout) {
             clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
           }
           isTimeout = false;
           this._g.setLoadingStatus(false);
-          if (x["errors"] && x["errors"].length > 0) {
-            errFn(x["errors"][0]);
+          if (response["errors"] && response["errors"].length > 0) {
+            errFn(response["errors"][0]);
             return;
           }
 
           if (responseType == DbResponseType.graph) {
-            callback(this.extractGraph(x));
+            callback(this.extractGraph(response));
           } else if (
             responseType == DbResponseType.table ||
             responseType == DbResponseType.count
           ) {
-            callback(this.extractTable(x, isTimeboxed));
+            callback(this.extractTable(response, isTimeboxed));
           } else if (responseType == DbResponseType.generic) {
-            callback(this.extractGenericData(x, isTimeboxed));
+            callback(this.extractGenericData(response, isTimeboxed));
           }
         },
         error: (err) => {
@@ -218,7 +218,7 @@ export class Neo4jDb implements DbService {
           },
         })
         .toPromise()
-        .then((x: any) => {
+        .then((response: any) => {
           if (isTimeout) {
             clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
           }
@@ -226,22 +226,22 @@ export class Neo4jDb implements DbService {
           isTimeout = false;
           this._g.setLoadingStatus(false);
 
-          if (x["errors"] && x["errors"].length > 0) {
-            errFn(x["errors"][0]);
+          if (response["errors"] && response["errors"].length > 0) {
+            errFn(response["errors"][0]);
             return;
           }
 
           let result: any = null;
 
           if (responseType == DbResponseType.graph) {
-            result = this.extractGraph(x);
+            result = this.extractGraph(response);
           } else if (
             responseType == DbResponseType.table ||
             responseType == DbResponseType.count
           ) {
-            result = this.extractTable(x, isTimeboxed);
+            result = this.extractTable(response, isTimeboxed);
           } else if (responseType == DbResponseType.generic) {
-            result = this.extractGenericData(x, isTimeboxed);
+            result = this.extractGenericData(response, isTimeboxed);
           }
 
           this._g.refreshCuesBadges();
@@ -256,7 +256,7 @@ export class Neo4jDb implements DbService {
 
   getNeighbors(
     elementIds: string[] | number[],
-    callback: (x: GraphResponse) => any,
+    callback: (response: GraphResponse) => any,
     meta?: DbQueryMeta
   ) {
     let isEdgeQuery = meta && meta.isEdgeQuery;
@@ -304,7 +304,7 @@ export class Neo4jDb implements DbService {
   getElementsUpToCertainDistance(
     nodeIds: string[],
     distance: number,
-    callback: (x: GraphResponse) => any,
+    callback: (response: GraphResponse) => any,
     isUp: boolean // if undefined, it is a bidirectional query
   ) {
     // Get all paths for given nodes
@@ -369,7 +369,7 @@ export class Neo4jDb implements DbService {
 
   getElements(
     ids: string[] | number[],
-    callback: (x: GraphResponse) => any,
+    callback: (response: GraphResponse) => any,
     meta: DbQueryMeta
   ) {
     const isEdgeQuery = meta && meta.isEdgeQuery;
@@ -386,23 +386,26 @@ export class Neo4jDb implements DbService {
     properties: (string | number)[],
     propertyType: string,
     objectType: string,
-    callback: (x: GraphResponse) => any
+    callback: (response: GraphResponse) => any
   ) {
     let q = "MATCH ";
-    properties.forEach((x, i) => {
+
+    properties.forEach((property, i) => {
       if (i != properties.length - 1) {
-        q += `(n${i}:${objectType} {${propertyType}: '${x}'})-[e${i}]-`;
+        q += `(n${i}:${objectType} {${propertyType}: '${property}'})-[e${i}]-`;
       } else {
-        q += `(n${i}:${objectType} {${propertyType}: '${x}'}) RETURN `;
+        q += `(n${i}:${objectType} {${propertyType}: '${property}'}) RETURN `;
       }
     });
-    properties.forEach((x, i) => {
+
+    properties.forEach((property, i) => {
       if (i != properties.length - 1) {
         q += `n${i}, e${i}, `;
       } else {
         q += `n${i}`;
       }
     });
+
     this.runQuery(q, callback);
   }
 
@@ -412,7 +415,7 @@ export class Neo4jDb implements DbService {
     skip: number,
     limit: number,
     type: DbResponseType,
-    callback: (x: GraphResponse | TableResponse) => any
+    callback: (response: GraphResponse | TableResponse) => any
   ) {
     const cql = this.rule2cql2(rules, skip, limit, type, filter);
     this.runQuery(cql, callback, DbResponseType.generic);
@@ -426,7 +429,7 @@ export class Neo4jDb implements DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    callback: (x: any) => void
+    callback: (response: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -466,7 +469,7 @@ export class Neo4jDb implements DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    callback: (x: any) => void
+    callback: (response: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -515,7 +518,7 @@ export class Neo4jDb implements DbService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    callback: (x: any) => void
+    callback: (response: any) => void
   ) {
     const t = filter.txt ?? "";
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -588,28 +591,61 @@ export class Neo4jDb implements DbService {
       this._g.setLoadingStatus(false);
       return;
     }
+
+    console.log(response);
+
     if (isTimeboxed) {
-      const object = response.results[0].data;
-      if (object[0] === undefined || object[0] === null) {
+      const responseData = response.results[0].data;
+
+      // If the object is empty, return empty columns and data
+      if (responseData[0] === undefined || responseData[0] === null) {
         return { columns: [], data: [] };
       }
-      const cols = Object.keys(object[0].row[0]);
-      const data = object.map((x: any) => Object.values(x.row[0]));
-      // put id to first
-      const idxId = cols.indexOf("ElementId(x)");
-      if (idxId > -1) {
-        const tmp = cols[idxId];
-        cols[idxId] = cols[0];
-        cols[0] = tmp;
+
+      const columns = Object.keys(responseData[0].row[0]); // Get the column headers
+      // Get the data rows as an array of arrays and concatenate the meta data to the data
+      const data = responseData.map((x: any) => {
+        const mergedObject = Object.assign(
+          {},
+          Object.values(x.row[0])[0],
+          Object.values(x.meta)[0]
+        );
+        console.log(x.row[0]);
+        console.log(x.meta);
+        console.log(Object.values(x.row[0]));
+        console.log(Object.values(x.meta));
+        console.log(mergedObject);
+        return mergedObject;
+      });
+
+      console.log(columns);
+      console.log(data);
+
+      // Get the index of the id column
+      const idIndex = columns.indexOf("ElementId(x)");
+
+      console.log(idIndex);
+
+      // If id is found, put it to the first column
+      if (idIndex > -1) {
+        const temp = columns[idIndex];
+        columns[idIndex] = columns[0];
+        columns[0] = temp;
+
+        console.log(temp);
+        console.log(columns);
 
         for (let i = 0; i < data.length; i++) {
-          const tmp2 = data[i][idxId];
-          data[i][idxId] = data[i][0];
-          data[i][0] = tmp2;
+          const temp2 = data[i][idIndex];
+          data[i][idIndex] = data[i][0];
+          data[i][0] = temp2;
         }
       }
-      return { columns: cols, data: data };
+
+      // Return the column headers and rows as data
+      return { columns: columns, data: data };
     }
+
     return {
       columns: response.results[0].columns,
       data: response.results[0].data.map((x: any) => x.row),

@@ -126,6 +126,7 @@ export interface GFASegment {
   segmentName: string;
   segmentLength: number;
   id: string;
+  elementId?: string;
   readCount?: number;
   fragmentCount?: number;
   kmerCount?: number;
