@@ -261,6 +261,7 @@ export function areSetsEqual(s1: Set<any>, s2: Set<any>) {
   if (!s1 || !s2) {
     return false;
   }
+
   for (let i of s1) {
     if (!s2.has(i)) {
       return false;
@@ -304,25 +305,6 @@ export function compareUsingOperator(a: any, b: any, op: string) {
 
 export function isNumber(value: string | number): boolean {
   return value != null && !isNaN(Number(value.toString()));
-}
-
-export function isPrimitiveType(o) {
-  const t = typeof o;
-  return t == "string" || t == "number" || t == "boolean";
-}
-
-export function extend(a, b) {
-  if (a == undefined || a == null) {
-    a = {};
-  }
-
-  for (let key in b) {
-    if (b.hasOwnProperty(key)) {
-      a[key] = b[key];
-    }
-  }
-
-  return a;
 }
 
 /**

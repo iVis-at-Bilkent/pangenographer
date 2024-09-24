@@ -3,14 +3,14 @@
     <div
       class="panel-heading"
       data-bs-toggle="collapse"
-      data-bs-target="#prop-tab"
+      data-bs-target="#property-tab"
     >
       <span class="panel-title accordion-toggle"
         ><b class="va-heading2">{{ selectedClasses }}</b></span
       >
     </div>
 
-    <div id="prop-tab" class="collapse show text-center m-1">
+    <div id="property-tab" class="collapse show text-center m-1">
       <div *ngIf="selectedItemProps.segmentData" class="segment-data-container">
         {{ selectedItemProps.segmentData.value }}
       </div>
@@ -494,9 +494,9 @@
 
       <app-table-view
         *ngIf="isShowObjTable"
-        [params]="multiObjTableInp"
-        [tableFilled]="multiObjTableFilled"
-        [clearFilter]="clearMultiObjTableFilter"
+        [params]="multiObjectTableInput"
+        [tableFilled]="multiObjectTableFilled"
+        [clearFilter]="clearMultiObjectTableFilter"
         (onFilteringChanged)="filterMultiObjTable($event)"
       >
       </app-table-view>

@@ -250,15 +250,15 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   highlightSearch() {
     const filterFn = (x: any) => {
       const entityMap = this._g.dataModel.getValue();
-      const propNames = getPropNamesFromObject(
+      const propertyNames = getPropNamesFromObject(
         [entityMap.nodes, entityMap.edges],
         false
       );
       const isIgnoreCase =
         this._g.userPreferences.isIgnoreCaseInText.getValue();
       let s = "";
-      for (const propName of propNames) {
-        const value = x.data(propName);
+      for (const propertyName of propertyNames) {
+        const value = x.data(propertyName);
         if (value != undefined && value != null) {
           s += value;
         }

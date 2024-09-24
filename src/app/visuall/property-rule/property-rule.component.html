@@ -3,12 +3,12 @@
     <select
       title="Select an option"
       autofocus
-      class="form-select tight-select filter-form va-small-text prop"
+      class="form-select tight-select filter-form va-small-text"
       [(ngModel)]="selectedProp"
       [disabled]="isGenericTypeSelected"
       (change)="changeSelectedProp()"
     >
-      <option *ngFor="let p of selectedClassProps" [value]="p" class="prop-opt">
+      <option *ngFor="let p of selectedClassProps" [value]="p">
         {{ p }}
       </option>
     </select>
@@ -17,11 +17,11 @@
   <div class="col-3 ps-1">
     <select
       title="Select an option"
-      class="form-select tight-select filter-form va-small-text prop-op-key"
+      class="form-select tight-select filter-form va-small-text"
       [(ngModel)]="selectedOperatorKey"
       [disabled]="isGenericTypeSelected"
     >
-      <option *ngFor="let o of operatorKeys" [value]="o" class="prop-op-key">
+      <option *ngFor="let o of operatorKeys" [value]="o">
         {{ o }}
       </option>
     </select>

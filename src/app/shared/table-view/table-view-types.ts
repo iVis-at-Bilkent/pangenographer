@@ -50,41 +50,61 @@ export interface TableRowMeta {
 export function property2TableData(
   properties: any,
   enumMapping: any,
-  propName: string,
-  propValue: any,
+  propertyName: string,
+  propertyValue: any,
   className: string,
   isEdge: boolean
 ): TableData {
-  let type = "";
+  let type = undefined;
 
   if (isEdge) {
-    type = properties.edges[className][propName];
+    type = properties.edges[className][propertyName];
   } else {
-    type = properties.nodes[className][propName];
+    type = properties.nodes[className][propertyName];
   }
 
+  console.log("type", type);
+
   if (type === undefined || type == null) {
-    return { value: propValue, type: TableDataType.string };
+    return { value: propertyValue, type: TableDataType.string };
   } else if (type.startsWith("enum")) {
-    const mapping = enumMapping[className][propName][propValue];
+    const mapping = enumMapping[className][propertyName][propertyValue];
     if (mapping) {
       return { value: mapping, type: TableDataType.enum };
     }
-    return { value: propValue, type: TableDataType.string };
+
+    return { value: propertyValue, type: TableDataType.string };
   } else if (type == "string") {
-    if (propName === "segmentData") {
-      return { value: propValue, type: TableDataType.data };
+    // SegmentData is a special case and considered as data
+    if (propertyName === "segmentData") {
+      return { value: propertyValue, type: TableDataType.data };
     } else {
-      return { value: propValue, type: TableDataType.string };
+      return { value: propertyValue, type: TableDataType.string };
     }
-  } else if (type == "list") {
-    if (typeof propValue === "string") {
-      return { value: propValue, type: TableDataType.string };
+  } else if (type == "list" || type.includes("[]")) {
+    if (typeof propertyValue === "string") {
+      return { value: propertyValue, type: TableDataType.string };
     }
-    return { value: propValue.join(), type: TableDataType.string };
-  } else if (type == "float" || type == "int") {
-    return { value: propValue, type: TableDataType.number };
+
+    return { value: propertyValue.join(), type: TableDataType.string };
+  } else if (
+    type == "float" ||
+    type == "int" ||
+    type == "long" ||
+    type == "double" ||
+    type == "short" ||
+    type == "number"
+  ) {
+    return { value: propertyValue, type: TableDataType.number };
   } else {
+    console.log("type not found", type);
+    console.log("propertyValue", propertyValue);
+    console.log("propertyName", propertyName);
+    console.log("className", className);
+    console.log("isEdge", isEdge);
+    console.log("properties", properties);
+    console.log("enumMapping", enumMapping);
+
     return {
       value: "see rawData2TableData function",
       type: TableDataType.string,

@@ -14,7 +14,6 @@ import {
   OBJ_INFO_UPDATE_DELAY,
   TYPES_NOT_TO_SHOW,
   debounce,
-  extend,
   getPropNamesFromObject,
 } from "../../constants";
 import { CytoscapeService } from "../../cytoscape.service";
@@ -33,8 +32,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   selectedClasses: string;
   selectedItemProps: any;
   tableFilled = new Subject<boolean>();
-  multiObjTableFilled = new Subject<boolean>();
-  clearMultiObjTableFilter = new Subject<boolean>();
+  multiObjectTableFilled = new Subject<boolean>();
+  clearMultiObjectTableFilter = new Subject<boolean>();
   isShowStatsTable: boolean = false;
   isShowObjTable: boolean = false;
   highlightedPathWalk: string = "";
@@ -57,7 +56,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     allChecked: false,
   };
 
-  multiObjTableInp: TableViewInput = {
+  multiObjectTableInput: TableViewInput = {
     columns: ["Type"],
     isHide0: true,
     results: [],
@@ -220,23 +219,38 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         stdSelectedEdges[i].id();
     }
     edges = edges.union(stdSelectedEdges);
-    this.fillMultiObjTable(edges, false, idMappingForHighlight, isNeed2Filter);
+    this.fillMultiObjectTable(
+      edges,
+      false,
+      idMappingForHighlight,
+      isNeed2Filter
+    );
   }
 
-  private fillMultiObjTable(
+  private fillMultiObjectTable(
     elements: any,
     isNode: boolean,
     idMappingForHighlight: any,
     isNeed2Filter: boolean
   ) {
-    this.multiObjTableInp.isNodeData = isNode;
-    let elementTypesArr = elements.map((x: any) => x.classes()[0]);
+    console.log(elements);
+
+    this.multiObjectTableInput.isNodeData = isNode;
+    const elementTypesArray = elements.map((x: any) => x.classes()[0]);
     let elementTypes = {};
-    for (let i = 0; i < elementTypesArr.length; i++) {
-      elementTypes[elementTypesArr[i]] = true;
+
+    for (let i = 0; i < elementTypesArray.length; i++) {
+      elementTypes[elementTypesArray[i]] = true;
     }
+
+    console.log(elementTypes);
+
     const properties = this._g.dataModel.getValue();
     let definedProperties = {};
+
+    console.log(properties);
+    console.log(definedProperties);
+
     for (let type in elementTypes) {
       if (isNode) {
         for (let j in properties.nodes[type]) {
@@ -248,20 +262,29 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         }
       }
     }
-    this.multiObjTableInp.columns = ["Type"].concat(
-      Object.keys(definedProperties)
+
+    this.multiObjectTableInput.columns = ["Type"].concat(
+      this._g.translateVariableNames2Labels(Object.keys(definedProperties))
     );
-    this.multiObjTableInp.results = [];
-    this.multiObjTableInp.classNames = [];
+    this.multiObjectTableInput.results = [];
+    this.multiObjectTableInput.classNames = [];
     let elementTypeCount = {};
     const enumMapping = this._g.getEnumMapping();
+
+    console.log(enumMapping);
+    console.log(this.multiObjectTableInput);
+
     for (let i = 0; i < elements.length; i++) {
       let className = elements[i].classes()[0];
-      if (elementTypeCount[className]) {
-        elementTypeCount[className] += 1;
-      } else {
-        elementTypeCount[className] = 1;
-      }
+
+      console.log(className);
+
+      elementTypeCount[className] = elementTypeCount[className]
+        ? elementTypeCount[className] + 1
+        : 1;
+
+      console.log(elementTypeCount);
+
       let row: TableData[] = [
         {
           type: TableDataType.string,
@@ -269,8 +292,15 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         },
         { type: TableDataType.string, value: className },
       ];
+
+      console.log(row);
+
       for (let j in definedProperties) {
         if (elements[i].data(j)) {
+          console.log(elements[i].data(j));
+          console.log(elements[i].data());
+          console.log(j);
+
           row.push(
             property2TableData(
               properties,
@@ -283,27 +313,43 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
           );
         }
       }
-      this.multiObjTableInp.results.push(row);
-      this.multiObjTableInp.classNames.push(className);
+
+      console.log(row);
+
+      this.multiObjectTableInput.results.push(row);
+      this.multiObjectTableInput.classNames.push(className);
     }
+
+    console.log(this.multiObjectTableInput);
+
     for (let k in elementTypeCount) {
       this.selectedClasses += k + "(" + elementTypeCount[k] + ") ";
     }
-    this.multiObjTableInp.pageSize =
+
+    console.log(this.selectedClasses);
+
+    this.multiObjectTableInput.pageSize =
       this._g.userPreferences.dataPageSize.getValue();
-    this.multiObjTableInp.currentPage = 1;
-    this.multiObjTableInp.resultCount = this.multiObjTableInp.results.length;
+    this.multiObjectTableInput.currentPage = 1;
+    this.multiObjectTableInput.resultCount =
+      this.multiObjectTableInput.results.length;
+
+    console.log(this.multiObjectTableInput);
+
     // if too many edges need to be shown, we should make pagination
     if (isNeed2Filter) {
-      this.clearMultiObjTableFilter.next(true);
+      this.clearMultiObjectTableFilter.next(true);
       filterTableDatas(
         { orderBy: "", orderDirection: "", txt: "" },
-        this.multiObjTableInp,
+        this.multiObjectTableInput,
         this._g.userPreferences.isIgnoreCaseInText.getValue()
       );
     }
+
+    console.log(this.multiObjectTableInput);
+
     setTimeout(() => {
-      this.multiObjTableFilled.next(true);
+      this.multiObjectTableFilled.next(true);
     }, 100);
   }
 
@@ -320,7 +366,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       let id = selected[i].id();
       idMappingForHighlight[id] = id;
     }
-    this.fillMultiObjTable(
+    this.fillMultiObjectTable(
       selected,
       hasNode,
       idMappingForHighlight,
@@ -692,7 +738,15 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
 
       if (firstElement === null) {
-        firstElement = extend(firstElement, data);
+        if (!firstElement) {
+          firstElement = {};
+        }
+
+        for (let key in data) {
+          if (data.hasOwnProperty(key)) {
+            firstElement[key] = data[key];
+          }
+        }
       }
 
       if (elementList.length === 1) {
@@ -944,11 +998,11 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
     filterTableDatas(
       filter,
-      this.multiObjTableInp,
+      this.multiObjectTableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
     setTimeout(() => {
-      this.multiObjTableFilled.next(true);
+      this.multiObjectTableFilled.next(true);
     }, 100);
   }
 }

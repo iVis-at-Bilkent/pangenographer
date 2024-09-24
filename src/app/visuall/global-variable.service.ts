@@ -14,7 +14,6 @@ import {
   LAYOUT_ANIMATION_DURATION,
   TYPES_NOT_TO_SHOW,
   debounce,
-  isPrimitiveType,
 } from "./constants";
 import { GraphElement, GraphHistoryItem } from "./db-service/data-types";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
@@ -316,6 +315,85 @@ export class GlobalVariableService {
     }, this.HISTORY_SNAP_DELAY);
   }
 
+  translateVariableNames2Labels(variables: string[]): string[] {
+    let labels = [];
+    for (let i = 0; i < variables.length; i++) {
+      // --- GFA segment variables ---
+      if (variables[i] === "segmentName") {
+        labels.push("Segment Name");
+      } else if (variables[i] === "segmentLength") {
+        labels.push("Segment Length");
+      } else if (variables[i] === "segmentData") {
+        labels.push("Segment Data");
+      }
+      // link
+      else if (variables[i] === "kmerCount") {
+        labels.push("Kmer Count");
+      }
+      // link
+      else if (variables[i] === "fragmentCount") {
+        labels.push("Fragment Count");
+      }
+      // containment, link
+      else if (variables[i] === "readCount") {
+        labels.push("Read Count");
+      } else if (variables[i] === "SHA256Checksum") {
+        labels.push("SHA256 Checksum");
+      } else if (variables[i] === "URIorLocalSystemPath") {
+        labels.push("URI or Local System Path");
+      }
+      // link, jump
+      else if (variables[i] === "pathNames") {
+        labels.push("Path Names");
+      }
+      // link
+      else if (variables[i] === "walkSampleIdentifiers") {
+        labels.push("Walk Sample Identifiers");
+      }
+
+      // --- GFA link variables ---
+      else if (variables[i] === "overlap") {
+        labels.push("Overlap");
+      }
+      // jump, containment
+      else if (variables[i] === "sourceOrientation") {
+        labels.push("Source Orientation");
+      }
+      // jump, containment
+      else if (variables[i] === "targetOrientation") {
+        labels.push("Target Orientation");
+      }
+      // containment
+      else if (variables[i] === "edgeIdentifier") {
+        labels.push("Edge Identifier");
+      } else if (variables[i] === "mappingQuality") {
+        labels.push("Mapping Quality");
+      }
+      // containment
+      else if (variables[i] === "numberOfMismatchesOrGaps") {
+        labels.push("Number of Mismatches or Gaps");
+      }
+      // jump, containment
+      else if (variables[i] === "sequenceLength") {
+        labels.push("Sequence Length");
+      }
+
+      // --- GFA jump variables ---
+      else if (variables[i] === "distance") {
+        labels.push("Distance");
+      } else if (variables[i] === "indirectShortcutConnections") {
+        labels.push("Indirect Shortcut Connections");
+      } else if (variables[i] === "directShortcutConnections") {
+        labels.push("Direct Shortcut Connections");
+      }
+      // GFA containment variables
+      else if (variables[i] === "pos") {
+        labels.push("Pos");
+      }
+    }
+    return labels;
+  }
+
   getLabels4Elements(
     elementIds: string[],
     isNode: boolean = true,
@@ -361,12 +439,14 @@ export class GlobalVariableService {
       if (s.indexOf("(") < 0) {
         labels.push(s);
       } else {
-        let propName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
+        let propertyName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
         if (!objectDatas) {
-          labels.push(this.cy.elements(`[id = "${cyIds[i]}"]`).data(propName));
+          labels.push(
+            this.cy.elements(`[id = "${cyIds[i]}"]`).data(propertyName)
+          );
         } else {
           const currentData = objectDatas[i].data;
-          let l = currentData[propName];
+          let l = currentData[propertyName];
           if (!l) {
             l = currentData[Object.keys(currentData)[0]];
           }
@@ -803,16 +883,21 @@ export class GlobalVariableService {
       return;
     }
     for (let k in object) {
-      let prop = object[k];
-      if (isPrimitiveType(prop)) {
+      let property = object[k];
+      let propType = typeof property;
+      if (
+        propType == "string" ||
+        propType == "number" ||
+        propType == "boolean"
+      ) {
         if (userPreferences[k]) {
-          (userPreferences[k] as BehaviorSubject<any>).next(prop);
+          (userPreferences[k] as BehaviorSubject<any>).next(property);
         } else {
-          userPreferences[k] = new BehaviorSubject(prop);
+          userPreferences[k] = new BehaviorSubject(property);
         }
       } else {
         if (!userPreferences[k]) {
-          if (prop instanceof Array) {
+          if (property instanceof Array) {
             userPreferences[k] = [];
           } else {
             userPreferences[k] = {};

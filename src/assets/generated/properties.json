@@ -6,15 +6,15 @@
       "segmentNames": "string"
     },
     "SEGMENT": {
+      "segmentName": "string",
+      "segmentLength": "number",
+      "segmentData": "string",
+      "kmerCount": "number",
+      "fragmentCount": "number",
+      "readCount": "number",
       "SHA256Checksum": "string",
       "URIorLocalSystemPath": "string",
-      "fragmentCount": "number",
-      "kmerCount": "number",
       "pathNames": "string[]",
-      "readCount": "number",
-      "segmentData": "string",
-      "segmentLength": "number",
-      "segmentName": "string",
       "walkSampleIdentifiers": "string[]"
     },
     "WALK": {
@@ -28,35 +28,35 @@
   },
   "edges": {
     "CONTAINMENT": {
+      "overlap": "string",
+      "sourceOrientation": "string",
+      "targetOrientation": "string",
       "edgeIdentifier": "string",
       "numberOfMismatchesOrGaps": "number",
-      "overlap": "string",
       "pos": "number",
       "readCount": "number",
-      "sequenceLength": "string",
-      "sourceOrientation": "string",
-      "targetOrientation": "string"
+      "sequenceLength": "string"
     },
     "JUMP": {
+      "sourceOrientation": "string",
+      "targetOrientation": "string",
       "distance": "string",
       "indirectShortcutConnections": "number",
-      "pathNames": "string[]",
       "sequenceLength": "string",
-      "sourceOrientation": "string",
-      "targetOrientation": "string"
+      "pathNames": "string[]"
     },
     "LINK": {
+      "overlap": "string",
+      "sourceOrientation": "string",
+      "targetOrientation": "string",
       "edgeIdentifier": "string",
       "fragmentCount": "number",
       "kmerCount": "number",
       "mappingQuality": "number",
       "numberOfMismatchesOrGaps": "number",
-      "overlap": "string",
-      "pathNames": "string[]",
       "readCount": "number",
       "sequenceLength": "number",
-      "sourceOrientation": "string",
-      "targetOrientation": "string",
+      "pathNames": "string[]",
       "walkSampleIdentifiers": "string[]"
     }
   }
