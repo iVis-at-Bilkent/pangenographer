@@ -419,3 +419,7 @@ rect[fill-opacity="0"]:not([stroke="none"]) {
   border-radius: 5px;
   background-color: #ffffff;
 }
+
+.w5-5 {
+  width: 5.5em;
+}

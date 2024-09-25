@@ -1,21 +1,32 @@
-<div class="custom-query"></div>
-<div class="va-text">
-  <div class="d-flex flex-column align-items-center justify-content-center">
-    <label for="segmentNamesInput" class="sr-only mb-2"
-      >Search by Segment Names</label
-    >
-    <textarea
+<div
+  class="va-text d-flex flex-column align-items-center justify-content-center"
+>
+  <label for="segmentNamesInput" class="sr-only my-2"
+    >Search by Segment Names</label
+  >
+  <textarea
+    type="number"
+    id="segmentNamesInput"
+    [(ngModel)]="segmentNames"
+    [style.height]="'100px'"
+    class="form-control va-small-text"
+    title="Enter Segment Names to search line by line or comma separated"
+    placeholder="Enter Segment Names to search line by line or comma separated"
+  >
+  </textarea>
+  <div class="form-inline va-text flex my-2">
+    <label>Neighbor Distance</label>
+    <input
       type="number"
-      id="segmentNamesInput"
-      [(ngModel)]="segmentNames"
-      [style.height]="'100px'"
-      class="form-control va-small-text"
-      title="Enter Segment Names to search line by line"
-      placeholder="Enter Segment Names to search line by line"
-    >
-    </textarea>
+      min="1"
+      step="any"
+      [(ngModel)]="neighborDistance"
+      class="form-control standart-input-height va-small-text ms-1 w5-5"
+      placeholder="Neighbor Distance"
+    />
   </div>
 </div>
+
 <div class="d-flex align-items-center justify-content-center m-1">
   <input
     class="btn btn-sm btn-dark va-text m-2 center"

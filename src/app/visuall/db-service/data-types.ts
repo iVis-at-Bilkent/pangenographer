@@ -132,6 +132,8 @@ export interface GFASegment {
   kmerCount?: number;
   SHA256Checksum?: string;
   URIorLocalSystemPath?: string;
+  pathNames?: string;
+  walkSampleIdentifiers?: string;
 }
 
 export interface GFALink {

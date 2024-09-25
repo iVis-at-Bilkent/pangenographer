@@ -24,7 +24,17 @@ import { GlobalVariableService } from "../../../../global-variable.service";
 export class SearchSegmentByNameComponent implements OnInit {
   tableFilled = new Subject<boolean>();
   tableInput: TableViewInput = {
-    columns: ["Segment Name", "Segment Length", "Segment Data"],
+    columns: [
+      "Segment Name",
+      "Segment Length",
+      "Segment Data",
+      "Kmer Count",
+      "Fragment Count",
+      "Read Count",
+      "SHA256 Checksum",
+      "Path Names",
+      "Walk Sample Identifiers",
+    ],
     results: [],
     tableTitle: "Query Results",
     isEmphasizeOnHover: true,
@@ -42,6 +52,7 @@ export class SearchSegmentByNameComponent implements OnInit {
   clearTableFilter = new Subject<boolean>();
 
   segmentNames: string;
+  neighborDistance: number;
 
   constructor(
     private _dbService: Neo4jDb,
@@ -55,6 +66,7 @@ export class SearchSegmentByNameComponent implements OnInit {
     });
 
     this.segmentNames = "";
+    this.neighborDistance = 1;
   }
 
   prepareQuery() {
@@ -85,13 +97,13 @@ export class SearchSegmentByNameComponent implements OnInit {
 
     const r = `[${skip}..${skip + dataCnt}]`;
 
-    let segmentNames = this.segmentNames.split("\n").join("','");
+    let segmentNames = this.segmentNames.split(/[\n,]/).join("','");
     segmentNames = "'" + segmentNames + "'";
 
     const cql = `WITH [${segmentNames}] as segmentNames
     MATCH (segment:SEGMENT)
     WHERE (segment.segmentName) IN segmentNames
-    OPTIONAL MATCH path = (segment)-[*..1]-(neighbor)
+    OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
     UNWIND nodes(path) AS node
     RETURN DISTINCT node`;
     this._dbService.runQuery(cql, cb, DbResponseType.table);
@@ -117,13 +129,13 @@ export class SearchSegmentByNameComponent implements OnInit {
       this._g.userPreferences.dataPageLimit.getValue() *
       this._g.userPreferences.dataPageSize.getValue();
 
-    let segmentNames = this.segmentNames.split("\n").join("','");
+    let segmentNames = this.segmentNames.split(/[\n,]/).join("','");
     segmentNames = "'" + segmentNames + "'";
 
     const cql = `WITH [${segmentNames}] as segmentNames
       MATCH (segment:SEGMENT)
       WHERE (segment.segmentName) IN segmentNames
-      OPTIONAL MATCH path = (segment)-[*..1]-(neighbor)
+      OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
       RETURN DISTINCT segment, nodes(path), relationships(path)
       SKIP ${skip} LIMIT ${dataCnt}`;
     this._dbService.runQuery(cql, cb);
@@ -170,6 +182,30 @@ export class SearchSegmentByNameComponent implements OnInit {
       row.push({
         value: segment.segmentData,
         type: TableDataType.data,
+      });
+      row.push({
+        value: segment.kmerCount,
+        type: TableDataType.number,
+      });
+      row.push({
+        value: segment.fragmentCount,
+        type: TableDataType.number,
+      });
+      row.push({
+        value: segment.readCount,
+        type: TableDataType.number,
+      });
+      row.push({
+        value: segment.SHA256Checksum,
+        type: TableDataType.string,
+      });
+      row.push({
+        value: segment.pathNames,
+        type: TableDataType.string,
+      });
+      row.push({
+        value: segment.walkSampleIdentifiers,
+        type: TableDataType.string,
       });
 
       this.tableInput.results.push(row); // Add the row to the table
