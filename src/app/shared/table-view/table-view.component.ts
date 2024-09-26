@@ -497,15 +497,15 @@ export class TableViewComponent implements OnInit, OnDestroy {
     let prefix = this.params.isNodeData ? "n" : "e";
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
-      let cName = this.params.classNameOfObjects;
 
-      if (!cName) {
-        if (this.params.classNames && this.params.classNames[i]) {
-          cName = cNames[i];
-        } else {
-          cName = getClassNameFromProperties(props, this.params.columns);
-        }
+      let cName = undefined;
+
+      if (this.params.classNames && this.params.classNames[i]) {
+        cName = cNames[i];
+      } else {
+        cName = getClassNameFromProperties(props, this.params.columns);
       }
+
       const data = {};
       // first index is for ID
       for (let i = 1; i < r.length; i++) {

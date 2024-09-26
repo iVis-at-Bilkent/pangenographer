@@ -570,7 +570,6 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   filterTable(filter: TableFiltering) {
-    console.log("filter table: ", filter);
     this.tableFilter = filter;
     this.runQuery(true, null);
   }

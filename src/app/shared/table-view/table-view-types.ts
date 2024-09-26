@@ -29,7 +29,6 @@ export interface TableViewInput {
   isDisableHover?: boolean;
   tableTitle?: string;
   isEmphasizeOnHover?: boolean;
-  classNameOfObjects?: string;
   classNames?: string[];
   isBlastResultTable?: boolean;
   allChecked?: boolean;
@@ -63,8 +62,6 @@ export function property2TableData(
     type = properties.nodes[className][propertyName];
   }
 
-  console.log("type", type);
-
   if (type === undefined || type == null) {
     return { value: propertyValue, type: TableDataType.string };
   } else if (type.startsWith("enum")) {
@@ -97,16 +94,12 @@ export function property2TableData(
   ) {
     return { value: propertyValue, type: TableDataType.number };
   } else {
-    console.log("type not found", type);
-    console.log("propertyValue", propertyValue);
-    console.log("propertyName", propertyName);
-    console.log("className", className);
-    console.log("isEdge", isEdge);
-    console.log("properties", properties);
-    console.log("enumMapping", enumMapping);
+    console.log(
+      `Type "${type}" not recognized. Please check the rawData2TableData function.`
+    );
 
     return {
-      value: "see rawData2TableData function",
+      value: `Type "${type}" not recognized. Please check the rawData2TableData function.`,
       type: TableDataType.string,
     };
   }

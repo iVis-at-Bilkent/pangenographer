@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
+import { GFA_SEGMENT_PROPERTIES } from "src/app/visuall/constants";
 import {
   DbResponseType,
   GFASegment,
@@ -24,21 +25,10 @@ import { GlobalVariableService } from "../../../../global-variable.service";
 export class SearchSegmentByNameComponent implements OnInit {
   tableFilled = new Subject<boolean>();
   tableInput: TableViewInput = {
-    columns: [
-      "Segment Name",
-      "Segment Length",
-      "Segment Data",
-      "Kmer Count",
-      "Fragment Count",
-      "Read Count",
-      "SHA256 Checksum",
-      "Path Names",
-      "Walk Sample Identifiers",
-    ],
+    columns: GFA_SEGMENT_PROPERTIES,
     results: [],
     tableTitle: "Query Results",
     isEmphasizeOnHover: true,
-    classNameOfObjects: "Segment", // Check if this is correct
     isShowExportAsCSV: true,
     resultCount: 0,
     currentPage: 1,
@@ -79,11 +69,7 @@ export class SearchSegmentByNameComponent implements OnInit {
 
   loadTable(skip: number, filter?: TableFiltering) {
     const cb = (x: any) => {
-      console.log(x);
-
       this.fillTable(x);
-
-      console.log(x);
 
       if (!filter) {
         this.tableResponse = x;
@@ -95,18 +81,15 @@ export class SearchSegmentByNameComponent implements OnInit {
       this._g.userPreferences.dataPageLimit.getValue() *
       this._g.userPreferences.dataPageSize.getValue();
 
-    const r = `[${skip}..${skip + dataCnt}]`;
+    let segmentNames = this.prepareSegmentNames(this.segmentNames);
 
-    let segmentNames = this.segmentNames.split(/[\n,]/).join("','");
-    segmentNames = "'" + segmentNames + "'";
-
-    const cql = `WITH [${segmentNames}] as segmentNames
+    const cypherQueryLanguage = `WITH ['${segmentNames}'] as segmentNames
     MATCH (segment:SEGMENT)
     WHERE (segment.segmentName) IN segmentNames
     OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
     UNWIND nodes(path) AS node
     RETURN DISTINCT node`;
-    this._dbService.runQuery(cql, cb, DbResponseType.table);
+    this._dbService.runQuery(cypherQueryLanguage, cb, DbResponseType.table);
   }
 
   loadGraph(skip: number, filter?: TableFiltering) {
@@ -129,24 +112,19 @@ export class SearchSegmentByNameComponent implements OnInit {
       this._g.userPreferences.dataPageLimit.getValue() *
       this._g.userPreferences.dataPageSize.getValue();
 
-    let segmentNames = this.segmentNames.split(/[\n,]/).join("','");
-    segmentNames = "'" + segmentNames + "'";
+    let segmentNames = this.prepareSegmentNames(this.segmentNames);
 
-    const cql = `WITH [${segmentNames}] as segmentNames
+    const cypherQueryLanguage = `WITH ['${segmentNames}'] as segmentNames
       MATCH (segment:SEGMENT)
       WHERE (segment.segmentName) IN segmentNames
       OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
       RETURN DISTINCT segment, nodes(path), relationships(path)
       SKIP ${skip} LIMIT ${dataCnt}`;
-    this._dbService.runQuery(cql, cb);
+    this._dbService.runQuery(cypherQueryLanguage, cb);
   }
 
   // This function is called when the table is filled with data
   fillTable(tableResponse: TableResponse) {
-    console.log(tableResponse);
-    console.log(this.tableInput.columns);
-    console.log(this.tableInput.results);
-
     this.tableInput.results = [];
     let segmentNameMap: { [key: string]: boolean } = {}; // To keep track of unique segment names
     let segmentNameMapSize = 0; // To keep track of unique segment names
@@ -211,10 +189,13 @@ export class SearchSegmentByNameComponent implements OnInit {
       this.tableInput.results.push(row); // Add the row to the table
     }
 
-    console.log(this.tableInput.results);
-
     this.tableInput.resultCount = this.tableInput.results.length; // Set the result count
     this.tableFilled.next(true); // Notify that the table is filled
+  }
+
+  // Transform the segment names into a format that can be used in the query
+  private prepareSegmentNames(segmentNames: string): string {
+    return segmentNames.split(/[\n,]/).join("','");
   }
 
   filterTable(filter: TableFiltering) {
@@ -226,12 +207,8 @@ export class SearchSegmentByNameComponent implements OnInit {
     }
   }
 
-  // tableInput is already filtered. Use that to filter graph elements.
-  // For this query, we should specifically bring the related nodes and their 1-neighborhood
+  // TableInput is already filtered. Use that to filter graph elements.
   private filterGraphResponse(graphResponse: GraphResponse): GraphResponse {
-    console.log(graphResponse);
-    console.log(this.tableInput.results);
-
     const filteredResponse: GraphResponse = {
       nodes: [],
       edges: graphResponse.edges,
@@ -242,22 +219,17 @@ export class SearchSegmentByNameComponent implements OnInit {
       nodeIdDictionary[this.tableInput.results[i][0].value] = true;
     }
 
-    console.log(nodeIdDictionary);
-
     // Add a node if an edge starts with a node that is already in the dictionary
     for (let i = 0; i < graphResponse.edges.length; i++) {
       if (nodeIdDictionary[graphResponse.edges[i].startNodeElementId]) {
         nodeIdDictionary[graphResponse.edges[i].endNodeElementId] = true;
       }
     }
-
-    console.log(nodeIdDictionary);
     for (let i = 0; i < graphResponse.nodes.length; i++) {
       if (nodeIdDictionary[graphResponse.nodes[i].elementId]) {
         filteredResponse.nodes.push(graphResponse.nodes[i]);
       }
     }
-    console.log(filteredResponse);
 
     return filteredResponse;
   }

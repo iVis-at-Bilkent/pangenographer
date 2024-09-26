@@ -592,8 +592,6 @@ export class Neo4jDb implements DbService {
       return;
     }
 
-    console.log(response);
-
     if (isTimeboxed) {
       const responseData = response.results[0].data;
 
@@ -610,30 +608,17 @@ export class Neo4jDb implements DbService {
           Object.values(x.row[0])[0],
           Object.values(x.meta)[0]
         );
-        console.log(x.row[0]);
-        console.log(x.meta);
-        console.log(Object.values(x.row[0]));
-        console.log(Object.values(x.meta));
-        console.log(mergedObject);
         return mergedObject;
       });
 
-      console.log(columns);
-      console.log(data);
-
       // Get the index of the id column
       const idIndex = columns.indexOf("ElementId(x)");
-
-      console.log(idIndex);
 
       // If id is found, put it to the first column
       if (idIndex > -1) {
         const temp = columns[idIndex];
         columns[idIndex] = columns[0];
         columns[0] = temp;
-
-        console.log(temp);
-        console.log(columns);
 
         for (let i = 0; i < data.length; i++) {
           const temp2 = data[i][idIndex];

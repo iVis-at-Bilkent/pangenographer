@@ -146,6 +146,18 @@ export const NEO4J_2_JS_STR_OPERATORS = {
 
 export const TYPES_NOT_TO_SHOW = ["PATH", "WALK", "PSEUDO"];
 
+export const GFA_SEGMENT_PROPERTIES = [
+  "Segment Name",
+  "Segment Length",
+  "Segment Data",
+  "Kmer Count",
+  "Fragment Count",
+  "Read Count",
+  "SHA256 Checksum",
+  "Path Names",
+  "Walk Sample Identifiers",
+];
+
 /** https://davidwalsh.name/javascript-debounce-function
  * Returns a function, that, as long as it continues to be invoked, will not
  * be triggered. The function will be called after it stops being called for

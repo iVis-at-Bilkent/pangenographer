@@ -15,11 +15,11 @@ export class QueryTabComponent implements OnInit {
     this.queries = [
       {
         component: SearchSegmentByNameComponent,
-        text: "Search Segment by Name",
+        text: "Search segment by name",
       },
       {
         component: SearchSegmentByNucleotideSequenceComponent,
-        text: "Search Segment by Sequence",
+        text: "Search segment by sequence",
       },
     ];
     this.selectedIndex = -1;

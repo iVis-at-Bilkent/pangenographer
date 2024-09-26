@@ -233,7 +233,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     idMappingForHighlight: any,
     isNeed2Filter: boolean
   ) {
-    console.log(elements);
 
     this.multiObjectTableInput.isNodeData = isNode;
     const elementTypesArray = elements.map((x: any) => x.classes()[0]);
@@ -243,13 +242,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       elementTypes[elementTypesArray[i]] = true;
     }
 
-    console.log(elementTypes);
-
     const properties = this._g.dataModel.getValue();
     let definedProperties = {};
-
-    console.log(properties);
-    console.log(definedProperties);
 
     for (let type in elementTypes) {
       if (isNode) {
@@ -271,19 +265,12 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     let elementTypeCount = {};
     const enumMapping = this._g.getEnumMapping();
 
-    console.log(enumMapping);
-    console.log(this.multiObjectTableInput);
-
     for (let i = 0; i < elements.length; i++) {
       let className = elements[i].classes()[0];
-
-      console.log(className);
 
       elementTypeCount[className] = elementTypeCount[className]
         ? elementTypeCount[className] + 1
         : 1;
-
-      console.log(elementTypeCount);
 
       let row: TableData[] = [
         {
@@ -293,14 +280,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         { type: TableDataType.string, value: className },
       ];
 
-      console.log(row);
-
       for (let j in definedProperties) {
         if (elements[i].data(j)) {
-          console.log(elements[i].data(j));
-          console.log(elements[i].data());
-          console.log(j);
-
           row.push(
             property2TableData(
               properties,
@@ -314,27 +295,19 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         }
       }
 
-      console.log(row);
-
       this.multiObjectTableInput.results.push(row);
       this.multiObjectTableInput.classNames.push(className);
     }
 
-    console.log(this.multiObjectTableInput);
-
     for (let k in elementTypeCount) {
       this.selectedClasses += k + "(" + elementTypeCount[k] + ") ";
     }
-
-    console.log(this.selectedClasses);
 
     this.multiObjectTableInput.pageSize =
       this._g.userPreferences.dataPageSize.getValue();
     this.multiObjectTableInput.currentPage = 1;
     this.multiObjectTableInput.resultCount =
       this.multiObjectTableInput.results.length;
-
-    console.log(this.multiObjectTableInput);
 
     // if too many edges need to be shown, we should make pagination
     if (isNeed2Filter) {
@@ -345,8 +318,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         this._g.userPreferences.isIgnoreCaseInText.getValue()
       );
     }
-
-    console.log(this.multiObjectTableInput);
 
     setTimeout(() => {
       this.multiObjectTableFilled.next(true);
