@@ -2,11 +2,10 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subject, Subscription } from "rxjs";
 import {
   TableData,
-  TableDataType,
   TableFiltering,
   TableViewInput,
   filterTableDatas,
-  property2TableData,
+  translateColumnNamesAndProperties,
 } from "../../../shared/table-view/table-view-types";
 import {
   CLUSTER_CLASS,
@@ -30,12 +29,12 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   nodeClasses: Set<string>;
   edgeClasses: Set<string>;
   selectedClasses: string;
-  selectedItemProps: any;
+  selectedItemProperties: any;
   tableFilled = new Subject<boolean>();
   multiObjectTableFilled = new Subject<boolean>();
   clearMultiObjectTableFilter = new Subject<boolean>();
   isShowStatsTable: boolean = false;
-  isShowObjTable: boolean = false;
+  isShowObjectTable: boolean = false;
   highlightedPathWalk: string = "";
 
   tableInput: TableViewInput = {
@@ -56,7 +55,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     allChecked: false,
   };
 
-  multiObjectTableInput: TableViewInput = {
+  multipleObjectTableInput: TableViewInput = {
     columns: ["Type"],
     isHide0: true,
     results: [],
@@ -87,7 +86,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     private _cyService: CytoscapeService,
     private _sequenceDataService: SequenceDataService
   ) {
-    this.selectedItemProps = {};
+    this.selectedItemProperties = {};
   }
 
   ngOnInit() {
@@ -115,10 +114,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
             this.showStats();
           }
         );
-        this.showObjectProps();
+        this.showObjectProperties();
         this.showStats();
         this._cyService.showObjPropsFn = debounce(
-          this.showObjectProps,
+          this.showObjectProperties,
           OBJ_INFO_UPDATE_DELAY
         ).bind(this);
         this._cyService.showStatsFn = debounce(
@@ -141,26 +140,33 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  showObjectProps() {
+  showObjectProperties() {
     let selected = this._g.cy.$(":selected");
-    this.isShowObjTable = false;
+    this.isShowObjectTable = false;
+
+    // If the selected element is a collapsed edge, then show the properties of the collapsed edge
     if (selected.filter("." + COLLAPSED_EDGE_CLASS).length > 0) {
-      this.isShowObjTable = true;
-      this.showCompoundEdgeProps(true);
+      this.isShowObjectTable = true;
+      this.showCompoundEdgeProperties(true);
       return;
     }
+
+    // If the selected elements are nodes or edges, then show the properties of the selected elements
     if (
       selected.length > 1 &&
       (selected.length == selected.filter("node").length ||
         selected.length == selected.filter("edge").length)
     ) {
-      this.isShowObjTable = true;
-      this.showMultiObjTable(true);
+      this.isShowObjectTable = true;
+      this.showMultipleObjectTable(true);
       return;
     }
+
+    // If the selected element is a node, then show the properties of the selected node
     const selectedNonMeta = selected.not("." + COLLAPSED_EDGE_CLASS);
     let props: { [x: string]: any }, classNames: any[];
-    [props, classNames] = this.getCommonObjectProps(selectedNonMeta);
+
+    [props, classNames] = this.getCommonObjectProperties(selectedNonMeta);
     const properties = this._g.dataModel.getValue();
     // remove undefined but somehow added properties (cuz of extensions)
     let definedProperties = getPropNamesFromObject(
@@ -192,13 +198,13 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  showCompoundEdgeProps(isNeed2Filter: boolean) {
+  showCompoundEdgeProperties(isNeed2Filter: boolean) {
     const compoundEdges = this._g.cy
       .edges(":selected")
       .filter("." + COLLAPSED_EDGE_CLASS);
     const selectedNodeCnt = this._g.cy.nodes(":selected").length;
     this.selectedClasses = "";
-    this.selectedItemProps = {};
+    this.selectedItemProperties = {};
     if (compoundEdges.length < 1 || selectedNodeCnt > 0) {
       return;
     }
@@ -233,8 +239,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     idMappingForHighlight: any,
     isNeed2Filter: boolean
   ) {
-
-    this.multiObjectTableInput.isNodeData = isNode;
+    this.multipleObjectTableInput.isNodeData = isNode;
     const elementTypesArray = elements.map((x: any) => x.classes()[0]);
     let elementTypes = {};
 
@@ -257,13 +262,12 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.multiObjectTableInput.columns = ["Type"].concat(
-      this._g.translateVariableNames2Labels(Object.keys(definedProperties))
+    this.multipleObjectTableInput.columns = ["Type"].concat(
+      translateColumnNamesAndProperties(Object.keys(definedProperties))
     );
-    this.multiObjectTableInput.results = [];
-    this.multiObjectTableInput.classNames = [];
+    this.multipleObjectTableInput.results = [];
+    this.multipleObjectTableInput.classNames = [];
     let elementTypeCount = {};
-    const enumMapping = this._g.getEnumMapping();
 
     for (let i = 0; i < elements.length; i++) {
       let className = elements[i].classes()[0];
@@ -274,47 +278,37 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
       let row: TableData[] = [
         {
-          type: TableDataType.string,
           value: "#" + idMappingForHighlight[elements[i].id()],
         },
-        { type: TableDataType.string, value: className },
+        { value: className },
       ];
 
       for (let j in definedProperties) {
         if (elements[i].data(j)) {
-          row.push(
-            property2TableData(
-              properties,
-              enumMapping,
-              j,
-              elements[i].data(j) ?? "",
-              className,
-              !isNode
-            )
-          );
+          row.push({
+            value: elements[i].data(j),
+          });
         }
       }
 
-      this.multiObjectTableInput.results.push(row);
-      this.multiObjectTableInput.classNames.push(className);
+      this.multipleObjectTableInput.results.push(row);
+      this.multipleObjectTableInput.classNames.push(className);
     }
 
     for (let k in elementTypeCount) {
       this.selectedClasses += k + "(" + elementTypeCount[k] + ") ";
     }
 
-    this.multiObjectTableInput.pageSize =
+    this.multipleObjectTableInput.pageSize =
       this._g.userPreferences.dataPageSize.getValue();
-    this.multiObjectTableInput.currentPage = 1;
-    this.multiObjectTableInput.resultCount =
-      this.multiObjectTableInput.results.length;
+    this.multipleObjectTableInput.currentPage = 1;
 
     // if too many edges need to be shown, we should make pagination
     if (isNeed2Filter) {
       this.clearMultiObjectTableFilter.next(true);
       filterTableDatas(
         { orderBy: "", orderDirection: "", txt: "" },
-        this.multiObjectTableInput,
+        this.multipleObjectTableInput,
         this._g.userPreferences.isIgnoreCaseInText.getValue()
       );
     }
@@ -324,10 +318,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  showMultiObjTable(isNeed2Filter: boolean) {
+  showMultipleObjectTable(isNeed2Filter: boolean) {
     let selected = this._g.cy.$(":selected").not("." + CLUSTER_CLASS);
     this.selectedClasses = "";
-    this.selectedItemProps = {};
+    this.selectedItemProperties = {};
     let hasNode = selected.filter("node").length > 0;
     if (hasNode && selected.filter("edge").length > 0) {
       return;
@@ -346,7 +340,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   // This function is used to render the properties of the selected object in the object tab
-  renderObjectProps(props: any, classNames: any, selectedCount: number) {
+  renderObjectProps(properties: any, classNames: any, selectedCount: number) {
     if (classNames && classNames.length > 0) {
       classNames = classNames.join(" & ");
     }
@@ -354,7 +348,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     // Set the selected classes
     this.selectedClasses = classNames;
     // Reset the selected item properties
-    this.selectedItemProps = {};
+    this.selectedItemProperties = {};
 
     // Prepare the properties to be rendered in the object tab
     // Get ordered keys if only one item is selected
@@ -363,14 +357,14 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       properityKeys =
         this.orderPropertyKeysIf1Selected(classNames) || properityKeys;
     } else {
-      properityKeys = Object.keys(props);
+      properityKeys = Object.keys(properties);
     }
 
     // Iterate through the properties and prepare the object to be rendered in the object tab
     for (const key of properityKeys) {
       // Replace - and _ with space
       let renderedKey = key.replace(/[_\-]/g, " ");
-      let renderedValue = props[key];
+      let renderedValue = properties[key];
 
       // If the value is undefined, skip it
       if (renderedValue === undefined) {
@@ -383,29 +377,29 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         renderedValue
       );
 
-      this.selectedItemProps[`${renderedKey}`] = {
+      this.selectedItemProperties[`${renderedKey}`] = {
         value: renderedValue,
       };
     }
 
     // If the object is contained in a path, then process the value further
-    if (this.selectedItemProps["pathNames"]) {
+    if (this.selectedItemProperties["pathNames"]) {
       this.preparePathData();
     }
 
     // If the object contained in a walk, then process the value further
-    if (this.selectedItemProps["walkSampleIdentifiers"]) {
+    if (this.selectedItemProperties["walkSampleIdentifiers"]) {
       this.prepareWalkData();
     }
 
     // If the object contains overlap, then process the value further
     if (
-      this.selectedItemProps["overlap"] &&
-      this.selectedItemProps["overlap"].value !== "*"
+      this.selectedItemProperties["overlap"] &&
+      this.selectedItemProperties["overlap"].value !== "*"
     ) {
-      this.selectedItemProps["overlap"] = {
-        value: this.selectedItemProps["overlap"].value,
-        overlapIdentifiers: this.selectedItemProps["overlap"].value
+      this.selectedItemProperties["overlap"] = {
+        value: this.selectedItemProperties["overlap"].value,
+        overlapIdentifiers: this.selectedItemProperties["overlap"].value
           .split(/[0-9]+/)
           .slice(1),
         currentIndex: 0,
@@ -414,7 +408,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
     // Prepare the combined sequence if an edge is selected
     // Only the edges have associated sourceOrientation
-    if (this.selectedItemProps["sourceOrientation"]) {
+    if (this.selectedItemProperties["sourceOrientation"]) {
       this.prepareCombinedSequenceData();
     }
   }
@@ -423,24 +417,24 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   private prepareWalkData() {
     // Create the walkChecked array to keep track of the selected walks
     // Initialize the walkChecked array with false values for each walk
-    this.selectedItemProps["walkChecked"] = [];
+    this.selectedItemProperties["walkChecked"] = [];
     for (
       let i = 0;
-      i < this.selectedItemProps["walkSampleIdentifiers"].length;
+      i < this.selectedItemProperties["walkSampleIdentifiers"].length;
       i++
     ) {
-      this.selectedItemProps["walkChecked"].push(false);
+      this.selectedItemProperties["walkChecked"].push(false);
     }
 
     // Extract the walk segment names from the walkSampleIdentifiers
-    this.selectedItemProps["walkHaplotypeIndexes"] = [];
-    this.selectedItemProps["walkSequenceIdentifiers"] = [];
-    this.selectedItemProps["walkSequenceStarts"] = [];
-    this.selectedItemProps["walkSequenceEnds"] = [];
-    this.selectedItemProps["walks"] = [];
+    this.selectedItemProperties["walkHaplotypeIndexes"] = [];
+    this.selectedItemProperties["walkSequenceIdentifiers"] = [];
+    this.selectedItemProperties["walkSequenceStarts"] = [];
+    this.selectedItemProperties["walkSequenceEnds"] = [];
+    this.selectedItemProperties["walks"] = [];
 
     // Iterate through the walk sample identifiers and extract the walk segment names
-    this.selectedItemProps["walkSampleIdentifiers"].value.forEach(
+    this.selectedItemProperties["walkSampleIdentifiers"].value.forEach(
       (walkSampleIdentifier: string) => {
         // Find the walk node in the graph based on the walk sample identifier
         let walk = this._g.cy.nodes(
@@ -449,28 +443,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
         // If the node is not found, then push undefined values to the walkSegmentNames
         if (walk.empty()) {
-          this.selectedItemProps["walkHaplotypeIndexes"].push(undefined);
-          this.selectedItemProps["walkSequenceIdentifiers"].push(undefined);
-          this.selectedItemProps["walkSequenceStarts"].push(undefined);
-          this.selectedItemProps["walkSequenceEnds"].push(undefined);
-          this.selectedItemProps["walks"].push(undefined);
+          this.selectedItemProperties["walkHaplotypeIndexes"].push(undefined);
+          this.selectedItemProperties["walkSequenceIdentifiers"].push(
+            undefined
+          );
+          this.selectedItemProperties["walkSequenceStarts"].push(undefined);
+          this.selectedItemProperties["walkSequenceEnds"].push(undefined);
+          this.selectedItemProperties["walks"].push(undefined);
           return;
         }
 
         // If the walk node is found, then extract the walk segment names
-        this.selectedItemProps["walkHaplotypeIndexes"].push(
+        this.selectedItemProperties["walkHaplotypeIndexes"].push(
           walk.data("haplotypeIndex")
         );
-        this.selectedItemProps["walkSequenceIdentifiers"].push(
+        this.selectedItemProperties["walkSequenceIdentifiers"].push(
           walk.data("sequenceIdentifier")
         );
-        this.selectedItemProps["walkSequenceStarts"].push(
+        this.selectedItemProperties["walkSequenceStarts"].push(
           walk.data("sequenceStart")
         );
-        this.selectedItemProps["walkSequenceEnds"].push(
+        this.selectedItemProperties["walkSequenceEnds"].push(
           walk.data("sequenceEnd")
         );
-        this.selectedItemProps["walks"].push(walk.data("walk"));
+        this.selectedItemProperties["walks"].push(walk.data("walk"));
       }
     );
   }
@@ -479,33 +475,35 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   private preparePathData() {
     // Create the pathChecked array to keep track of the selected paths
     // Initialize the pathChecked array with false values for each path
-    this.selectedItemProps["pathChecked"] = [];
-    for (let i = 0; i < this.selectedItemProps["pathNames"].length; i++) {
-      this.selectedItemProps["pathChecked"].push(false);
+    this.selectedItemProperties["pathChecked"] = [];
+    for (let i = 0; i < this.selectedItemProperties["pathNames"].length; i++) {
+      this.selectedItemProperties["pathChecked"].push(false);
     }
 
     // Extract the path segment names and path overlaps from the pathNames
-    this.selectedItemProps["pathSegmentNames"] = [];
-    this.selectedItemProps["pathOverlaps"] = [];
+    this.selectedItemProperties["pathSegmentNames"] = [];
+    this.selectedItemProperties["pathOverlaps"] = [];
 
     // Iterate through the path names and extract the path segment names and path overlaps
-    this.selectedItemProps["pathNames"].value.forEach((pathName: string) => {
-      // Find the path node in the graph based on the path name
-      let path = this._g.cy.nodes(`[pathName = "${pathName}"]`);
+    this.selectedItemProperties["pathNames"].value.forEach(
+      (pathName: string) => {
+        // Find the path node in the graph based on the path name
+        let path = this._g.cy.nodes(`[pathName = "${pathName}"]`);
 
-      // If the node is not found, then push undefined values to the pathSegmentNames and pathOverlaps
-      if (path.empty()) {
-        this.selectedItemProps["pathSegmentNames"].push(undefined);
-        this.selectedItemProps["pathOverlaps"].push(undefined);
-        return;
+        // If the node is not found, then push undefined values to the pathSegmentNames and pathOverlaps
+        if (path.empty()) {
+          this.selectedItemProperties["pathSegmentNames"].push(undefined);
+          this.selectedItemProperties["pathOverlaps"].push(undefined);
+          return;
+        }
+
+        // If the path node is found, then extract the path segment names and path overlaps
+        this.selectedItemProperties["pathSegmentNames"].push(
+          path.data("segmentNames")
+        );
+        this.selectedItemProperties["pathOverlaps"].push(path.data("overlaps"));
       }
-
-      // If the path node is found, then extract the path segment names and path overlaps
-      this.selectedItemProps["pathSegmentNames"].push(
-        path.data("segmentNames")
-      );
-      this.selectedItemProps["pathOverlaps"].push(path.data("overlaps"));
-    });
+    );
   }
 
   // This function is used to prepare the combined sequence data for the selected edge in the object tab
@@ -515,21 +513,21 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       let combinedSequence =
         this._sequenceDataService.prepareCombinedSequence(element);
 
-      // Every edge type has sequence length attribute, so add it to the selected item props
-      this.selectedItemProps["sequenceLength"] = {
+      // Every edge type has sequence length attribute, so add it to the selected item properties
+      this.selectedItemProperties["sequenceLength"] = {
         value: combinedSequence.sequenceLength,
       };
 
       // Prepare combined sequence for containment edge type
       // Containment edge type has pos attribute
       if (element.data("pos")) {
-        this.selectedItemProps["leftOfTheContainedSequence"] = {
+        this.selectedItemProperties["leftOfTheContainedSequence"] = {
           value: combinedSequence.firstSequence,
         };
-        this.selectedItemProps["containedSequence"] = {
+        this.selectedItemProperties["containedSequence"] = {
           value: combinedSequence.secondSequence,
         };
-        this.selectedItemProps["rightOfTheContainedSequence"] = {
+        this.selectedItemProperties["rightOfTheContainedSequence"] = {
           value: combinedSequence.thirdSequence,
         };
       }
@@ -537,10 +535,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       // Prepare combined sequence for jump edge type
       // Jump edge type has distance attribute
       else if (element.data("distance")) {
-        this.selectedItemProps["sourceSequence"] = {
+        this.selectedItemProperties["sourceSequence"] = {
           value: combinedSequence.firstSequence,
         };
-        this.selectedItemProps["targetSequence"] = {
+        this.selectedItemProperties["targetSequence"] = {
           value: combinedSequence.thirdSequence,
         };
       }
@@ -548,16 +546,16 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       // Prepare combined sequence for link edge type
       // Link edge type has overlap attribute
       else {
-        this.selectedItemProps["sourceSequenceWithoutOverlap"] = {
+        this.selectedItemProperties["sourceSequenceWithoutOverlap"] = {
           value: combinedSequence.firstSequence,
         };
-        this.selectedItemProps["overlapSequence"] = {
+        this.selectedItemProperties["overlapSequence"] = {
           value: combinedSequence.secondSequence,
         };
-        this.selectedItemProps["targetSequenceWithoutOverlap"] = {
+        this.selectedItemProperties["targetSequenceWithoutOverlap"] = {
           value: combinedSequence.thirdSequence,
         };
-        this.selectedItemProps["overlap"]["overlapNumerics"] =
+        this.selectedItemProperties["overlap"]["overlapNumerics"] =
           combinedSequence.overlapNumerics;
       }
     });
@@ -565,28 +563,28 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   prepareCIGARForIndex(index: number): string {
     if (
-      this.selectedItemProps.overlap.currentIndex >=
-      this.selectedItemProps.overlapSequence.value.length
+      this.selectedItemProperties.overlap.currentIndex >=
+      this.selectedItemProperties.overlapSequence.value.length
     ) {
-      this.selectedItemProps.overlap.currentIndex = 0;
+      this.selectedItemProperties.overlap.currentIndex = 0;
     }
-    let s = this.selectedItemProps.overlapSequence.value.substring(
-      this.selectedItemProps.overlap.currentIndex,
-      this.selectedItemProps.overlap.currentIndex +
-        Number(this.selectedItemProps.overlap.overlapNumerics[index])
+    let s = this.selectedItemProperties.overlapSequence.value.substring(
+      this.selectedItemProperties.overlap.currentIndex,
+      this.selectedItemProperties.overlap.currentIndex +
+        Number(this.selectedItemProperties.overlap.overlapNumerics[index])
     );
-    this.selectedItemProps.overlap.currentIndex += Number(
-      this.selectedItemProps.overlap.overlapNumerics[index]
+    this.selectedItemProperties.overlap.currentIndex += Number(
+      this.selectedItemProperties.overlap.overlapNumerics[index]
     );
     return s;
   }
 
   getPathsSelected() {
     let segmentNames = [];
-    this.selectedItemProps["pathChecked"].forEach(
+    this.selectedItemProperties["pathChecked"].forEach(
       (isChecked: boolean, i: number) => {
         if (isChecked) {
-          this.selectedItemProps.pathSegmentNames[i]
+          this.selectedItemProperties.pathSegmentNames[i]
             .split(/[;,]/)
             .forEach((segmentName: string) => {
               segmentNames.push(
@@ -611,10 +609,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   getWalksSelected() {
     let segmentNames = [];
-    this.selectedItemProps["walkChecked"].forEach(
+    this.selectedItemProperties["walkChecked"].forEach(
       (isChecked: boolean, i: number) => {
         if (isChecked) {
-          this.selectedItemProps.walks[i]
+          this.selectedItemProperties.walks[i]
             .substring(1)
             .split(/[<>]/)
             .forEach((segmentName: string) => {
@@ -643,7 +641,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       // Load the path fetched from the database
       this._cyService.loadElementsFromDatabase(x, true);
       // Refresh the object tab
-      this.showObjectProps();
+      this.showObjectProperties();
     });
   }
 
@@ -658,23 +656,23 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         // Load the walk fetched from the database
         this._cyService.loadElementsFromDatabase(x, true);
         // Refresh the object tab
-        this.showObjectProps();
+        this.showObjectProperties();
       }
     );
   }
 
   setOtherPathsFalse(index: number): void {
-    for (let i = 0; i < this.selectedItemProps.pathChecked.length; i++) {
+    for (let i = 0; i < this.selectedItemProperties.pathChecked.length; i++) {
       if (i !== index) {
-        this.selectedItemProps.pathChecked[i] = false;
+        this.selectedItemProperties.pathChecked[i] = false;
       }
     }
   }
 
   setOtherWalksFalse(index: number): void {
-    for (let i = 0; i < this.selectedItemProps.walkChecked.length; i++) {
+    for (let i = 0; i < this.selectedItemProperties.walkChecked.length; i++) {
       if (i !== index) {
-        this.selectedItemProps.walkChecked[i] = false;
+        this.selectedItemProperties.walkChecked[i] = false;
       }
     }
   }
@@ -684,19 +682,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   // get common key-value pairs for non-nested properties
-  getCommonObjectProps(elementList: any[]) {
-    let superObj = {};
+  getCommonObjectProperties(elementList: any[]) {
+    let superObject = {};
     let superClassNames = {};
-    let commonProps = {};
+    let commonProperties = {};
     let commonClassNames = [];
     let firstElement = null;
 
     // Assume element is instance of Cytoscape.js element
     elementList.forEach((element: any) => {
       const e = element.json();
-      const data = e.data;
-      const classes = e.classes;
-      const classArray = classes.split(" ");
+      let data: any, classes: string, classArray: string[];
+      [data, classes, classArray] = [e.data, e.classes, e.classes.split(" ")];
 
       // construct superClassNames
       for (let i = 0; i < classArray.length; i++) {
@@ -726,7 +723,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
 
       // count common key-value pairs
-      this.countKeyValuePairs(data, superObj);
+      this.countKeyValuePairs(data, superObject);
     });
 
     if (elementList.length === 1) {
@@ -736,10 +733,10 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     const elementCount = elementList.length;
 
     // get common key-value pairs
-    for (const [k, v] of Object.entries(superObj)) {
+    for (const [k, v] of Object.entries(superObject)) {
       for (const [, v2] of Object.entries(v)) {
         if (v2 === elementCount) {
-          commonProps[k] = firstElement[k];
+          commonProperties[k] = firstElement[k];
         }
       }
     }
@@ -751,7 +748,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
     }
 
-    return [commonProps, commonClassNames];
+    return [commonProperties, commonClassNames];
   }
 
   // This function is used to highlight the path or walk when hovered over the path name
@@ -899,32 +896,30 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       }
       let cySelector = "." + c;
       // first element must be ID, ID is irrelevant here
-      let row: TableData[] = [
-        { value: cySelector, type: TableDataType.string },
-      ];
+      let row: TableData[] = [{ value: cySelector }];
       if (c == this.NODE_TYPE) {
         row[0].value = "node";
-        row.push({ value: "Node", type: TableDataType.string });
+        row.push({ value: "Node" });
       } else if (c == this.EDGE_TYPE) {
         row[0].value = "edge";
-        row.push({ value: "Edge", type: TableDataType.string });
+        row.push({ value: "Edge" });
       } else if (c == COLLAPSED_EDGE_CLASS) {
         row[0].value = "." + COLLAPSED_EDGE_CLASS;
-        row.push({ value: "Meta edge", type: TableDataType.string });
+        row.push({ value: "Meta edge" });
       } else {
-        row.push({ value: c, type: TableDataType.string });
+        row.push({ value: c });
       }
-      row.push({ value: stat[c].total, type: TableDataType.number });
+      row.push({ value: stat[c].total });
 
       if (stat[c]["selected"]) {
-        row.push({ value: stat[c]["selected"], type: TableDataType.number });
+        row.push({ value: stat[c]["selected"] });
       } else {
-        row.push({ value: 0, type: TableDataType.number });
+        row.push({ value: 0 });
       }
       if (stat[c]["hidden"]) {
-        row.push({ value: stat[c]["hidden"], type: TableDataType.number });
+        row.push({ value: stat[c]["hidden"] });
       } else {
-        row.push({ value: 0, type: TableDataType.number });
+        row.push({ value: 0 });
       }
       this.tableInput.results.push(row);
       this.tableInput.classNames.push(row[1].value);
@@ -958,18 +953,18 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     setTimeout(() => this.tableFilled.next(true), 100);
   }
 
-  filterMultiObjTable(filter: TableFiltering) {
+  filterMultipleObjectTable(filter: TableFiltering) {
     if (
       this._g.cy.edges(":selected").filter("." + COLLAPSED_EDGE_CLASS).length >
       0
     ) {
-      this.showCompoundEdgeProps(false);
+      this.showCompoundEdgeProperties(false);
     } else {
-      this.showMultiObjTable(false);
+      this.showMultipleObjectTable(false);
     }
     filterTableDatas(
       filter,
-      this.multiObjectTableInput,
+      this.multipleObjectTableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
     setTimeout(() => {

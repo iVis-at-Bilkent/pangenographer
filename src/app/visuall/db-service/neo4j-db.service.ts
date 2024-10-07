@@ -111,6 +111,7 @@ export class Neo4jDb implements DbService {
           if (isTimeout) {
             clearTimeout(timeoutId); // Clear the timeout if the request completed before the timeout
           }
+
           isTimeout = false;
           this._g.setLoadingStatus(false);
           if (response["errors"] && response["errors"].length > 0) {
@@ -1160,11 +1161,11 @@ export class Neo4jDb implements DbService {
       if (segment.hasOwnProperty("kmerCount")) {
         element2Create += `, kmerCount: ${segment.kmerCount}`;
       }
-      if (segment.hasOwnProperty("SHA256Checksum")) {
-        element2Create += `, SHA256Checksum: '${segment.SHA256Checksum}'`;
+      if (segment.hasOwnProperty("Sha256Checksum")) {
+        element2Create += `, Sha256Checksum: '${segment.Sha256Checksum}'`;
       }
-      if (segment.hasOwnProperty("URIorLocalSystemPath")) {
-        element2Create += `, URIorLocalSystemPath: '${segment.URIorLocalSystemPath}'`;
+      if (segment.hasOwnProperty("UriOrLocalSystemPath")) {
+        element2Create += `, UriOrLocalSystemPath: '${segment.UriOrLocalSystemPath}'`;
       }
 
       // Check if the segment is in the segmentsToPathNamesMap

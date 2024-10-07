@@ -11,57 +11,63 @@
     </div>
 
     <div id="property-tab" class="collapse show text-center m-1">
-      <div *ngIf="selectedItemProps.segmentData" class="segment-data-container">
-        {{ selectedItemProps.segmentData.value }}
+      <div
+        *ngIf="selectedItemProperties.segmentData"
+        class="segment-data-container"
+      >
+        {{ selectedItemProperties.segmentData.value }}
       </div>
-      <div *ngIf="selectedItemProps.pos" class="combined-sequence-container">
+      <div
+        *ngIf="selectedItemProperties.pos"
+        class="combined-sequence-container"
+      >
         <span
-          *ngIf="selectedItemProps.leftOfTheContainedSequence"
+          *ngIf="selectedItemProperties.leftOfTheContainedSequence"
           class="combined-sequence-container-part"
-          >{{ selectedItemProps.leftOfTheContainedSequence.value }}</span
+          >{{ selectedItemProperties.leftOfTheContainedSequence.value }}</span
         >
         <span
-          *ngIf="selectedItemProps.containedSequence"
+          *ngIf="selectedItemProperties.containedSequence"
           class="edge-CIGAR-M-Eq-X"
-          >{{ selectedItemProps.containedSequence.value }}</span
+          >{{ selectedItemProperties.containedSequence.value }}</span
         >
         <span
-          *ngIf="selectedItemProps.rightOfTheContainedSequence"
+          *ngIf="selectedItemProperties.rightOfTheContainedSequence"
           class="combined-sequence-container-part"
-          >{{ selectedItemProps.rightOfTheContainedSequence.value }}</span
+          >{{ selectedItemProperties.rightOfTheContainedSequence.value }}</span
         >
       </div>
       <div
-        *ngIf="selectedItemProps.distance"
+        *ngIf="selectedItemProperties.distance"
         class="combined-sequence-container"
       >
         <span
-          *ngIf="selectedItemProps.sourceSequence"
+          *ngIf="selectedItemProperties.sourceSequence"
           class="combined-sequence-container-part"
-          >{{ selectedItemProps.sourceSequence.value }}</span
+          >{{ selectedItemProperties.sourceSequence.value }}</span
         >
-        <span *ngIf="selectedItemProps.distance" class="edge-CIGAR-M-Eq-X"
-          >..({{ selectedItemProps.distance.value }})..</span
+        <span *ngIf="selectedItemProperties.distance" class="edge-CIGAR-M-Eq-X"
+          >..({{ selectedItemProperties.distance.value }})..</span
         >
         <span
-          *ngIf="selectedItemProps.targetSequence"
+          *ngIf="selectedItemProperties.targetSequence"
           class="combined-sequence-container-part"
-          >{{ selectedItemProps.targetSequence.value }}</span
+          >{{ selectedItemProperties.targetSequence.value }}</span
         >
       </div>
       <div
-        *ngIf="selectedItemProps.overlapSequence"
+        *ngIf="selectedItemProperties.overlapSequence"
         class="combined-sequence-container"
       >
         <span
-          *ngIf="selectedItemProps.sourceSequenceWithoutOverlap"
+          *ngIf="selectedItemProperties.sourceSequenceWithoutOverlap"
           class="combined-sequence-container-part"
-          >{{ selectedItemProps.sourceSequenceWithoutOverlap.value }}</span
+          >{{ selectedItemProperties.sourceSequenceWithoutOverlap.value }}</span
         >
 
         <ng-container
           *ngFor="
-            let overlapIdentifier of selectedItemProps.overlap
+            let overlapIdentifier of selectedItemProperties.overlap
               .overlapIdentifiers;
             let i = index
           "
@@ -92,156 +98,158 @@
         </ng-container>
 
         <span
-          *ngIf="selectedItemProps.targetSequenceWithoutOverlap"
+          *ngIf="selectedItemProperties.targetSequenceWithoutOverlap"
           class="combined-sequence-container-part"
-          >{{ selectedItemProps.targetSequenceWithoutOverlap.value }}</span
+          >{{ selectedItemProperties.targetSequenceWithoutOverlap.value }}</span
         >
       </div>
 
       <table class="table table-responsive table-borderless table-sm">
         <tbody>
-          <tr *ngIf="selectedItemProps.sequenceLength">
+          <tr *ngIf="selectedItemProperties.sequenceLength">
             <td class="text-start">
-              <b class="va-text">Sequence Length</b>
+              <b class="va-text">Sequence length</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.sequenceLength.value }}
+              {{ selectedItemProperties.sequenceLength.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.segmentName">
+          <tr *ngIf="selectedItemProperties.segmentName">
             <td class="text-start">
-              <b class="va-text">Segment Name</b>
+              <b class="va-text">Segment name</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.segmentName.value }}
+              {{ selectedItemProperties.segmentName.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.segmentLength">
+          <tr *ngIf="selectedItemProperties.segmentLength">
             <td class="text-start">
-              <b class="va-text">Segment Length</b>
+              <b class="va-text">Segment length</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.segmentLength.value }}
+              {{ selectedItemProperties.segmentLength.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.readCount">
+          <tr *ngIf="selectedItemProperties.readCount">
             <td class="text-start">
-              <b class="va-text">Read Count</b>
+              <b class="va-text">Read count</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.readCount.value }}
+              {{ selectedItemProperties.readCount.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.fragmentCount">
+          <tr *ngIf="selectedItemProperties.fragmentCount">
             <td class="text-start">
-              <b class="va-text">Fragment Count</b>
+              <b class="va-text">Fragment count</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.fragmentCount.value }}
+              {{ selectedItemProperties.fragmentCount.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.kmerCount">
+          <tr *ngIf="selectedItemProperties.kmerCount">
             <td class="text-start">
-              <b class="va-text">K-mer Count</b>
+              <b class="va-text">K-mer count</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.kmerCount.value }}
+              {{ selectedItemProperties.kmerCount.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.SHA256Checksum">
+          <tr *ngIf="selectedItemProperties.Sha256Checksum">
             <td class="text-start">
-              <b class="va-text">SHA-256 Checksum</b>
+              <b class="va-text">SHA-256 checksum</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.SHA256Checksum.value }}
+              {{ selectedItemProperties.Sha256Checksum.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.URIorLocalSystemPath">
+          <tr *ngIf="selectedItemProperties.UriOrLocalSystemPath">
             <td class="text-start">
-              <b class="va-text">URI or Local File-system Path</b>
+              <b class="va-text">URI or local file-system path</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.URIorLocalSystemPath.value }}
+              {{ selectedItemProperties.UriOrLocalSystemPath.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.overlap">
+          <tr *ngIf="selectedItemProperties.overlap">
             <td class="text-start">
               <b class="va-text">Overlap</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.overlap.value }}
+              {{ selectedItemProperties.overlap.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.sourceOrientation">
+          <tr *ngIf="selectedItemProperties.sourceOrientation">
             <td class="text-start">
-              <b class="va-text">Source Orientation</b>
+              <b class="va-text">Source orientation</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.sourceOrientation.value }}
+              {{ selectedItemProperties.sourceOrientation.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.targetOrientation">
+          <tr *ngIf="selectedItemProperties.targetOrientation">
             <td class="text-start">
-              <b class="va-text">Target Orientation</b>
+              <b class="va-text">Target orientation</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.targetOrientation.value }}
+              {{ selectedItemProperties.targetOrientation.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.mappingQuality">
+          <tr *ngIf="selectedItemProperties.mappingQuality">
             <td class="text-start">
-              <b class="va-text">Mapping Quality</b>
+              <b class="va-text">Mapping quality</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.mappingQuality.value }}
+              {{ selectedItemProperties.mappingQuality.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.numberOfMismatchesOrGaps">
+          <tr *ngIf="selectedItemProperties.numberOfMismatchesOrGaps">
             <td class="text-start">
-              <b class="va-text">Number of Mismatches/gap</b>
+              <b class="va-text">Number of mismatches/gap</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.numberOfMismatchesOrGaps.value }}
+              {{ selectedItemProperties.numberOfMismatchesOrGaps.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.edgeIdentifier">
+          <tr *ngIf="selectedItemProperties.edgeIdentifier">
             <td class="text-start">
-              <b class="va-text">Edge Identifier</b>
+              <b class="va-text">Edge identifier</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.edgeIdentifier.value }}
+              {{ selectedItemProperties.edgeIdentifier.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.indirectShortcutConnections">
+          <tr *ngIf="selectedItemProperties.indirectShortcutConnections">
             <td class="text-start">
-              <b class="va-text">Indirect Shortcut Connections</b>
+              <b class="va-text">Indirect shortcut connections</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.indirectShortcutConnections.value }}
+              {{ selectedItemProperties.indirectShortcutConnections.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.distance">
+          <tr *ngIf="selectedItemProperties.distance">
             <td class="text-start">
               <b class="va-text">Distance</b>
             </td>
             <td class="va-text text-end">
-              {{ selectedItemProps.distance.value }}
+              {{ selectedItemProperties.distance.value }}
             </td>
           </tr>
-          <tr *ngIf="selectedItemProps.pos">
+          <tr *ngIf="selectedItemProperties.pos">
             <td class="text-start">
               <b class="va-text">Pos</b>
             </td>
-            <td class="va-text text-end">{{ selectedItemProps.pos.value }}</td>
+            <td class="va-text text-end">
+              {{ selectedItemProperties.pos.value }}
+            </td>
           </tr>
         </tbody>
       </table>
 
       <div
         *ngIf="
-          selectedItemProps.pathNames &&
-          selectedItemProps.pathNames.value &&
-          selectedItemProps.pathNames.value.length
+          selectedItemProperties.pathNames &&
+          selectedItemProperties.pathNames.value &&
+          selectedItemProperties.pathNames.value.length
         "
         class="panel"
       >
@@ -268,7 +276,7 @@
             <tbody>
               <ng-container
                 *ngFor="
-                  let item of selectedItemProps.pathNames.value;
+                  let item of selectedItemProperties.pathNames.value;
                   let i = index
                 "
               >
@@ -278,13 +286,13 @@
                       class="path-walk-name"
                       (mouseover)="
                         hightlightHoveredPath(
-                          selectedItemProps.pathNames.value[i]
+                          selectedItemProperties.pathNames.value[i]
                         )
                       "
                       (mouseout)="removeHighlightHoveredPathWalk()"
                       [ngClass]="{
                         isHoveredPathWalk:
-                          selectedItemProps.pathNames.value[i] ===
+                          selectedItemProperties.pathNames.value[i] ===
                           highlightedPathWalk
                       }"
                     >
@@ -292,7 +300,7 @@
                         ><b>Path Name: </b>
                         {{
                           pathWalkNameTransform(
-                            selectedItemProps.pathNames.value[i]
+                            selectedItemProperties.pathNames.value[i]
                           )
                         }}
                       </span>
@@ -300,19 +308,19 @@
                     <div>
                       <input
                         type="checkbox"
-                        [(ngModel)]="selectedItemProps.pathChecked[i]"
+                        [(ngModel)]="selectedItemProperties.pathChecked[i]"
                         (change)="setOtherPathsFalse(i)"
                         title="Select path"
                       />
                     </div>
                   </div>
                   <!-- If there is data for the path, show the path -->
-                  <div *ngIf="selectedItemProps.pathSegmentNames[i]">
+                  <div *ngIf="selectedItemProperties.pathSegmentNames[i]">
                     <div>
                       <div class="path-walk-text-container">
                         <span>
                           {{
-                            selectedItemProps.pathSegmentNames[i]
+                            selectedItemProperties.pathSegmentNames[i]
                               .replaceAll(";", " ")
                               .replaceAll(",", " ")
                           }}
@@ -326,7 +334,7 @@
                       <div class="path-walk-text-container">
                         <span>
                           {{
-                            selectedItemProps.pathOverlaps[i].replaceAll(
+                            selectedItemProperties.pathOverlaps[i].replaceAll(
                               ",",
                               " "
                             )
@@ -336,14 +344,14 @@
                     </div>
                   </div>
                   <!-- Else if there is no data for the path, show a button to get the path -->
-                  <div *ngIf="!selectedItemProps.pathSegmentNames[i]">
+                  <div *ngIf="!selectedItemProperties.pathSegmentNames[i]">
                     <div class="align-center display-flex justify-center">
                       <input
                         class="btn btn-sm btn-dark va-text m-2 center"
                         type="button"
                         (click)="
                           getPathFromDatabase(
-                            selectedItemProps.pathNames.value[i]
+                            selectedItemProperties.pathNames.value[i]
                           )
                         "
                         value="Get Path's Properities"
@@ -360,9 +368,9 @@
 
       <div
         *ngIf="
-          selectedItemProps.walkSampleIdentifiers &&
-          selectedItemProps.walkSampleIdentifiers.value &&
-          selectedItemProps.walkSampleIdentifiers.value.length
+          selectedItemProperties.walkSampleIdentifiers &&
+          selectedItemProperties.walkSampleIdentifiers.value &&
+          selectedItemProperties.walkSampleIdentifiers.value.length
         "
         class="panel"
       >
@@ -389,7 +397,8 @@
             <tbody>
               <ng-container
                 *ngFor="
-                  let item of selectedItemProps.walkSampleIdentifiers.value;
+                  let item of selectedItemProperties.walkSampleIdentifiers
+                    .value;
                   let i = index
                 "
               >
@@ -399,21 +408,24 @@
                       class="path-walk-name"
                       (mouseover)="
                         hightlightHoveredWalk(
-                          selectedItemProps.walkSampleIdentifiers.value[i]
+                          selectedItemProperties.walkSampleIdentifiers.value[i]
                         )
                       "
                       (mouseout)="removeHighlightHoveredPathWalk()"
                       [ngClass]="{
                         isHoveredPathWalk:
-                          selectedItemProps.walkSampleIdentifiers.value[i] ===
-                          highlightedPathWalk
+                          selectedItemProperties.walkSampleIdentifiers.value[
+                            i
+                          ] === highlightedPathWalk
                       }"
                     >
                       <span
-                        ><b>Walk Sample Identifier: </b>
+                        ><b>Walk sample identifier: </b>
                         {{
                           pathWalkNameTransform(
-                            selectedItemProps.walkSampleIdentifiers.value[i]
+                            selectedItemProperties.walkSampleIdentifiers.value[
+                              i
+                            ]
                           )
                         }}
                       </span>
@@ -421,36 +433,36 @@
                     <div>
                       <input
                         type="checkbox"
-                        [(ngModel)]="selectedItemProps.walkChecked[i]"
+                        [(ngModel)]="selectedItemProperties.walkChecked[i]"
                         (change)="setOtherWalksFalse(i)"
                         title="Select walk"
                       />
                     </div>
                   </div>
                   <!-- If there is data for the walk, show the walk -->
-                  <div *ngIf="selectedItemProps.walks[i]">
+                  <div *ngIf="selectedItemProperties.walks[i]">
                     <div>
                       <span
-                        ><b>Haplotype Index: </b>
-                        {{ selectedItemProps.walkHaplotypeIndexes[i] }}
+                        ><b>Haplotype index: </b>
+                        {{ selectedItemProperties.walkHaplotypeIndexes[i] }}
                       </span>
                     </div>
                     <div>
                       <span
-                        ><b>Sequence Identifier: </b>
-                        {{ selectedItemProps.walkSequenceIdentifiers[i] }}
+                        ><b>Sequence identifier: </b>
+                        {{ selectedItemProperties.walkSequenceIdentifiers[i] }}
                       </span>
                     </div>
                     <div>
                       <span
-                        ><b>Start Position: </b>
-                        {{ selectedItemProps.walkSequenceStarts[i] }}
+                        ><b>Start position: </b>
+                        {{ selectedItemProperties.walkSequenceStarts[i] }}
                       </span>
                     </div>
                     <div>
                       <span
-                        ><b>End Position: </b>
-                        {{ selectedItemProps.walkSequenceEnds[i] }}
+                        ><b>End position: </b>
+                        {{ selectedItemProperties.walkSequenceEnds[i] }}
                       </span>
                     </div>
                     <div>
@@ -460,7 +472,7 @@
                       <div class="path-walk-text-container">
                         <span>
                           {{
-                            selectedItemProps.walks[i]
+                            selectedItemProperties.walks[i]
                               .replaceAll("\<", " \< ")
                               .replaceAll("\>", " \> ")
                               .substring(1)
@@ -470,14 +482,16 @@
                     </div>
                   </div>
                   <!-- Else if there is no data for the walk, show a button to get the walk -->
-                  <div *ngIf="!selectedItemProps.walks[i]">
+                  <div *ngIf="!selectedItemProperties.walks[i]">
                     <div>
                       <input
                         class="btn btn-sm btn-dark va-text m-2 center"
                         type="button"
                         (click)="
                           getWalkFromDatabase(
-                            selectedItemProps.walkSampleIdentifiers.value[i]
+                            selectedItemProperties.walkSampleIdentifiers.value[
+                              i
+                            ]
                           )
                         "
                         value="Get Walk's Properities"
@@ -493,11 +507,11 @@
       </div>
 
       <app-table-view
-        *ngIf="isShowObjTable"
-        [params]="multiObjectTableInput"
+        *ngIf="isShowObjectTable"
+        [params]="multipleObjectTableInput"
         [tableFilled]="multiObjectTableFilled"
         [clearFilter]="clearMultiObjectTableFilter"
-        (onFilteringChanged)="filterMultiObjTable($event)"
+        (onFilteringChanged)="filterMultipleObjectTable($event)"
       >
       </app-table-view>
     </div>

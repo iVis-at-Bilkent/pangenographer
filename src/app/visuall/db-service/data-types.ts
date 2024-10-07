@@ -127,11 +127,14 @@ export interface GFASegment {
   segmentLength: number;
   id: string;
   elementId?: string;
+  stableSequenceName?: string;
+  stableSequenceOffset?: number;
+  stableSequenceRank?: number;
   readCount?: number;
   fragmentCount?: number;
   kmerCount?: number;
-  SHA256Checksum?: string;
-  URIorLocalSystemPath?: string;
+  Sha256Checksum?: string;
+  UriOrLocalSystemPath?: string;
   pathNames?: string;
   walkSampleIdentifiers?: string;
 }

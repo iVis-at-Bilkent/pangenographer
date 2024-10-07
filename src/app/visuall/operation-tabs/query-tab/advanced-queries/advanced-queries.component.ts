@@ -3,11 +3,9 @@ import { Subject, Subscription } from "rxjs";
 import { FileReaderService } from "src/app/visuall/file-reader.service";
 import {
   TableData,
-  TableDataType,
   TableFiltering,
   TableRowMeta,
   TableViewInput,
-  property2TableData,
 } from "../../../../shared/table-view/table-view-types";
 import { getCyStyleFromColorAndWid, isJson } from "../../../constants";
 import { CytoscapeService } from "../../../cytoscape.service";
@@ -392,43 +390,25 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       this.tableInput.columns = [];
     }
     this.tableInput.classNames = [];
-    const enumMapping = this._g.getEnumMapping();
-    const props = this._g.dataModel.getValue();
     for (let i = 0; i < nodes.length; i++) {
       const d = nodes[i];
       delete d["tconst"];
       delete d["nconst"];
       const propNames = Object.keys(d);
-      const row: TableData[] = [
-        { type: TableDataType.string, value: nodeId[i] },
-      ];
+      const row: TableData[] = [{ value: nodeId[i] }];
       for (const n of propNames) {
         const index = this.tableInput.columns.indexOf(n);
         if (index == -1) {
           this.tableInput.columns.push(n);
-          row[this.tableInput.columns.length] = property2TableData(
-            props,
-            enumMapping,
-            n,
-            d[n],
-            nodeClass[i],
-            false
-          );
+          row[this.tableInput.columns.length] = { value: d[n] };
         } else {
-          row[index + 1] = property2TableData(
-            props,
-            enumMapping,
-            n,
-            d[n],
-            nodeClass[i],
-            false
-          );
+          row[index + 1] = { value: d[n] };
         }
       }
       // fill empty columns
       for (let j = 0; j < this.tableInput.columns.length + 1; j++) {
         if (!row[j]) {
-          row[j] = { value: "", type: TableDataType.string };
+          row[j] = { value: "" };
         }
       }
       this.tableInput.classNames.push(nodeClass[i]);
@@ -440,7 +420,6 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       for (let j = this.tableInput.results[i].length; j < maxColCnt; j++) {
         this.tableInput.results[i].push({
           value: "",
-          type: TableDataType.string,
         });
       }
     }

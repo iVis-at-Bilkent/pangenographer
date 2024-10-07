@@ -55,21 +55,27 @@ export class FileReaderService {
     segment.segmentData = segmentLineTabSeperated[2];
     segment.segmentLength = segmentLineTabSeperated[2].length;
     for (let i = 3; i < segmentLineTabSeperated.length; i++) {
-      let optField = (segmentLineTabSeperated[i] as string).trim();
-      if (optField.startsWith("LN")) {
-        segment.segmentLength = Number(optField.substring(5));
-      } else if (optField.startsWith("RC")) {
-        segment["readCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("FC")) {
-        segment["fragmentCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("KC")) {
-        segment["kmerCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("SH")) {
-        segment["SHA256Checksum"] = optField;
-      } else if (optField.startsWith("UR")) {
-        segment["URIorLocalSystemPath"] = optField;
+      let optionalField = (segmentLineTabSeperated[i] as string).trim();
+      if (optionalField.startsWith("LN")) {
+        segment.segmentLength = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("RC")) {
+        segment.readCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("FC")) {
+        segment.fragmentCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("KC")) {
+        segment.kmerCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("SH")) {
+        segment.Sha256Checksum = optionalField;
+      } else if (optionalField.startsWith("UR")) {
+        segment.UriOrLocalSystemPath = optionalField;
+      } else if (optionalField.startsWith("SN")) {
+        segment.stableSequenceName = optionalField;
+      } else if (optionalField.startsWith("SO")) {
+        segment.stableSequenceOffset = Number(optionalField);
+      } else if (optionalField.startsWith("SR")) {
+        segment.stableSequenceRank = Number(optionalField);
       } else {
-        console.log("This field is not parsed: " + optField);
+        console.log("This field is not parsed: " + optionalField);
       }
     }
 
@@ -100,11 +106,11 @@ export class FileReaderService {
     jump.target = jumpLineTabSeperated[3];
     jump.targetOrientation = this.convertOrientation(jumpLineTabSeperated[4]);
     for (let i = 4; i < jumpLineTabSeperated.length; i++) {
-      let optField = (jumpLineTabSeperated[i] as string).trim();
-      if (optField.startsWith("SC")) {
-        jump["indirectShortcutConnections"] = Number(optField.substring(5));
+      let optionalField = (jumpLineTabSeperated[i] as string).trim();
+      if (optionalField.startsWith("SC")) {
+        jump.indirectShortcutConnections = Number(optionalField.substring(5));
       } else {
-        jump.distance = optField;
+        jump.distance = optionalField;
       }
     }
     return jump;
@@ -133,13 +139,15 @@ export class FileReaderService {
     containment.pos = Number(containmentLineTabSeperated[5]);
     containment.overlap = containmentLineTabSeperated[6];
     for (let i = 4; i < containmentLineTabSeperated.length; i++) {
-      let optField = (containmentLineTabSeperated[i] as string).trim();
-      if (optField.startsWith("RC")) {
-        containment["readCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("NM")) {
-        containment["numberOfMismatchesOrGaps"] = Number(optField.substring(5));
-      } else if (optField.startsWith("ID")) {
-        containment["edgeIdentifier"] = optField;
+      let optionalField = (containmentLineTabSeperated[i] as string).trim();
+      if (optionalField.startsWith("RC")) {
+        containment.readCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("NM")) {
+        containment.numberOfMismatchesOrGaps = Number(
+          optionalField.substring(5)
+        );
+      } else if (optionalField.startsWith("ID")) {
+        containment.edgeIdentifier = optionalField;
       }
     }
 
@@ -162,21 +170,21 @@ export class FileReaderService {
     link.targetOrientation = this.convertOrientation(linkLineTabSeperated[4]);
 
     for (let i = 4; i < linkLineTabSeperated.length; i++) {
-      let optField = (linkLineTabSeperated[i] as string).trim();
-      if (optField.startsWith("MQ")) {
-        link["mappingQuality"] = Number(optField.substring(5));
-      } else if (optField.startsWith("NM")) {
-        link["numberOfMismatchesOrGaps"] = Number(optField.substring(5));
-      } else if (optField.startsWith("RC")) {
-        link["readCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("FC")) {
-        link["fragmentCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("KC")) {
-        link["kmerCount"] = Number(optField.substring(5));
-      } else if (optField.startsWith("ID")) {
-        link["edgeIdentifier"] = optField;
+      let optionalField = (linkLineTabSeperated[i] as string).trim();
+      if (optionalField.startsWith("MQ")) {
+        link.mappingQuality = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("NM")) {
+        link.numberOfMismatchesOrGaps = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("RC")) {
+        link.readCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("FC")) {
+        link.fragmentCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("KC")) {
+        link.kmerCount = Number(optionalField.substring(5));
+      } else if (optionalField.startsWith("ID")) {
+        link.edgeIdentifier = optionalField;
       } else {
-        link.overlap = optField;
+        link.overlap = optionalField;
       }
     }
 

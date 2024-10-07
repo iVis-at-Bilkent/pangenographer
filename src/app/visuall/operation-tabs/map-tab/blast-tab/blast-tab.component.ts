@@ -5,7 +5,6 @@ import { COLLAPSED_EDGE_CLASS } from "src/app/visuall/constants";
 import { environment } from "src/environments/environment";
 import {
   TableData,
-  TableDataType,
   TableFiltering,
   TableViewInput,
   filterTableDatas,
@@ -208,21 +207,21 @@ export class BlastTabComponent implements OnInit {
   webResultTableInput: string = "";
 
   // Standalone service variables
-  standaloneTableOutput: TableViewInput = {
+  standaloneTableInput: TableViewInput = {
     results: [],
     columns: [
-      "Query Name",
-      "Source Name",
-      "Percent Identity",
-      "Alignment Length",
+      "Query name",
+      "Source name",
+      "Percent identity",
+      "Alignment length",
       "Mis-matches",
-      "Gap Opens",
-      "Query Start",
-      "Query End",
-      "Source Start",
-      "Source End",
+      "Gap opens",
+      "Query start",
+      "Query end",
+      "Source start",
+      "Source end",
       "E-value",
-      "Bit Score",
+      "Bit score",
     ],
     isLoadGraph: false,
     isMergeGraph: false,
@@ -245,8 +244,8 @@ export class BlastTabComponent implements OnInit {
   standaloneResult: string = "";
   standaloneUrl: string = environment.blastStandaloneUrl;
   standaloneCommandLineArguments: string = "-outfmt 6";
-  standaloneIsTableOutput: boolean = false;
-  standaloneIsTableOutputFilled = new Subject<boolean>();
+  standaloneIsTableInput: boolean = false;
+  standaloneIsTableInputFilled = new Subject<boolean>();
   standaloneClearTableOutputFilter = new Subject<boolean>();
 
   constructor(
@@ -556,10 +555,10 @@ export class BlastTabComponent implements OnInit {
     // Clear the standalone output
     this.standaloneResult = "";
     // Close the table output if it is open
-    this.standaloneIsTableOutput = false;
-    this.standaloneIsTableOutputFilled.next(false);
+    this.standaloneIsTableInput = false;
+    this.standaloneIsTableInputFilled.next(false);
     this.standaloneClearTableOutputFilter.next(true);
-    this.standaloneTableOutput.results = [];
+    this.standaloneTableInput.results = [];
 
     // Clear the web output
     this.webResult = "";
@@ -867,17 +866,17 @@ export class BlastTabComponent implements OnInit {
       false,
       (res) => {
         this.standaloneResult = res.results;
-        this.standaloneIsTableOutput = res.isFormat6;
+        this.standaloneIsTableInput = res.isFormat6;
 
-        if (this.standaloneIsTableOutput) {
+        if (this.standaloneIsTableInput) {
           this.onStandaloneTableFilterChange({
             txt: "",
             orderBy: "Query Name",
             orderDirection: "asc",
           });
         } else {
-          this.standaloneTableOutput.results = [];
-          this.standaloneIsTableOutputFilled.next(false);
+          this.standaloneTableInput.results = [];
+          this.standaloneIsTableInputFilled.next(false);
         }
       }
     );
@@ -885,7 +884,7 @@ export class BlastTabComponent implements OnInit {
 
   fillStandaloneTableOutput() {
     let lines = this.standaloneResult.split("\n");
-    this.standaloneTableOutput.results = [];
+    this.standaloneTableInput.results = [];
     let id = 0;
 
     for (let i = 0; i < lines.length; i++) {
@@ -897,56 +896,58 @@ export class BlastTabComponent implements OnInit {
       // Otherwise, ignore the row as it is not a valid row
       if (cols.length == 12) {
         // Id for the row
-        row.push({ value: id++, type: TableDataType.number });
+        row.push({ value: id++ });
         // Query name
-        row.push({ value: cols[0], type: TableDataType.string });
+        row.push({ value: cols[0] });
         // Source name
-        row.push({ value: cols[1], type: TableDataType.string });
+        row.push({ value: cols[1] });
         // Percent identity
-        row.push({ value: cols[2], type: TableDataType.number });
+        row.push({ value: cols[2] });
         // Alignment length
-        row.push({ value: cols[3], type: TableDataType.number });
+        row.push({ value: cols[3] });
         // Mis-matches
-        row.push({ value: cols[4], type: TableDataType.number });
+        row.push({ value: cols[4] });
         // Gap opens
-        row.push({ value: cols[5], type: TableDataType.number });
+        row.push({ value: cols[5] });
         // Query start
-        row.push({ value: cols[6], type: TableDataType.number });
+        row.push({ value: cols[6] });
         // Query end
-        row.push({ value: cols[7], type: TableDataType.number });
+        row.push({ value: cols[7] });
         // Source start
-        row.push({ value: cols[8], type: TableDataType.number });
+        row.push({ value: cols[8] });
         // Source end
-        row.push({ value: cols[9], type: TableDataType.number });
+        row.push({ value: cols[9] });
         // E-value
-        row.push({ value: cols[10], type: TableDataType.string });
+        row.push({ value: cols[10] });
         // Bit score
-        row.push({ value: cols[11], type: TableDataType.number });
+        row.push({ value: cols[11] });
 
         // Add the row to the table output
-        this.standaloneTableOutput.results.push(row);
+        this.standaloneTableInput.results.push(row);
       }
     }
-    this.standaloneTableOutput.pageSize =
+    this.standaloneTableInput.pageSize =
       this._g.userPreferences.dataPageSize.getValue();
-    this.standaloneTableOutput.currentPage = 1;
-    this.standaloneTableOutput.resultCount =
-      this.standaloneTableOutput.results.length;
+    this.standaloneTableInput.currentPage = 1;
+    this.standaloneTableInput.resultCount =
+      this.standaloneTableInput.results.length;
+    console.log(this.standaloneTableInput.results);
 
-    this.standaloneIsTableOutputFilled.next(true);
+    this.standaloneIsTableInputFilled.next(true);
     this.standaloneClearTableOutputFilter.next(true);
   }
 
   onStandaloneTableFilterChange(filter: TableFiltering) {
-    this.standaloneIsTableOutputFilled.next(false);
+    this.standaloneIsTableInputFilled.next(false);
     this.fillStandaloneTableOutput();
     filterTableDatas(
       filter,
-      this.standaloneTableOutput,
+      this.standaloneTableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
+
     setTimeout(() => {
-      this.standaloneIsTableOutputFilled.next(true);
+      this.standaloneIsTableInputFilled.next(true);
     }, 100);
   }
 

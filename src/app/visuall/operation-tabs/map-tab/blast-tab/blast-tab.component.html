@@ -491,14 +491,14 @@
 
       <div>
         <pre
-          *ngIf="standaloneResult && !standaloneIsTableOutput"
+          *ngIf="standaloneResult && !standaloneIsTableInput"
           class="result"
           >{{ standaloneResult }}</pre
         >
         <app-table-view
-          *ngIf="standaloneTableOutput && standaloneIsTableOutput"
-          [params]="standaloneTableOutput"
-          [tableFilled]="standaloneIsTableOutputFilled"
+          *ngIf="standaloneTableInput && standaloneIsTableInput"
+          [params]="standaloneTableInput"
+          [tableFilled]="standaloneIsTableInputFilled"
           [clearFilter]="standaloneClearTableOutputFilter"
           (onFilteringChanged)="onStandaloneTableFilterChange($event)"
         >

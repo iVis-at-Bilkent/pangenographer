@@ -23,6 +23,7 @@ export const HIGHLIGHT_ANIM_DUR = 400; // it is more reasonable to make HIGHLIGH
 export const HIGHLIGHT_WAIT_DUR = 1500;
 export const EV_MOUSE_ON = "mouseover";
 export const EV_MOUSE_OFF = "mouseout";
+export const TABLE_TOOLTIP_SHOW_LIMIT = 240;
 export const CY_BATCH_END_DELAY = 100;
 export const TABLE_ALL_CHECK_DELAY = 100;
 export const OBJ_INFO_UPDATE_DELAY = 200;
@@ -146,16 +147,11 @@ export const NEO4J_2_JS_STR_OPERATORS = {
 
 export const TYPES_NOT_TO_SHOW = ["PATH", "WALK", "PSEUDO"];
 
-export const GFA_SEGMENT_PROPERTIES = [
-  "Segment Name",
-  "Segment Length",
-  "Segment Data",
-  "Kmer Count",
-  "Fragment Count",
-  "Read Count",
-  "SHA256 Checksum",
-  "Path Names",
-  "Walk Sample Identifiers",
+export const GFA_SEGMENT_PROPERTIES_NOT_TO_SHOW = [
+  "elementId",
+  "id",
+  "deleted",
+  "type",
 ];
 
 /** https://davidwalsh.name/javascript-debounce-function

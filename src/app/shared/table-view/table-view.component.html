@@ -154,23 +154,22 @@
             {{ (params.currentPage - 1) * params.pageSize + i + 1 }}
           </td>
           <td *ngFor="let e of r | slice : 1 : columnLimit + 1; let j = index">
-            <span *ngIf="e.type == 0 || e.type == 3">
+            <span
+              *ngIf="
+                typeOfData(e.value) === 'number' &&
+                (e.value !== 0 || !params.isHide0)
+              "
+              >{{ e.value | number : "1.0-2" }}</span
+            >
+            <span
+              *ngIf="typeOfData(e.value) !== 'number'"
+              [table-tooltip]="e.value"
+            >
               <ngb-highlight
-                [result]="e.value"
+                [result]="truncateData(e.value)"
                 [term]="filterTxt"
               ></ngb-highlight>
             </span>
-            <span *ngIf="e.type == 1 && (e.value != 0 || !params.isHide0)">{{
-              e.value | number : "1.0-2"
-            }}</span>
-            <div *ngIf="e.type == 4" [table-tooltip]="e.value">
-              <span>
-                <ngb-highlight
-                  [result]="truncateData(e.value)"
-                  [term]="filterTxt"
-                ></ngb-highlight>
-              </span>
-            </div>
           </td>
           <td *ngIf="!isDraggable && params.columns.length - 1 >= columnLimit">
             <span>...</span>

@@ -1,13 +1,5 @@
-export enum TableDataType {
-  string = 0,
-  number = 1,
-  enum = 3,
-  data = 4, // for segmentData like sequences
-}
-
 export interface TableData {
   value: any;
-  type: TableDataType;
 }
 
 export interface TableViewInput {
@@ -46,63 +38,68 @@ export interface TableRowMeta {
   tableIndex: number[];
 }
 
-export function property2TableData(
-  properties: any,
-  enumMapping: any,
-  propertyName: string,
-  propertyValue: any,
-  className: string,
-  isEdge: boolean
-): TableData {
-  let type = undefined;
+export function object2TableRow(
+  objectProperties: any,
+  columnNames: string[],
+  id: number
+): TableData[] {
+  let row: TableData[] = [];
 
-  if (isEdge) {
-    type = properties.edges[className][propertyName];
-  } else {
-    type = properties.nodes[className][propertyName];
+  // first column is id
+  row.push({
+    value: id,
+  });
+
+  for (let i = 0; i < columnNames.length; i++) {
+    let objectPropertyName = translateColumnNamesAndProperties(
+      columnNames[i]
+    )[0];
+    let objectPropertyValue = objectProperties[objectPropertyName];
+
+    row.push({
+      value: objectPropertyValue,
+    });
   }
 
-  if (type === undefined || type == null) {
-    return { value: propertyValue, type: TableDataType.string };
-  } else if (type.startsWith("enum")) {
-    const mapping = enumMapping[className][propertyName][propertyValue];
-    if (mapping) {
-      return { value: mapping, type: TableDataType.enum };
-    }
+  return row;
+}
 
-    return { value: propertyValue, type: TableDataType.string };
-  } else if (type == "string") {
-    // SegmentData is a special case and considered as data
-    if (propertyName === "segmentData") {
-      return { value: propertyValue, type: TableDataType.data };
+export function translateColumnNamesAndProperties(
+  names: string[] | string
+): string[] {
+  if (typeof names === "string") {
+    names = [names];
+  }
+
+  let labels = [];
+  for (let i = 0; i < names.length; i++) {
+    if (names[i].charAt(0) >= "A" && names[i].charAt(0) <= "Z") {
+      // Lowercase the string
+      names[i] = names[i].toLowerCase();
+      // Split the string according to spaces
+      let split = names[i].split(" ");
+      // Capitalize the first letter of each word, except the first one
+      for (let j = 1; j < split.length; j++) {
+        split[j] = split[j].trim();
+        split[j] = split[j].charAt(0).toUpperCase() + split[j].slice(1);
+      }
+      // Join the split string without spaces
+      labels.push(split.join(""));
     } else {
-      return { value: propertyValue, type: TableDataType.string };
+      // Split the string according to capital letters
+      let split = names[i].split(/(?=[A-Z])/);
+      // Make capital letters lowercase
+      for (let j = 0; j < split.length; j++) {
+        split[j] = split[j].toLowerCase();
+      }
+      // Join the split string with spaces
+      labels.push(split.join(" "));
+      // Capitalize the first letter
+      labels[i] = labels[i].charAt(0).toUpperCase() + labels[i].slice(1);
     }
-  } else if (type == "list" || type.includes("[]")) {
-    if (typeof propertyValue === "string") {
-      return { value: propertyValue, type: TableDataType.string };
-    }
-
-    return { value: propertyValue.join(), type: TableDataType.string };
-  } else if (
-    type == "float" ||
-    type == "int" ||
-    type == "long" ||
-    type == "double" ||
-    type == "short" ||
-    type == "number"
-  ) {
-    return { value: propertyValue, type: TableDataType.number };
-  } else {
-    console.log(
-      `Type "${type}" not recognized. Please check the rawData2TableData function.`
-    );
-
-    return {
-      value: `Type "${type}" not recognized. Please check the rawData2TableData function.`,
-      type: TableDataType.string,
-    };
   }
+
+  return labels;
 }
 
 export function getClassNameFromProperties(

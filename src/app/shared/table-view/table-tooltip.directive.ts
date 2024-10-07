@@ -5,6 +5,7 @@ import {
   Input,
   Renderer2,
 } from "@angular/core";
+import { TABLE_TOOLTIP_SHOW_LIMIT } from "src/app/visuall/constants";
 
 @Directive({
   selector: "[table-tooltip]",
@@ -15,16 +16,14 @@ export class TableTooltipDirective {
   onTooltip: boolean = false;
   onHost: boolean = false;
 
-  constructor(private el: ElementRef, private renderer: Renderer2) {}
+  constructor(private element: ElementRef, private renderer: Renderer2) {}
 
   @HostListener("mouseenter") onMouseEnter() {
     this.onHost = true;
-    if (!this.tooltip) {
-      setTimeout(() => {
-        if (this.onHost) {
-          this.show();
-        }
-      }, 400); // delay to show tooltip
+    if (!this.tooltip && this.tooltipText.length > TABLE_TOOLTIP_SHOW_LIMIT) {
+      if (this.onHost) {
+        this.show();
+      }
     }
   }
 
@@ -45,7 +44,7 @@ export class TableTooltipDirective {
 
     this.renderer.addClass(this.tooltip, "table-tooltip");
 
-    const hostPos = this.el.nativeElement.getBoundingClientRect();
+    const hostPos = this.element.nativeElement.getBoundingClientRect();
     const tooltipPos = this.tooltip.getBoundingClientRect();
 
     const scrollPos =
@@ -77,6 +76,6 @@ export class TableTooltipDirective {
         this.renderer.removeChild(document.body, this.tooltip);
         this.tooltip = null;
       }
-    }, 100);
+    }, 300);
   }
 }

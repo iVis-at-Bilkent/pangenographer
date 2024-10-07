@@ -315,85 +315,6 @@ export class GlobalVariableService {
     }, this.HISTORY_SNAP_DELAY);
   }
 
-  translateVariableNames2Labels(variables: string[]): string[] {
-    let labels = [];
-    for (let i = 0; i < variables.length; i++) {
-      // --- GFA segment variables ---
-      if (variables[i] === "segmentName") {
-        labels.push("Segment Name");
-      } else if (variables[i] === "segmentLength") {
-        labels.push("Segment Length");
-      } else if (variables[i] === "segmentData") {
-        labels.push("Segment Data");
-      }
-      // link
-      else if (variables[i] === "kmerCount") {
-        labels.push("Kmer Count");
-      }
-      // link
-      else if (variables[i] === "fragmentCount") {
-        labels.push("Fragment Count");
-      }
-      // containment, link
-      else if (variables[i] === "readCount") {
-        labels.push("Read Count");
-      } else if (variables[i] === "SHA256Checksum") {
-        labels.push("SHA256 Checksum");
-      } else if (variables[i] === "URIorLocalSystemPath") {
-        labels.push("URI or Local System Path");
-      }
-      // link, jump
-      else if (variables[i] === "pathNames") {
-        labels.push("Path Names");
-      }
-      // link
-      else if (variables[i] === "walkSampleIdentifiers") {
-        labels.push("Walk Sample Identifiers");
-      }
-
-      // --- GFA link variables ---
-      else if (variables[i] === "overlap") {
-        labels.push("Overlap");
-      }
-      // jump, containment
-      else if (variables[i] === "sourceOrientation") {
-        labels.push("Source Orientation");
-      }
-      // jump, containment
-      else if (variables[i] === "targetOrientation") {
-        labels.push("Target Orientation");
-      }
-      // containment
-      else if (variables[i] === "edgeIdentifier") {
-        labels.push("Edge Identifier");
-      } else if (variables[i] === "mappingQuality") {
-        labels.push("Mapping Quality");
-      }
-      // containment
-      else if (variables[i] === "numberOfMismatchesOrGaps") {
-        labels.push("Number of Mismatches or Gaps");
-      }
-      // jump, containment
-      else if (variables[i] === "sequenceLength") {
-        labels.push("Sequence Length");
-      }
-
-      // --- GFA jump variables ---
-      else if (variables[i] === "distance") {
-        labels.push("Distance");
-      } else if (variables[i] === "indirectShortcutConnections") {
-        labels.push("Indirect Shortcut Connections");
-      } else if (variables[i] === "directShortcutConnections") {
-        labels.push("Direct Shortcut Connections");
-      }
-      // GFA containment variables
-      else if (variables[i] === "pos") {
-        labels.push("Pos");
-      }
-    }
-    return labels;
-  }
-
   getLabels4Elements(
     elementIds: string[],
     isNode: boolean = true,
@@ -706,6 +627,12 @@ export class GlobalVariableService {
       }
     }
     this._isSetEnums = true;
+
+    console.log("enum mapping", mapping);
+    console.log("enums", enums);
+    console.log("app description", this.appDescription.getValue());
+    console.log("user preferences", this.userPreferences);
+
     return mapping;
   }
 

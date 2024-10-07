@@ -17,6 +17,7 @@ import {
   EV_MOUSE_OFF,
   EV_MOUSE_ON,
   TABLE_ALL_CHECK_DELAY,
+  TABLE_TOOLTIP_SHOW_LIMIT,
   debounce,
 } from "../../visuall/constants";
 import { CytoscapeService } from "../../visuall/cytoscape.service";
@@ -524,9 +525,14 @@ export class TableViewComponent implements OnInit, OnDestroy {
   // This data is used in the table tooltip to show the full data
   // Data can include long strings like segment sequences
   truncateData(data: string): string {
-    if (data.length > 240) {
+    if (typeof data === "string" && data.length > TABLE_TOOLTIP_SHOW_LIMIT) {
       return data.substring(0, 238) + "...";
     }
     return data;
+  }
+
+  // Return the type of the data to be able to use in the html file
+  typeOfData(data: any): string {
+    return typeof data;
   }
 }

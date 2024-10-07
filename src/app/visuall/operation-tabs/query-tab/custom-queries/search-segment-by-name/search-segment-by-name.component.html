@@ -58,7 +58,7 @@
 
 <app-table-view
   [params]="tableInput"
-  [tableFilled]="tableFilled"
-  (onFilteringChanged)="filterTable($event)"
+  [tableFilled]="tableIsFilled"
   [clearFilter]="clearTableFilter"
+  (onFilteringChanged)="filterTable($event)"
 ></app-table-view>

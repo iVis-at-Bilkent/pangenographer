@@ -2,11 +2,9 @@ import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { Subject, Subscription } from "rxjs";
 import {
   TableData,
-  TableDataType,
   TableFiltering,
   TableRowMeta,
   TableViewInput,
-  property2TableData,
 } from "../../../shared/table-view/table-view-types";
 import {
   CLUSTER_CLASS,
@@ -475,26 +473,16 @@ export class MapTabComponent implements OnInit, OnDestroy {
         continue;
       }
       // first column is ID
-      let d: TableData[] = [
-        { value: data.data[i][0], type: TableDataType.string },
-      ];
+      let d: TableData[] = [{ value: data.data[i][0] }];
       for (let [k, v] of Object.entries(data.data[i][1])) {
         let index = this.tableInput.columns.indexOf(k);
         if (index > -1) {
-          const enumMapping = this._g.getEnumMapping();
-          d[index + 1] = property2TableData(
-            properties,
-            enumMapping,
-            k,
-            v,
-            this.queryRule.className,
-            this.queryRule.isEdge
-          );
+          d[index + 1] = { value: v };
         }
       }
       for (let j = 0; j < this.tableInput.columns.length + 1; j++) {
         if (!d[j]) {
-          d[j] = { value: "", type: TableDataType.string };
+          d[j] = { value: "" };
         }
       }
       this.tableInput.results.push(d);
