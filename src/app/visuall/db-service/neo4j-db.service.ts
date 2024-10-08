@@ -1062,6 +1062,15 @@ export class Neo4jDb implements DbService {
     );
   }
 
+  // Prepare the properties of an object to be used in a CQL query
+  private prepareProperties(object: any): string {
+    let properties = "";
+    Object.keys(object).forEach((key: string) => {
+      properties += `, ${key}: '${object[key]}'`;
+    });
+    return properties.substring(2); // Remove the first comma and space
+  }
+
   // This function converts the GFAData object to a CQL query
   private GFAdata2CQL(GFAData: GFAData): string {
     let query = "";
@@ -1087,10 +1096,8 @@ export class Neo4jDb implements DbService {
       path.pathName = this.propertyName2CQL(path.pathName);
 
       // Create the path node
-      element2Create = `(p${path.pathName} :PATH {pathName: '${path.pathName}', segmentNames: '${path.segmentNames}'`;
-      if (path.hasOwnProperty("overlaps")) {
-        element2Create += `, overlaps: '${path.overlaps}'`;
-      }
+      element2Create = `(p${path.pathName} :PATH {`;
+      element2Create += this.prepareProperties(path);
       element2Create += "}),\n";
 
       query += element2Create;
@@ -1102,14 +1109,8 @@ export class Neo4jDb implements DbService {
       walk.sampleIdentifier = this.propertyName2CQL(walk.sampleIdentifier);
 
       // Create the walk node
-      element2Create = `(w${walk.sampleIdentifier} :WALK {sampleIdentifier: '${walk.sampleIdentifier}', walk: '${walk.walk}'`;
-      element2Create += `, haplotypeIndex: '${walk.haplotypeIndex}', sequenceIdentifier: '${walk.sequenceIdentifier}'`;
-      if (walk.hasOwnProperty("sequenceStart")) {
-        element2Create += `, sequenceStart: '${walk.sequenceStart}'`;
-      }
-      if (walk.hasOwnProperty("sequenceEnd")) {
-        element2Create += `, sequenceEnd: '${walk.sequenceEnd}'`;
-      }
+      element2Create = `(w${walk.sampleIdentifier} :WALK {`;
+      element2Create += this.prepareProperties(walk);
       element2Create += "}),\n";
 
       query += element2Create;
@@ -1150,23 +1151,8 @@ export class Neo4jDb implements DbService {
       segment.segmentName = this.propertyName2CQL(segment.segmentName);
 
       // Create the segment node
-      element2Create = `(n${segment.segmentName} :SEGMENT {segmentData: '${segment.segmentData}', `;
-      element2Create += `segmentName: '${segment.segmentName}', segmentLength: ${segment.segmentLength}`;
-      if (segment.hasOwnProperty("readCount")) {
-        element2Create += `, readCount: ${segment.readCount}`;
-      }
-      if (segment.hasOwnProperty("fragmentCount")) {
-        element2Create += `, fragmentCount: ${segment.fragmentCount}`;
-      }
-      if (segment.hasOwnProperty("kmerCount")) {
-        element2Create += `, kmerCount: ${segment.kmerCount}`;
-      }
-      if (segment.hasOwnProperty("Sha256Checksum")) {
-        element2Create += `, Sha256Checksum: '${segment.Sha256Checksum}'`;
-      }
-      if (segment.hasOwnProperty("UriOrLocalSystemPath")) {
-        element2Create += `, UriOrLocalSystemPath: '${segment.UriOrLocalSystemPath}'`;
-      }
+      element2Create = `(n${segment.segmentName} :SEGMENT {`;
+      element2Create += this.prepareProperties(segment);
 
       // Check if the segment is in the segmentsToPathNamesMap
       // If it is, add the pathNames to the segment
@@ -1238,26 +1224,8 @@ export class Neo4jDb implements DbService {
       }
 
       // The edge creation
-      element2Create = `(n${link.source})-[:LINK {sourceOrientation: '${link.sourceOrientation}', source: '${link.source}' , `;
-      element2Create += `targetOrientation: '${link.targetOrientation}', target: '${link.target}'`;
-      if (link.hasOwnProperty("overlap")) {
-        element2Create += `, overlap: '${link.overlap}'`;
-      }
-      if (link.hasOwnProperty("mappingQuality")) {
-        element2Create += `, mappingQuality: ${link.mappingQuality}`;
-      }
-      if (link.hasOwnProperty("numberOfMismatchesOrGaps")) {
-        element2Create += `, numberOfMismatchesOrGaps: ${link.numberOfMismatchesOrGaps}`;
-      }
-      if (link.hasOwnProperty("readCount")) {
-        element2Create += `, readCount: ${link.readCount}`;
-      }
-      if (link.hasOwnProperty("fragmentCount")) {
-        element2Create += `, fragmentCount: ${link.fragmentCount}`;
-      }
-      if (link.hasOwnProperty("kmerCount")) {
-        element2Create += `, kmerCount: ${link.kmerCount}`;
-      }
+      element2Create = `(n${link.source})-[:LINK {`;
+      element2Create += this.prepareProperties(link);
 
       // Create a list of sample identifiers to add to the link edge
       element2Create += `, walkSampleIdentifiers: [`;
@@ -1346,11 +1314,8 @@ export class Neo4jDb implements DbService {
       jump.target = this.propertyName2CQL(jump.target);
 
       // The edge creation
-      element2Create = `(n${jump.source})-[:JUMP {sourceOrientation: '${jump.sourceOrientation}', source: '${jump.source}', `;
-      element2Create += `targetOrientation: '${jump.targetOrientation}', target: '${jump.target}', distance: '${jump.distance}'`;
-      if (jump.hasOwnProperty("indirectShortcutConnections")) {
-        element2Create += `, indirectShortcutConnections: ${jump.indirectShortcutConnections}`;
-      }
+      element2Create = `(n${jump.source})-[:JUMP {`;
+      element2Create += this.prepareProperties(jump);
 
       // Create a list of path names to add to the link edge
       element2Create += `, pathNames: [`;
@@ -1403,15 +1368,8 @@ export class Neo4jDb implements DbService {
       containment.target = this.propertyName2CQL(containment.target);
 
       // The edge creation
-      element2Create = `(n${containment.source})-[:CONTAINMENT {sourceOrientation: '${containment.sourceOrientation}', `;
-      element2Create += `source: '${containment.source}', targetOrientation: '${containment.targetOrientation}', `;
-      element2Create += `target: '${containment.target}', overlap: '${containment.overlap}', pos: ${containment.pos}`;
-      if (containment.hasOwnProperty("numberOfMismatchesOrGaps")) {
-        element2Create += `, numberOfMismatchesOrGaps: ${containment.numberOfMismatchesOrGaps}`;
-      }
-      if (containment.hasOwnProperty("readCount")) {
-        element2Create += `, readCount: ${containment.readCount}`;
-      }
+      element2Create = `(n${containment.source})-[:CONTAINMENT {`;
+      element2Create += this.prepareProperties(containment);
 
       // Close the edge creation
       element2Create += `}]->(n${containment.target}),\n`;

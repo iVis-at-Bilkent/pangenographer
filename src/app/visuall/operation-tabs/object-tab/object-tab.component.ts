@@ -16,6 +16,7 @@ import {
   getPropNamesFromObject,
 } from "../../constants";
 import { CytoscapeService } from "../../cytoscape.service";
+import { GFASegment } from "../../db-service/data-types";
 import { DbAdapterService } from "../../db-service/db-adapter.service";
 import { GlobalVariableService } from "../../global-variable.service";
 import { SequenceDataService } from "../../sequence-data.service";
@@ -29,7 +30,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   nodeClasses: Set<string>;
   edgeClasses: Set<string>;
   selectedClasses: string;
-  selectedItemProperties: any;
+  selectedItemProperties: GFASegment | any;
   tableFilled = new Subject<boolean>();
   multiObjectTableFilled = new Subject<boolean>();
   clearMultiObjectTableFilter = new Subject<boolean>();

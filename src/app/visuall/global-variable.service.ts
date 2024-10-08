@@ -630,8 +630,6 @@ export class GlobalVariableService {
 
     console.log("enum mapping", mapping);
     console.log("enums", enums);
-    console.log("app description", this.appDescription.getValue());
-    console.log("user preferences", this.userPreferences);
 
     return mapping;
   }

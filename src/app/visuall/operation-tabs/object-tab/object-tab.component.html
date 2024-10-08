@@ -242,6 +242,30 @@
               {{ selectedItemProperties.pos.value }}
             </td>
           </tr>
+          <tr *ngIf="selectedItemProperties.stableSequenceName">
+            <td class="text-start">
+              <b class="va-text">Stable sequence name</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProperties.stableSequenceName.value }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProperties.stableSequenceOffset">
+            <td class="text-start">
+              <b class="va-text">Stable sequence offset</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProperties.stableSequenceOffset.value }}
+            </td>
+          </tr>
+          <tr *ngIf="selectedItemProperties.stableSequenceRank">
+            <td class="text-start">
+              <b class="va-text">Stable sequence rank</b>
+            </td>
+            <td class="va-text text-end">
+              {{ selectedItemProperties.stableSequenceRank.value }}
+            </td>
+          </tr>
         </tbody>
       </table>
 

@@ -69,11 +69,11 @@ export class FileReaderService {
       } else if (optionalField.startsWith("UR")) {
         segment.UriOrLocalSystemPath = optionalField;
       } else if (optionalField.startsWith("SN")) {
-        segment.stableSequenceName = optionalField;
+        segment.stableSequenceName = optionalField.substring(5);
       } else if (optionalField.startsWith("SO")) {
-        segment.stableSequenceOffset = Number(optionalField);
+        segment.stableSequenceOffset = Number(optionalField.substring(5));
       } else if (optionalField.startsWith("SR")) {
-        segment.stableSequenceRank = Number(optionalField);
+        segment.stableSequenceRank = Number(optionalField.substring(5));
       } else {
         console.log("This field is not parsed: " + optionalField);
       }
