@@ -10,8 +10,8 @@
     [(ngModel)]="segmentNames"
     [style.height]="'100px'"
     class="form-control va-small-text"
-    title="Enter Segment Names to search line by line or comma separated"
-    placeholder="Enter Segment Names to search line by line or comma separated"
+    title="Enter Segment names to search line by line or comma separated"
+    placeholder="Enter Segment names to search line by line or comma separated"
   >
   </textarea>
   <div class="form-inline va-text flex my-2">
@@ -19,8 +19,10 @@
     <input
       type="number"
       min="1"
+      max="20"
       step="any"
       [(ngModel)]="neighborDistance"
+      (change)="onNeighborDistanceChange($event)"
       class="form-control standart-input-height va-small-text ms-1 w5-5"
       placeholder="Neighbor Distance"
     />

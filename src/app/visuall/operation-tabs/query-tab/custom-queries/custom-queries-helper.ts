@@ -76,3 +76,12 @@ export function fillTable(
   tableInput.resultCount = tableInput.results.length; // Set the result count
   tableIsFilled.next(true); // Notify that the table is filled
 }
+
+// Common function to prepare the input for queries
+export function prepareInput(input: string): string {
+  return input
+    .replace(/ /g, "")
+    .split(/[\n,]/)
+    .filter((x) => x)
+    .join("','");
+}

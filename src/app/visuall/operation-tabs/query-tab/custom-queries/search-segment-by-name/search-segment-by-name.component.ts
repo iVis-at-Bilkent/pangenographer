@@ -12,7 +12,7 @@ import {
 import { CytoscapeService } from "../../../../cytoscape.service";
 import { Neo4jDb } from "../../../../db-service/neo4j-db.service";
 import { GlobalVariableService } from "../../../../global-variable.service";
-import { fillTable } from "../custom-queries-helper";
+import { fillTable, prepareInput } from "../custom-queries-helper";
 
 @Component({
   selector: "search-segment-by-name",
@@ -114,7 +114,7 @@ export class SearchSegmentByNameComponent implements OnInit {
 
   // Transform the segment names into a format that can be used in the query
   private prepareSegmentNames(segmentNames: string): string {
-    return segmentNames.split(/[\n,]/).join("','");
+    return prepareInput(segmentNames);
   }
 
   filterTable(filter: TableFiltering) {
@@ -155,5 +155,15 @@ export class SearchSegmentByNameComponent implements OnInit {
     }
 
     return filteredResponse;
+  }
+
+  onNeighborDistanceChange(event: any) {
+    if (!event.target.value || event.target.value <= 1) {
+      this.neighborDistance = 1;
+    } else if (event.target.value >= 20) {
+      this.neighborDistance = 20;
+    } else {
+      this.neighborDistance = Number(event.target.value);
+    }
   }
 }

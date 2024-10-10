@@ -12,7 +12,7 @@ import {
 import { CytoscapeService } from "../../../../cytoscape.service";
 import { Neo4jDb } from "../../../../db-service/neo4j-db.service";
 import { GlobalVariableService } from "../../../../global-variable.service";
-import { fillTable } from "../custom-queries-helper";
+import { fillTable, prepareInput } from "../custom-queries-helper";
 
 @Component({
   selector: "search-segment-by-nucleotide-sequence",
@@ -117,7 +117,7 @@ export class SearchSegmentByNucleotideSequenceComponent implements OnInit {
 
   // Transform the segment names into a format that can be used in the query
   private prepareSequences(sequences: string): string {
-    return sequences.split(/[\n,]/).join("','").toUpperCase();
+    return prepareInput(sequences).toUpperCase();
   }
 
   filterTable(filter: TableFiltering) {
