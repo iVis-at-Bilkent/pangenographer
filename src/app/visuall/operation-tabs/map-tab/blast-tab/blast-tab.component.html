@@ -15,25 +15,23 @@
     </div>
 
     <div *ngIf="selectedTypeIndex === 1" class="panel">
-      <div>
-        <div class="top-button">
-          <input
-            class="btn btn-sm btn-dark va-text m-2 center"
-            type="button"
-            (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
-            value="Get Selected Segment's Sequence"
-            title="Get Selected Segment's Sequence"
-          />
-        </div>
-        <div class="form-inline blast-option">
-          <textarea
-            (change)="onQueryChange($event)"
-            [(ngModel)]="query"
-            class="form-control blast-sequence-input va-small-text"
-            rows="1"
-            placeholder="Accession, GI, or FASTA."
-          ></textarea>
-        </div>
+      <div class="top-button">
+        <input
+          class="btn btn-sm btn-dark va-text m-2 center"
+          type="button"
+          (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
+          value="Add selected Segments to query"
+          title="Add selected Segment to query"
+        />
+      </div>
+      <div class="form-inline blast-option">
+        <textarea
+          (change)="onQueryChange($event)"
+          [(ngModel)]="query"
+          class="form-control blast-query-input va-small-text"
+          rows="1"
+          placeholder="Accession, GI, or FASTA."
+        ></textarea>
       </div>
 
       <div class="form-inline blast-option">
@@ -436,14 +434,52 @@
     </div>
 
     <div *ngIf="selectedTypeIndex === 0" class="panel">
-      <div class="top-button">
-        <input
-          class="btn btn-sm btn-dark va-text m-2 center float-left"
-          type="button"
-          (click)="createDatabase()"
-          value="Create Database"
-          title="Create Database"
-        />
+      <div>
+        <div class="top-button">
+          <input
+            class="btn btn-sm btn-dark va-text m-2 center"
+            type="button"
+            (click)="addSelectedSegment2DBCreation()"
+            value="Add selected Segment to database creation"
+            title="Add selected Segment to database creation"
+          />
+        </div>
+        <div class="form-inline blast-option">
+          <textarea
+            (change)="onStandaloneSegmentNames2Add2DBChange($event)"
+            [(ngModel)]="standaloneSegmentNames2Add2DB"
+            class="form-control blast-segment-name-input va-small-text"
+            rows="1"
+            placeholder="Segment names for adding sequences to the database (line separated)"
+          ></textarea>
+        </div>
+        <div class="top-button">
+          <input
+            class="btn btn-sm btn-dark va-text m-2 center"
+            type="button"
+            (click)="addNewlyEnteredSegmentNames2DBCreation()"
+            value="Add newly entered Segment names to database creation"
+            title="Add newly entered Segment names to database creation"
+          />
+        </div>
+        <div class="form-inline blast-option">
+          <textarea
+            (change)="onStandaloneSequences2Add2DBChange($event)"
+            [(ngModel)]="standaloneFastaData2Add2DB"
+            class="form-control blast-segment-name-input va-small-text"
+            rows="1"
+            placeholder="Sequences to be added to the database (FASTA format)"
+          ></textarea>
+        </div>
+        <div class="top-button">
+          <input
+            class="btn btn-sm btn-dark va-text m-2 center float-left"
+            type="button"
+            (click)="createDatabase()"
+            value="Create database"
+            title="Create database"
+          />
+        </div>
       </div>
 
       <div>
@@ -452,17 +488,18 @@
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
             (click)="fillQueryTextareaWithSelectedSegmentsSequence()"
-            value="Get Selected Segment's Sequence"
-            title="Get Selected Segment's Sequence"
+            value="Add selected Segment to query"
+            title="Add selected Segment to query"
           />
         </div>
+
         <div class="form-inline blast-option">
           <textarea
             (change)="onQueryChange($event)"
             [(ngModel)]="query"
-            class="form-control blast-sequence-input va-small-text"
+            class="form-control blast-query-input va-small-text"
             rows="1"
-            placeholder="Accession, GI, or FASTA."
+            placeholder="Sequences for database creation (Accession, GI, or FASTA formats)"
           ></textarea>
         </div>
       </div>

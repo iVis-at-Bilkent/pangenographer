@@ -38,6 +38,10 @@ textarea.form-control {
   resize: vertical;
 }
 
-.blast-sequence-input {
+.blast-query-input {
   height: 15em;
+}
+
+.blast-segment-name-input {
+  height: 6em;
 }

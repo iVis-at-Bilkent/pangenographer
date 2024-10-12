@@ -247,6 +247,8 @@ export class BlastTabComponent implements OnInit {
   standaloneIsTableInput: boolean = false;
   standaloneIsTableInputFilled = new Subject<boolean>();
   standaloneClearTableOutputFilter = new Subject<boolean>();
+  standaloneSegmentNames2Add2DB: string = "";
+  standaloneFastaData2Add2DB: string = "";
 
   constructor(
     protected _http: HttpClient,
@@ -832,11 +834,7 @@ export class BlastTabComponent implements OnInit {
     // Run standalone query to create database from all nodes in the graph
     this.runStandaloneQuery(
       {
-        // Prepare fasta data for all nodes in the graph
-        //  by preparing fasta data for the sequence array of the nodes in the graph
-        fastaData: this._sequenceDataService.prepareFastaData4SequenceArray(
-          this._sequenceDataService.nodeDatas2SequenceArray(this._g.cy.nodes())
-        ),
+        fastaData: this.standaloneFastaData2Add2DB,
       },
       true, // Make database flag
       (res) => {
@@ -847,6 +845,80 @@ export class BlastTabComponent implements OnInit {
             " sequences "
         );
       }
+    );
+  }
+
+  // Add selected segments to the database by preparing fasta data for the selected segments
+  addSelectedSegment2DBCreation() {
+    if (!this._g.cy.nodes(":selected").length) {
+      this._g.showErrorModal(
+        "No segments selected",
+        "Please select segments and try again."
+      );
+      return;
+    }
+
+    // Sequence names for selected nodes
+
+    let selectedNodeSegmentNames = this._g.cy
+      .nodes(":selected")
+      .map((x: any) => x.data("segmentName"));
+    let splitStandaloneNames = this.standaloneSegmentNames2Add2DB.split(/\n,/);
+
+    // Prepare selected nodes segment names
+    // and adding the segment names to the standalone segment names to add to the database
+    selectedNodeSegmentNames.forEach((segmentName: string) => {
+      if (!splitStandaloneNames.includes(segmentName)) {
+        this.standaloneSegmentNames2Add2DB += "\n" + segmentName;
+      }
+    });
+    // Remove the leading whitespace
+    this.standaloneSegmentNames2Add2DB =
+      this.standaloneSegmentNames2Add2DB.trim();
+
+    // Sequence data for selected nodes
+
+    let selectedNodesFasta =
+      this._sequenceDataService.prepareFastaData4SequenceArray(
+        this._sequenceDataService.nodeDatas2SequenceArray(
+          this._g.cy.nodes(":selected")
+        )
+      );
+
+    // Prepare selected nodes fasta headers and sequences by splitting the selected nodes fasta data
+    // and adding the headers and sequences to the selected nodes fasta headers and sequences arrays
+    // We ignore the empty lines and the lines that are already in the standalone fasta data to add to the database
+    let selectedNodesFastaHeaders = [];
+    let selectedNodesFastaSequences = [];
+    let splitStandaloneFastaData2Add2DB =
+      this.standaloneFastaData2Add2DB.split("\n");
+    selectedNodesFasta.split("\n").forEach((line: string) => {
+      if (!line || splitStandaloneFastaData2Add2DB.includes(line)) {
+        return;
+      }
+
+      if (line.startsWith(">")) {
+        selectedNodesFastaHeaders.push(line);
+      } else {
+        selectedNodesFastaSequences.push(line);
+      }
+    });
+
+    // Finally, add the selected nodes fasta headers and sequences to the standalone fasta data to add to the database
+    for (let i = 0; i < selectedNodesFastaHeaders.length; i++) {
+      this.standaloneFastaData2Add2DB +=
+        "\n" +
+        selectedNodesFastaHeaders[i] +
+        "\n" +
+        selectedNodesFastaSequences[i];
+    }
+  }
+
+  // Add new entered segment names to the database creation
+  addNewlyEnteredSegmentNames2DBCreation() {
+    this._g.showErrorModal(
+      "Not implemented",
+      "This feature is not implemented yet."
     );
   }
 
@@ -953,6 +1025,14 @@ export class BlastTabComponent implements OnInit {
 
   onStandaloneCommandLineArgumentsChange(event: any) {
     this.standaloneCommandLineArguments = event.target.value.trim();
+  }
+
+  onStandaloneSegmentNames2Add2DBChange(event: any) {
+    this.standaloneSegmentNames2Add2DB = event.target.value.trim();
+  }
+
+  onStandaloneSequences2Add2DBChange(event: any) {
+    this.standaloneFastaData2Add2DB = event.target.value.trim();
   }
 
   // Save the results of the BLAST as a text file with the name blast_<web/standalone>_result.txt
