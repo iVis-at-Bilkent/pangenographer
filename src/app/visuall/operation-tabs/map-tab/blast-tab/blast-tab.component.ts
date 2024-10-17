@@ -173,10 +173,10 @@ export class BlastTabComponent implements OnInit {
   ];
   webSelectedFormatType: string = "HTML";
   webExpect: number = 0;
-  webNulceotideReward: number = 0;
+  webNucleotideReward: number = 0;
   webNucleotidePenalty: number = 0;
   webGapCost: string = "";
-  webMatrixs: string[] = [
+  webMatrixes: string[] = [
     "BLOSUM45",
     "BLOSUM50",
     "BLOSUM62",
@@ -248,7 +248,7 @@ export class BlastTabComponent implements OnInit {
   standaloneIsTableInputFilled = new Subject<boolean>();
   standaloneClearTableOutputFilter = new Subject<boolean>();
   standaloneSegmentNames2Add2DB: string = "";
-  standaloneFastaData2Add2DB: string = "";
+  standaloneFastaData2CreateDB: string = "";
 
   constructor(
     protected _http: HttpClient,
@@ -381,7 +381,7 @@ export class BlastTabComponent implements OnInit {
   }
 
   // Get combined sequence from combined sequence object
-  // by concatenating first, second and third sequencess
+  // by concatenating first, second and third sequences
   private getCombinedSequenceFromCombinedSequenceObject(
     combinedSequenceObject: CombinedSequence
   ): string {
@@ -628,11 +628,11 @@ export class BlastTabComponent implements OnInit {
     if (this.webExpect) {
       queryParams += "&EXPECT=" + this.webExpect;
     }
-    if (this.webNulceotideReward) {
-      queryParams += "&NUCL_REWARD=" + this.webNulceotideReward;
+    if (this.webNucleotideReward) {
+      queryParams += "&NUCL_REWARD=" + this.webNucleotideReward;
     }
-    if (this.webNulceotideReward) {
-      queryParams += "&NUCL_PENALTY=" + this.webNulceotideReward;
+    if (this.webNucleotideReward) {
+      queryParams += "&NUCL_PENALTY=" + this.webNucleotideReward;
     }
     if (this.webGapCost) {
       queryParams += "&GAPCOSTS=" + this.webGapCost;
@@ -738,11 +738,11 @@ export class BlastTabComponent implements OnInit {
   }
 
   onWebNucleotideRewardChange(event: any) {
-    this.webNulceotideReward = event.target.value.trim();
+    this.webNucleotideReward = event.target.value.trim();
   }
 
   onWebNucleotidePenaltyChange(event: any) {
-    this.webNulceotideReward = event.target.value.trim();
+    this.webNucleotideReward = event.target.value.trim();
   }
 
   onWebGapCostChange(event: any) {
@@ -751,7 +751,7 @@ export class BlastTabComponent implements OnInit {
 
   onWebMatrixChange(event: any) {
     this.webSelectedMatrixIdx = event.target.selectedIndex;
-    this.webSelectedMatrix = this.webMatrixs[this.webSelectedMatrixIdx];
+    this.webSelectedMatrix = this.webMatrixes[this.webSelectedMatrixIdx];
   }
 
   onWebHitlistSizeChange(event: any) {
@@ -834,7 +834,7 @@ export class BlastTabComponent implements OnInit {
     // Run standalone query to create database from all nodes in the graph
     this.runStandaloneQuery(
       {
-        fastaData: this.standaloneFastaData2Add2DB,
+        fastaData: this.standaloneFastaData2CreateDB,
       },
       true, // Make database flag
       (res) => {
@@ -863,7 +863,8 @@ export class BlastTabComponent implements OnInit {
     let selectedNodeSegmentNames = this._g.cy
       .nodes(":selected")
       .map((x: any) => x.data("segmentName"));
-    let splitStandaloneNames = this.standaloneSegmentNames2Add2DB.split(/\n,/);
+    let splitStandaloneNames =
+      this.standaloneSegmentNames2Add2DB.split(/[,|\n]+/);
 
     // Prepare selected nodes segment names
     // and adding the segment names to the standalone segment names to add to the database
@@ -890,10 +891,10 @@ export class BlastTabComponent implements OnInit {
     // We ignore the empty lines and the lines that are already in the standalone fasta data to add to the database
     let selectedNodesFastaHeaders = [];
     let selectedNodesFastaSequences = [];
-    let splitStandaloneFastaData2Add2DB =
-      this.standaloneFastaData2Add2DB.split("\n");
+    let splitStandaloneFastaData2CreateDB =
+      this.standaloneFastaData2CreateDB.split("\n");
     selectedNodesFasta.split("\n").forEach((line: string) => {
-      if (!line || splitStandaloneFastaData2Add2DB.includes(line)) {
+      if (!line || splitStandaloneFastaData2CreateDB.includes(line)) {
         return;
       }
 
@@ -906,20 +907,52 @@ export class BlastTabComponent implements OnInit {
 
     // Finally, add the selected nodes fasta headers and sequences to the standalone fasta data to add to the database
     for (let i = 0; i < selectedNodesFastaHeaders.length; i++) {
-      this.standaloneFastaData2Add2DB +=
+      this.standaloneFastaData2CreateDB +=
         "\n" +
         selectedNodesFastaHeaders[i] +
         "\n" +
         selectedNodesFastaSequences[i];
     }
+    this.standaloneFastaData2CreateDB =
+      this.standaloneFastaData2CreateDB.trim();
   }
 
   // Add new entered segment names to the database creation
-  addNewlyEnteredSegmentNames2DBCreation() {
-    this._g.showErrorModal(
-      "Not implemented",
-      "This feature is not implemented yet."
-    );
+  updateSequenceData4DBGeneration() {
+    // Split the entered segment names by comma or newline
+    let splitStandaloneSegmentNames =
+      this.standaloneSegmentNames2Add2DB.split(/[,|\n]+/);
+    let splitStandaloneFastaData2CreateDBHeaders =
+      this.standaloneFastaData2CreateDB
+        .split("\n")
+        .filter((x) => x.startsWith(">"));
+
+    // Loop through the split segment names to check whether the segments sequence data is already in the standalone fasta data to add to the database
+    for (let i = 0; i < splitStandaloneSegmentNames.length; i++) {
+      // Check if the segment name is already in the standalone fasta data to add to the database
+      if (
+        splitStandaloneFastaData2CreateDBHeaders.includes(
+          ">" + splitStandaloneSegmentNames[i]
+        )
+      ) {
+        continue;
+      }
+
+      // Find the node in the graph with the segment name
+      let newNode = this._g.cy.nodes().find((x: any) => {
+        return x.data("segmentName") === splitStandaloneSegmentNames[i];
+      });
+
+      // Add the segment name and sequence data to the standalone fasta data to add to the database
+      if (newNode) {
+        this.standaloneFastaData2CreateDB +=
+          "\n" +
+          ">" +
+          newNode.data("segmentName") +
+          "\n" +
+          newNode.data("segmentData");
+      }
+    }
   }
 
   executeStandaloneQueryWithParams() {
@@ -1003,7 +1036,6 @@ export class BlastTabComponent implements OnInit {
     this.standaloneTableInput.currentPage = 1;
     this.standaloneTableInput.resultCount =
       this.standaloneTableInput.results.length;
-    console.log(this.standaloneTableInput.results);
 
     this.standaloneIsTableInputFilled.next(true);
     this.standaloneClearTableOutputFilter.next(true);
@@ -1031,8 +1063,8 @@ export class BlastTabComponent implements OnInit {
     this.standaloneSegmentNames2Add2DB = event.target.value.trim();
   }
 
-  onStandaloneSequences2Add2DBChange(event: any) {
-    this.standaloneFastaData2Add2DB = event.target.value.trim();
+  onStandaloneFastaData2CreateDBChange(event: any) {
+    this.standaloneFastaData2CreateDB = event.target.value.trim();
   }
 
   // Save the results of the BLAST as a text file with the name blast_<web/standalone>_result.txt

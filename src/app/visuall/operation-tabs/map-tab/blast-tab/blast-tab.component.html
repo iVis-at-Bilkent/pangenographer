@@ -286,7 +286,7 @@
               [(ngModel)]="webSelectedMatrixIdx"
             >
               <option
-                *ngFor="let matrix of webMatrixs; let i = index"
+                *ngFor="let matrix of webMatrixes; let i = index"
                 [value]="matrix"
                 [selected]="webSelectedMatrixIdx === i"
               >
@@ -351,7 +351,7 @@
               type="number"
               min="0"
               (keydown.enter)="onWebNucleotideRewardChange($event)"
-              [(ngModel)]="webNulceotideReward"
+              [(ngModel)]="webNucleotideReward"
               class="form-control input-3-char standart-input-height va-small-text"
               title="Nucleotide Reward"
             />
@@ -368,7 +368,7 @@
               type="number"
               max="0"
               (keydown.enter)="onWebNucleotidePenaltyChange($event)"
-              [(ngModel)]="webNulceotideReward"
+              [(ngModel)]="webNucleotideReward"
               class="form-control input-3-char standart-input-height va-small-text"
               title="Nucleotide Penalty"
             />
@@ -440,8 +440,8 @@
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
             (click)="addSelectedSegment2DBCreation()"
-            value="Add selected Segment to database creation"
-            title="Add selected Segment to database creation"
+            value="Add selected Segments to database creation"
+            title="Add selected Segments to database creation"
           />
         </div>
         <div class="form-inline blast-option">
@@ -457,18 +457,18 @@
           <input
             class="btn btn-sm btn-dark va-text m-2 center"
             type="button"
-            (click)="addNewlyEnteredSegmentNames2DBCreation()"
-            value="Add newly entered Segment names to database creation"
-            title="Add newly entered Segment names to database creation"
+            (click)="updateSequenceData4DBGeneration()"
+            value="Update sequence data for database generation"
+            title="Update sequence data for database generation"
           />
         </div>
         <div class="form-inline blast-option">
           <textarea
-            (change)="onStandaloneSequences2Add2DBChange($event)"
-            [(ngModel)]="standaloneFastaData2Add2DB"
+            (change)="onStandaloneFastaData2CreateDBChange($event)"
+            [(ngModel)]="standaloneFastaData2CreateDB"
             class="form-control blast-segment-name-input va-small-text"
             rows="1"
-            placeholder="Sequences to be added to the database (FASTA format)"
+            placeholder="Sequences to create the database (FASTA format)"
           ></textarea>
         </div>
         <div class="top-button">
