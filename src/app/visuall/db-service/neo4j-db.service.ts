@@ -795,6 +795,19 @@ export class Neo4jDb implements DbService {
     this.runQuery(query, callback);
   }
 
+  // Get given segment names from the database
+  getSegmentsByNames(
+    segmentNames: string[],
+    callback: (response: GraphResponse) => any
+  ) {
+    let query = `
+      OPTIONAL MATCH (n:SEGMENT)
+      WHERE n.segmentName IN [${segmentNames.map((x) => `'${x}'`).join(", ")}]
+      RETURN n
+    `;
+    this.runQuery(query, callback);
+  }
+
   // ------------------------------------------------- methods for conversion to CQL -------------------------------------------------
   private rule2cql2(
     rules: ClassBasedRules,

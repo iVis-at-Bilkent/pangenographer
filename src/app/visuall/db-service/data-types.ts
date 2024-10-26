@@ -87,6 +87,12 @@ export interface DbService {
 
   // Definition for getting all nodes with zero outgoing degree
   getAllZeroOutgoingDegreeNodes(callback: (x: GraphResponse) => any);
+
+  // Definition for getting all the segments given a list of segment names
+  getSegmentsByNames(
+    segmentNames: string[],
+    callback: (x: GraphResponse) => any
+  );
 }
 
 export interface GraphResponse {

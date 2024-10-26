@@ -268,4 +268,16 @@ export class DbAdapterService {
     };
     this._db.getAllZeroOutgoingDegreeNodes(fn);
   }
+
+  // Adapter function to get segments by names
+  getSegmentsByNames(
+    segmentNames: string[],
+    callback: (x: GraphResponse) => any
+  ) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Get segments by names");
+    };
+    this._db.getSegmentsByNames(segmentNames, fn);
+  }
 }

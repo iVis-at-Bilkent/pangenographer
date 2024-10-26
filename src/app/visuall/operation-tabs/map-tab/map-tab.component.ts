@@ -364,6 +364,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
         this.tableInput.resultCount = x.count;
       }
     };
+
     this._dbService.getFilteringResult(
       this.queryRule,
       null,

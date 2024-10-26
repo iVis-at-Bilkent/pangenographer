@@ -10,6 +10,7 @@ import {
   filterTableDatas,
 } from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
+import { DbAdapterService } from "../../../db-service/db-adapter.service";
 import { GlobalVariableService } from "../../../global-variable.service";
 import {
   CombinedSequence,
@@ -254,7 +255,8 @@ export class BlastTabComponent implements OnInit {
     protected _http: HttpClient,
     private _g: GlobalVariableService,
     private _cyService: CytoscapeService,
-    private _sequenceDataService: SequenceDataService
+    private _sequenceDataService: SequenceDataService,
+    private _dbService: DbAdapterService
   ) {}
 
   ngOnInit(): void {}
@@ -927,6 +929,8 @@ export class BlastTabComponent implements OnInit {
         .split("\n")
         .filter((x) => x.startsWith(">"));
 
+    let segmentsNames2Fetch = [];
+
     // Loop through the split segment names to check whether the segments sequence data is already in the standalone fasta data to add to the database
     for (let i = 0; i < splitStandaloneSegmentNames.length; i++) {
       // Check if the segment name is already in the standalone fasta data to add to the database
@@ -952,6 +956,33 @@ export class BlastTabComponent implements OnInit {
           "\n" +
           newNode.data("segmentData");
       }
+      // Add the segment name to the segments names to fetch
+      else {
+        segmentsNames2Fetch.push(splitStandaloneSegmentNames[i]);
+      }
+    }
+
+    // Fetch the sequence data for the segment names to fetch
+    if (segmentsNames2Fetch.length) {
+      this._dbService.getSegmentsByNames(segmentsNames2Fetch, (res) => {
+        res.nodes.forEach((node: any) => {
+          this.standaloneFastaData2CreateDB +=
+            "\n" +
+            ">" +
+            node.properties.segmentName +
+            "\n" +
+            node.properties.segmentData;
+        });
+
+        this._g.statusMsg.next(
+          "Succesfully added " +
+            res.nodes.length +
+            " sequences to the BLAST database creation"
+        );
+
+        this.standaloneFastaData2CreateDB =
+          this.standaloneFastaData2CreateDB.trim();
+      });
     }
   }
 
