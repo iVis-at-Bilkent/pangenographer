@@ -7,11 +7,13 @@ export interface DbService {
     callback: (x: GraphResponse) => any,
     queryMeta?: DbQueryMeta
   );
+
   getElements(
     ids: string[] | number[],
     callback: (x: GraphResponse) => any,
     meta: DbQueryMeta
   );
+
   getFilteringResult(
     rules: ClassBasedRules,
     filter: TableFiltering,
@@ -20,6 +22,7 @@ export interface DbService {
     type: DbResponseType,
     callback: (x: GraphResponse | TableResponse) => any
   );
+
   getGraphOfInterest(
     dbIds: (string | number)[],
     ignoredTypes: string[],
@@ -30,6 +33,7 @@ export interface DbService {
     idFilter: (string | number)[],
     cb: (x: any) => void
   );
+
   getCommonStream(
     dbIds: (string | number)[],
     ignoredTypes: string[],
@@ -40,6 +44,7 @@ export interface DbService {
     idFilter: (string | number)[],
     cb: (x: any) => void
   );
+
   getNeighborhood(
     dbIds: (string | number)[],
     ignoredTypes: string[],
@@ -49,6 +54,13 @@ export interface DbService {
     idFilter: (string | number)[],
     cb: (x: any) => void
   );
+
+  searchBySequenceChain(
+    sequences: string,
+    maxJumpLength: number,
+    callback: (x: GraphResponse) => any
+  );
+
   getConsecutiveNodes(
     properties: (string | number)[],
     propertyType: string,
@@ -56,7 +68,6 @@ export interface DbService {
     callback: (x: GraphResponse) => any
   );
 
-  // Definition for getting elements up to a certain distance
   getElementsUpToCertainDistance(
     nodeIds: string[],
     distance: number,
@@ -64,31 +75,22 @@ export interface DbService {
     isUp: boolean
   );
 
-  // Definition for importing GFA data
   importGFA(GFAData: GFAData, cb: () => void);
-
-  // Definition for importing GFA data with a promise
+  // import GFA data with a sequence of promises
   importGFAPromised(GFAData: GFAData): Promise<any>;
 
-  // Definition for clearing data from the database
   clearDatabase(cb: () => void);
 
-  // Definition for getting sample data
   getSampleData(callback: (x: GraphResponse) => any);
 
-  // Definition for getting some nodes with zero degree
   getSomeZeroDegreeNodes(callback: (x: GraphResponse) => any);
 
-  // Definition for getting all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any);
 
-  // Definition for getting all nodes with zero incoming degree
   getAllZeroIncomingDegreeNodes(callback: (x: GraphResponse) => any);
 
-  // Definition for getting all nodes with zero outgoing degree
   getAllZeroOutgoingDegreeNodes(callback: (x: GraphResponse) => any);
 
-  // Definition for getting all the segments given a list of segment names
   getSegmentsByNames(
     segmentNames: string[],
     callback: (x: GraphResponse) => any

@@ -206,25 +206,33 @@ export class DbAdapterService {
     );
   }
 
-  // Adapter function to import GFA data, add to history and call the database service function
+  searchBySequenceChain(
+    sequences: string,
+    maxJumpLength: number,
+    callback: (x: any) => void
+  ) {
+    let fn = (x: any) => {
+      callback(x);
+      this._g.add2GraphHistory("Search by sequence chain");
+    };
+    this._db.searchBySequenceChain(sequences, maxJumpLength, fn);
+  }
+
   getGFAData2ImportGFA(GFAData: GFAData, callback: () => void) {
     this._g.add2GraphHistory("Import GFA");
     this._db.importGFA(GFAData, callback);
   }
 
-  // Adapter function to import GFA data and return a promise, add to history and call the database service function
   getGFAData2ImportGFAPromised(GFAData: GFAData): Promise<any> {
     this._g.add2GraphHistory("Import GFA");
     return this._db.importGFAPromised(GFAData);
   }
 
-  // Adapter function to clear database
   clearDatabase(callback: () => void) {
     this._g.add2GraphHistory("Clear Database");
     this._db.clearDatabase(callback);
   }
 
-  // Adapter function to get sample data
   getSampleData(callback: (x: GraphResponse) => any) {
     let fn = (x: any) => {
       callback(x);
@@ -233,7 +241,6 @@ export class DbAdapterService {
     this._db.getSampleData(fn);
   }
 
-  // Adapter function to get some nodes with zero degree
   getSomeZeroDegreeNodes(callback: (x: GraphResponse) => any) {
     let fn = (x: any) => {
       callback(x);
@@ -242,7 +249,6 @@ export class DbAdapterService {
     this._db.getSomeZeroDegreeNodes(fn);
   }
 
-  // Adapter function to get all nodes with zero degree
   getAllZeroDegreeNodes(callback: (x: GraphResponse) => any) {
     let fn = (x: any) => {
       callback(x);
@@ -251,7 +257,6 @@ export class DbAdapterService {
     this._db.getAllZeroDegreeNodes(fn);
   }
 
-  // Adapter function to get all nodes with zero incoming degree
   getAllZeroIncomingDegreeNodes(callback: (x: GraphResponse) => any) {
     let fn = (x: any) => {
       callback(x);
@@ -260,7 +265,6 @@ export class DbAdapterService {
     this._db.getAllZeroIncomingDegreeNodes(fn);
   }
 
-  // Adapter function to get all nodes with zero outgoing degree
   getAllZeroOutgoingDegreeNodes(callback: (x: GraphResponse) => any) {
     let fn = (x: any) => {
       callback(x);
@@ -269,7 +273,6 @@ export class DbAdapterService {
     this._db.getAllZeroOutgoingDegreeNodes(fn);
   }
 
-  // Adapter function to get segments by names
   getSegmentsByNames(
     segmentNames: string[],
     callback: (x: GraphResponse) => any

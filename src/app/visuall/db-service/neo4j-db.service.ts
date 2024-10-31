@@ -550,6 +550,21 @@ export class Neo4jDb implements DbService {
     );
   }
 
+  searchBySequenceChain(
+    sequences: string,
+    maxJumpLength: number,
+    callback: (response: any) => void
+  ) {
+    const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
+
+    this.runQuery(
+      `CALL searchBySequenceChain('${sequences}', ${maxJumpLength}, ${timeout})`,
+      callback,
+      DbResponseType.table,
+      false
+    );
+  }
+
   private getPageSize4Backend(): number {
     let pageSize = this._g.userPreferences.dataPageSize.getValue();
     if (this._g.userPreferences.queryResultPagination.getValue() == "Client") {
