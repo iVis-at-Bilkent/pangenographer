@@ -1,9 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
-import {
-  DbResponseType,
-  GraphResponse,
-} from "src/app/visuall/db-service/data-types";
+import { DbResponseType } from "src/app/visuall/db-service/data-types";
 import {
   filterTableDatas,
   TableFiltering,
@@ -87,10 +84,7 @@ export class SearchSegmentByNameComponent implements OnInit {
     }
 
     const callback = (x: any) => {
-      this._cyService.loadElementsFromDatabase(
-        this.filterGraphResponse(x),
-        this.tableInput.isMergeGraph
-      );
+      this._cyService.loadElementsFromDatabase(x, this.tableInput.isMergeGraph);
 
       if (this.graphResponse == null) {
         this.graphResponse = x;
@@ -128,42 +122,5 @@ export class SearchSegmentByNameComponent implements OnInit {
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
-  }
-
-  // TableInput is already filtered. Use that to filter graph elements.
-  private filterGraphResponse(graphResponse: GraphResponse): GraphResponse {
-    const filteredResponse: GraphResponse = {
-      nodes: [],
-      edges: graphResponse.edges,
-    };
-
-    const nodeIdDictionary = {};
-    for (let i = 0; i < this.tableInput.results.length; i++) {
-      nodeIdDictionary[this.tableInput.results[i][0].value] = true;
-    }
-
-    // Add a node if an edge starts with a node that is already in the dictionary
-    for (let i = 0; i < graphResponse.edges.length; i++) {
-      if (nodeIdDictionary[graphResponse.edges[i].startNodeElementId]) {
-        nodeIdDictionary[graphResponse.edges[i].endNodeElementId] = true;
-      }
-    }
-    for (let i = 0; i < graphResponse.nodes.length; i++) {
-      if (nodeIdDictionary[graphResponse.nodes[i].elementId]) {
-        filteredResponse.nodes.push(graphResponse.nodes[i]);
-      }
-    }
-
-    return filteredResponse;
-  }
-
-  onNeighborDistanceChange(event: any) {
-    if (!event.target.value || event.target.value <= 1) {
-      this.neighborDistance = 1;
-    } else if (event.target.value >= 20) {
-      this.neighborDistance = 20;
-    } else {
-      this.neighborDistance = Number(event.target.value);
-    }
   }
 }

@@ -1,9 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
-import {
-  DbResponseType,
-  GraphResponse,
-} from "src/app/visuall/db-service/data-types";
+import { DbResponseType } from "src/app/visuall/db-service/data-types";
 import {
   filterTableDatas,
   TableFiltering,
@@ -83,10 +80,7 @@ export class SearchSegmentByNucleotideSequenceComponent implements OnInit {
     }
 
     const callback = (x: any) => {
-      this._cyService.loadElementsFromDatabase(
-        this.filterGraphResponse(x),
-        this.tableInput.isMergeGraph
-      );
+      this._cyService.loadElementsFromDatabase(x, this.tableInput.isMergeGraph);
 
       if (this.graphResponse == null) {
         this.graphResponse = x;
@@ -131,34 +125,5 @@ export class SearchSegmentByNucleotideSequenceComponent implements OnInit {
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
-  }
-
-  // tableInput is already filtered. Use that to filter graph elements.
-  // For this query, we should specifically bring the related nodes and their 1-neighborhood
-  private filterGraphResponse(graphResponse: GraphResponse): GraphResponse {
-    const filteredResponse: GraphResponse = {
-      nodes: [],
-      edges: graphResponse.edges,
-    };
-
-    const nodeIdDictionary = {};
-    for (let i = 0; i < this.tableInput.results.length; i++) {
-      nodeIdDictionary[this.tableInput.results[i][0].value] = true;
-    }
-
-    // Add a node if an edge starts with a node that is already in the dictionary
-    for (let i = 0; i < graphResponse.edges.length; i++) {
-      if (nodeIdDictionary[graphResponse.edges[i].startNodeElementId]) {
-        nodeIdDictionary[graphResponse.edges[i].endNodeElementId] = true;
-      }
-    }
-
-    for (let i = 0; i < graphResponse.nodes.length; i++) {
-      if (nodeIdDictionary[graphResponse.nodes[i].elementId]) {
-        filteredResponse.nodes.push(graphResponse.nodes[i]);
-      }
-    }
-
-    return filteredResponse;
   }
 }
