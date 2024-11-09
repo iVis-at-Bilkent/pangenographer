@@ -132,10 +132,16 @@ export class PropertyRuleComponent implements OnInit {
     if (!attrType) {
       return;
     }
+
     if (attrType == "string") {
       this.currInpType = "text";
       this.addOperators(TEXT_OPERATORS);
-    } else if (attrType == "float" || attrType == "int" || attrType == "edge") {
+    } else if (
+      attrType == "float" ||
+      attrType == "int" ||
+      attrType == "edge" ||
+      attrType == "number"
+    ) {
       this.currInpType = "number";
       this.addOperators(NUMBER_OPERATORS);
     } else if (attrType == "list") {

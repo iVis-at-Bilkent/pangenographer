@@ -302,13 +302,13 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
         });
     } else if (filter) {
       for (let i = 0; i < nodes.length; i++) {
-        const vals = Object.values(nodes[i]).join("");
+        const values = Object.values(nodes[i]).join("");
         // always include source nodes
         if (
           srcNodeIds.includes(nodeId[i]) ||
           (isIgnoreCase &&
-            vals.toLowerCase().includes(filter.txt.toLowerCase())) ||
-          (!isIgnoreCase && vals.includes(filter.txt))
+            values.toLowerCase().includes(filter.txt.toLowerCase())) ||
+          (!isIgnoreCase && values.includes(filter.txt))
         ) {
           tempNodes.push({
             node: nodes[i],

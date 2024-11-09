@@ -113,10 +113,12 @@ export class MapTabComponent implements OnInit, OnDestroy {
       if (x === null) {
         return;
       }
+
       this.dataModelSubscription = this._g.dataModel.subscribe((x2) => {
         if (x2 === null) {
           return;
         }
+
         for (const key in x2.nodes) {
           if (!TYPES_NOT_TO_SHOW.includes(key)) {
             this.classOptions.push({ text: key, isDisabled: false });
@@ -387,11 +389,11 @@ export class MapTabComponent implements OnInit, OnDestroy {
     };
     let tmpData: { graph: any; table: any }[] = [];
     for (let i = 0; i < d.tableData.data.length; i++) {
-      const vals = Object.values(d.tableData.data[i][1]).join("");
+      const values = Object.values(d.tableData.data[i][1]).join("");
       if (
         (isIgnoreCase &&
-          vals.toLowerCase().includes(filter.txt.toLowerCase())) ||
-        (!isIgnoreCase && vals.includes(filter.txt))
+          values.toLowerCase().includes(filter.txt.toLowerCase())) ||
+        (!isIgnoreCase && values.includes(filter.txt))
       ) {
         if (this.queryRule.isEdge) {
           tmpData.push({
@@ -500,7 +502,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  filterElesByClass(e: { className: string; willBeShowed: boolean }) {
+  filterElementsByClass(e: { className: string; willBeShowed: boolean }) {
     if (e.willBeShowed) {
       this._g.hiddenClasses.delete(e.className);
       this._g.viewUtils.show(this._g.cy.$("." + e.className));
@@ -640,7 +642,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
     this.changeSelectedClass();
   }
 
-  groupTabCliked() {
+  groupTabClicked() {
     this.isGroupTabOpen = !this.isGroupTabOpen;
     if (this.isGroupTabOpen) {
       this.groupComponent.componentOpened();

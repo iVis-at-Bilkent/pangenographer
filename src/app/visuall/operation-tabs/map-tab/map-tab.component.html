@@ -11,7 +11,7 @@
     </div>
     <div id="filter-class" class="collapse show text-center m-1">
       <app-types-view
-        (onFilterByType)="filterElesByClass($event)"
+        (onFilterByType)="filterElementsByClass($event)"
       ></app-types-view>
     </div>
   </div>
@@ -200,7 +200,7 @@
   <div class="panel">
     <div
       class="panel-heading collapsed"
-      (click)="groupTabCliked()"
+      (click)="groupTabClicked()"
       data-bs-toggle="collapse"
       data-bs-target="#group"
     >

@@ -4,7 +4,7 @@
   href="#"
   role="button"
   [ngClass]="{ 'filter-class-disabled': !showNodeClass[nc] }"
-  (click)="filterElesByClass(nc, true)"
+  (click)="filterElementsByClass(nc, true)"
   >{{ nc }}</a
 >
 <br *ngIf="nodeClasses.size > 0 && edgeClasses.size > 0" />
@@ -13,7 +13,7 @@
   *ngFor="let ec of edgeClasses"
   href="#"
   role="button"
-  (click)="filterElesByClass(ec, false)"
+  (click)="filterElementsByClass(ec, false)"
   [ngClass]="{ 'filter-class-disabled': !showEdgeClass[ec] }"
   >{{ ec }}<br
 /></a>

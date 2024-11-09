@@ -1093,9 +1093,16 @@ export class Neo4jDb implements DbService {
   // Prepare the properties of an object to be used in a CQL query
   private prepareProperties(object: any): string {
     let properties = "";
+
     Object.keys(object).forEach((key: string) => {
-      properties += `, ${key}: '${object[key]}'`;
+      properties += `, ${key}: `;
+      if (typeof object[key] === "string") {
+        properties += `'${object[key]}'`;
+      } else {
+        properties += object[key];
+      }
     });
+
     return properties.substring(2); // Remove the first comma and space
   }
 

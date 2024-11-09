@@ -57,7 +57,7 @@ export class TypesViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  filterElesByClass(className: string, isNode: boolean) {
+  filterElementsByClass(className: string, isNode: boolean) {
     let willBeShowed = false;
     if (isNode) {
       this.showNodeClass[className] = !this.showNodeClass[className];
