@@ -5,11 +5,11 @@
 export const environment = {
   production: false,
   dbConfig: {
-    getSampleUrl: "http://pg2.cs.bilkent.edu.tr/browser/db/neo4j/tx/commit",
+    getSampleUrl: "https://pg2.cs.bilkent.edu.tr/browser/db/neo4j/tx/commit",
     username: "neo4j",
     password: "12345678",
   },
-  blastStandaloneUrl: "http://pg2.cs.bilkent.edu.tr/blast",
+  blastStandaloneUrl: "https://pg2.cs.bilkent.edu.tr/blast",
 };
 
 /*
