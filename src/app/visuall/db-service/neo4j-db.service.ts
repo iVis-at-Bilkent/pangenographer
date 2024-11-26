@@ -375,10 +375,10 @@ export class Neo4jDb implements DbService {
   ) {
     const isEdgeQuery = meta && meta.isEdgeQuery;
     const idFilter = this.buildIdFilter(ids, false, isEdgeQuery);
-    let edgepart = isEdgeQuery ? "-[e]-(n2)" : "";
+    let edgePart = isEdgeQuery ? "-[e]-(n2)" : "";
     let returnPart = isEdgeQuery ? "n,e,n2" : "n";
     this.runQuery(
-      `MATCH (n)${edgepart} WHERE ${idFilter} RETURN ${returnPart}`,
+      `MATCH (n)${edgePart} WHERE ${idFilter} RETURN ${returnPart}`,
       callback
     );
   }
@@ -550,17 +550,23 @@ export class Neo4jDb implements DbService {
     );
   }
 
-  searchBySequenceChain(
+  sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
+    dbResponseType: DbResponseType,
     callback: (response: any) => void
   ) {
     const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
+    const pageSize = this.getPageSize4Backend();
+    const t = "";
+    const isIgnoreCase = true;
+    const orderBy = null;
+    const orderDir = 0;
 
     this.runQuery(
-      `CALL searchBySequenceChain('${sequences}', ${maxJumpLength}, ${timeout})`,
+      `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, [], ${pageSize}, 1, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeout})`,
       callback,
-      DbResponseType.table,
+      dbResponseType,
       false
     );
   }
@@ -874,7 +880,7 @@ export class Neo4jDb implements DbService {
       matchClause = `OPTIONAL MATCH (x${classFilter})\n`;
     }
 
-    let conditions = this.getCondtion4RuleNode(rule.rules);
+    let conditions = this.getCondition4RuleNode(rule.rules);
 
     if (filter != null && filter.txt.length > 0) {
       let s = this.getCondition4TxtFilter(
@@ -920,7 +926,7 @@ export class Neo4jDb implements DbService {
     return s;
   }
 
-  private getCondtion4RuleNode(node: RuleNode): string {
+  private getCondition4RuleNode(node: RuleNode): string {
     let s = "(";
     if (!node.r.ruleOperator) {
       s += " " + this.getCondition4Rule(node.r) + " ";
@@ -929,11 +935,11 @@ export class Neo4jDb implements DbService {
         if (i != node.children.length - 1) {
           s +=
             " " +
-            this.getCondtion4RuleNode(node.children[i]) +
+            this.getCondition4RuleNode(node.children[i]) +
             " " +
             node.r.ruleOperator;
         } else {
-          s += " " + this.getCondtion4RuleNode(node.children[i]) + " ";
+          s += " " + this.getCondition4RuleNode(node.children[i]) + " ";
         }
       }
     }
@@ -1546,7 +1552,7 @@ export class Neo4jDb implements DbService {
       query = query.substring(0, query.length - 2);
     }
 
-    // Matching previosly created elements starts here
+    // Matching previously created elements starts here
 
     // If there are edges to match
     let edgesToMatch = {};

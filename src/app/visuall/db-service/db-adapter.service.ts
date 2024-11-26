@@ -23,7 +23,7 @@ import { Neo4jDb } from "./neo4j-db.service";
 // functions that are not defined due to interface DbService might be deleted
 export class DbAdapterService {
   private _db: DbService;
-  // put prefered database service type as argument
+  // put preferred database service type as argument
   constructor(private _g: GlobalVariableService, private db: Neo4jDb) {
     this._db = db;
   }
@@ -206,16 +206,17 @@ export class DbAdapterService {
     );
   }
 
-  searchBySequenceChain(
+  sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
+    dbResponseType: DbResponseType,
     callback: (x: any) => void
   ) {
     let fn = (x: any) => {
       callback(x);
       this._g.add2GraphHistory("Search by sequence chain");
     };
-    this._db.searchBySequenceChain(sequences, maxJumpLength, fn);
+    this._db.sequenceChainSearch(sequences, maxJumpLength, dbResponseType, fn);
   }
 
   getGFAData2ImportGFA(GFAData: GFAData, callback: () => void) {

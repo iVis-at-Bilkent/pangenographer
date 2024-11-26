@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { DbResponseType } from "src/app/visuall/db-service/data-types";
 import {
-  filterTableDatas,
+  filterTableData,
   TableFiltering,
   TableViewInput,
 } from "../../../../../shared/table-view/table-view-types";
@@ -68,7 +68,7 @@ export class SearchSegmentByNameComponent implements OnInit {
 
     let segmentNames = this.prepareSegmentNames(this.segmentNames);
 
-    const cypherQuery = `WITH ['${segmentNames}'] as segmentNames
+    const cypherQuery = `WITH [${segmentNames}] as segmentNames
     MATCH (segment:SEGMENT)
     WHERE (segment.segmentName) IN segmentNames
     OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
@@ -97,7 +97,7 @@ export class SearchSegmentByNameComponent implements OnInit {
 
     let segmentNames = this.prepareSegmentNames(this.segmentNames);
 
-    const cypherQuery = `WITH ['${segmentNames}'] as segmentNames
+    const cypherQuery = `WITH [${segmentNames}] as segmentNames
       MATCH (segment:SEGMENT)
       WHERE (segment.segmentName) IN segmentNames
       OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
@@ -117,7 +117,7 @@ export class SearchSegmentByNameComponent implements OnInit {
       this.loadGraph();
     }
 
-    filterTableDatas(
+    filterTableData(
       filter,
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()

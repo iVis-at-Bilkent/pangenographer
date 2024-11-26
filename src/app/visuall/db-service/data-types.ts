@@ -55,9 +55,10 @@ export interface DbService {
     cb: (x: any) => void
   );
 
-  searchBySequenceChain(
+  sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
+    dbResponseType: DbResponseType,
     callback: (x: GraphResponse) => any
   );
 

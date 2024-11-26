@@ -1,11 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
+import { DbResponseType } from "src/app/visuall/db-service/data-types";
 import {
-  DbResponseType,
-  GraphResponse,
-} from "src/app/visuall/db-service/data-types";
-import {
-  filterTableDatas,
+  filterTableData,
   TableFiltering,
   TableViewInput,
 } from "../../../../../shared/table-view/table-view-types";
@@ -19,7 +16,7 @@ import { fillTable, prepareInput } from "../custom-queries-helper";
   templateUrl: "./search-by-sequence-chain.component.html",
   styleUrls: ["./search-by-sequence-chain.component.css"],
 })
-export class SearchBySequenceChainComponent implements OnInit {
+export class SequenceChainSearchComponent implements OnInit {
   tableIsFilled = new Subject<boolean>();
   tableInput: TableViewInput = {
     columns: [],
@@ -31,7 +28,7 @@ export class SearchBySequenceChainComponent implements OnInit {
     currentPage: 1,
     pageSize: 15,
     isLoadGraph: false,
-    isMergeGraph: true,
+    isMergeGraph: false,
     isNodeData: true,
     isHide0: false,
   };
@@ -59,46 +56,45 @@ export class SearchBySequenceChainComponent implements OnInit {
   prepareQuery() {
     this.tableInput.currentPage = 1;
     this.clearTableFilter.next(true);
+
     this.loadTable();
-    this.loadGraph();
   }
 
   loadTable() {
-    const callback = (x: any) => {
-      fillTable(x, this.tableInput, this.tableIsFilled);
-    };
-
     const sequences = this.prepareSequences(this.sequences);
 
-    const cypherQuery = ``;
-    this._dbService.runQuery(cypherQuery, callback, DbResponseType.table);
-  }
-
-  loadGraph() {
-    if (!this.tableInput.isLoadGraph) {
-      return;
-    }
-
     const callback = (x: any) => {
-      this._cyService.loadElementsFromDatabase(
-        this.filterGraphResponse(x),
-        this.tableInput.isMergeGraph
-      );
+      // Advanced query response processing
+      x.columns = ["node"];
+      if (!this.tableInput.isLoadGraph) {
+        x.data = x.data[0][0];
+      } else {
+        x["data"] = [];
+        for (let i = 0; i < x.nodes.length; i++) {
+          x["data"].push(x.nodes[i].properties);
+        }
+      }
 
-      if (this.graphResponse == null) {
-        this.graphResponse = x;
+      fillTable(x, this.tableInput, this.tableIsFilled);
+
+      if (this.tableInput.isLoadGraph) {
+        this._cyService.loadElementsFromDatabase(
+          x,
+          this.tableInput.isMergeGraph
+        );
+
+        if (this.graphResponse == null) {
+          this.graphResponse = x;
+        }
       }
     };
 
-    let dataCount =
-      this._g.userPreferences.dataPageLimit.getValue() *
-      this._g.userPreferences.dataPageSize.getValue();
-
-    const sequences = this.prepareSequences(this.sequences);
-
-    let cypherQuery = ``;
-
-    this._dbService.runQuery(cypherQuery, callback);
+    this._dbService.sequenceChainSearch(
+      sequences,
+      this.maxJumpLength,
+      this.tableInput.isLoadGraph ? DbResponseType.graph : DbResponseType.table,
+      callback
+    );
   }
 
   // Transform the segment names into a format that can be used in the query
@@ -108,44 +104,12 @@ export class SearchBySequenceChainComponent implements OnInit {
 
   filterTable(filter: TableFiltering) {
     this.loadTable();
-    if (this.tableInput.isLoadGraph) {
-      this.loadGraph();
-    }
 
-    filterTableDatas(
+    filterTableData(
       filter,
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
-  }
-
-  // tableInput is already filtered. Use that to filter graph elements.
-  // For this query, we should specifically bring the related nodes and their 1-neighborhood
-  private filterGraphResponse(graphResponse: GraphResponse): GraphResponse {
-    const filteredResponse: GraphResponse = {
-      nodes: [],
-      edges: graphResponse.edges,
-    };
-
-    const nodeIdDictionary = {};
-    for (let i = 0; i < this.tableInput.results.length; i++) {
-      nodeIdDictionary[this.tableInput.results[i][0].value] = true;
-    }
-
-    // Add a node if an edge starts with a node that is already in the dictionary
-    for (let i = 0; i < graphResponse.edges.length; i++) {
-      if (nodeIdDictionary[graphResponse.edges[i].startNodeElementId]) {
-        nodeIdDictionary[graphResponse.edges[i].endNodeElementId] = true;
-      }
-    }
-
-    for (let i = 0; i < graphResponse.nodes.length; i++) {
-      if (nodeIdDictionary[graphResponse.nodes[i].elementId]) {
-        filteredResponse.nodes.push(graphResponse.nodes[i]);
-      }
-    }
-
-    return filteredResponse;
   }
 
   onMaxJumpLengthChange(event: any) {

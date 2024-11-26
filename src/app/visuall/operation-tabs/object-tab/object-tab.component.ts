@@ -4,7 +4,7 @@ import {
   TableData,
   TableFiltering,
   TableViewInput,
-  filterTableDatas,
+  filterTableData,
   translateColumnNamesAndProperties,
 } from "../../../shared/table-view/table-view-types";
 import {
@@ -307,7 +307,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     // if too many edges need to be shown, we should make pagination
     if (isNeed2Filter) {
       this.clearMultiObjectTableFilter.next(true);
-      filterTableDatas(
+      filterTableData(
         { orderBy: "", orderDirection: "", txt: "" },
         this.multipleObjectTableInput,
         this._g.userPreferences.isIgnoreCaseInText.getValue()
@@ -353,16 +353,16 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
     // Prepare the properties to be rendered in the object tab
     // Get ordered keys if only one item is selected
-    let properityKeys: string[];
+    let propertyKeys: string[];
     if (selectedCount === 1) {
-      properityKeys =
-        this.orderPropertyKeysIf1Selected(classNames) || properityKeys;
+      propertyKeys =
+        this.orderPropertyKeysIf1Selected(classNames) || propertyKeys;
     } else {
-      properityKeys = Object.keys(properties);
+      propertyKeys = Object.keys(properties);
     }
 
     // Iterate through the properties and prepare the object to be rendered in the object tab
-    for (const key of properityKeys) {
+    for (const key of propertyKeys) {
       // Replace - and _ with space
       let renderedKey = key.replace(/[_\-]/g, " ");
       let renderedValue = properties[key];
@@ -753,7 +753,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   // This function is used to highlight the path or walk when hovered over the path name
-  hightlightHoveredPath(pathName: string) {
+  highlightHoveredPath(pathName: string) {
     this.highlightedPathWalk = pathName; // Set the highlighted path name
 
     // Highlight the elements contained in the path
@@ -769,7 +769,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   }
 
   // This function is used to remove the highlight when the mouse is not hovered over the walk sample identier
-  hightlightHoveredWalk(walkName: string) {
+  highlightHoveredWalk(walkName: string) {
     this.highlightedPathWalk = walkName; // Set the highlighted walk sample identifier
 
     // Highlight the elements contained in the walk
@@ -946,7 +946,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   filterTable(filter: TableFiltering) {
     this.showStats();
-    filterTableDatas(
+    filterTableData(
       filter,
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
@@ -963,7 +963,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     } else {
       this.showMultipleObjectTable(false);
     }
-    filterTableDatas(
+    filterTableData(
       filter,
       this.multipleObjectTableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()

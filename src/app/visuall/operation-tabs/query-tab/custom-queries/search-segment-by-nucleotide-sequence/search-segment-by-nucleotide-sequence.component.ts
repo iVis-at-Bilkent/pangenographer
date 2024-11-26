@@ -2,7 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { Subject } from "rxjs";
 import { DbResponseType } from "src/app/visuall/db-service/data-types";
 import {
-  filterTableDatas,
+  filterTableData,
   TableFiltering,
   TableViewInput,
 } from "../../../../../shared/table-view/table-view-types";
@@ -66,7 +66,7 @@ export class SearchSegmentByNucleotideSequenceComponent implements OnInit {
 
     const sequences = this.prepareSequences(this.sequences);
 
-    const cypherQuery = `WITH ['${sequences}'] as sequences
+    const cypherQuery = `WITH [${sequences}] as sequences
       MATCH (segment:SEGMENT)
       WHERE any(sequence IN sequences WHERE segment.segmentData CONTAINS sequence)
       WITH DISTINCT segment
@@ -93,7 +93,7 @@ export class SearchSegmentByNucleotideSequenceComponent implements OnInit {
 
     const sequences = this.prepareSequences(this.sequences);
 
-    let cypherQuery = `WITH ['${sequences}'] as sequences
+    let cypherQuery = `WITH [${sequences}] as sequences
       MATCH (segment:SEGMENT)
       WHERE any(sequence IN sequences WHERE segment.segmentData CONTAINS sequence)\n`;
     if (this.graphEdges) {
@@ -120,7 +120,7 @@ export class SearchSegmentByNucleotideSequenceComponent implements OnInit {
       this.loadGraph();
     }
 
-    filterTableDatas(
+    filterTableData(
       filter,
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()

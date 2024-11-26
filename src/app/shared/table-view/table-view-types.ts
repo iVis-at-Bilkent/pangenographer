@@ -121,7 +121,7 @@ export function getClassNameFromProperties(
   return null;
 }
 
-export function filterTableDatas(
+export function filterTableData(
   filter: TableFiltering,
   input: TableViewInput,
   isIgnoreCaseInText: boolean

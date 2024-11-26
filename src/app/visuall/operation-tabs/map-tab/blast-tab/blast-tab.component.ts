@@ -7,7 +7,7 @@ import {
   TableData,
   TableFiltering,
   TableViewInput,
-  filterTableDatas,
+  filterTableData,
 } from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
 import { DbAdapterService } from "../../../db-service/db-adapter.service";
@@ -1075,7 +1075,7 @@ export class BlastTabComponent implements OnInit {
   onStandaloneTableFilterChange(filter: TableFiltering) {
     this.standaloneIsTableInputFilled.next(false);
     this.fillStandaloneTableOutput();
-    filterTableDatas(
+    filterTableData(
       filter,
       this.standaloneTableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()

@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { SearchBySequenceChainComponent } from "./custom-queries/search-by-sequence-chain/search-by-sequence-chain.component";
+import { SequenceChainSearchComponent } from "./custom-queries/search-by-sequence-chain/search-by-sequence-chain.component";
 import { SearchSegmentByNameComponent } from "./custom-queries/search-segment-by-name/search-segment-by-name.component";
 import { SearchSegmentByNucleotideSequenceComponent } from "./custom-queries/search-segment-by-nucleotide-sequence/search-segment-by-nucleotide-sequence.component";
 @Component({
@@ -23,7 +23,7 @@ export class QueryTabComponent implements OnInit {
         text: "Search segment by sequence",
       },
       {
-        component: SearchBySequenceChainComponent,
+        component: SequenceChainSearchComponent,
         text: "Search by sequence chain",
       },
     ];

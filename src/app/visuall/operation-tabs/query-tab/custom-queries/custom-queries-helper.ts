@@ -79,9 +79,13 @@ export function fillTable(
 
 // Common function to prepare the input for queries
 export function prepareInput(input: string): string {
-  return input
-    .replace(/ /g, "")
-    .split(/[\n,]/)
-    .filter((x) => x)
-    .join("','");
+  let result =
+    "'" +
+    input
+      .replace(/ /g, "")
+      .split(/[\n,]/)
+      .filter((x) => x)
+      .join("','") +
+    "'";
+  return result;
 }
