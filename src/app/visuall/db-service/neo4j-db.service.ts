@@ -1408,6 +1408,10 @@ export class Neo4jDb implements DbService {
       containment.source = this.propertyName2CQL(containment.source);
       containment.target = this.propertyName2CQL(containment.target);
 
+      if (!containment.overlap) {
+        containment.overlap = "*";
+      }
+
       // The edge creation
       element2Create = `(n${containment.source})-[:CONTAINMENT {`;
       element2Create += this.prepareProperties(containment);
