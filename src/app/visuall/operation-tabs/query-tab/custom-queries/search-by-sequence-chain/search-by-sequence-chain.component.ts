@@ -50,7 +50,7 @@ export class SequenceChainSearchComponent implements OnInit {
     });
 
     this.sequences = "";
-    this.maxJumpLength = 1;
+    this.maxJumpLength = 0;
   }
 
   prepareQuery() {
@@ -113,8 +113,8 @@ export class SequenceChainSearchComponent implements OnInit {
   }
 
   onMaxJumpLengthChange(event: any) {
-    if (!event.target.value || event.target.value <= 1) {
-      this.maxJumpLength = 1;
+    if (!event.target.value || event.target.value <= 0) {
+      this.maxJumpLength = 0;
     } else if (event.target.value >= 20) {
       this.maxJumpLength = 20;
     } else {
