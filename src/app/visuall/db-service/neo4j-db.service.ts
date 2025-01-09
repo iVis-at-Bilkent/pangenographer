@@ -4,6 +4,7 @@ import { environment } from "src/environments/environment";
 import { TableFiltering } from "../../shared/table-view/table-view-types";
 import {
   CQL_QUERY_CHANGE_MARKER,
+  CYPHER_WRITE_QUERY_TYPES,
   GENERIC_TYPE,
   PATH_WALK_NAME_DISALLOWED_REGEX,
 } from "../constants";
@@ -41,8 +42,23 @@ export class Neo4jDb implements DbService {
     responseType: DbResponseType = 0,
     isTimeboxed = true
   ) {
+    if (
+      this._g.sampleDatabaseIndex.getValue() &&
+      (query.includes(CYPHER_WRITE_QUERY_TYPES[0]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[1]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[2]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[3]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[4]))
+    ) {
+      this._g.showErrorModal(
+        "Invalid Query",
+        "Write operation is not allowed in this environment!"
+      );
+      return;
+    }
+
     const conf = environment.dbConfig;
-    const url = conf.getSampleUrl;
+    const url = conf.urls[this._g.sampleDatabaseIndex.getValue()];
     const username = conf.username;
     const password = conf.password;
     const requestType = responseType == DbResponseType.graph ? "graph" : "row";
@@ -51,6 +67,7 @@ export class Neo4jDb implements DbService {
 
     // If the query is timeboxed, wrap it in a CALL apoc.cypher.run() procedure to allow for timeout
     // Otherwise, execute the query directly
+
     const q = isTimeboxed
       ? `CALL apoc.cypher.run("${query}", null) YIELD value RETURN value`
       : query;
@@ -84,7 +101,7 @@ export class Neo4jDb implements DbService {
       isTimeout = false;
       // Handle errors
       if (err.message.includes("Timeout occurred! It takes longer than")) {
-        this._g.statusMsg.next(
+        this._g.statusMessage.next(
           "Timeout occurred! It takes longer than expected! See the error message for more details."
         );
         this._g.showErrorModal(
@@ -92,7 +109,7 @@ export class Neo4jDb implements DbService {
           "Your query took too long!  <br> Consider adjusting timeout setting."
         );
       } else {
-        this._g.statusMsg.next("Database query execution raised an error!");
+        this._g.statusMessage.next("Database query execution raised an error!");
         this._g.showErrorModal("Database Query Execution Error", err.message);
       }
       this._g.setLoadingStatus(false);
@@ -144,9 +161,24 @@ export class Neo4jDb implements DbService {
     responseType: DbResponseType = 0,
     isTimeboxed = true
   ): Promise<any> {
+    if (
+      this._g.sampleDatabaseIndex.getValue() &&
+      (query.includes(CYPHER_WRITE_QUERY_TYPES[0]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[1]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[2]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[3]) ||
+        query.includes(CYPHER_WRITE_QUERY_TYPES[4]))
+    ) {
+      this._g.showErrorModal(
+        "Invalid Query",
+        "Write operation is not allowed in this environment!"
+      );
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       const conf = environment.dbConfig;
-      const url = conf.getSampleUrl;
+      const url = conf.urls[this._g.sampleDatabaseIndex.getValue()];
       const username = conf.username;
       const password = conf.password;
       const requestType =
@@ -194,7 +226,7 @@ export class Neo4jDb implements DbService {
 
         // Handle errors
         if (err.message.includes("Timeout occurred! It takes longer than")) {
-          this._g.statusMsg.next(
+          this._g.statusMessage.next(
             "Timeout occurred! It takes longer than expected! See the error message for more details."
           );
           this._g.showErrorModal(
@@ -202,7 +234,9 @@ export class Neo4jDb implements DbService {
             "Your query took too long!  <br> Consider adjusting timeout setting."
           );
         } else {
-          this._g.statusMsg.next("Database query execution raised an error!");
+          this._g.statusMessage.next(
+            "Database query execution raised an error!"
+          );
           this._g.showErrorModal("Database Query Execution Error", err.message);
         }
 
@@ -727,12 +761,12 @@ export class Neo4jDb implements DbService {
 
   // Import GFA data to the database by converting it to CQL
   importGFA(GFAData: GFAData, callback: () => void) {
-    this.runQuery(this.GFAdata2CQL(GFAData), callback, 0, false); // 0 is for generic response type, false is for isTimeboxed
+    this.runQuery(this.GFAData2CQL(GFAData), callback, 0, false); // 0 is for generic response type, false is for isTimeboxed
   }
 
   // Import GFA data to the database by converting it to CQL and return a promise
   importGFAPromised(GFAData: GFAData): Promise<any> {
-    return this.runQueryPromised(this.GFAdata2CQL(GFAData), 0, false);
+    return this.runQueryPromised(this.GFAData2CQL(GFAData), 0, false);
   }
 
   // Clear the database
@@ -1113,7 +1147,7 @@ export class Neo4jDb implements DbService {
   }
 
   // This function converts the GFAData object to a CQL query
-  private GFAdata2CQL(GFAData: GFAData): string {
+  private GFAData2CQL(GFAData: GFAData): string {
     let query = "";
     let element2Create = "";
 

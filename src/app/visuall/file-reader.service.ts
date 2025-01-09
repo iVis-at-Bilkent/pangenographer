@@ -393,7 +393,7 @@ export class FileReaderService {
     const processBatch = async ({ done, value }) => {
       if (done && this.previousBatchRemainders === "") {
         console.log("GFA file read successfully");
-        this._g.statusMsg.next("GFA file read successfully");
+        this._g.statusMessage.next("GFA file read successfully");
         return;
       }
 
@@ -661,7 +661,7 @@ export class FileReaderService {
       // This is done recursively until the end of the file is reached
       await processChunks(GFADataChunks).then(() => {
         console.log("Processed batch " + this.readLineCount + " lines");
-        this._g.statusMsg.next(
+        this._g.statusMessage.next(
           "Importing GFA sample, processed batch " +
             this.readLineCount +
             " lines..."
@@ -694,7 +694,7 @@ export class FileReaderService {
     // Process any errors that occur while reading the GFA file
     const processError = (reason: any) => {
       console.error("Error reading GFA file", reason);
-      this._g.statusMsg.next("Error reading GFA file");
+      this._g.statusMessage.next("Error reading GFA file");
       reader.cancel();
     };
 
@@ -712,7 +712,7 @@ export class FileReaderService {
     // Parse the GFA sample and call the callback function
     callback(this.parseGFA(seperatedGFASample)).then(() => {
       console.log("Processed GFA sample");
-      this._g.statusMsg.next("Processed GFA sample");
+      this._g.statusMessage.next("Processed GFA sample");
     });
   }
 

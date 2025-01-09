@@ -528,28 +528,28 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Uses cytoscape service to get some nodes with zero degree
   getSomeZeroDegreeNodes() {
     this._cyService.getSomeZeroDegreeNodes();
-    this._g.statusMsg.next("Getting some nodes with zero degree");
+    this._g.statusMessage.next("Getting some nodes with zero degree");
   }
 
   // Get all nodes with zero degree
   // Uses cytoscape service to get all nodes with zero degree
   getAllZeroDegreeNodes() {
     this._cyService.getAllZeroDegreeNodes();
-    this._g.statusMsg.next("Getting all nodes with zero degree");
+    this._g.statusMessage.next("Getting all nodes with zero degree");
   }
 
   // Get all nodes with zero incoming degree
   // Uses cytoscape service to get all nodes with zero incoming degree
   getAllZeroIncomingDegreeNodes() {
     this._cyService.getAllZeroIncomingDegreeNodes();
-    this._g.statusMsg.next("Getting all nodes with zero incoming degree");
+    this._g.statusMessage.next("Getting all nodes with zero incoming degree");
   }
 
   // Get all nodes with zero outgoing degree
   // Uses cytoscape service to get all nodes with zero outgoing degree
   getAllZeroOutgoingDegreeNodes() {
     this._cyService.getAllZeroOutgoingDegreeNodes();
-    this._g.statusMsg.next("Getting all nodes with zero outgoing degree");
+    this._g.statusMessage.next("Getting all nodes with zero outgoing degree");
   }
 
   // Get all nodes with zero degree
@@ -559,7 +559,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // cytoscape service is used to load the elements from the database
   getSampleData() {
     this._g.layout.clusters = null;
-    this._g.statusMsg.next("Getting sample data");
+    this._g.statusMessage.next("Getting sample data");
     this._dbService.getSampleData((x) => {
       this._cyService.loadElementsFromDatabase(x, false);
     });

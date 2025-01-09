@@ -18,8 +18,9 @@
             (click)="triggerAct(i)"
             title="menu item"
           />
+          <!-- Searchbar -->
           <input
-            *ngIf="!i.isRegular"
+            *ngIf="!i.isRegular && i.title === 'Search'"
             class="toolbar-element va-text form-control filter-form filter-input"
             id="highlight-search-input"
             type="text"
@@ -27,6 +28,23 @@
             (keydown.enter)="highlightSearch()"
             placeholder="Search"
           />
+          <!-- Sample selection -->
+          <select
+            *ngIf="!i.isRegular && i.title === 'Sample'"
+            class="va-text form-select"
+            id="toolbar-element sample-database-select"
+            title="Sample database selection"
+            [(ngModel)]="selectedSampleDatabase"
+            (change)="setSampleDatabase()"
+          >
+            <option
+              *ngFor="let sampleDatabase of sampleDatabases"
+              [value]="sampleDatabase"
+              class="va-text"
+            >
+              {{ sampleDatabase }}
+            </option>
+          </select>
         </div>
       </ng-container>
     </div>
@@ -34,6 +52,6 @@
   </ng-container>
   <div>&nbsp;&nbsp;</div>
   <div class="va-small-text ms-auto my-auto">
-    {{ statusMsg }}
+    {{ statusMessage }}
   </div>
 </div>

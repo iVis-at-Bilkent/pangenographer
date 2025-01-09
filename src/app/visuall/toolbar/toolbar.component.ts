@@ -8,13 +8,16 @@ import {
 } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
-import { getPropNamesFromObject } from "../constants";
+import {
+  getPropNamesFromObject,
+  MIN_MESSAGE_DURATION,
+  SAMPLE_DATABASES,
+} from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GlobalVariableService } from "../global-variable.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
-import { UserProfileService } from "../user-profile.service";
 import { ToolbarAction, ToolbarDiv } from "./itoolbar";
 
 @Component({
@@ -25,13 +28,14 @@ import { ToolbarAction, ToolbarDiv } from "./itoolbar";
 export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("file", { static: false }) file;
   searchTxt: string;
+  selectedSampleDatabase: string = SAMPLE_DATABASES[0];
+  sampleDatabases: string[] = SAMPLE_DATABASES;
   menu: ToolbarDiv[];
-  statusMsg = "";
-  statusMsgQueue: string[] = [];
-  MIN_MSG_DURATION = 500;
-  statusMsgSubscription: Subscription;
+  statusMessage = "";
+  statusMessageQueue: string[] = [];
+  statusMessageSubscription: Subscription;
   userPreferenceSubscription: Subscription;
-  msgStarted2show: number = 0;
+  messageStarted2Show: number = 0;
   isLimitDbQueries2range: boolean;
   @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
   @ViewChild("dbQueryDate2", { static: false }) dbQueryDate2: ElementRef;
@@ -39,8 +43,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private _cyService: CytoscapeService,
     private modalService: NgbModal,
-    private _g: GlobalVariableService,
-    private _profile: UserProfileService
+    private _g: GlobalVariableService
   ) {
     this.menu = [
       {
@@ -111,7 +114,7 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
           },
           {
             imgSrc: "",
-            title: "must be hard coded to HTML",
+            title: "Search",
             fn: "",
             isRegular: false,
           },
@@ -163,12 +166,23 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
           },
         ],
       },
+      {
+        div: 6,
+        items: [
+          {
+            imgSrc: "",
+            title: "Sample",
+            fn: "",
+            isRegular: false,
+          },
+        ],
+      },
     ];
   }
 
   ngOnDestroy(): void {
-    if (this.statusMsgSubscription) {
-      this.statusMsgSubscription.unsubscribe();
+    if (this.statusMessageSubscription) {
+      this.statusMessageSubscription.unsubscribe();
     }
     if (this.userPreferenceSubscription) {
       this.userPreferenceSubscription.unsubscribe();
@@ -176,8 +190,8 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.statusMsgSubscription = this._g.statusMsg.subscribe((x) => {
-      this.statusMsgQueue.push(x);
+    this.statusMessageSubscription = this._g.statusMessage.subscribe((x) => {
+      this.statusMessageQueue.push(x);
       this.processMsgQueue();
     });
     this.userPreferenceSubscription = this._g.isUserPrefReady.subscribe((x) => {
@@ -190,21 +204,21 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private processMsgQueue() {
-    if (this.statusMsgQueue.length < 1) {
-      this.statusMsg = "";
+    if (this.statusMessageQueue.length < 1) {
+      this.statusMessage = "";
       return;
     }
     const currTime = new Date().getTime();
-    const timePassed = currTime - this.msgStarted2show;
-    if (timePassed >= this.MIN_MSG_DURATION || this.statusMsg.length === 0) {
-      this.statusMsg = this.statusMsgQueue[0];
-      this.msgStarted2show = currTime;
-      this.statusMsgQueue.shift();
+    const timePassed = currTime - this.messageStarted2Show;
+    if (timePassed >= MIN_MESSAGE_DURATION || this.statusMessage.length === 0) {
+      this.statusMessage = this.statusMessageQueue[0];
+      this.messageStarted2Show = currTime;
+      this.statusMessageQueue.shift();
     } else {
       // enough time didn't passed yet. Check again when it is passed.
       setTimeout(
         this.processMsgQueue.bind(this),
-        this.MIN_MSG_DURATION - timePassed
+        MIN_MESSAGE_DURATION - timePassed
       );
     }
   }
@@ -302,5 +316,9 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   showHideGraphHistory() {
     const v = this._g.showHideGraphHistory.getValue();
     this._g.showHideGraphHistory.next(!v);
+  }
+
+  setSampleDatabase() {
+    this._g.setSampleDatabase(this.selectedSampleDatabase);
   }
 }

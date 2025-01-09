@@ -172,7 +172,7 @@ export class CytoscapeService {
     dontHighlight: boolean = false
   ) {
     // Show loading spinner
-    this._g.statusMsg.next("Loading elements from database...");
+    this._g.statusMessage.next("Loading elements from database...");
     this._g.setLoadingStatus(true);
 
     if (!isIncremental) {
@@ -293,7 +293,7 @@ export class CytoscapeService {
     this._g.refreshCuesBadges();
 
     this._g.isLoadFromDB = true;
-    this._g.statusMsg.next("Loaded elements from database!");
+    this._g.statusMessage.next("Loaded elements from database!");
     this._g.setLoadingStatus(false);
   }
 
@@ -702,7 +702,7 @@ export class CytoscapeService {
     // Check if the file type is suitable
     if (type === "gfa") {
       // Status message
-      this._g.statusMsg.next("Importing GFA file...");
+      this._g.statusMessage.next("Importing GFA file...");
 
       // Read the GFA file and call the callback function with the GFA data
       this._fileReaderService.readGFAFile(file, (GFAData: GFAData) => {
@@ -719,7 +719,7 @@ export class CytoscapeService {
   // Read GFA sample and call the callback function with the GFA data
   readGFASample(sample: string, callback: (GFAData: GFAData) => Promise<any>) {
     // Status message
-    this._g.statusMsg.next("Importing GFA sample...");
+    this._g.statusMessage.next("Importing GFA sample...");
 
     // Read the GFA sample and call the callback function with the GFA data
     this._fileReaderService.readGFASample(sample, (GFAData: GFAData) => {
@@ -735,7 +735,7 @@ export class CytoscapeService {
     this._g.cy.remove(this._g.cy.$());
     this._dbService.clearDatabase(() => {
       // Status message after clearing the database
-      this._g.statusMsg.next("Database cleared!");
+      this._g.statusMessage.next("Database cleared!");
     });
   }
 

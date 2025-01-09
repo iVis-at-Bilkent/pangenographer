@@ -576,7 +576,7 @@ export class BlastTabComponent implements OnInit {
     this._g.setLoadingStatus(true);
     const q = url + queryParams;
     console.log(q);
-    this._g.statusMsg.next("Executing BLAST query...");
+    this._g.statusMessage.next("Executing BLAST query...");
 
     let error = (x: any) => {
       this._g.setLoadingStatus(false);
@@ -666,7 +666,7 @@ export class BlastTabComponent implements OnInit {
       this.webRid = match && match[1];
       match = result.match(/^    RTOE = (.*)$/m);
       this.webRtoe = match && match[1];
-      this._g.statusMsg.next("BLAST query submitted successfully");
+      this._g.statusMessage.next("BLAST query submitted successfully");
     });
   }
 
@@ -675,7 +675,7 @@ export class BlastTabComponent implements OnInit {
     this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/Status=(\w+)/);
       this.webStatus = match && match[1];
-      this._g.statusMsg.next("BLAST query checked successfully");
+      this._g.statusMessage.next("BLAST query checked successfully");
     });
   }
 
@@ -684,7 +684,7 @@ export class BlastTabComponent implements OnInit {
     queryParams += "&FORMAT_TYPE=" + this.webSelectedFormatType;
     this.runWebBlastQuery(queryParams, (result: any) => {
       this.webResult = result;
-      this._g.statusMsg.next("BLAST query result retrieved successfully");
+      this._g.statusMessage.next("BLAST query result retrieved successfully");
     });
   }
 
@@ -804,9 +804,9 @@ export class BlastTabComponent implements OnInit {
       url += "/blastn";
     }
     this._g.setLoadingStatus(true);
-    this._g.statusMsg.next("Executing BLAST query...");
+    this._g.statusMessage.next("Executing BLAST query...");
     const errFn = (err: any) => {
-      this._g.statusMsg.next("BLAST Query Execution Raised an Error!");
+      this._g.statusMessage.next("BLAST Query Execution Raised an Error!");
       this._g.showErrorModal("BLAST Query Execution Error", err.message);
       this._g.setLoadingStatus(false);
     };
@@ -817,7 +817,9 @@ export class BlastTabComponent implements OnInit {
         return;
       }
 
-      this._g.statusMsg.next("BLAST Query Execution Completed Successfully!");
+      this._g.statusMessage.next(
+        "BLAST Query Execution Completed Successfully!"
+      );
 
       if (callback) {
         callback(x);
@@ -841,7 +843,7 @@ export class BlastTabComponent implements OnInit {
       true, // Make database flag
       (res) => {
         // Show status message for the number of sequences added to the database
-        this._g.statusMsg.next(
+        this._g.statusMessage.next(
           "Succesfully added " +
             res.results.split("\n")[9].split(" ")[5] +
             " sequences "
@@ -883,7 +885,7 @@ export class BlastTabComponent implements OnInit {
 
     let selectedNodesFasta =
       this._sequenceDataService.prepareFastaData4SequenceArray(
-        this._sequenceDataService.nodeDatas2SequenceArray(
+        this._sequenceDataService.nodeData2SequenceArray(
           this._g.cy.nodes(":selected")
         )
       );
@@ -974,7 +976,7 @@ export class BlastTabComponent implements OnInit {
             node.properties.segmentData;
         });
 
-        this._g.statusMsg.next(
+        this._g.statusMessage.next(
           "Succesfully added " +
             res.nodes.length +
             " sequences to the BLAST database creation"

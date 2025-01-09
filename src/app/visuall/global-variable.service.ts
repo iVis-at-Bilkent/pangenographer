@@ -8,12 +8,13 @@ import {
   COLLAPSED_EDGE_CLASS,
   COLLAPSED_NODE_CLASS,
   CY_BATCH_END_DELAY,
+  debounce,
   EXPAND_COLLAPSE_FAST_OPT,
   HIGHLIGHT_INDEX,
   HIGHLIGHT_OPACITY,
   LAYOUT_ANIMATION_DURATION,
+  SAMPLE_DATABASES,
   TYPES_NOT_TO_SHOW,
-  debounce,
 } from "./constants";
 import { GraphElement, GraphHistoryItem } from "./db-service/data-types";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
@@ -54,7 +55,8 @@ export class GlobalVariableService {
   isLoadFromDB: boolean = false;
   isLoadFromExpandCollapse: boolean = false;
   isUserPrefReady = new BehaviorSubject<boolean>(false);
-  statusMsg = new BehaviorSubject<string>("");
+  statusMessage = new BehaviorSubject<string>("");
+  sampleDatabaseIndex = new BehaviorSubject<number>(0);
   performLayout: Function;
   cyNaviPositionSetter: any;
   appDescription = new BehaviorSubject<any>(null);
@@ -147,9 +149,9 @@ export class GlobalVariableService {
     }
 
     if (this.layout.randomize) {
-      this.statusMsg.next("Recalculating layout...");
+      this.statusMessage.next("Recalculating layout...");
     } else {
-      this.statusMsg.next("Performing layout...");
+      this.statusMessage.next("Performing layout...");
     }
 
     this.setLoadingStatus(true);
@@ -168,7 +170,7 @@ export class GlobalVariableService {
 
     layout.run();
 
-    this.statusMsg.next("Rendering graph...");
+    this.statusMessage.next("Rendering graph...");
   }
 
   private removeDeletedClusters() {
@@ -318,9 +320,9 @@ export class GlobalVariableService {
   getLabels4Elements(
     elementIds: string[],
     isNode: boolean = true,
-    objectDatas: GraphElement[] = null
+    objectData: GraphElement[] = null
   ): string {
-    return this.getLabels4ElementsAsArray(elementIds, isNode, objectDatas).join(
+    return this.getLabels4ElementsAsArray(elementIds, isNode, objectData).join(
       ","
     );
   }
@@ -328,15 +330,15 @@ export class GlobalVariableService {
   getLabels4ElementsAsArray(
     elementIds: string[],
     isNode: boolean = true,
-    objectDatas: GraphElement[] = null
+    objectData: GraphElement[] = null
   ): string[] {
     let cyIds: string[] = [];
     let idChar = "n";
     if (!isNode) {
       idChar = "e";
     }
-    if (objectDatas) {
-      cyIds = objectDatas.map((x) => x.data.id);
+    if (objectData) {
+      cyIds = objectData.map((x) => x.data.id);
     } else {
       for (let i = 0; i < elementIds.length; i++) {
         cyIds.push(idChar + elementIds[i]);
@@ -350,10 +352,10 @@ export class GlobalVariableService {
     }
     for (let i = 0; i < cyIds.length; i++) {
       let className = "";
-      if (!objectDatas) {
+      if (!objectData) {
         className = this.cy.elements(`[id = "${cyIds[i]}"]`).className()[0];
       } else {
-        className = objectDatas[i].classes.split(" ")[0];
+        className = objectData[i].classes.split(" ")[0];
       }
 
       let s = labelParent[className]["style"]["label"] as string;
@@ -361,12 +363,12 @@ export class GlobalVariableService {
         labels.push(s);
       } else {
         let propertyName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
-        if (!objectDatas) {
+        if (!objectData) {
           labels.push(
             this.cy.elements(`[id = "${cyIds[i]}"]`).data(propertyName)
           );
         } else {
-          const currentData = objectDatas[i].data;
+          const currentData = objectData[i].data;
           let l = currentData[propertyName];
           if (!l) {
             l = currentData[Object.keys(currentData)[0]];
@@ -382,10 +384,10 @@ export class GlobalVariableService {
   listen4graphEvents() {
     this.cy.on("layoutstop", () => {
       this.setLoadingStatus(false);
-      this.statusMsg.next("Layout is done.");
+      this.statusMessage.next("Layout is done.");
 
       setTimeout(() => {
-        this.statusMsg.next("");
+        this.statusMessage.next("");
       }, 2000);
     });
   }
@@ -730,7 +732,7 @@ export class GlobalVariableService {
       // -------- Mandatory parameters --------
       name: "cise",
 
-      // ClusterInfo can be a 2D array contaning node id's or a function that returns cluster ids.
+      // ClusterInfo can be a 2D array containing node id's or a function that returns cluster ids.
       // For the 2D array option, the index of the array indicates the cluster ID for all elements in
       // the collection at that index. Unclustered nodes must NOT be present in this array of clusters.
       //
@@ -978,6 +980,10 @@ export class GlobalVariableService {
       }
     }
     return Object.keys(classDictionary).length > 1;
+  }
+
+  setSampleDatabase(sampleDatabase: string) {
+    this.sampleDatabaseIndex.next(SAMPLE_DATABASES.indexOf(sampleDatabase));
   }
 
   // Move all the elements to the right by 0.000001

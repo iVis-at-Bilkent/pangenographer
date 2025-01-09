@@ -459,7 +459,7 @@ export class SequenceDataService {
   }
 
   // Gets the sequence data of the nodes and returns as an array of strings
-  nodeDatas2SequenceArray(nodes: any) {
+  nodeData2SequenceArray(nodes: any) {
     let sequenceData: string[] = [];
     nodes.forEach((element: any) => {
       sequenceData.push(element.data("segmentName"));

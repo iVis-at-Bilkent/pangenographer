@@ -15,6 +15,7 @@ export const CSS_SM_TEXT_SIZE = 11;
 export const CSS_FONT_NAME = "Arial";
 export const CLUSTER_CLASS = "Cluster";
 export const LAYOUT_ANIMATION_DURATION = 500;
+export const MIN_MESSAGE_DURATION = 500;
 export const META_EDGE_CLASS = "cy-expand-collapse-meta-edge"; // defined in expand-collapse extension
 export const COLLAPSED_EDGE_CLASS = "cy-expand-collapse-collapsed-edge";
 export const COLLAPSED_NODE_CLASS = "cy-expand-collapse-collapsed-node";
@@ -117,6 +118,22 @@ export const ENUM_OPERATORS = {
   "\u2260": "<>",
   "one of": "One of",
 };
+
+export const SAMPLE_DATABASES = [
+  "Freebase",
+  "Minigraph GRCh38 Human Pangenome",
+  "Human HLA Pangenome",
+  "Bifrost Ecoli Pangenome",
+  "PGGB Ecoli Pangenome",
+];
+
+export const CYPHER_WRITE_QUERY_TYPES = [
+  "CREATE",
+  "MERGE",
+  "SET",
+  "DELETE",
+  "REMOVE",
+];
 
 export const TEXT_OPERATORS = {
   "equal to": "=",
