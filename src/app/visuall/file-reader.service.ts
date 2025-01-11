@@ -9,6 +9,7 @@ import {
   GFAPathEdge,
   GFAPathSegment,
   GFASegment,
+  GFASegmentData,
   GFAWalk,
   GFAWalkData,
   GFAWalkEdge,
@@ -409,17 +410,13 @@ export class FileReaderService {
       // Parse the lines to create the GFA data
       let GFAData: GFAData = this.parseGFA(linesToSend);
 
-      // Split the GFAData into chunks, each chunk has equal amount of objects
-      // Do not forget Path and Path lines create more than one objects (lines), themselves + amount of segments in them
-      // Size of each chunk in lines (default: 30)
-      let chunkSize =
-        this._g.userPreferences.sizeOfNeo4jQueryBatchesInLines.getValue();
       let GFADataChunks: GFAData[] = [];
 
       // Distribute the GFA data equally into chunks
 
       // Initialize counters for the number of objects taken for each type of object (line)
       let segmentsTaken = 0;
+      let segmentsDataTaken = 0;
       let linksTaken = 0;
       let jumpsTaken = 0;
       let containmentsTaken = 0;
@@ -435,6 +432,7 @@ export class FileReaderService {
       // Calculate the total size of the GFA data
       let totalSize =
         GFAData.segments.length +
+        GFAData.segmentsData.length +
         GFAData.links.length +
         GFAData.jumps.length +
         GFAData.containments.length +
@@ -450,6 +448,7 @@ export class FileReaderService {
         // Create a new chunk of GFA data
         let chunk: GFAData = {
           segments: [],
+          segmentsData: [],
           links: [],
           jumps: [],
           containments: [],
@@ -461,15 +460,22 @@ export class FileReaderService {
           pathEdges: [],
         };
 
-        let toTake = chunkSize;
-        // Take the next chunkSize elements from the GFA data
+        // Split the GFAData into chunks, each chunk has equal amount of objects
+        // Do not forget Path and Path lines create more than one objects (lines), themselves + amount of segments in them
+        // Size of each chunk in lines (default: 30)
+        let toTake =
+          this._g.userPreferences.sizeOfNeo4jQueryBatchesInLines.getValue();
+
+        function calculateElementNumber2Take(elements: any[], taken: number) {
+          return Math.min(toTake, elements.length - taken);
+        }
 
         // Take segments
         if (segmentsTaken < GFAData.segments.length && toTake > 0) {
           // Calculate the number of segments to take
-          let toTakeSegment = Math.min(
-            toTake,
-            GFAData.segments.length - segmentsTaken
+          let toTakeSegment = calculateElementNumber2Take(
+            GFAData.segments,
+            segmentsTaken
           );
 
           // Take the next toTakeSegment segments from the GFA data
@@ -484,10 +490,33 @@ export class FileReaderService {
           toTake -= toTakeSegment;
         }
 
+        // Take segment data
+        if (segmentsDataTaken < GFAData.segmentsData.length && toTake > 0) {
+          // Calculate the number of segment data to take
+          let toTakeSegmentData = calculateElementNumber2Take(
+            GFAData.segmentsData,
+            segmentsDataTaken
+          );
+
+          // Take the next toTakeSegmentData segment data from the GFA data
+          chunk.segmentsData = GFAData.segmentsData.slice(
+            segmentsDataTaken,
+            segmentsDataTaken + toTakeSegmentData
+          );
+
+          // Update the counter for the number of segment data taken
+          segmentsDataTaken += toTakeSegmentData;
+          totalTaken += toTakeSegmentData;
+          toTake -= toTakeSegmentData;
+        }
+
         // Take links
         if (linksTaken < GFAData.links.length && toTake > 0) {
           // Calculate the number of links to take
-          let toTakeLink = Math.min(toTake, GFAData.links.length - linksTaken);
+          let toTakeLink = calculateElementNumber2Take(
+            GFAData.links,
+            linksTaken
+          );
 
           // Take the next toTakeLink links from the GFA data
           chunk.links = GFAData.links.slice(
@@ -504,7 +533,10 @@ export class FileReaderService {
         // Take jumps
         if (jumpsTaken < GFAData.jumps.length && toTake > 0) {
           // Calculate the number of jumps to take
-          let toTakeJump = Math.min(toTake, GFAData.jumps.length - jumpsTaken);
+          let toTakeJump = calculateElementNumber2Take(
+            GFAData.jumps,
+            jumpsTaken
+          );
 
           // Take the next toTakeJump jumps from the GFA data
           chunk.jumps = GFAData.jumps.slice(
@@ -521,9 +553,9 @@ export class FileReaderService {
         // Take containments
         if (containmentsTaken < GFAData.containments.length && toTake > 0) {
           // Calculate the number of containments to take
-          let toTakeContainment = Math.min(
-            toTake,
-            GFAData.containments.length - containmentsTaken
+          let toTakeContainment = calculateElementNumber2Take(
+            GFAData.containments,
+            containmentsTaken
           );
 
           // Take the next toTakeContainment containments from the GFA data
@@ -541,7 +573,10 @@ export class FileReaderService {
         // Take walks
         if (walksTaken < GFAData.walks.length && toTake > 0) {
           // Calculate the number of walks to take
-          let toTakeWalk = Math.min(toTake, GFAData.walks.length - walksTaken);
+          let toTakeWalk = calculateElementNumber2Take(
+            GFAData.walks,
+            walksTaken
+          );
 
           // Take the next toTakeWalk walks from the GFA data
           chunk.walks = GFAData.walks.slice(
@@ -558,9 +593,9 @@ export class FileReaderService {
         // Take walk segments
         if (walkSegmentsTaken < GFAData.walkSegments.length && toTake > 0) {
           // Calculate the number of walk segments to take
-          let toTakeWalkSegment = Math.min(
-            toTake,
-            GFAData.walkSegments.length - walkSegmentsTaken
+          let toTakeWalkSegment = calculateElementNumber2Take(
+            GFAData.walkSegments,
+            walkSegmentsTaken
           );
 
           // Take the next toTakeWalkSegment walk segments from the GFA data
@@ -578,9 +613,9 @@ export class FileReaderService {
         // Take walk edges
         if (walkEdgesTaken < GFAData.walkEdges.length && toTake > 0) {
           // Calculate the number of walk edges to take
-          let toTakeWalkEdge = Math.min(
-            toTake,
-            GFAData.walkEdges.length - walkEdgesTaken
+          let toTakeWalkEdge = calculateElementNumber2Take(
+            GFAData.walkEdges,
+            walkEdgesTaken
           );
 
           // Take the next toTakeWalkEdge walk edges from the GFA data
@@ -598,7 +633,10 @@ export class FileReaderService {
         // Take paths
         if (pathsTaken < GFAData.paths.length && toTake > 0) {
           // Calculate the number of paths to take
-          let toTakePath = Math.min(toTake, GFAData.paths.length - pathsTaken);
+          let toTakePath = calculateElementNumber2Take(
+            GFAData.paths,
+            pathsTaken
+          );
 
           // Take the next toTakePath paths from the GFA data
           chunk.paths = GFAData.paths.slice(
@@ -615,9 +653,9 @@ export class FileReaderService {
         // Take path segments
         if (pathSegmentsTaken < GFAData.pathSegments.length && toTake > 0) {
           // Calculate the number of path segments to take
-          let toTakePathSegment = Math.min(
-            toTake,
-            GFAData.pathSegments.length - pathSegmentsTaken
+          let toTakePathSegment = calculateElementNumber2Take(
+            GFAData.pathSegments,
+            pathSegmentsTaken
           );
 
           // Take the next toTakePathSegment path segments from the GFA data
@@ -635,9 +673,9 @@ export class FileReaderService {
         // Take path edges
         if (pathEdgesTaken < GFAData.pathEdges.length && toTake > 0) {
           // Calculate the number of path edges to take
-          let toTakePathEdge = Math.min(
-            toTake,
-            GFAData.pathEdges.length - pathEdgesTaken
+          let toTakePathEdge = calculateElementNumber2Take(
+            GFAData.pathEdges,
+            pathEdgesTaken
           );
 
           // Take the next toTakePathEdge path edges from the GFA data
@@ -720,6 +758,7 @@ export class FileReaderService {
     const lines = content;
     let GFAData: GFAData = {
       segments: [],
+      segmentsData: [],
       links: [],
       jumps: [],
       containments: [],
@@ -764,6 +803,57 @@ export class FileReaderService {
         );
       }
     });
+
+    // If any segments' data are too large to be taken in one go
+    // Create a segmentData object for each segment and take them in chunks
+    for (let i = 0; i < GFAData.segments.length; i++) {
+      // Calculate the number of segmentData objects to create for each segment based on the size of the segmentData
+      // remove 1, as the first chunk will be at the segment
+      let segmentDataCount = Math.ceil(
+        GFAData.segments[i].segmentData.length /
+          this._g.userPreferences.segmentDataSizeQueryLimit.getValue() -
+          1
+      );
+
+      // Create segmentData objects for each segment, this is done by clipping the segmentData into chunks
+      // first chunk will be at Segment, other data will be put into segmentData objects
+      while (segmentDataCount > 0) {
+        let segmentData: GFASegmentData = {
+          segmentName: GFAData.segments[i].segmentName,
+          segmentData: "",
+        };
+
+        // Calculate the size of the segmentData to take
+        let toTakeLength = Math.min(
+          this._g.userPreferences.segmentDataSizeQueryLimit.getValue(),
+          GFAData.segments[i].segmentData.length -
+            this._g.userPreferences.segmentDataSizeQueryLimit.getValue()
+        );
+
+        // Take the segmentData from the segment
+        segmentData.segmentData = GFAData.segments[i].segmentData.substring(
+          this._g.userPreferences.segmentDataSizeQueryLimit.getValue(),
+          this._g.userPreferences.segmentDataSizeQueryLimit.getValue() +
+            toTakeLength
+        );
+
+        // Add the segmentData to the GFAData
+        GFAData.segmentsData.push(segmentData);
+
+        // Update the segments data
+        GFAData.segments[i].segmentData =
+          GFAData.segments[i].segmentData.substring(
+            0,
+            this._g.userPreferences.segmentDataSizeQueryLimit.getValue()
+          ) +
+          GFAData.segments[i].segmentData.substring(
+            this._g.userPreferences.segmentDataSizeQueryLimit.getValue() +
+              toTakeLength
+          );
+
+        segmentDataCount--;
+      }
+    }
 
     return GFAData;
   }

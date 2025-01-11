@@ -77,6 +77,24 @@
       </div>
     </div>
 
+    <!-- Adjusts the maximum segment data size to be sent per line -->
+    <div>
+      <div class="form-inline m-1">
+        <label class="va-text"
+          >Maximum segment data size to be sent per line</label
+        >
+        <input
+          type="number"
+          min="1"
+          step="any"
+          (change)="onsegmentDataSizeQueryLimitSelected($event)"
+          [(ngModel)]="segmentDataSizeQueryLimit"
+          class="form-control standart-input-height va-small-text ms-1 w5-5"
+          placeholder="Maximum segment data size to be sent per line"
+        />
+      </div>
+    </div>
+
     <!-- Adjust the size of the sample data fetched from neo4j -->
     <div>
       <div class="form-inline m-1">

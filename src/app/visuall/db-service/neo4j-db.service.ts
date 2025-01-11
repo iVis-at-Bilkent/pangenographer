@@ -1215,6 +1215,17 @@ export class Neo4jDb implements DbService {
       );
     });
 
+    // Get segments to be matched with the segmentsData
+    // This is used to add segmentData to the segments
+    let segmentsToSegmentDataMap = {};
+    GFAData.segmentsData.forEach((segmentData) => {
+      if (!segmentsToSegmentDataMap[`${segmentData.segmentName}`]) {
+        segmentsToSegmentDataMap[`${segmentData.segmentName}`] = "";
+      }
+      segmentsToSegmentDataMap[`${segmentData.segmentName}`] +=
+        segmentData.segmentData;
+    });
+
     // Create a segment map to store the segment objects given in GFAData.segments
     // This is used to avoid matching the same segment multiple times in the query
     // segmentName -> segment object given in GFAData.segments
@@ -1224,6 +1235,16 @@ export class Neo4jDb implements DbService {
     GFAData.segments.forEach((segment) => {
       // Convert the segmentName to CQL as it may contain special characters
       segment.segmentName = this.propertyName2CQL(segment.segmentName);
+
+      // Check if the segment is in the segmentsToSegmentDataMap
+      // If it is, add the segmentData to the segment
+      if (segmentsToSegmentDataMap[`${segment.segmentName}`]) {
+        segment.segmentData +=
+          segmentsToSegmentDataMap[`${segment.segmentName}`];
+
+        // Remove the segment from the segmentsToSegmentDataMap to avoid adding the same segmentData multiple times
+        delete segmentsToSegmentDataMap[`${segment.segmentName}`];
+      }
 
       // Create the segment node
       element2Create = `(n${segment.segmentName} :SEGMENT {`;
@@ -1471,20 +1492,24 @@ export class Neo4jDb implements DbService {
 
     // Adding new properties to existing elements starts here
 
-    // Extract the segment names of the segments to add pathNames and walkSampleIdentifiers
+    // Extract the segment names of the segments to add pathNames, walkSampleIdentifiers and segmentData
     let segmentNamesOfSegmentsToPathMap = Object.keys(segmentsToPathNamesMap);
     let segmentNamesOfSegmentsToWalkMap = Object.keys(
       segmentsToWalkSampleIdentifiersMap
     );
+    let segmentNamesOfSegmentsToSegmentDataMap = Object.keys(
+      segmentsToSegmentDataMap
+    );
 
-    // If there are segments to add pathNames or walkSampleIdentifiers
+    // If there are segments to add pathNames, walkSampleIdentifiers and segmentData
     if (
       segmentNamesOfSegmentsToPathMap.length ||
       segmentNamesOfSegmentsToWalkMap.length ||
+      segmentNamesOfSegmentsToSegmentDataMap.length ||
       GFAData.pathEdges.length ||
       GFAData.walkEdges.length
     ) {
-      // Add the SET clause to add the pathNames and walkSampleIdentifiers to the segments
+      // Add the SET clause to add the pathNames, walkSampleIdentifiers, and segmentData to the segments
       query += "\nSET\n";
     }
 
@@ -1513,6 +1538,15 @@ export class Neo4jDb implements DbService {
 
       // Remove the last comma and space and add the closing bracket
       query = query.substring(0, query.length - 2) + "],\n";
+
+      // Add the segment to the segmentToMatch map
+      segmentsToMatch[`${segmentName}`] = true;
+    });
+
+    // Add the segmentData to the segments
+    segmentNamesOfSegmentsToSegmentDataMap.forEach((segmentName: string) => {
+      query += `n${segmentName}.segmentData = n${segmentName}.segmentData + `;
+      query += `'${segmentsToSegmentDataMap[`${segmentName}`]}',\n`;
 
       // Add the segment to the segmentToMatch map
       segmentsToMatch[`${segmentName}`] = true;
@@ -1584,6 +1618,7 @@ export class Neo4jDb implements DbService {
     if (
       segmentNamesOfSegmentsToPathMap.length ||
       segmentNamesOfSegmentsToWalkMap.length ||
+      segmentNamesOfSegmentsToSegmentDataMap.length ||
       GFAData.pathEdges.length ||
       GFAData.walkEdges.length
     ) {

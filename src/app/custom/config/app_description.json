@@ -67,6 +67,7 @@
     "sizeOfGetSampleData": 150,
     "sizeOfNeo4jQueryBatchesInCharacters": 10000,
     "sizeOfNeo4jQueryBatchesInLines": 10,
+    "segmentDataSizeQueryLimit": 50000,
     "sizeSourceTargetCount": 10,
     "tableColumnLimit": 3,
     "tilingPadding": 4

@@ -42,6 +42,7 @@ export interface UserPreferences {
   seedSourceTargetCount: BehaviorSubject<number>; // seed source target count
   sizeOfNeo4jQueryBatchesInCharacters: BehaviorSubject<number>; // size of neo4j query batches in characters
   sizeOfNeo4jQueryBatchesInLines: BehaviorSubject<number>; // size of neo4j query batches in lines
+  segmentDataSizeQueryLimit: BehaviorSubject<number>; // segment data size query limit
   sizeOfGetSampleData: BehaviorSubject<number>; // size of get sample data
 }
 

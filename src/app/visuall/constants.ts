@@ -53,6 +53,7 @@ export const PANGENOGRAPHER_SETTING_NAMES = [
   "sizeOfGetSampleData",
   "sizeOfNeo4jQueryBatchesInCharacters",
   "sizeOfNeo4jQueryBatchesInLines",
+  "segmentDataSizeQueryLimit",
 ];
 
 export const GRAPH_THEORETIC_QUERY_NAMES = {

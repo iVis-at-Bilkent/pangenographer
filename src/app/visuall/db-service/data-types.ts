@@ -119,6 +119,7 @@ export interface CyEdge {
 
 export interface GFAData {
   segments: GFASegment[];
+  segmentsData: GFASegmentData[];
   links: GFALink[];
   jumps: GFAJump[];
   containments: GFAContainment[];
@@ -146,6 +147,11 @@ export interface GFASegment {
   UriOrLocalSystemPath?: string;
   pathNames?: string;
   walkSampleIdentifiers?: string;
+}
+
+export interface GFASegmentData {
+  segmentData: string;
+  segmentName: string;
 }
 
 export interface GFALink {

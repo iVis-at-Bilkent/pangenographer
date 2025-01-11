@@ -62,6 +62,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   sizeOfGetSampleData: number; // size of get sample data
   sizeOfNeo4jQueryBatchesInCharacters: number; // size of Neo4j query batches in characters
   sizeOfNeo4jQueryBatchesInLines: number; // size of Neo4j query batches in lines
+  segmentDataSizeQueryLimit: number; // segment data size query limit
   tabChangeSubscription: Subscription;
   tableColumnLimit: number;
 
@@ -226,6 +227,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up.sizeOfNeo4jQueryBatchesInCharacters.getValue(); // get the size of the Neo4j query batches in characters
     this.sizeOfNeo4jQueryBatchesInLines =
       up.sizeOfNeo4jQueryBatchesInLines.getValue(); // get the size of the Neo4j query batches in lines
+    this.segmentDataSizeQueryLimit = up.segmentDataSizeQueryLimit.getValue(); // get the segment data size query limit
 
     this.setHighlightStyles();
     this.highlightStyleSelected(
@@ -396,6 +398,17 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.sizeOfNeo4jQueryBatchesInLines = size;
 
     // save the user preferences
+    this._profile.saveUserPreferences();
+  }
+
+  // Used to change the segment data size query limit in the user preferences and the current component when the user selects a new limit
+  onsegmentDataSizeQueryLimitSelected(x: any) {
+    let limit = parseInt(x.target.value);
+    if (limit < 1) {
+      limit = 1;
+    }
+    this._g.userPreferences.segmentDataSizeQueryLimit.next(limit);
+    this.segmentDataSizeQueryLimit = limit;
     this._profile.saveUserPreferences();
   }
 
