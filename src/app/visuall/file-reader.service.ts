@@ -333,36 +333,40 @@ export class FileReaderService {
     // Split the text into lines as the GFA file is line-based
     let linesToSend = combinedText.split(/\n/);
 
-    // Calculate the character length of the lines to send
-    // If the total character length of the lines to send exceeds the maximum character length of the batch
-    // then add the remainder of the current batch to the next batch
-    // Do not count the last line as it may be incomplete and should be added to the next batch
-    let totalLength = 0;
-    let okayToSendIndex = 0;
-    for (let i = 0; i < linesToSend.length - 1; i++) {
-      totalLength += linesToSend[i].length;
+    if (linesToSend.length > 1) {
+      // Calculate the character length of the lines to send
+      // If the total character length of the lines to send exceeds the maximum character length of the batch
+      // then add the remainder of the current batch to the next batch
+      // Do not count the last line as it may be incomplete and should be added to the next batch
+      let totalLength = 0;
+      let okayToSendIndex = 0;
+      for (let i = 0; i < linesToSend.length - 1; i++) {
+        totalLength += linesToSend[i].length;
 
-      // Check if the total character length of the lines to send exceeds the maximum character length of the batch
-      if (
-        totalLength <=
-        this._g.userPreferences.sizeOfNeo4jQueryBatchesInCharacters.getValue()
-      ) {
-        okayToSendIndex = i;
-      } else {
-        break;
+        // Check if the total character length of the lines to send exceeds the maximum character length of the batch
+        if (
+          totalLength <=
+          this._g.userPreferences.sizeOfNeo4jQueryBatchesInCharacters.getValue()
+        ) {
+          okayToSendIndex = i;
+        } else {
+          break;
+        }
       }
-    }
 
-    // Save the remainder of the current batch to be added to the next batch
-    this.previousBatchRemainders = linesToSend
-      .slice(okayToSendIndex + 1)
-      .join("\n");
+      // Save the remainder of the current batch to be added to the next batch
+      this.previousBatchRemainders = linesToSend
+        .slice(okayToSendIndex + 1)
+        .join("\n");
 
-    // Update the lines to send by taking only the lines that can be sent
-    linesToSend = linesToSend.slice(0, okayToSendIndex + 1);
-
-    // Check if the lines to send are empty, add the previous batch remainders to the lines to send
-    if (linesToSend.length === 0) {
+      // Update the lines to send by taking only the lines that can be sent
+      linesToSend = linesToSend.slice(0, okayToSendIndex + 1);
+    } else if (linesToSend.length === 1) {
+      // If only one line is present, add it to the previous batch remainders
+      this.previousBatchRemainders = linesToSend[0];
+      linesToSend = [];
+    } else {
+      // Check if the lines to send are empty, add the previous batch remainders to the lines to send
       linesToSend = this.previousBatchRemainders.split(/\n/);
       this.previousBatchRemainders = "";
     }
@@ -754,8 +758,7 @@ export class FileReaderService {
     });
   }
 
-  parseGFA(content: string[]): GFAData {
-    const lines = content;
+  parseGFA(lines: string[]): GFAData {
     let GFAData: GFAData = {
       segments: [],
       segmentsData: [],
