@@ -10,7 +10,7 @@ import {
   sample_6,
   sample_7,
 } from "../../../../sample_gfas/sample_gfas";
-import { CLUSTER_CLASS } from "../constants";
+import { CLUSTER_CLASS, SAMPLE_DATABASES } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GFAData } from "../db-service/data-types";
 import { DbAdapterService } from "../db-service/db-adapter.service";
@@ -56,69 +56,106 @@ export class NavbarComponent implements OnInit, OnDestroy {
       {
         dropdown: "File",
         actions: [
-          { txt: "Load...", id: "nbi00", fn: "loadFile" },
-          { txt: "Save", id: "nbi01", fn: "saveAsJson" },
+          { text: "Load...", id: "nbi00", function: "loadFile" },
+          { text: "Save", id: "nbi01", function: "saveAsJson" },
           {
-            txt: "Save Selected Objects",
+            text: "Save Selected Objects",
             id: "nbi02",
-            fn: "saveSelectedAsJson",
+            function: "saveSelectedAsJson",
           },
           {
-            txt: "Samples",
+            text: "Samples",
             id: "nbi07",
             actions: [
               {
-                txt: "Sample 1",
+                text: "Sample 1",
                 id: "nbi07-0",
-                fn: "loadSampleGFAFile1",
+                function: "sampleGFASelected",
+                parameters: sample_1,
               },
               {
-                txt: "Sample 2",
+                text: "Sample 2",
                 id: "nbi07-1",
-                fn: "loadSampleGFAFile2",
+                function: "sampleGFASelected",
+                parameters: sample_2,
               },
               {
-                txt: "Sample 3",
+                text: "Sample 3",
                 id: "nbi07-2",
-                fn: "loadSampleGFAFile3",
+                function: "sampleGFASelected",
+                parameters: sample_3,
               },
               {
-                txt: "Sample 4",
+                text: "Sample 4",
                 id: "nbi07-3",
-                fn: "loadSampleGFAFile4",
+                function: "sampleGFASelected",
+                parameters: sample_4,
               },
               {
-                txt: "Sample 5",
+                text: "Sample 5",
                 id: "nbi07-4",
-                fn: "loadSampleGFAFile5",
+                function: "sampleGFASelected",
+                parameters: sample_5,
               },
               {
-                txt: "Sample 6",
+                text: "Sample 6",
                 id: "nbi07-5",
-                fn: "loadSampleGFAFile6",
+                function: "sampleGFASelected",
+                parameters: sample_6,
               },
               {
-                txt: "Sample 7",
+                text: "Sample 7",
                 id: "nbi07-6",
-                fn: "loadSampleGFAFile7",
+                function: "sampleGFASelected",
+                parameters: sample_7,
+              },
+              {
+                text: SAMPLE_DATABASES[1],
+                id: SAMPLE_DATABASES[1],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[1],
+              },
+              {
+                text: SAMPLE_DATABASES[2],
+                id: SAMPLE_DATABASES[2],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[2],
+              },
+              {
+                text: SAMPLE_DATABASES[3],
+                id: SAMPLE_DATABASES[3],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[3],
+              },
+              {
+                text: SAMPLE_DATABASES[4],
+                id: SAMPLE_DATABASES[4],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[4],
+              },
+              {
+                text: SAMPLE_DATABASES[5],
+                id: SAMPLE_DATABASES[5],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[5],
               },
             ],
           },
           {
-            txt: "Import GFA..",
+            text: "Import GFA..",
             id: "nbi04",
-            fn: "loadGFAFile2Db",
+            function: "loadGFAFile2Db",
           },
-          { txt: "Save as PNG...", id: "nbi03", fn: "saveAsPng" },
+          { text: "Save as PNG...", id: "nbi03", function: "saveAsPng" },
           {
-            txt: "Load User Profile...",
+            text: "Load User Profile...",
             id: "nbi05",
-            fn: "loadUserProfile",
+            function: "loadUserProfile",
           },
           {
-            txt: "Save User Profile...",
+            text: "Save User Profile...",
             id: "nbi06",
-            fn: "saveUserProfile",
+            function: "saveUserProfile",
           },
         ],
       },
@@ -126,29 +163,29 @@ export class NavbarComponent implements OnInit, OnDestroy {
         dropdown: "Edit",
         actions: [
           {
-            txt: "Add Group for Selected",
+            text: "Add Group for Selected",
             id: "nbi10",
-            fn: "addGroup4Selected",
+            function: "addGroup4Selected",
           },
           {
-            txt: "Remove Group for Selected",
+            text: "Remove Group for Selected",
             id: "nbi11",
-            fn: "removeGroup4Selected",
+            function: "removeGroup4Selected",
           },
           {
-            txt: "Remove All Groups",
+            text: "Remove All Groups",
             id: "nbi12",
-            fn: "removeAllGroups",
+            function: "removeAllGroups",
           },
           {
-            txt: "Delete Selected",
+            text: "Delete Selected",
             id: "nbi13",
-            fn: "deleteSelected",
+            function: "deleteSelected",
           },
           {
-            txt: "Query History",
+            text: "Query History",
             id: "nbi101",
-            fn: "showHideGraphHistory",
+            function: "showHideGraphHistory",
           },
         ],
       },
@@ -156,35 +193,35 @@ export class NavbarComponent implements OnInit, OnDestroy {
         dropdown: "View",
         actions: [
           {
-            txt: "Hide Selected",
+            text: "Hide Selected",
             id: "nbi20",
-            fn: "hideSelected",
+            function: "hideSelected",
           },
           {
-            txt: "Hide Unselected",
+            text: "Hide Unselected",
             id: "nbi21",
-            fn: "hideUnselected",
+            function: "hideUnselected",
           },
-          { txt: "Show All", id: "nbi22", fn: "showAll" },
+          { text: "Show All", id: "nbi22", function: "showAll" },
           {
-            txt: "Collapse All Nodes",
+            text: "Collapse All Nodes",
             id: "nbi23",
-            fn: "collapseAllNodes",
+            function: "collapseAllNodes",
           },
           {
-            txt: "Expand All Nodes",
+            text: "Expand All Nodes",
             id: "nbi24",
-            fn: "expandAllNodes",
+            function: "expandAllNodes",
           },
           {
-            txt: "Collapse All Edges",
+            text: "Collapse All Edges",
             id: "nbi25",
-            fn: "collapseAllEdges",
+            function: "collapseAllEdges",
           },
           {
-            txt: "Expand All Edges",
+            text: "Expand All Edges",
             id: "nbi26",
-            fn: "expandAllEdges",
+            function: "expandAllEdges",
           },
         ],
       },
@@ -192,71 +229,71 @@ export class NavbarComponent implements OnInit, OnDestroy {
         dropdown: "Highlight",
         actions: [
           {
-            txt: "Search...",
+            text: "Search...",
             id: "nbi30",
-            fn: "search2Highlight",
+            function: "search2Highlight",
           },
           {
-            txt: "Selected",
+            text: "Selected",
             id: "nbi31",
-            fn: "highlightSelected",
+            function: "highlightSelected",
           },
           {
-            txt: "Neighbors of Selected",
+            text: "Neighbors of Selected",
             id: "nbi32",
-            fn: "highlightNeighborsOfSelected",
+            function: "highlightNeighborsOfSelected",
           },
           {
-            txt: "Remove Highlights",
+            text: "Remove Highlights",
             id: "nbi33",
-            fn: "removeHighlights",
+            function: "removeHighlights",
           },
         ],
       },
       {
         dropdown: "Layout",
         actions: [
-          { txt: "Perform Layout", id: "nbi40", fn: "doLayout" },
+          { text: "Perform Layout", id: "nbi40", function: "doLayout" },
           {
-            txt: "Recalculate Layout",
+            text: "Recalculate Layout",
             id: "nbi41",
-            fn: "recalculateLayout",
+            function: "recalculateLayout",
           },
         ],
       },
       {
         dropdown: "Help",
         actions: [
-          { txt: "Quick Help", id: "nbi50", fn: "openQuickHelp" },
-          { txt: "Legend", id: "nbi52", fn: "openLegend" },
-          { txt: "About", id: "nbi51", fn: "openAbout" },
+          { text: "Quick Help", id: "nbi50", function: "openQuickHelp" },
+          { text: "Legend", id: "nbi52", function: "openLegend" },
+          { text: "About", id: "nbi51", function: "openAbout" },
         ],
       },
       {
         dropdown: "Data",
         actions: [
           {
-            txt: "Get Some Zero Degree Nodes",
+            text: "Get Some Zero Degree Nodes",
             id: "nbi60",
-            fn: "getSomeZeroDegreeNodes",
+            function: "getSomeZeroDegreeNodes",
           },
           {
-            txt: "Get All Zero Degree Nodes",
+            text: "Get All Zero Degree Nodes",
             id: "nbi61",
-            fn: "getAllZeroDegreeNodes",
+            function: "getAllZeroDegreeNodes",
           },
           {
-            txt: "Get All Zero Incoming Degree Nodes",
+            text: "Get All Zero Incoming Degree Nodes",
             id: "nbi62",
-            fn: "getAllZeroIncomingDegreeNodes",
+            function: "getAllZeroIncomingDegreeNodes",
           },
           {
-            txt: "Get All Zero Outgoing Degree Nodes",
+            text: "Get All Zero Outgoing Degree Nodes",
             id: "nbi63",
-            fn: "getAllZeroOutgoingDegreeNodes",
+            function: "getAllZeroOutgoingDegreeNodes",
           },
-          { txt: "Sample Data", id: "nbi64", fn: "getSampleData" },
-          { txt: "Clear Data", id: "nbi65", fn: "clearDatabase" },
+          { text: "Sample Data", id: "nbi64", function: "getSampleData" },
+          { text: "Clear Data", id: "nbi65", function: "clearDatabase" },
         ],
       },
     ];
@@ -278,8 +315,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerAct(act: NavbarAction) {
-    this[act.fn]();
+  triggerAct(action: NavbarAction) {
+    if (action.parameters) {
+      this[action.function](action.parameters);
+    } else {
+      this[action.function]();
+    }
   }
 
   preventDropdownClose(event: Event) {
@@ -314,6 +355,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Triggered when the user selects a sample from the samples dropdown
   sampleGFASelected(sample: string) {
     // If the user selects a sample, open the clear database modal
+    this._g.setSampleDatabase(SAMPLE_DATABASES[0]);
+    console.log(SAMPLE_DATABASES[0]);
     this._modalService
       // Open the clear database modal to certify that the user wants to clear the database
       .open(ClearDatabaseModalComponent)
@@ -334,39 +377,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
       );
   }
 
-  // Load sample GFA file 1
-  loadSampleGFAFile1() {
-    this.sampleGFASelected(sample_1);
-  }
-
-  // Load sample GFA file 2
-  loadSampleGFAFile2() {
-    this.sampleGFASelected(sample_2);
-  }
-
-  // Load sample GFA file 3
-  loadSampleGFAFile3() {
-    this.sampleGFASelected(sample_3);
-  }
-
-  // Load sample GFA file 4
-  loadSampleGFAFile4() {
-    this.sampleGFASelected(sample_4);
-  }
-
-  // Load sample GFA file 5
-  loadSampleGFAFile5() {
-    this.sampleGFASelected(sample_5);
-  }
-
-  // Load sample GFA file 6
-  loadSampleGFAFile6() {
-    this.sampleGFASelected(sample_6);
-  }
-
-  // Load sample GFA file 7
-  loadSampleGFAFile7() {
-    this.sampleGFASelected(sample_7);
+  setSampleDatabase(sampleDatabase: string) {
+    this._g.setSampleDatabase(sampleDatabase);
   }
 
   // Load file selected by the user from the file input element
@@ -376,7 +388,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       () => {}, // Execute nothing when the modal is closed
       (reason) => {
         // Execute the callback function when the modal is dismissed
-
         this.isLoadFile4Graph = true; // Set the isLoadFile4Graph flag to true
         this.isLoadFileGFA = false; // Set the isLoadFileGFA flag to false
         this.openFileInput(); // Open the file input to allow the user to select a file

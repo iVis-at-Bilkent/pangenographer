@@ -9,9 +9,11 @@ export interface NavbarAction {
   // only used to make unit testing easier
   id: string;
   // used to show on navbar
-  txt: string;
-  // must be the name of function, function should be parameterless
-  fn?: string;
+  text: string;
+  // must be the name of function
+  function?: string;
   // used for custom items
   actions?: NavbarAction[];
+  // used for custom items
+  parameters?: any;
 }

@@ -18,7 +18,7 @@ import { GlobalVariableService } from "../global-variable.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
-import { ToolbarAction, ToolbarDiv } from "./itoolbar";
+import { ToolbarAction, ToolbarDiv } from "./toolbar";
 
 @Component({
   selector: "app-toolbar",
@@ -28,13 +28,14 @@ import { ToolbarAction, ToolbarDiv } from "./itoolbar";
 export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("file", { static: false }) file;
   searchTxt: string;
-  selectedSampleDatabase: string = SAMPLE_DATABASES[0];
   sampleDatabases: string[] = SAMPLE_DATABASES;
+  selectedSampleDatabase: string = this._g.selectedSampleDatabase.getValue();
   menu: ToolbarDiv[];
   statusMessage = "";
   statusMessageQueue: string[] = [];
   statusMessageSubscription: Subscription;
   userPreferenceSubscription: Subscription;
+  selectedSampleDatabaseSubscription: Subscription;
   messageStarted2Show: number = 0;
   isLimitDbQueries2range: boolean;
   @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
@@ -187,6 +188,9 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.userPreferenceSubscription) {
       this.userPreferenceSubscription.unsubscribe();
     }
+    if (this.selectedSampleDatabaseSubscription) {
+      this.selectedSampleDatabaseSubscription.unsubscribe();
+    }
   }
 
   ngOnInit() {
@@ -198,9 +202,13 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!x) {
         return;
       }
-      // user preferences from local storage should be setted
-      // Better way might be to use a shared behaviour subject just like `isUserPrefReady`. Its name might be isUserPrefFromLocalStorageReady
+      // user preferences from local storage should be set
+      // Better way might be to use a shared behavior subject just like `isUserPrefReady`. Its name might be isUserPrefFromLocalStorageReady
     });
+    this.selectedSampleDatabaseSubscription =
+      this._g.selectedSampleDatabase.subscribe(() => {
+        this.selectedSampleDatabase = this._g.selectedSampleDatabase.getValue();
+      });
   }
 
   private processMsgQueue() {

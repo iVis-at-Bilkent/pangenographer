@@ -1,6 +1,6 @@
 export const CY_NAVI_POSITION_WAIT_DUR = 500;
-export const MAX_HIGHTLIGHT_WIDTH = 20;
-export const MIN_HIGHTLIGHT_WIDTH = 1;
+export const MAX_HIGHLIGHT_WIDTH = 20;
+export const MIN_HIGHLIGHT_WIDTH = 1;
 export const MAX_HIGHLIGHT_CNT = 12;
 export const MAX_DATA_PAGE_SIZE = 10000;
 export const MIN_DATA_PAGE_SIZE = 1;
@@ -228,7 +228,7 @@ export function debounce2(fn1: Function, wait: number, fn2: Function) {
 }
 
 // objects is an array of objects, types is an array of strings
-// get propperty names of types. If types does not exists get all
+// get property names of types. If types does not exists get all
 export function getPropNamesFromObject(objects: any, types: any) {
   let s1 = new Set<string>();
 

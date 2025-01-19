@@ -45,16 +45,16 @@
           <div class="dropdown-menu">
             <ng-container *ngFor="let act of item.actions">
               <button
-                *ngIf="act.txt !== 'Samples'"
+                *ngIf="act.text !== 'Samples'"
                 class="dropdown-item va-text"
                 type="button"
                 id="{{ act.id }}"
                 (click)="triggerAct(act)"
               >
-                {{ act.txt }}
+                {{ act.text }}
               </button>
               <div
-                *ngIf="act.txt === 'Samples'"
+                *ngIf="act.text === 'Samples'"
                 class="dropdown inner-dropdown"
               >
                 <button
@@ -65,7 +65,7 @@
                   aria-expanded="false"
                   (click)="preventDropdownClose($event)"
                 >
-                  {{ act.txt }}
+                  {{ act.text }}
                 </button>
                 <div class="dropdown-menu inner-dropdown-menu">
                   <ng-container *ngFor="let sampleAction of act.actions">
@@ -75,7 +75,7 @@
                       id="{{ sampleAction.id }}"
                       (click)="triggerAct(sampleAction)"
                     >
-                      {{ sampleAction.txt }}
+                      {{ sampleAction.text }}
                     </button>
                   </ng-container>
                 </div>

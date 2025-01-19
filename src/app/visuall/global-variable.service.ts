@@ -43,6 +43,7 @@ export class GlobalVariableService {
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
   setLoadingStatus: (boolean: boolean) => void;
+  selectedSampleDatabase = new BehaviorSubject<string>(SAMPLE_DATABASES[0]);
   userPreferences: UserPreferences = {} as UserPreferences;
   userPreferencesFromFiles: UserPreferences = {} as UserPreferences;
   shownElementsChanged = new BehaviorSubject<boolean>(true);
@@ -85,14 +86,14 @@ export class GlobalVariableService {
 
   constructor(private _http: HttpClient, private _modalService: NgbModal) {
     this.hiddenClasses = new Set([]);
-    // set user preferences staticly (necessary for rendering html initially)
+    // set user preferences statically (necessary for rendering html initially)
     this.setUserPreferences(appPreferences, this.userPreferences);
     // set default values dynamically
     this._http.get("./assets/appPreferences.json").subscribe((x) => {
       this.setUserPreferences(x, this.userPreferences);
       this.setUserPreferences(x, this.userPreferencesFromFiles);
 
-      // set user prefered values. These will be overriden if "Store User Profile" is checked
+      // set user preferred values. These will be overridden if "Store User Profile" is checked
       this._http
         .get("/app/custom/config/app_description.json")
         .subscribe((x) => {
@@ -117,7 +118,7 @@ export class GlobalVariableService {
       isGraphEmpty
     );
 
-    // set cytoscape.js style dynamicly
+    // set cytoscape.js style dynamically
     this._http.get("./assets/generated/stylesheet.json").subscribe((x) => {
       this.cy.style(x);
       this.addOtherStyles();
@@ -984,6 +985,7 @@ export class GlobalVariableService {
 
   setSampleDatabase(sampleDatabase: string) {
     this.sampleDatabaseIndex.next(SAMPLE_DATABASES.indexOf(sampleDatabase));
+    this.selectedSampleDatabase.next(sampleDatabase);
   }
 
   // Move all the elements to the right by 0.000001

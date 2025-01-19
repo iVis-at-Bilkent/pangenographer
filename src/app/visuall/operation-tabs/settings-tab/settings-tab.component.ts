@@ -8,10 +8,10 @@ import {
 import { BehaviorSubject, Subscription } from "rxjs";
 import {
   HIGHLIGHT_NAMES,
-  MAX_HIGHTLIGHT_WIDTH,
+  MAX_HIGHLIGHT_WIDTH,
   MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH,
   MAX_LENGTH_OF_UP_DOWN_STREAM,
-  MIN_HIGHTLIGHT_WIDTH,
+  MIN_HIGHLIGHT_WIDTH,
   MIN_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH,
   MIN_LENGTH_OF_UP_DOWN_STREAM,
   PANGENOGRAPHER_SETTING_NAMES,
@@ -524,11 +524,11 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   bandPassHighlightWidth() {
-    if (this.highlightWidth < MIN_HIGHTLIGHT_WIDTH) {
-      this.highlightWidth = MIN_HIGHTLIGHT_WIDTH;
+    if (this.highlightWidth < MIN_HIGHLIGHT_WIDTH) {
+      this.highlightWidth = MIN_HIGHLIGHT_WIDTH;
     }
-    if (this.highlightWidth > MAX_HIGHTLIGHT_WIDTH) {
-      this.highlightWidth = MAX_HIGHTLIGHT_WIDTH;
+    if (this.highlightWidth > MAX_HIGHLIGHT_WIDTH) {
+      this.highlightWidth = MAX_HIGHLIGHT_WIDTH;
     }
   }
 
