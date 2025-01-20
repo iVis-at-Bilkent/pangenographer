@@ -356,7 +356,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
   sampleGFASelected(sample: string) {
     // If the user selects a sample, open the clear database modal
     this._g.setSampleDatabase(SAMPLE_DATABASES[0]);
-    console.log(SAMPLE_DATABASES[0]);
     this._modalService
       // Open the clear database modal to certify that the user wants to clear the database
       .open(ClearDatabaseModalComponent)

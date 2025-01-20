@@ -1,6 +1,9 @@
 <!-- Modal to ask user action to take when importing a file -->
 <div class="modal-header">
-  <div class="modal-title va-heading1 text-center">Clear the Database</div>
+  <div class="modal-title va-heading1 text-center">
+    Clear the <span *ngIf="clearDatabase">Database</span
+    ><span *ngIf="!clearDatabase">Canvas</span>
+  </div>
   <div>
     <button
       #closeBtn
@@ -13,7 +16,11 @@
   </div>
 </div>
 <div class="modal-body">
-  <div class="va-text">Are you sure you want to clear the database?</div>
+  <div class="va-text">
+    Are you sure you want to clear the
+    <span *ngIf="clearDatabase">database</span
+    ><span *ngIf="!clearDatabase">canvas</span>?
+  </div>
 </div>
 <div class="modal-footer">
   <button
@@ -21,7 +28,7 @@
     class="btn btn-primary va-text"
     id="clear-db-btn"
     data-dismiss="modal"
-    (click)="clearDatabase()"
+    (click)="clear()"
   >
     Clear
   </button>

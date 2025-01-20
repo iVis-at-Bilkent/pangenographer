@@ -2,6 +2,7 @@ import {
   AfterViewChecked,
   Component,
   ElementRef,
+  Input,
   ViewChild,
 } from "@angular/core";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
@@ -14,6 +15,7 @@ import { CytoscapeService } from "../../cytoscape.service";
 })
 export class ClearDatabaseModalComponent implements AfterViewChecked {
   @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @Input() clearDatabase: boolean = true; // Clear database by default
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -24,8 +26,8 @@ export class ClearDatabaseModalComponent implements AfterViewChecked {
     this.closeBtnRef.nativeElement.blur();
   }
 
-  clearDatabase() {
-    this._cyService.clearDatabase();
+  clear() {
+    this._cyService.clear(this.clearDatabase);
     this.activeModal.dismiss();
   }
 

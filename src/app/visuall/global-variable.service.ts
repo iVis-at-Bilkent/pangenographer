@@ -17,6 +17,7 @@ import {
   TYPES_NOT_TO_SHOW,
 } from "./constants";
 import { GraphElement, GraphHistoryItem } from "./db-service/data-types";
+import { ClearDatabaseModalComponent } from "./popups/clear-database-modal/clear-database-modal.component";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
 import { GroupingOptionTypes, UserPreferences } from "./user-preference";
 
@@ -984,8 +985,17 @@ export class GlobalVariableService {
   }
 
   setSampleDatabase(sampleDatabase: string) {
+    // If the selected sample database is the same as the new sample database, do nothing
+    if (this.selectedSampleDatabase.getValue() === sampleDatabase) {
+      return;
+    }
+    // If the selected sample database is different from the new sample database, update the selected sample database
     this.sampleDatabaseIndex.next(SAMPLE_DATABASES.indexOf(sampleDatabase));
     this.selectedSampleDatabase.next(sampleDatabase);
+
+    // Reset the canvas
+    let modal = this._modalService.open(ClearDatabaseModalComponent);
+    modal.componentInstance.clearDatabase = false;
   }
 
   // Move all the elements to the right by 0.000001

@@ -729,14 +729,16 @@ export class CytoscapeService {
 
   // Clear database and cytoscape graph
   // Remove external tools, clear graph history, and remove all elements from cytoscape graph
-  clearDatabase() {
+  clear(clearDatabase: boolean = true) {
     this.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
-    this._dbService.clearDatabase(() => {
-      // Status message after clearing the database
-      this._g.statusMessage.next("Database cleared!");
-    });
+    if (clearDatabase) {
+      this._dbService.clearDatabase(() => {
+        // Status message after clearing the database
+        this._g.statusMessage.next("Database cleared!");
+      });
+    }
   }
 
   private str2file(str: string, fileName: string) {
