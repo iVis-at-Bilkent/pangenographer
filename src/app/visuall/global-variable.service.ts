@@ -993,6 +993,11 @@ export class GlobalVariableService {
     this.sampleDatabaseIndex.next(SAMPLE_DATABASES.indexOf(sampleDatabase));
     this.selectedSampleDatabase.next(sampleDatabase);
 
+    // If there is no existing graph, do nothing
+    if (this.cy.elements().length === 0) {
+      return;
+    }
+
     // Reset the canvas
     let modal = this._modalService.open(ClearDatabaseModalComponent);
     modal.componentInstance.clearDatabase = false;
