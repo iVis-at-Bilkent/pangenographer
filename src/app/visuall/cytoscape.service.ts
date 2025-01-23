@@ -501,7 +501,7 @@ export class CytoscapeService {
   }
 
   highlightElements(elementIds: string[]) {
-    // remove all existing hightlights before hightlighting new elements
+    // remove all existing highlights before highlighting new elements
     const newElementIndicator =
       this._g.userPreferences.mergedElementIndicator.getValue();
     if (newElementIndicator == MergedElementIndicatorTypes.none) {
