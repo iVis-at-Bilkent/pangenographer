@@ -18,13 +18,25 @@
     <label>Maximum jump length</label>
     <input
       type="number"
-      min="0"
+      min="1"
       max="20"
       step="any"
       [(ngModel)]="maxJumpLength"
       (change)="onMaxJumpLengthChange($event)"
       class="form-control standart-input-height va-small-text ms-1 w5-5"
       placeholder="Maximum jump length"
+    />
+  </div>
+  <div class="form-inline va-text flex my-2">
+    <label>Minimum subsequence match length</label>
+    <input
+      type="number"
+      min="0"
+      step="any"
+      [(ngModel)]="minSubsequenceMatchLength"
+      (change)="onMinSubsequenceMatchLengthChange($event)"
+      class="form-control standart-input-height va-small-text ms-1 w5-5"
+      placeholder="Minimum subsequence match length"
     />
   </div>
 </div>

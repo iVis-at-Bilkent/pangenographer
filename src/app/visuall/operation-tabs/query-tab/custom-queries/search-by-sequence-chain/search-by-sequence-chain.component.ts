@@ -35,8 +35,9 @@ export class SequenceChainSearchComponent implements OnInit {
   graphResponse = null;
   clearTableFilter = new Subject<boolean>();
 
-  sequences: string;
-  maxJumpLength: number;
+  sequences: string = "";
+  maxJumpLength: number = 1;
+  minSubsequenceMatchLength: number = 2;
 
   constructor(
     private _dbService: Neo4jDb,
@@ -48,9 +49,6 @@ export class SequenceChainSearchComponent implements OnInit {
     this._g.userPreferences.dataPageSize.subscribe((x) => {
       this.tableInput.pageSize = x;
     });
-
-    this.sequences = "";
-    this.maxJumpLength = 0;
   }
 
   prepareQuery() {
@@ -92,6 +90,7 @@ export class SequenceChainSearchComponent implements OnInit {
     this._dbService.sequenceChainSearch(
       sequences,
       this.maxJumpLength,
+      this.minSubsequenceMatchLength,
       this.tableInput.isLoadGraph ? DbResponseType.graph : DbResponseType.table,
       callback
     );
@@ -113,12 +112,19 @@ export class SequenceChainSearchComponent implements OnInit {
   }
 
   onMaxJumpLengthChange(event: any) {
-    if (!event.target.value || event.target.value <= 0) {
-      this.maxJumpLength = 0;
+    if (!event.target.value || event.target.value <= 1) {
+      this.maxJumpLength = 1;
     } else if (event.target.value >= 20) {
       this.maxJumpLength = 20;
     } else {
       this.maxJumpLength = Number(event.target.value);
+    }
+  }
+  onMinSubsequenceMatchLengthChange(event: any) {
+    if (!event.target.value || event.target.value <= 0) {
+      this.minSubsequenceMatchLength = 0;
+    } else {
+      this.minSubsequenceMatchLength = Number(event.target.value);
     }
   }
 }

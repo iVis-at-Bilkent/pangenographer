@@ -209,6 +209,7 @@ export class DbAdapterService {
   sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
+    minSubsequenceMatchLength: number,
     dbResponseType: DbResponseType,
     callback: (x: any) => void
   ) {
@@ -216,7 +217,13 @@ export class DbAdapterService {
       callback(x);
       this._g.add2GraphHistory("Search by sequence chain");
     };
-    this._db.sequenceChainSearch(sequences, maxJumpLength, dbResponseType, fn);
+    this._db.sequenceChainSearch(
+      sequences,
+      maxJumpLength,
+      minSubsequenceMatchLength,
+      dbResponseType,
+      fn
+    );
   }
 
   getGFAData2ImportGFA(GFAData: GFAData, callback: () => void) {

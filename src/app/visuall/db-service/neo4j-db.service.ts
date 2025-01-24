@@ -587,18 +587,16 @@ export class Neo4jDb implements DbService {
   sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
+    minSubsequenceMatchLength: number,
     dbResponseType: DbResponseType,
     callback: (response: any) => void
   ) {
     const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
     const pageSize = this.getPageSize4Backend();
-    const t = "";
-    const isIgnoreCase = true;
-    const orderBy = null;
-    const orderDir = 0;
+    const currentPage = 1;
 
     this.runQuery(
-      `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, [], ${pageSize}, 1, '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, ${timeout})`,
+      `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, ${minSubsequenceMatchLength}, [], ${pageSize}, ${currentPage}, ${timeout})`,
       callback,
       dbResponseType,
       false

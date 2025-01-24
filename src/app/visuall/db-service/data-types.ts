@@ -58,6 +58,7 @@ export interface DbService {
   sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
+    minSubsequenceMatchLength: number,
     dbResponseType: DbResponseType,
     callback: (x: GraphResponse) => any
   );
