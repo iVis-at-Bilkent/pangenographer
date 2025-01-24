@@ -35,8 +35,8 @@ export class SearchSegmentByNameComponent implements OnInit {
     isHide0: false,
   };
 
-  segmentNames: string;
-  neighborDistance: number;
+  segmentNames: string = "";
+  neighborDistance: number = 0;
 
   constructor(
     private _dbService: Neo4jDb,
@@ -48,9 +48,6 @@ export class SearchSegmentByNameComponent implements OnInit {
     this._g.userPreferences.dataPageSize.subscribe((x) => {
       this.tableInput.pageSize = x;
     });
-
-    this.segmentNames = "";
-    this.neighborDistance = 1;
   }
 
   prepareQuery() {
@@ -97,12 +94,15 @@ export class SearchSegmentByNameComponent implements OnInit {
 
     let segmentNames = this.prepareSegmentNames(this.segmentNames);
 
-    const cypherQuery = `WITH [${segmentNames}] as segmentNames
+    const cypherQuery =
+      `WITH [${segmentNames}] as segmentNames
       MATCH (segment:SEGMENT)
-      WHERE (segment.segmentName) IN segmentNames
-      OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
-      RETURN DISTINCT path`;
-    `LIMIT ${dataCount}`;
+      WHERE (segment.segmentName) IN segmentNames ` +
+      (this.neighborDistance
+        ? `OPTIONAL MATCH path = (segment)-[*..${this.neighborDistance}]-(neighbor)
+          RETURN DISTINCT path`
+        : `RETURN segment`) +
+      ` LIMIT ${dataCount}`;
     this._dbService.runQuery(cypherQuery, callback);
   }
 
@@ -122,5 +122,15 @@ export class SearchSegmentByNameComponent implements OnInit {
       this.tableInput,
       this._g.userPreferences.isIgnoreCaseInText.getValue()
     );
+  }
+
+  onNeighborDistanceChange(event: any) {
+    if (!event.target.value || event.target.value <= 0) {
+      this.neighborDistance = 0;
+    } else if (event.target.value >= 20) {
+      this.neighborDistance = 20;
+    } else {
+      this.neighborDistance = Number(event.target.value);
+    }
   }
 }
