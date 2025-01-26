@@ -1,7 +1,10 @@
 <div
   class="va-text d-flex flex-column align-items-center justify-content-center"
 >
-  <label for="segmentNamesInput" class="sr-only my-2"
+  <label
+    for="segmentNamesInput"
+    class="sr-only my-2"
+    title="Takes a list of segment names entered and finds all segments that match the names. The resulting segments can be listed or directly graphed depending on the options. Additionally, you can specify a neighbor distance to include neighboring segments within the given distance."
     >Search by segment names</label
   >
   <textarea
@@ -15,7 +18,10 @@
   >
   </textarea>
   <div class="form-inline va-text flex my-2">
-    <label>Neighbor distance</label>
+    <label
+      title="Specify the neighbor distance to include neighboring segments within the given distance."
+      >Neighbor distance</label
+    >
     <input
       type="number"
       min="0"
@@ -25,6 +31,7 @@
       (change)="onNeighborDistanceChange($event)"
       class="form-control standart-input-height va-small-text ms-1 w5-5"
       placeholder="Neighbor Distance"
+      title="Specify the neighbor distance to include neighboring segments within the given distance."
     />
   </div>
 </div>
@@ -43,18 +50,31 @@
       class="form-check-input"
       [(ngModel)]="tableInput.isLoadGraph"
       id="isGraph"
+      title="Elements queried will be loaded as a graph"
+      placeholder="Elements queried will be loaded as a graph"
     />
-    <label class="form-check-label" for="isGraph">Graph</label>
+    <label
+      class="form-check-label"
+      for="isGraph"
+      title="Elements queried will be loaded as a graph"
+      >Graph</label
+    >
   </div>
   <div class="form-check va-text m-1">
     <input
       type="checkbox"
       class="form-check-input"
       [(ngModel)]="tableInput.isMergeGraph"
-      title="Merge Graph"
+      id="isMerge"
+      title="If checked, the queried elements will be merged into current graph"
       placeholder="Merge Graph"
     />
-    <label class="form-check-label" for="isMerge">Merge</label>
+    <label
+      class="form-check-label"
+      for="isMerge"
+      title="If checked, the queried elements will be merged into current graph"
+      >Merge</label
+    >
   </div>
 </div>
 

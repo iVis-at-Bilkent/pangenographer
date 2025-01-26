@@ -136,7 +136,9 @@
               [(ngModel)]="isQueryOnDb"
               title="Query on database"
             />
-            <label class="form-label va-text">Database</label>
+            <label class="form-label va-text" title="Query on database"
+              >Database</label
+            >
           </div>
           <div class="form-check m-1">
             <input
@@ -144,9 +146,14 @@
               class="form-check-input cb-filter cb-is-load-graph"
               [(ngModel)]="tableInput.isLoadGraph"
               [disabled]="!isQueryOnDb"
-              title="Load graph from database"
+              title="Elements queried will be loaded as a graph"
+              placeholder="Elements queried will be loaded as a graph"
             />
-            <label class="form-label va-text">Graph</label>
+            <label
+              class="form-label va-text"
+              title="Elements queried will be loaded as a graph"
+              >Graph</label
+            >
           </div>
           <div class="form-check m-1">
             <input
@@ -154,9 +161,13 @@
               class="form-check-input cb-filter cb-is-merge-graph"
               [(ngModel)]="tableInput.isMergeGraph"
               [disabled]="!isQueryOnDb"
-              title="Merge graph from database"
+              title="If checked, the queried elements will be merged into current graph"
             />
-            <label class="form-label va-text">Merge</label>
+            <label
+              class="form-label va-text"
+              title="If checked, the queried elements will be merged into current graph"
+              >Merge</label
+            >
           </div>
         </div>
 

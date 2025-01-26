@@ -1,7 +1,10 @@
 <div
   class="va-text d-flex flex-column align-items-center justify-content-center"
 >
-  <label for="sequencesInput" class="sr-only my-2"
+  <label
+    for="sequencesInput"
+    class="sr-only my-2"
+    title="Takes a chain of sequences entered and finds all maximal paths that contain the entire chain of sequences or a sub-chain of sequences. The resulting paths can be listed or directly graphed depending on the options."
     >Search by sequence chain</label
   >
   <textarea
@@ -15,28 +18,41 @@
   >
   </textarea>
   <div class="form-inline va-text flex my-2">
-    <label>Maximum jump length</label>
+    <label
+      for="maxJumpLength"
+      class="d-inline-block"
+      title="Specify the maximum allowed jump length between sequences, counted in number of segments skipped"
+      >Maximum jump length</label
+    >
     <input
       type="number"
       min="0"
       max="20"
       step="any"
+      id="maxJumpLength"
       [(ngModel)]="maxJumpLength"
       (change)="onMaxJumpLengthChange($event)"
       class="form-control standart-input-height va-small-text ms-1 w5-5"
       placeholder="Maximum jump length"
+      title="Specify the maximum allowed jump length between sequences, counted in number of segments skipped"
     />
   </div>
   <div class="form-inline va-text flex my-2">
-    <label>Minimum subsequence match length</label>
+    <label
+      for="minSubsequenceMatchLength"
+      title="Specify the minimum length of subsequences that must match, counted in number of sequences starting from the first sequence"
+      >Minimum subsequence match length</label
+    >
     <input
       type="number"
       min="0"
       step="any"
+      id="minSubsequenceMatchLength"
       [(ngModel)]="minSubsequenceMatchLength"
       (change)="onMinSubsequenceMatchLengthChange($event)"
       class="form-control standart-input-height va-small-text ms-1 w5-5"
       placeholder="Minimum subsequence match length"
+      title="Specify the minimum length of subsequences that must match, counted in number of sequences starting from the first sequence"
     />
   </div>
 </div>
@@ -55,18 +71,31 @@
       class="form-check-input"
       [(ngModel)]="tableInput.isLoadGraph"
       id="isGraph"
+      title="Elements queried will be loaded as a graph"
+      placeholder="Elements queried will be loaded as a graph"
     />
-    <label class="form-check-label" for="isGraph">Graph</label>
+    <label
+      class="form-check-label"
+      for="isGraph"
+      title="Elements queried will be loaded as a graph"
+      >Graph</label
+    >
   </div>
   <div class="form-check va-text m-1">
     <input
       type="checkbox"
       class="form-check-input"
       [(ngModel)]="tableInput.isMergeGraph"
-      title="Merge Graph"
+      id="isMerge"
+      title="If checked, the queried elements will be merged into current graph"
       placeholder="Merge Graph"
     />
-    <label class="form-check-label" for="isMerge">Merge</label>
+    <label
+      class="form-check-label"
+      for="isMerge"
+      title="If checked, the queried elements will be merged into current graph"
+      >Merge</label
+    >
   </div>
 </div>
 

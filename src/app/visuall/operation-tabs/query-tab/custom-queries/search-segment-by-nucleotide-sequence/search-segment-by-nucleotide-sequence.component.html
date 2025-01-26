@@ -1,7 +1,12 @@
 <div
   class="va-text d-flex flex-column align-items-center justify-content-center"
 >
-  <label for="sequencesInput" class="sr-only my-2">Search by sequence</label>
+  <label
+    for="sequencesInput"
+    class="sr-only my-2"
+    title="Enter nucleotide sequences to search for specific segments"
+    >Search by sequence</label
+  >
   <textarea
     type="number"
     id="sequencesInput"
@@ -13,13 +18,17 @@
   >
   </textarea>
   <div class="form-inline va-text flex my-2">
-    <label for="graphEdges">Connect nodes when graphing</label>
+    <label
+      for="graphEdges"
+      title="Enable this option to connect nodes when visualizing the graph"
+      >Connect nodes when graphing</label
+    >
     <input
       class="form-check-input ms-1"
       type="checkbox"
       [(ngModel)]="graphEdges"
       id="graphEdges"
-      title="Graph Edges"
+      title="Enable this option to connect nodes when visualizing the graph"
       placeholder="Graph Edges"
     />
   </div>
@@ -39,18 +48,31 @@
       class="form-check-input"
       [(ngModel)]="tableInput.isLoadGraph"
       id="isGraph"
+      title="Elements queried will be loaded as a graph"
+      placeholder="Elements queried will be loaded as a graph"
     />
-    <label class="form-check-label" for="isGraph">Graph</label>
+    <label
+      class="form-check-label"
+      for="isGraph"
+      title="Elements queried will be loaded as a graph"
+      >Graph</label
+    >
   </div>
   <div class="form-check va-text m-1">
     <input
       type="checkbox"
       class="form-check-input"
       [(ngModel)]="tableInput.isMergeGraph"
-      title="Merge Graph"
+      id="isMerge"
+      title="If checked, the queried elements will be merged into current graph"
       placeholder="Merge Graph"
     />
-    <label class="form-check-label" for="isMerge">Merge</label>
+    <label
+      class="form-check-label"
+      for="isMerge"
+      title="If checked, the queried elements will be merged into current graph"
+      >Merge</label
+    >
   </div>
 </div>
 
