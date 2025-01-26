@@ -36,8 +36,8 @@ export class SequenceChainSearchComponent implements OnInit {
   clearTableFilter = new Subject<boolean>();
 
   sequences: string = "";
-  maxJumpLength: number = 1;
-  minSubsequenceMatchLength: number = 2;
+  maxJumpLength: number = 0;
+  minSubsequenceMatchLength: number = 0;
 
   constructor(
     private _dbService: Neo4jDb,
@@ -112,17 +112,20 @@ export class SequenceChainSearchComponent implements OnInit {
   }
 
   onMaxJumpLengthChange(event: any) {
-    if (!event.target.value || event.target.value <= 1) {
-      this.maxJumpLength = 1;
-    } else if (event.target.value >= 20) {
-      this.maxJumpLength = 20;
+    let min = 0,
+      max = 20;
+    if (!event.target.value || event.target.value <= min) {
+      this.maxJumpLength = min;
+    } else if (event.target.value >= max) {
+      this.maxJumpLength = max;
     } else {
       this.maxJumpLength = Number(event.target.value);
     }
   }
   onMinSubsequenceMatchLengthChange(event: any) {
-    if (!event.target.value || event.target.value <= 0) {
-      this.minSubsequenceMatchLength = 0;
+    let min = 0;
+    if (!event.target.value || event.target.value <= min) {
+      this.minSubsequenceMatchLength = min;
     } else {
       this.minSubsequenceMatchLength = Number(event.target.value);
     }
