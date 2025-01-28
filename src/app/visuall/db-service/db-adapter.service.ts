@@ -210,7 +210,6 @@ export class DbAdapterService {
     sequences: string,
     maxJumpLength: number,
     minSubsequenceMatchLength: number,
-    dbResponseType: DbResponseType,
     callback: (x: any) => void
   ) {
     let fn = (x: any) => {
@@ -221,7 +220,6 @@ export class DbAdapterService {
       sequences,
       maxJumpLength,
       minSubsequenceMatchLength,
-      dbResponseType,
       fn
     );
   }

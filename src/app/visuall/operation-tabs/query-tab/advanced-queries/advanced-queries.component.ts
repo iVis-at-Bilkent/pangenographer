@@ -36,7 +36,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   selectedClass = "";
   targetOrRegulator = 0;
   clickedNodeIndex = -1;
-  addNodeButonTxt = "Select Nodes to Add";
+  addNodeButtonTxt = "Select Nodes to Add";
   tableInput: TableViewInput = {
     columns: ["Title"],
     results: [],
@@ -112,10 +112,10 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   addSelectedNodes() {
     if (this._g.isSwitch2ObjectTabOnSelect) {
       this._g.isSwitch2ObjectTabOnSelect = false;
-      this.addNodeButonTxt = "Complete Selection";
+      this.addNodeButtonTxt = "Complete Selection";
       return;
     }
-    this.addNodeButonTxt = "Select Nodes to Add";
+    this.addNodeButtonTxt = "Select Nodes to Add";
     this._g.isSwitch2ObjectTabOnSelect = true;
     const selectedNodes = this._g.cy.nodes(":selected");
     if (selectedNodes.length < 1) {

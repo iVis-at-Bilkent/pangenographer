@@ -196,7 +196,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this._ngZone.run(() => {
       if (e.type == "mouseover") {
         if (this.params.isUseCySelector4Highlight) {
-          this.hoveredElementId = "#" + e.target.id();
+          this.hoveredElementId = e.target.id();
         } else {
           this.hoveredElementId = e.target.id().substr(1);
         }

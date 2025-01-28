@@ -73,6 +73,7 @@ export class Neo4jDb implements DbService {
       : query;
 
     console.log(q);
+
     const requestBody = {
       statements: [
         {
@@ -538,7 +539,7 @@ export class Neo4jDb implements DbService {
         `CALL commonStream([${dbIds
           .map((element) => `'${element}'`)
           .join()}], [${ignoredTypes.join()}], ${lengthLimit}, ${dir}, ${pageSize}, ${currentPage},
-       '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
+        '${t}', ${isIgnoreCase}, ${orderBy}, ${orderDir}, {}, 0, 0, 0, ${timeout}, ${idf})`,
         callback,
         type,
         false
@@ -588,7 +589,6 @@ export class Neo4jDb implements DbService {
     sequences: string,
     maxJumpLength: number,
     minSubsequenceMatchLength: number,
-    dbResponseType: DbResponseType,
     callback: (response: any) => void
   ) {
     const timeout = this._g.userPreferences.dbTimeout.getValue() * 1000;
@@ -597,9 +597,7 @@ export class Neo4jDb implements DbService {
 
     this.runQuery(
       `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, ${minSubsequenceMatchLength}, [], ${pageSize}, ${currentPage}, ${timeout})`,
-      callback,
-      dbResponseType,
-      false
+      callback
     );
   }
 
@@ -776,7 +774,7 @@ export class Neo4jDb implements DbService {
       DELETE n
     `,
       callback,
-      0,
+      1,
       false
     );
   }

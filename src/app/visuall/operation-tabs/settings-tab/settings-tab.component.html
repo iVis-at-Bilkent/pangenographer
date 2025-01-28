@@ -37,7 +37,7 @@
           max="10"
           min="1"
           step="any"
-          (change)="onlengthOfUpDownstreamSelected($event)"
+          (change)="onLengthOfUpDownstreamSelected($event)"
           [(ngModel)]="lengthOfUpDownstream"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
           placeholder="Length of up/downstream"
@@ -87,7 +87,7 @@
           type="number"
           min="1"
           step="any"
-          (change)="onsegmentDataSizeQueryLimitSelected($event)"
+          (change)="onSegmentDataSizeQueryLimitSelected($event)"
           [(ngModel)]="segmentDataSizeQueryLimit"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
           placeholder="Maximum segment data size to be sent per line"
@@ -103,7 +103,7 @@
           type="number"
           min="1"
           step="any"
-          (change)="onsizeOfGetSampleDataSelected($event)"
+          (change)="onSizeOfGetSampleDataSelected($event)"
           [(ngModel)]="sizeOfGetSampleData"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
           placeholder="Size of sample data fetched from Neo4j"
@@ -120,7 +120,7 @@
           max="10"
           min="1"
           step="any"
-          (change)="onlengthOfBlastSelectedSegmentsPathSelected($event)"
+          (change)="onLengthOfBlastSelectedSegmentsPathSelected($event)"
           [(ngModel)]="lengthOfBlastSelectedSegmentsPath"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
           placeholder="Length of BLAST selected segments path"
@@ -137,7 +137,7 @@
           max="100"
           min="1"
           step="any"
-          (change)="onseedSourceTargetCount($event)"
+          (change)="onSeedSourceTargetCount($event)"
           [(ngModel)]="seedSourceTargetCount"
           class="form-control standart-input-height va-small-text ms-1 w5-5"
           placeholder="Seed source/target count"
@@ -178,11 +178,14 @@
           [(ngModel)]="setting.isEnable"
           [id]="'generalBool' + i"
           (change)="settingChanged(setting.isEnable, setting.path2userPref)"
-          title="General"
+          [title]="setting.title"
         />
-        <label class="form-check-label" [for]="'generalBool' + i">{{
-          setting.text
-        }}</label>
+        <label
+          class="form-check-label"
+          [for]="'generalBool' + i"
+          [title]="setting.title"
+          >{{ setting.text }}</label
+        >
       </div>
     </div>
     <div>

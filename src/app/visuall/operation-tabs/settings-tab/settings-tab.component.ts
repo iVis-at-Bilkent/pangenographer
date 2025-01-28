@@ -106,6 +106,8 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
         text: "Highlight on hover",
         isEnable: false,
         path2userPref: "isHighlightOnHover",
+        title:
+          "Highlights the node and its edges when hovered over, the color can be changed in the highlight style settings. This also applies to the table view.",
       },
       {
         text: "Show overview window",
@@ -342,7 +344,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     }
   }
 
-  onlengthOfUpDownstreamSelected(x: any) {
+  onLengthOfUpDownstreamSelected(x: any) {
     let length = parseInt(x.target.value);
     if (length > MAX_LENGTH_OF_UP_DOWN_STREAM) {
       length = MAX_LENGTH_OF_UP_DOWN_STREAM;
@@ -402,7 +404,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   // Used to change the segment data size query limit in the user preferences and the current component when the user selects a new limit
-  onsegmentDataSizeQueryLimitSelected(x: any) {
+  onSegmentDataSizeQueryLimitSelected(x: any) {
     let limit = parseInt(x.target.value);
     if (limit < 1) {
       limit = 1;
@@ -413,7 +415,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   }
 
   // Used to change the size of the get sample data in the user preferences and the current component when the user selects a new size
-  onsizeOfGetSampleDataSelected(x: any) {
+  onSizeOfGetSampleDataSelected(x: any) {
     let size = parseInt(x.target.value);
 
     // if the size is less than 1, set it to 1
@@ -433,7 +435,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
   // Used to change the seed source target count of the get some zero degree nodes
   // in the user preferences and the current component when the user selects a new count
-  onseedSourceTargetCount(x: any) {
+  onSeedSourceTargetCount(x: any) {
     let count = parseInt(x.target.value);
 
     // if the count is less than 1, set it to 1
@@ -451,7 +453,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this._profile.saveUserPreferences();
   }
 
-  onlengthOfBlastSelectedSegmentsPathSelected(x: any) {
+  onLengthOfBlastSelectedSegmentsPathSelected(x: any) {
     let length = parseInt(x.target.value);
     if (length > MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH) {
       length = MAX_LENGTH_OF_BLAST_SELECTED_SEGMENTS_PATH;

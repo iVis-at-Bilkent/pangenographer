@@ -1,4 +1,94 @@
+<div class="va-text">
+  <div class="d-flex align-items-center justify-content-center">
+    <select
+      class="form-select tight-select filter-form va-small-text query-select"
+      [(ngModel)]="selectedQuery"
+      title="Choose a query"
+    >
+      <option value="">Choose a query</option>
+      <option *ngFor="let query of queries" [value]="query">{{ query }}</option>
+    </select>
+  </div>
+</div>
+
 <div
+  *ngIf="selectedQuery === queries[0]"
+  class="va-text d-flex flex-column align-items-center justify-content-center"
+>
+  <label
+    for="segmentNamesInput"
+    class="sr-only my-2"
+    title="Takes a list of segment names entered and finds all segments that match the names. The resulting segments can be listed or directly graphed depending on the options. Additionally, you can specify a neighbor distance to include neighboring segments within the given distance."
+    >Search by segment names</label
+  >
+  <textarea
+    type="number"
+    id="segmentNamesInput"
+    [(ngModel)]="segmentNames"
+    [style.height]="'100px'"
+    class="form-control va-small-text"
+    title="Enter Segment names to search line by line or comma separated"
+    placeholder="Enter Segment names to search line by line or comma separated"
+  >
+  </textarea>
+  <div class="form-inline va-text flex my-2">
+    <label
+      title="Specify the neighbor distance to include neighboring segments within the given distance."
+      >Neighbor distance</label
+    >
+    <input
+      type="number"
+      min="0"
+      max="20"
+      step="any"
+      [(ngModel)]="neighborDistance"
+      (change)="onNeighborDistanceChange($event)"
+      class="form-control standart-input-height va-small-text ms-1 w5-5"
+      placeholder="Neighbor Distance"
+      title="Specify the neighbor distance to include neighboring segments within the given distance."
+    />
+  </div>
+</div>
+
+<div
+  *ngIf="selectedQuery === queries[1]"
+  class="va-text d-flex flex-column align-items-center justify-content-center"
+>
+  <label
+    for="sequencesInput"
+    class="sr-only my-2"
+    title="Enter nucleotide sequences to search for specific segments"
+    >Search by sequence</label
+  >
+  <textarea
+    type="number"
+    id="sequencesInput"
+    [(ngModel)]="sequences"
+    [style.height]="'100px'"
+    class="form-control va-small-text"
+    title="Enter Segment sequences to search line by line or comma separated"
+    placeholder="Enter Segment sequences to search line by line or comma separated"
+  >
+  </textarea>
+  <div class="form-inline va-text flex my-2">
+    <label
+      for="graphEdges"
+      title="Enable this option to connect nodes when visualizing the graph"
+      >Connect nodes when graphing</label
+    >
+    <input
+      class="form-check-input ms-1"
+      type="checkbox"
+      [(ngModel)]="graphEdges"
+      id="graphEdges"
+      title="Enable this option to connect nodes when visualizing the graph"
+      placeholder="Graph Edges"
+    />
+  </div>
+</div>
+
+<div
+  *ngIf="selectedQuery === queries[2]"
   class="va-text d-flex flex-column align-items-center justify-content-center"
 >
   <label
@@ -57,11 +147,14 @@
   </div>
 </div>
 
-<div class="d-flex align-items-center justify-content-center m-1">
+<div
+  *ngIf="selectedQuery !== ''"
+  class="d-flex align-items-center justify-content-center m-1"
+>
   <input
     class="btn btn-sm btn-dark va-text m-2 center"
     type="button"
-    (click)="prepareQuery()"
+    (click)="execute()"
     value="Execute"
   />
 
@@ -100,6 +193,7 @@
 </div>
 
 <app-table-view
+  *ngIf="selectedQuery !== ''"
   [params]="tableInput"
   [tableFilled]="tableIsFilled"
   (onFilteringChanged)="filterTable($event)"

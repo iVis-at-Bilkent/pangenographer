@@ -27,8 +27,8 @@ export class ElementOfInterestComponent implements OnInit {
 
   selectedNodes: ElementAsQueryParam[] = [];
   clickedNodeIndex = -1;
-  addNodeButonTxt = "Select nodes to add";
-  addNodeButonImage = "assets/img/add-selection-cursor.svg";
+  addNodeButtonTxt = "Select nodes to add";
+  addNodeButtonImage = "assets/img/add-selection-cursor.svg";
   isShow = true;
 
   constructor(
@@ -50,12 +50,12 @@ export class ElementOfInterestComponent implements OnInit {
   addSelectedNodes() {
     if (this._g.isSwitch2ObjectTabOnSelect) {
       this._g.isSwitch2ObjectTabOnSelect = false;
-      this.addNodeButonTxt = "Complete selection";
-      this.addNodeButonImage = "assets/img/tick.svg";
+      this.addNodeButtonTxt = "Complete selection";
+      this.addNodeButtonImage = "assets/img/tick.svg";
       return;
     }
-    this.addNodeButonTxt = "Select nodes to add";
-    this.addNodeButonImage = "assets/img/add-selection-cursor.svg";
+    this.addNodeButtonTxt = "Select nodes to add";
+    this.addNodeButtonImage = "assets/img/add-selection-cursor.svg";
     this._g.isSwitch2ObjectTabOnSelect = true;
     const selectedNodes = this._g.cy.nodes(":selected");
     if (selectedNodes.length < 1) {

@@ -65,6 +65,7 @@ export interface BoolSetting {
   isEnable: boolean;
   text: string;
   path2userPref: string;
+  title?: string;
 }
 
 export interface UserProfile {

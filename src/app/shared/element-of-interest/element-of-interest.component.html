@@ -44,13 +44,15 @@
     </button>
     <button
       class="btn btn-sm m-1"
-      [ngClass]="{ 'highlighted-btn': addNodeButonTxt == 'Complete selection' }"
+      [ngClass]="{
+        'highlighted-btn': addNodeButtonTxt == 'Complete selection'
+      }"
       type="button"
     >
       <img
-        [src]="addNodeButonImage"
+        [src]="addNodeButtonImage"
         class="img-btn"
-        [title]="addNodeButonTxt"
+        [title]="addNodeButtonTxt"
         (click)="addSelectedNodes()"
         title="Add selected nodes"
       />

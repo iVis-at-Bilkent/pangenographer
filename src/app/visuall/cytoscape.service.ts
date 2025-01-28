@@ -609,7 +609,7 @@ export class CytoscapeService {
     }) {
       let elements2remain = null;
       if (event.cySelector != undefined) {
-        elements2remain = this._g.cy.$(event.cySelector);
+        elements2remain = this._g.cy.getElementById(event.cySelector);
       } else {
         elements2remain = event.target.neighborhood().union(event.target);
         if (event.target.isEdge()) {

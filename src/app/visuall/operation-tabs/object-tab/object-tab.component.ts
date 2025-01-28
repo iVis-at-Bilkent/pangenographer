@@ -279,7 +279,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
       let row: TableData[] = [
         {
-          value: "#" + idMappingForHighlight[elements[i].id()],
+          value: idMappingForHighlight[elements[i].id()],
         },
         { value: className },
       ];

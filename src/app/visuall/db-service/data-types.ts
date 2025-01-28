@@ -59,7 +59,6 @@ export interface DbService {
     sequences: string,
     maxJumpLength: number,
     minSubsequenceMatchLength: number,
-    dbResponseType: DbResponseType,
     callback: (x: GraphResponse) => any
   );
 
@@ -137,7 +136,7 @@ export interface GFASegment {
   segmentName: string;
   segmentLength: number;
   id: string;
-  elementId?: string;
+  elementId: string;
   stableSequenceName?: string;
   stableSequenceOffset?: number;
   stableSequenceRank?: number;

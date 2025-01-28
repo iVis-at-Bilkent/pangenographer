@@ -48,6 +48,7 @@ export class FileReaderService {
     let segment: GFASegment = {
       segmentName: "",
       id: "",
+      elementId: "",
       segmentData: "",
       segmentLength: 0,
     };
@@ -749,10 +750,8 @@ export class FileReaderService {
     gfaSample: string,
     callback: (GFAData: GFAData) => Promise<void>
   ) {
-    let seperatedGFASample = gfaSample.split(/\n/);
-
     // Parse the GFA sample and call the callback function
-    callback(this.parseGFA(seperatedGFASample)).then(() => {
+    callback(this.parseGFA(gfaSample.split(/\n/))).then(() => {
       console.log("Processed GFA sample");
       this._g.statusMessage.next("Processed GFA sample");
     });

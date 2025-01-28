@@ -41,7 +41,7 @@ export interface TableRowMeta {
 export function object2TableRow(
   objectProperties: any,
   columnNames: string[],
-  id: number
+  id: string
 ): TableData[] {
   let row: TableData[] = [];
 

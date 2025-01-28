@@ -27,29 +27,7 @@
     </div>
 
     <div id="custom-query-tab" class="show collapse text-center m-1">
-      <div>
-        <div class="va-text">
-          <div class="d-flex align-items-center justify-content-center">
-            <select
-              class="form-select tight-select filter-form va-small-text query-select"
-              [(ngModel)]="selectedQuery"
-              (change)="changeQuery($event)"
-              title="Choose a query"
-            >
-              <option value="">Choose a query</option>
-              <option *ngFor="let p of queries" [value]="p.text">
-                {{ p.text }}
-              </option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div *ngFor="let t of queries; let i = index">
-        <div [style.display]="i == selectedIndex ? 'block' : 'none'">
-          <ng-container *ngComponentOutlet="t.component"></ng-container>
-        </div>
-      </div>
+      <app-custom-queries></app-custom-queries>
     </div>
   </div>
 </div>
