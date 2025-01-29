@@ -46,7 +46,7 @@ export class CustomQueriesComponent implements OnInit {
   sequences: string = "";
   segmentNames: string = "";
   neighborDistance: number = 0;
-  maxJumpLength: number = 0;
+  maxJumpLength: number = 2;
   minSubsequenceMatchLength: number = 0;
   graphEdges: boolean = true;
 
