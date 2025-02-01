@@ -977,7 +977,7 @@ export class BlastTabComponent implements OnInit {
         });
 
         this._g.statusMessage.next(
-          "Succesfully added " +
+          "Successfully added " +
             res.nodes.length +
             " sequences to the BLAST database creation"
         );
