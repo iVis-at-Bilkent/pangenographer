@@ -42,7 +42,7 @@ export class FileReaderService {
   }
 
   private createSegmentFromGFA(segmentLine: string): GFASegment {
-    let segmentLineTabSeperated = segmentLine
+    let segmentLineTabSeparated = segmentLine
       .split(/\t/)
       .map((part) => part.trim());
     let segment: GFASegment = {
@@ -52,12 +52,12 @@ export class FileReaderService {
       segmentData: "",
       segmentLength: 0,
     };
-    segment.segmentName = segmentLineTabSeperated[1];
-    segment.id = segmentLineTabSeperated[1];
-    segment.segmentData = segmentLineTabSeperated[2];
-    segment.segmentLength = segmentLineTabSeperated[2].length;
-    for (let i = 3; i < segmentLineTabSeperated.length; i++) {
-      let optionalField = (segmentLineTabSeperated[i] as string).trim();
+    segment.segmentName = segmentLineTabSeparated[1];
+    segment.id = segmentLineTabSeparated[1];
+    segment.segmentData = segmentLineTabSeparated[2];
+    segment.segmentLength = segmentLineTabSeparated[2].length;
+    for (let i = 3; i < segmentLineTabSeparated.length; i++) {
+      let optionalField = (segmentLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("LN")) {
         segment.segmentLength = Number(optionalField.substring(5));
       } else if (optionalField.startsWith("RC")) {
@@ -95,7 +95,7 @@ export class FileReaderService {
   }
 
   private createJumpFromGFA(jumpLine: string): GFAJump {
-    let jumpLineTabSeperated = jumpLine.split(/\t/).map((part) => part.trim());
+    let jumpLineTabSeparated = jumpLine.split(/\t/).map((part) => part.trim());
     let jump: GFAJump = {
       source: "",
       sourceOrientation: "",
@@ -103,12 +103,12 @@ export class FileReaderService {
       targetOrientation: "",
       distance: "",
     };
-    jump.source = jumpLineTabSeperated[1];
-    jump.sourceOrientation = this.convertOrientation(jumpLineTabSeperated[2]);
-    jump.target = jumpLineTabSeperated[3];
-    jump.targetOrientation = this.convertOrientation(jumpLineTabSeperated[4]);
-    for (let i = 4; i < jumpLineTabSeperated.length; i++) {
-      let optionalField = (jumpLineTabSeperated[i] as string).trim();
+    jump.source = jumpLineTabSeparated[1];
+    jump.sourceOrientation = this.convertOrientation(jumpLineTabSeparated[2]);
+    jump.target = jumpLineTabSeparated[3];
+    jump.targetOrientation = this.convertOrientation(jumpLineTabSeparated[4]);
+    for (let i = 4; i < jumpLineTabSeparated.length; i++) {
+      let optionalField = (jumpLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("SC")) {
         jump.indirectShortcutConnections = Number(optionalField.substring(5));
       } else {
@@ -119,7 +119,7 @@ export class FileReaderService {
   }
 
   private createContainmentFromGFA(containmentLine: string): GFAContainment {
-    let containmentLineTabSeperated = containmentLine
+    let containmentLineTabSeparated = containmentLine
       .split(/\t/)
       .map((part) => part.trim());
     let containment: GFAContainment = {
@@ -130,18 +130,18 @@ export class FileReaderService {
       pos: 0,
       overlap: "",
     };
-    containment.source = containmentLineTabSeperated[1];
+    containment.source = containmentLineTabSeparated[1];
     containment.sourceOrientation = this.convertOrientation(
-      containmentLineTabSeperated[2]
+      containmentLineTabSeparated[2]
     );
-    containment.target = containmentLineTabSeperated[3];
+    containment.target = containmentLineTabSeparated[3];
     containment.targetOrientation = this.convertOrientation(
-      containmentLineTabSeperated[4]
+      containmentLineTabSeparated[4]
     );
-    containment.pos = Number(containmentLineTabSeperated[5]);
-    containment.overlap = containmentLineTabSeperated[6];
-    for (let i = 4; i < containmentLineTabSeperated.length; i++) {
-      let optionalField = (containmentLineTabSeperated[i] as string).trim();
+    containment.pos = Number(containmentLineTabSeparated[5]);
+    containment.overlap = containmentLineTabSeparated[6];
+    for (let i = 4; i < containmentLineTabSeparated.length; i++) {
+      let optionalField = (containmentLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("RC")) {
         containment.readCount = Number(optionalField.substring(5));
       } else if (optionalField.startsWith("NM")) {
@@ -157,7 +157,7 @@ export class FileReaderService {
   }
 
   private createLinkFromGFA(linkLine: string): GFALink {
-    let linkLineTabSeperated = linkLine.split(/\t/).map((part) => part.trim());
+    let linkLineTabSeparated = linkLine.split(/\t/).map((part) => part.trim());
     let link: GFALink = {
       source: "",
       sourceOrientation: "",
@@ -166,13 +166,13 @@ export class FileReaderService {
       overlap: "",
     };
 
-    link.source = linkLineTabSeperated[1];
-    link.sourceOrientation = this.convertOrientation(linkLineTabSeperated[2]);
-    link.target = linkLineTabSeperated[3];
-    link.targetOrientation = this.convertOrientation(linkLineTabSeperated[4]);
+    link.source = linkLineTabSeparated[1];
+    link.sourceOrientation = this.convertOrientation(linkLineTabSeparated[2]);
+    link.target = linkLineTabSeparated[3];
+    link.targetOrientation = this.convertOrientation(linkLineTabSeparated[4]);
 
-    for (let i = 4; i < linkLineTabSeperated.length; i++) {
-      let optionalField = (linkLineTabSeperated[i] as string).trim();
+    for (let i = 4; i < linkLineTabSeparated.length; i++) {
+      let optionalField = (linkLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("MQ")) {
         link.mappingQuality = Number(optionalField.substring(5));
       } else if (optionalField.startsWith("NM")) {
@@ -196,7 +196,7 @@ export class FileReaderService {
   // Create a walk object from a GFA walk line
   private createWalkFromGFA(walkLine: string): GFAWalkData {
     // Split the walk line into tab-separated parts and trim each part
-    let walkLineTabSeperated = walkLine.split(/\t/).map((part) => part.trim());
+    let walkLineTabSeparated = walkLine.split(/\t/).map((part) => part.trim());
 
     // Create a new walk object and set its properties
     let walk: GFAWalk = {
@@ -209,12 +209,12 @@ export class FileReaderService {
     };
 
     // Set the properties of the walk object from the tab-separated parts of the walk line
-    walk.sampleIdentifier = walkLineTabSeperated[1];
-    walk.haplotypeIndex = walkLineTabSeperated[2];
-    walk.sequenceIdentifier = walkLineTabSeperated[3];
-    walk.sequenceStart = walkLineTabSeperated[4];
-    walk.sequenceEnd = walkLineTabSeperated[5];
-    walk.walk = walkLineTabSeperated[6];
+    walk.sampleIdentifier = walkLineTabSeparated[1];
+    walk.haplotypeIndex = walkLineTabSeparated[2];
+    walk.sequenceIdentifier = walkLineTabSeparated[3];
+    walk.sequenceStart = walkLineTabSeparated[4];
+    walk.sequenceEnd = walkLineTabSeparated[5];
+    walk.walk = walkLineTabSeparated[6];
 
     // Extract the segment names from the walk string and split them into an array
     // to be added to particular segments in the graph
@@ -255,7 +255,7 @@ export class FileReaderService {
   // Create a path object from a GFA path line
   private createPathFromGFA(pathLine: string): GFAPathData {
     // Split the path line into tab-separated parts and trim each part
-    let pathLineTabSeperated = pathLine.split(/\t/).map((part) => part.trim());
+    let pathLineTabSeparated = pathLine.split(/\t/).map((part) => part.trim());
     // Create a new path object and set its properties
     let path: GFAPath = {
       pathName: "",
@@ -264,9 +264,9 @@ export class FileReaderService {
     };
 
     // Set the properties of the path object from the tab-separated parts of the path line
-    path.pathName = pathLineTabSeperated[1];
-    path.segmentNames = pathLineTabSeperated[2];
-    path.overlaps = pathLineTabSeperated[3];
+    path.pathName = pathLineTabSeparated[1];
+    path.segmentNames = pathLineTabSeparated[2];
+    path.overlaps = pathLineTabSeparated[3];
 
     // Extract the segment names from the path string and split them into an array
     // to be added to particular segments in the graph
@@ -291,7 +291,7 @@ export class FileReaderService {
     let edges: GFAPathEdge[] = [];
 
     // Handle the case where the overlaps are separated by semicolons instead of commas in the path line representing the jumps
-    if (pathLineTabSeperated[2].indexOf(";") !== -1) {
+    if (pathLineTabSeparated[2].indexOf(";") !== -1) {
       // Split the segment names and overlaps into arrays
       for (let i = 0; i < segmentNamesArray.length - 1; i++) {
         // Extract the overlap between the segments
@@ -334,7 +334,10 @@ export class FileReaderService {
     // Split the text into lines as the GFA file is line-based
     let linesToSend = combinedText.split(/\n/);
 
-    if (linesToSend.length > 1) {
+    if (
+      linesToSend.length > 1 &&
+      this.previousBatchRemainders !== combinedText
+    ) {
       // Calculate the character length of the lines to send
       // If the total character length of the lines to send exceeds the maximum character length of the batch
       // then add the remainder of the current batch to the next batch
@@ -362,7 +365,10 @@ export class FileReaderService {
 
       // Update the lines to send by taking only the lines that can be sent
       linesToSend = linesToSend.slice(0, okayToSendIndex + 1);
-    } else if (linesToSend.length === 1) {
+    } else if (
+      linesToSend.length === 1 &&
+      this.previousBatchRemainders !== combinedText
+    ) {
       // If only one line is present, add it to the previous batch remainders
       this.previousBatchRemainders = linesToSend[0];
       linesToSend = [];
