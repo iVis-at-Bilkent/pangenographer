@@ -602,7 +602,7 @@ export class Neo4jDb implements DbService {
   }
 
   private getPageSize4Backend(): number {
-    let pageSize = this._g.userPreferences.dataPageSize.getValue();
+    let pageSize = this._g.userPreferences.queryResultPageSize.getValue();
     if (this._g.userPreferences.queryResultPagination.getValue() == "Client") {
       pageSize = pageSize * this._g.userPreferences.dataPageLimit.getValue();
     }
@@ -612,6 +612,7 @@ export class Neo4jDb implements DbService {
   private extractGraph(response: any): GraphResponse {
     let nodes = [];
     let edges = [];
+    const nodeIds = new Set();
 
     const results = response.results[0];
     if (!results) {
@@ -626,7 +627,10 @@ export class Neo4jDb implements DbService {
       const graph_edges = graph.relationships;
 
       for (let node of graph_nodes) {
-        nodes.push(node);
+        if (!nodeIds.has(node.id)) {
+          nodes.push(node);
+          nodeIds.add(node.id);
+        }
       }
 
       for (let edge of graph_edges) {

@@ -526,7 +526,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   // Data can include long strings like segment sequences
   truncateData(data: string): string {
     if (typeof data === "string" && data.length > TABLE_TOOLTIP_SHOW_LIMIT) {
-      return data.substring(0, 238) + "...";
+      return data.substring(0, TABLE_TOOLTIP_SHOW_LIMIT - 2) + "...";
     }
     return data;
   }

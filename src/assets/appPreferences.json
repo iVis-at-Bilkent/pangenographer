@@ -3,7 +3,7 @@
     "compoundPadding": "5%",
     "currHighlightIdx": 0,
     "dataPageLimit": 15,
-    "dataPageSize": 15,
+    "queryResultPageSize": 15,
     "dbTimeout": 100,
     "edgeCollapseLimit": 2,
     "groupingOption": 0,

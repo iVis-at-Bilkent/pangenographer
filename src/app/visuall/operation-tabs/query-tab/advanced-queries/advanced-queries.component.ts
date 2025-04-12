@@ -89,7 +89,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     });
     this.selectedQuery = "";
     this.dataPageSizeSubscription =
-      this._g.userPreferences.dataPageSize.subscribe((x) => {
+      this._g.userPreferences.queryResultPageSize.subscribe((x) => {
         this.tableInput.pageSize = x;
         this.tableInput.currentPage = 1;
         this.tableFilter.skip = 0;
@@ -267,7 +267,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     const idxTotalCnt = x.columns.indexOf("totalNodeCount");
     const maxResultCnt =
       this._g.userPreferences.dataPageLimit.getValue() *
-      this._g.userPreferences.dataPageSize.getValue();
+      this._g.userPreferences.queryResultPageSize.getValue();
 
     const nodes = x.data[0][indexNodes];
     const nodeClass = x.data[0][indexNodeClass];
@@ -360,7 +360,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
     tempNodes = tempNodes.slice(
       skip,
-      skip + this._g.userPreferences.dataPageSize.getValue()
+      skip + this._g.userPreferences.queryResultPageSize.getValue()
     );
     r.data[0][indexNodes] = tempNodes.map((x) => x.node);
     r.data[0][indexNodeClass] = tempNodes.map((x) => x.cls);

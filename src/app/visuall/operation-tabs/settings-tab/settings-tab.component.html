@@ -342,8 +342,10 @@
           type="number"
           max="10000"
           min="1"
-          (keydown.enter)="settingChanged(dataPageSize, 'dataPageSize')"
-          [(ngModel)]="dataPageSize"
+          (keydown.enter)="
+            settingChanged(queryResultPageSize, 'queryResultPageSize')
+          "
+          [(ngModel)]="queryResultPageSize"
           class="form-control input-3-char standart-input-height va-small-text"
           title="Query result page size"
         />

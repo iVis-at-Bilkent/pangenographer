@@ -5,17 +5,20 @@ import {
   TableData,
   translateColumnNamesAndProperties,
 } from "src/app/shared/table-view/table-view-types";
-import { GFA_SEGMENT_PROPERTIES_NOT_TO_SHOW } from "src/app/visuall/constants";
+import {
+  deepCopy,
+  GFA_SEGMENT_PROPERTIES_NOT_TO_SHOW,
+} from "src/app/visuall/constants";
 import {
   GFASegment,
   GraphResponse,
 } from "src/app/visuall/db-service/data-types";
 import {
-  filterTableData,
   TableFiltering,
   TableViewInput,
 } from "../../../../shared/table-view/table-view-types";
 import { CytoscapeService } from "../../../cytoscape.service";
+import { DbResponse } from "../../../db-service/data-types";
 import { Neo4jDb } from "../../../db-service/neo4j-db.service";
 import { GlobalVariableService } from "../../../global-variable.service";
 
@@ -34,13 +37,12 @@ export class CustomQueriesComponent implements OnInit {
     isShowExportAsCSV: true,
     resultCount: 0,
     currentPage: 1,
-    pageSize: 15,
+    pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
     isLoadGraph: false,
     isMergeGraph: false,
     isNodeData: true,
     isHide0: false,
   };
-  graphResponse = null;
   clearTableFilter = new Subject<boolean>();
 
   sequences: string = "";
@@ -56,6 +58,7 @@ export class CustomQueriesComponent implements OnInit {
     "Search by sequence chain",
   ];
   selectedQuery: string = "";
+  databaseResponse: DbResponse = {} as DbResponse;
 
   constructor(
     private _dbService: Neo4jDb,
@@ -64,7 +67,7 @@ export class CustomQueriesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this._g.userPreferences.dataPageSize.subscribe((pageSize) => {
+    this._g.userPreferences.queryResultPageSize.subscribe((pageSize) => {
       this.tableInput.pageSize = pageSize;
     });
   }
@@ -74,24 +77,25 @@ export class CustomQueriesComponent implements OnInit {
     this.clearTableFilter.next(true);
 
     const callback = (response: any) => {
-      this.fillTable(response);
+      this.databaseResponse.graphData = response;
+      this.filterTable({
+        orderBy: null,
+        orderDirection: null,
+        txt: "",
+        skip: null,
+      } as TableFiltering);
 
       if (this.tableInput.isLoadGraph) {
-        console.log("load graph", response);
         this._cyService.loadElementsFromDatabase(
           response,
           this.tableInput.isMergeGraph
         );
-
-        if (this.graphResponse == null) {
-          this.graphResponse = response;
-        }
       }
     };
 
     let dataCount =
       this._g.userPreferences.dataPageLimit.getValue() *
-      this._g.userPreferences.dataPageSize.getValue();
+      this._g.userPreferences.queryResultPageSize.getValue();
 
     const segmentNames = this.prepareInput(this.segmentNames);
     const sequences = this.prepareInput(this.sequences, true); // To uppercase
@@ -139,11 +143,93 @@ export class CustomQueriesComponent implements OnInit {
   }
 
   filterTable(filter: TableFiltering) {
-    filterTableData(
-      filter,
-      this.tableInput,
-      this._g.userPreferences.isIgnoreCaseInText.getValue()
+    const filteredResponse = this.filterDatabaseResponse(
+      deepCopy(this.databaseResponse),
+      filter
     );
+
+    this.fillTable(filteredResponse.graphData);
+
+    if (this.tableInput.isLoadGraph) {
+      this._cyService.loadElementsFromDatabase(
+        filteredResponse.graphData as GraphResponse,
+        this.tableInput.isMergeGraph && this._g.cy.elements().length > 0
+      );
+    }
+
+    this.tableInput.resultCount = filteredResponse.count;
+  }
+
+  // used for client-side filtering, assumes graphData arrays are parallel (index i corresponds to the same element)
+  private filterDatabaseResponse(
+    databaseResponse: DbResponse,
+    filter: TableFiltering
+  ): DbResponse {
+    const response: DbResponse = {
+      count:
+        this._g.userPreferences.queryResultPageSize.getValue() *
+        this._g.userPreferences.dataPageLimit.getValue(),
+      graphData: databaseResponse.graphData,
+      tableData: { columns: [], data: [] },
+    };
+
+    let tempData: { graph: any; table: any }[] = [];
+
+    for (let i = 0; i < databaseResponse.graphData.nodes.length; i++) {
+      const values = Object.values(databaseResponse.graphData.nodes[i]).join(
+        ""
+      );
+
+      if (
+        (this._g.userPreferences.isIgnoreCaseInText.getValue() &&
+          values.toLowerCase().includes(filter.txt.toLowerCase())) ||
+        (!this._g.userPreferences.isIgnoreCaseInText.getValue() &&
+          values.includes(filter.txt))
+      ) {
+        // just nodes
+        tempData.push({
+          table: undefined,
+          graph: databaseResponse.graphData.nodes[i],
+        });
+      }
+    }
+    // order by
+    if (filter.orderDirection && filter.orderDirection.length > 0) {
+      const o = filter.orderBy;
+      if (filter.orderDirection == "asc") {
+        tempData = tempData.sort((a, b) => {
+          if (a.table[1][o] > b.table[1][o]) {
+            return 1;
+          } else if (b.table[1][o] > a.table[1][o]) {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
+      } else {
+        tempData = tempData.sort((a, b) => {
+          if (a.table[1][o] < b.table[1][o]) {
+            return 1;
+          } else if (b.table[1][o] < a.table[1][o]) {
+            return -1;
+          } else {
+            return 0;
+          }
+        });
+      }
+    }
+    // pagination
+    const skip = filter.skip ? filter.skip : 0;
+    response.count = tempData.length;
+    tempData = tempData.slice(
+      skip,
+      skip + this._g.userPreferences.queryResultPageSize.getValue()
+    );
+
+    // just nodes
+    response.graphData.nodes = tempData.map((x) => x.graph);
+
+    return response;
   }
 
   onMaxJumpLengthChange(event: any) {
@@ -177,7 +263,7 @@ export class CustomQueriesComponent implements OnInit {
   }
 
   private fillTable(graphResponse: GraphResponse) {
-    this.tableIsFilled.next(false); // Notify that the table is not filled
+    this.tableIsFilled.next(false);
     this.tableInput.results = [];
     this.tableInput.columns = [];
     let segmentNameMap: { [key: string]: boolean } = {}; // To keep track of unique segment names

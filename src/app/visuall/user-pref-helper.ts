@@ -41,7 +41,7 @@ export class UserPrefHelper {
       up.nodeLabelWrap.subscribe(() => {
         this._cyService.fitLabel2Node();
       });
-      up.dataPageSize.subscribe((x) => {
+      up.queryResultPageSize.subscribe((x) => {
         this.dataPageSizeChanged(x);
       });
       up.dataPageLimit.subscribe((x) => {
@@ -103,12 +103,12 @@ export class UserPrefHelper {
   dataPageSizeChanged(x: number) {
     if (x > MAX_DATA_PAGE_SIZE) {
       x = MAX_DATA_PAGE_SIZE;
-      this._g.userPreferences.dataPageSize.next(x);
+      this._g.userPreferences.queryResultPageSize.next(x);
       return;
     }
     if (x < MIN_DATA_PAGE_SIZE) {
       x = MIN_DATA_PAGE_SIZE;
-      this._g.userPreferences.dataPageSize.next(x);
+      this._g.userPreferences.queryResultPageSize.next(x);
       return;
     }
   }

@@ -105,7 +105,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.dataPageSizeSubscription =
-      this._g.userPreferences.dataPageSize.subscribe((x) => {
+      this._g.userPreferences.queryResultPageSize.subscribe((x) => {
         this.tableInput.pageSize = x;
       });
 
@@ -325,7 +325,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
       this._g.userPreferences.queryResultPagination.getValue() == "Client";
     const skip = (this.tableInput.currentPage - 1) * this.tableInput.pageSize;
     const limit4clientSidePaginated =
-      this._g.userPreferences.dataPageSize.getValue() *
+      this._g.userPreferences.queryResultPageSize.getValue() *
       this._g.userPreferences.dataPageLimit.getValue();
     const limit = isClientSidePagination
       ? limit4clientSidePaginated
@@ -379,7 +379,7 @@ export class MapTabComponent implements OnInit, OnDestroy {
 
   // used for client-side filtering, assumes tableData and graphData arrays are parallel (index i corresponds to the same element)
   private filterDbResponse(d: DbResponse, filter: TableFiltering): DbResponse {
-    const pageSize = this._g.userPreferences.dataPageSize.getValue();
+    const pageSize = this._g.userPreferences.queryResultPageSize.getValue();
     const pageLimit = this._g.userPreferences.dataPageLimit.getValue();
     const isIgnoreCase = this._g.userPreferences.isIgnoreCaseInText.getValue();
     const r: DbResponse = {

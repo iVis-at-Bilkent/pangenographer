@@ -301,7 +301,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     }
 
     this.multipleObjectTableInput.pageSize =
-      this._g.userPreferences.dataPageSize.getValue();
+      this._g.userPreferences.queryResultPageSize.getValue();
     this.multipleObjectTableInput.currentPage = 1;
 
     // if too many edges need to be shown, we should make pagination
@@ -925,7 +925,8 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       this.tableInput.results.push(row);
       this.tableInput.classNames.push(row[1].value);
     }
-    this.tableInput.pageSize = this._g.userPreferences.dataPageSize.getValue();
+    this.tableInput.pageSize =
+      this._g.userPreferences.queryResultPageSize.getValue();
 
     // let tableView ngOnInit finish
     setTimeout(() => this.tableFilled.next(true), 100);

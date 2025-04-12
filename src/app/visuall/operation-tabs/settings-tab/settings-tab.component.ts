@@ -36,7 +36,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   compoundPadding: string;
   currentHighlightStyles: string[] = [];
   dataPageLimit: number;
-  dataPageSize: number;
+  queryResultPageSize: number;
   dbTimeout: number;
   edgeCollapseLimit: number;
   generalBoolSettings: BoolSetting[];
@@ -187,7 +187,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.nodeLabelWrap = up.nodeLabelWrap.getValue();
     this.mergedElementIndicator = up.mergedElementIndicator.getValue();
     this.groupingOption = up.groupingOption.getValue();
-    this.dataPageSize = up.dataPageSize.getValue();
+    this.queryResultPageSize = up.queryResultPageSize.getValue();
     this.dataPageLimit = up.dataPageLimit.getValue();
     this.queryHistoryLimit = up.queryHistoryLimit.getValue();
     this.dbTimeout = up.dbTimeout.getValue();

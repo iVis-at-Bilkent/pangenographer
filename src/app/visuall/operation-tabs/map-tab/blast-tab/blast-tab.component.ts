@@ -1065,7 +1065,7 @@ export class BlastTabComponent implements OnInit {
       }
     }
     this.standaloneTableInput.pageSize =
-      this._g.userPreferences.dataPageSize.getValue();
+      this._g.userPreferences.queryResultPageSize.getValue();
     this.standaloneTableInput.currentPage = 1;
     this.standaloneTableInput.resultCount =
       this.standaloneTableInput.results.length;

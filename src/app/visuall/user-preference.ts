@@ -5,7 +5,7 @@ export interface UserPreferences {
   compoundPadding: BehaviorSubject<string>;
   currHighlightIdx: BehaviorSubject<number>;
   dataPageLimit: BehaviorSubject<number>;
-  dataPageSize: BehaviorSubject<number>;
+  queryResultPageSize: BehaviorSubject<number>;
   dbTimeout: BehaviorSubject<number>;
   edgeCollapseLimit: BehaviorSubject<number>;
   groupingOption: BehaviorSubject<GroupingOptionTypes>;
