@@ -293,7 +293,9 @@ export class CytoscapeService {
     this._g.refreshCuesBadges();
 
     this._g.isLoadFromDB = true;
-    this._g.statusMessage.next("Loaded elements from database!");
+    this._g.statusMessage.next(
+      "Loaded " + elementIdSet.size + " elements from database!"
+    );
     this._g.setLoadingStatus(false);
   }
 
