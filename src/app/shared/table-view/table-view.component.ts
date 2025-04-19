@@ -76,6 +76,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   tableColumnLimitSubscription: Subscription;
   hoveredElementId = "-";
   isCheckbox4AllChecked: boolean = false;
+  highlightedTexts: {} = {};
 
   elementBadgeMaxPercentages: any = {};
   badgeColor = "#69D96E";
@@ -529,6 +530,68 @@ export class TableViewComponent implements OnInit, OnDestroy {
       return data.substring(0, TABLE_TOOLTIP_SHOW_LIMIT - 2) + "...";
     }
     return data;
+  }
+
+  // Given queries and text, it returns array of pairs that help visualize the text
+  // in the table. The first element of the pair is the text to be highlighted and the second is the type of the text
+  // The type can be "highlight" or "normal"
+  getHighlightedText(
+    text: string,
+    rowIndex: number
+  ): { text: { type: string; text: string }[]; queriedSequences: string } {
+    if (!this.params.queriedSequences || !text) {
+      return { text: [{ type: "normal", text: text }], queriedSequences: "" };
+    }
+    if (this.highlightedTexts[rowIndex] && this.highlightedTexts[rowIndex].queriedSequences === this.params.queriedSequences) {
+      return this.highlightedTexts[rowIndex];
+    }
+
+    let queries = this.params.queriedSequences.replace(/'/g, "").split(",");
+    let result: {
+      text: { type: string; text: string }[];
+      queriedSequences: string;
+    } = {
+      text: [],
+      queriedSequences: this.params.queriedSequences || "",
+    };
+    let lastIndex = 0,
+      lastQueriedSequenceIndex = -1,
+      found = true;
+    while (lastIndex < text.length && found) {
+      found = false;
+      let i = (lastQueriedSequenceIndex + 1) % queries.length;
+      while (true) {
+        let index = text.indexOf(queries[i], lastIndex);
+        if (index >= 0) {
+          found = true;
+          if (lastIndex < index) {
+            result.text.push({
+              type: "normal",
+              text: text.substring(lastIndex, index),
+            });
+          }
+          result.text.push({ type: "highlight", text: queries[i] });
+          lastIndex = index + queries[i].length;
+          lastQueriedSequenceIndex = i;
+          break;
+        } else if (lastQueriedSequenceIndex === i) {
+          break;
+        }
+        i = (i + 1) % queries.length;
+      }
+    }
+    // if the last index is not at the end of the text, add the remaining text as normal
+    if (lastIndex < text.length) {
+      result.text.push({ type: "normal", text: text.substring(lastIndex) });
+    }
+    // if the result is empty, it means that the text is not found in the queries
+    if (result.text.length == 0) {
+      result.text.push({ type: "normal", text: text });
+    }
+
+    this.highlightedTexts[rowIndex] = result;
+
+    return result;
   }
 
   // Return the type of the data to be able to use in the html file

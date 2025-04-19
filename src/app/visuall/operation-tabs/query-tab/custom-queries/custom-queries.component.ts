@@ -42,6 +42,7 @@ export class CustomQueriesComponent implements OnInit {
     isMergeGraph: false,
     isNodeData: true,
     isHide0: false,
+    queriedSequences: undefined,
   };
   clearTableFilter = new Subject<boolean>();
 
@@ -97,10 +98,11 @@ export class CustomQueriesComponent implements OnInit {
       this._g.userPreferences.dataPageLimit.getValue() *
       this._g.userPreferences.queryResultPageSize.getValue();
 
-    const segmentNames = this.prepareInput(this.segmentNames);
     const sequences = this.prepareInput(this.sequences, true); // To uppercase
+    this.tableInput.queriedSequences = sequences;
 
     if (this.selectedQuery === this.queries[2]) {
+      // Search by sequence chain
       this._dbService.sequenceChainSearch(
         sequences,
         this.maxJumpLength,
@@ -108,6 +110,7 @@ export class CustomQueriesComponent implements OnInit {
         callback
       );
     } else if (this.selectedQuery === this.queries[1]) {
+      // Search by sequence
       const cypherQuery =
         `
       WITH [${sequences}] as sequences
@@ -126,6 +129,8 @@ export class CustomQueriesComponent implements OnInit {
 
       this._dbService.runQuery(cypherQuery, callback);
     } else if (this.selectedQuery === this.queries[0]) {
+      // Search by name
+      const segmentNames = this.prepareInput(this.segmentNames);
       const cypherQuery =
         `
         WITH [${segmentNames}] as segmentNames

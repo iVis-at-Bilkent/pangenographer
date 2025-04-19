@@ -166,9 +166,40 @@
               [table-tooltip]="e.value"
             >
               <ngb-highlight
+                *ngIf="j !== 2"
                 [result]="truncateData(e.value)"
                 [term]="filterTxt"
               ></ngb-highlight>
+              <!-- Display the 3rd column(segment data) differently -->
+              <span *ngIf="j === 2" class="va-text">
+                <span
+                  *ngFor="
+                    let seg of getHighlightedText(
+                      truncateData(e.value),
+                      (params.currentPage - 1) * params.pageSize + i + 1
+                    ).text;
+                    let k = index
+                  "
+                >
+                  <ngb-highlight
+                    *ngIf="seg.type === 'highlight' && k % 2 === 0"
+                    [result]="seg.text"
+                    [term]="filterTxt"
+                    style="color: #05be14; font-weight: bold"
+                  ></ngb-highlight>
+                  <ngb-highlight
+                    *ngIf="seg.type === 'highlight' && k % 2 !== 0"
+                    [result]="seg.text"
+                    [term]="filterTxt"
+                    style="color: #be05b5; font-weight: bold"
+                  ></ngb-highlight>
+                  <ngb-highlight
+                    *ngIf="seg.type === 'normal'"
+                    [result]="seg.text"
+                    [term]="filterTxt"
+                  ></ngb-highlight>
+                </span>
+              </span>
             </span>
           </td>
           <td *ngIf="!isDraggable && params.columns.length - 1 >= columnLimit">
