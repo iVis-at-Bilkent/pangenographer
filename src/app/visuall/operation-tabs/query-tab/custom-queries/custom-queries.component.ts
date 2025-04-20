@@ -99,10 +99,15 @@ export class CustomQueriesComponent implements OnInit {
       this._g.userPreferences.queryResultPageSize.getValue();
 
     const sequences = this.prepareInput(this.sequences, true); // To uppercase
-    this.tableInput.queriedSequences = sequences;
 
     if (this.selectedQuery === this.queries[2]) {
       // Search by sequence chain
+      this.tableInput.queriedSequences =
+        sequences.replace(/'/g, "") +
+        "," +
+        this.maxJumpLength +
+        "," +
+        this.minSubsequenceMatchLength;
       this._dbService.sequenceChainSearch(
         sequences,
         this.maxJumpLength,
@@ -111,6 +116,7 @@ export class CustomQueriesComponent implements OnInit {
       );
     } else if (this.selectedQuery === this.queries[1]) {
       // Search by sequence
+      this.tableInput.queriedSequences = sequences.replace(/'/g, "");
       const cypherQuery =
         `
       WITH [${sequences}] as sequences

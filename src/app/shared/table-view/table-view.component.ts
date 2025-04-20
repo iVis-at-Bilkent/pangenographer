@@ -542,20 +542,39 @@ export class TableViewComponent implements OnInit, OnDestroy {
     if (!this.params.queriedSequences || !text) {
       return { text: [{ type: "normal", text: text }], queriedSequences: "" };
     }
-    if (this.highlightedTexts[rowIndex] && this.highlightedTexts[rowIndex].queriedSequences === this.params.queriedSequences) {
+
+    if (
+      this.highlightedTexts[rowIndex] &&
+      this.highlightedTexts[rowIndex].queriedSequences == // value equality check
+        this.params.queriedSequences
+    ) {
       return this.highlightedTexts[rowIndex];
+    } else {
+      delete this.highlightedTexts[rowIndex];
     }
 
-    let queries = this.params.queriedSequences.replace(/'/g, "").split(",");
+    function lastIndexOf(str: string) {
+      for (let i = str.length - 1; i >= 0; i--) {
+        if (/[A-Za-z]/.test(str[i])) {
+          return i;
+        }
+      }
+      return -1;
+    }
+
+    let queries = this.params.queriedSequences
+      .slice(0, lastIndexOf(this.params.queriedSequences))
+      .split(",");
     let result: {
       text: { type: string; text: string }[];
       queriedSequences: string;
     } = {
       text: [],
-      queriedSequences: this.params.queriedSequences || "",
+      queriedSequences: this.params.queriedSequences + "",
     };
+
     let lastIndex = 0,
-      lastQueriedSequenceIndex = -1,
+      lastQueriedSequenceIndex = queries.length - 1,
       found = true;
     while (lastIndex < text.length && found) {
       found = false;
