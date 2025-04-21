@@ -41,12 +41,7 @@
         <span
           ><i>{{ root.r.propertyOperand }}</i> {{ root.r.operator }}
         </span>
-        <span *ngIf="root.r.enumMapping; else no_enum">{{
-          root.r.enumMapping
-        }}</span>
-        <ng-template #no_enum
-          ><span>{{ root.r.inputOperand }}</span></ng-template
-        >
+        <span>{{ root.r.inputOperand }}</span>
       </span>
     </span>
 

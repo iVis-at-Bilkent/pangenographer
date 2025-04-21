@@ -68,11 +68,6 @@ export function deepCopyQueryRules(metrics: QueryRule[]): QueryRule[] {
   return t2;
 }
 
-export enum PropertyCategory {
-  other = 0,
-  finiteSet = 2,
-}
-
 export interface Rule {
   propertyOperand?: string;
   propertyType?: string;
@@ -80,7 +75,6 @@ export interface Rule {
   inputOperand?: string;
   ruleOperator: "AND" | "OR" | null;
   rawInput?: string;
-  enumMapping?: string;
 }
 
 export interface RuleSync {

@@ -82,8 +82,4 @@ export interface SavedLists {
     name: BehaviorSubject<string>;
     values: BehaviorSubject<string>[];
   }[];
-  enumLists: {
-    name: BehaviorSubject<string>;
-    values: BehaviorSubject<string>[];
-  }[];
 }

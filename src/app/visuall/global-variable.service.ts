@@ -26,7 +26,6 @@ import { GroupingOptionTypes, UserPreferences } from "./user-preference";
 })
 export class GlobalVariableService {
   private HISTORY_SNAP_DELAY = 1500; // we should wait for layout to finish
-  private _isSetEnums = false;
   private _isErrorModalUp = false;
   cy: any;
   viewUtils: any;
@@ -63,7 +62,6 @@ export class GlobalVariableService {
   cyNaviPositionSetter: any;
   appDescription = new BehaviorSubject<any>(null);
   dataModel = new BehaviorSubject<any>(null);
-  enums = new BehaviorSubject<any>(null);
   // Below are for counting the number of nodes with zero indegree and outdegree nodes
   // that are brought by get some zero degree nodes option
   someZeroDegreeNodesCount = new BehaviorSubject<number>(0);
@@ -127,10 +125,6 @@ export class GlobalVariableService {
 
     this._http.get("./assets/generated/properties.json").subscribe((x) => {
       this.dataModel.next(x);
-    }, this.showErr.bind(this));
-
-    this._http.get("/app/custom/config/enums.json").subscribe((x) => {
-      this.enums.next(x);
     }, this.showErr.bind(this));
   }
 
@@ -616,26 +610,6 @@ export class GlobalVariableService {
         this.cy.remove(clusterNodes[i]);
       }
     }
-  }
-
-  getEnumMapping(): any {
-    // changes value inside `this.appDescription.getValue().enumMapping` since it works on reference
-    const mapping = this.appDescription.getValue().enumMapping;
-    if (this._isSetEnums) {
-      return mapping;
-    }
-    const enums = this.enums.getValue();
-    for (const k in mapping) {
-      for (const k2 in mapping[k]) {
-        mapping[k][k2] = enums[mapping[k][k2]];
-      }
-    }
-    this._isSetEnums = true;
-
-    console.log("enum mapping", mapping);
-    console.log("enums", enums);
-
-    return mapping;
   }
 
   showErrorModal(title: string, msg: string) {

@@ -19,11 +19,7 @@ import {
   isNumber,
 } from "../constants";
 import { GlobalVariableService } from "../global-variable.service";
-import {
-  PropertyCategory,
-  Rule,
-  RuleSync,
-} from "../operation-tabs/map-tab/query-types";
+import { Rule, RuleSync } from "../operation-tabs/map-tab/query-types";
 import { UserProfileService } from "../user-profile.service";
 
 @Component({
@@ -43,11 +39,9 @@ export class PropertyRuleComponent implements OnInit {
   selectedClassProps: string[];
   selectedOperatorKey: string;
   operatorKeys: string[];
-  selectedPropertyCategory: PropertyCategory;
   filterInp: string;
   optInp: string;
   textAreaInp: string = "";
-  finiteSetPropertyMap: any = null;
   selectedClass: string;
   currInpType: string = "text";
   @Input() propertyChanged: Subject<RuleSync>;
@@ -125,7 +119,6 @@ export class PropertyRuleComponent implements OnInit {
     this.attributeType = attrType;
     this.operators = {};
     this.operatorKeys = [];
-    this.selectedPropertyCategory = this.getPropertyCategory();
 
     this.operators[this.NO_OPERATION] = this.NO_OPERATION;
     this.operatorKeys.push(this.NOT_SELECTED);
@@ -192,27 +185,6 @@ export class PropertyRuleComponent implements OnInit {
       value = this.filterInp;
     }
 
-    let mapped = undefined;
-    if (this.finiteSetPropertyMap) {
-      const o = this.finiteSetPropertyMap.find((x) => x.key == this.filterInp);
-      if (o) {
-        mapped = o.value;
-      }
-      if (this.selectedOperatorKey === this.ONE_OF) {
-        mapped = "";
-        const arr = this.filterInp.split(",");
-        for (const el of arr) {
-          const o = this.finiteSetPropertyMap.find((x) => x.key == el);
-          if (o) {
-            mapped += o.value + ",";
-          }
-        }
-        const strSize = mapped.length;
-        if (strSize > 0 && mapped[strSize - 1] === ",") {
-          mapped = mapped.substr(0, strSize - 1);
-        }
-      }
-    }
     if (Number.isNaN(value)) {
       value = "";
     }
@@ -223,7 +195,6 @@ export class PropertyRuleComponent implements OnInit {
       inputOperand: value,
       ruleOperator: null,
       operator: operator,
-      enumMapping: mapped,
     };
     const isOk = this.isStrictlyValid(rule);
     if (this.isStrict && !isOk) {
@@ -248,14 +219,7 @@ export class PropertyRuleComponent implements OnInit {
     if (typeof this.filterInp !== "string") {
       this.filterInp = "" + this.filterInp;
     }
-    if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      const arr = this.filterInp.split(",");
-      for (const o of this.finiteSetPropertyMap) {
-        this.option2selected[o.key] = arr.includes(o.key);
-      }
-    } else {
-      this.textAreaInp = this.filterInp.split(",").join("\n");
-    }
+    this.textAreaInp = this.filterInp.split(",").join("\n");
   }
 
   optSelected() {
@@ -263,19 +227,7 @@ export class PropertyRuleComponent implements OnInit {
   }
 
   txtAreaPopupOk() {
-    if (
-      this.selectedOperatorKey == this.ONE_OF &&
-      this.selectedPropertyCategory == PropertyCategory.finiteSet
-    ) {
-      const selectedOptions = [
-        ...this.multiSelect.nativeElement.querySelectorAll("option"),
-      ]
-        .filter((x) => x.selected)
-        .map((x) => x.value);
-      this.filterInp = selectedOptions.join(",");
-    } else {
-      this.filterInp = this.textAreaInp.trim().split("\n").join(",");
-    }
+    this.filterInp = this.textAreaInp.trim().split("\n").join(",");
     this.isShowTxtArea = false;
   }
 
@@ -296,22 +248,13 @@ export class PropertyRuleComponent implements OnInit {
     let selectedOptions = this.textAreaInp
       .split("\n")
       .map((x) => new BehaviorSubject<string>(x));
-    if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      selectedOptions = [
-        ...this.multiSelect.nativeElement.querySelectorAll("option"),
-      ]
-        .filter((x) => x.selected)
-        .map((x) => new BehaviorSubject<string>(x.value));
-    }
     const isNum = this.isNumberProperty();
     // the button to fire this function will only be visible when operator is 'one of'
     let theLists: {
       name: BehaviorSubject<string>;
       values: BehaviorSubject<string>[];
     }[] = null;
-    if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      theLists = this._g.userPreferences.savedLists.enumLists;
-    } else if (isNum) {
+    if (isNum) {
       theLists = this._g.userPreferences.savedLists.numberLists;
     } else {
       theLists = this._g.userPreferences.savedLists.stringLists;
@@ -339,9 +282,7 @@ export class PropertyRuleComponent implements OnInit {
       name: BehaviorSubject<string>;
       values: BehaviorSubject<string>[];
     }[] = null;
-    if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      theLists = this._g.userPreferences.savedLists.enumLists;
-    } else if (isNum) {
+    if (isNum) {
       theLists = this._g.userPreferences.savedLists.numberLists;
     } else {
       theLists = this._g.userPreferences.savedLists.stringLists;
@@ -362,11 +303,7 @@ export class PropertyRuleComponent implements OnInit {
     this.currentListName = ev;
     let savedList: BehaviorSubject<string>[] = [];
     const isNum = this.isNumberProperty();
-    if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      savedList = this._g.userPreferences.savedLists.enumLists.find(
-        (x) => x.name.getValue() === ev
-      ).values;
-    } else if (isNum) {
+    if (isNum) {
       savedList = this._g.userPreferences.savedLists.numberLists.find(
         (x) => x.name.getValue() === ev
       ).values;
@@ -375,25 +312,15 @@ export class PropertyRuleComponent implements OnInit {
         (x) => x.name.getValue() === ev
       ).values;
     }
-    if (this.selectedPropertyCategory == PropertyCategory.finiteSet) {
-      for (const i in this.option2selected) {
-        this.option2selected[i] = false;
-      }
-      for (const i of savedList) {
-        this.option2selected[i.getValue()] = true;
-      }
-    } else {
-      this.textAreaInp = savedList.map((x) => x.getValue()).join("\n");
-    }
+
+    this.textAreaInp = savedList.map((x) => x.getValue()).join("\n");
   }
 
   private fillFittingSavedLists() {
     this.fittingSavedLists.length = 0;
     const l = this._g.userPreferences.savedLists;
     const isNum = this.isNumberProperty();
-    if (this.selectedPropertyCategory === PropertyCategory.finiteSet) {
-      this.fittingSavedLists = l.enumLists.map((x) => x.name.getValue());
-    } else if (isNum) {
+    if (isNum) {
       this.fittingSavedLists = l.numberLists.map((x) => x.name.getValue());
     } else {
       this.fittingSavedLists = l.stringLists.map((x) => x.name.getValue());
@@ -405,30 +332,6 @@ export class PropertyRuleComponent implements OnInit {
       this.operators[k] = v;
       this.operatorKeys.push(k);
     }
-  }
-
-  private getPropertyCategory(): PropertyCategory {
-    let m = this._g.getEnumMapping();
-    this.finiteSetPropertyMap = null;
-    if (
-      m &&
-      m[this.selectedClass] &&
-      m[this.selectedClass][this.selectedProp]
-    ) {
-      this.finiteSetPropertyMap = m[this.selectedClass][this.selectedProp];
-      const arr = [];
-      for (const k in this.finiteSetPropertyMap) {
-        arr.push({ key: k, value: this.finiteSetPropertyMap[k] });
-      }
-      arr.sort((a: any, b: any) => {
-        if (a.value > b.value) return 1;
-        if (b.value > a.value) return -1;
-        return 0;
-      });
-      this.finiteSetPropertyMap = arr;
-      return PropertyCategory.finiteSet;
-    }
-    return PropertyCategory.other;
   }
 
   private isStrictlyValid(rule: Rule) {

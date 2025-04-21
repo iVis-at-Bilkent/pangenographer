@@ -372,12 +372,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         continue;
       }
 
-      renderedValue = this.getMappedProperty(
-        this.selectedClasses,
-        key,
-        renderedValue
-      );
-
       this.selectedItemProperties[`${renderedKey}`] = {
         value: renderedValue,
       };
@@ -816,29 +810,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
       return Object.keys(edgeProps);
     }
     return null;
-  }
-
-  getMappedProperty(
-    className: string,
-    propertyName: string,
-    propertyValue: string
-  ): string {
-    const enumMap = this._g.getEnumMapping();
-    let classes = Object.keys(enumMap);
-    let c = classes.find((x) => x == className);
-    if (!c) {
-      return propertyValue;
-    }
-
-    const mapping = enumMap[c][propertyName];
-    if (!mapping) {
-      return propertyValue;
-    }
-    const value = enumMap[c][propertyName][propertyValue];
-    if (value != null || value != undefined) {
-      return value;
-    }
-    return propertyValue;
   }
 
   showStats() {

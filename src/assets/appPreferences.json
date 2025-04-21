@@ -42,7 +42,6 @@
     "queryHistoryLimit": 10,
     "queryResultPagination": "Client",
     "savedLists": {
-        "enumLists": [],
         "numberLists": [],
         "stringLists": []
     },

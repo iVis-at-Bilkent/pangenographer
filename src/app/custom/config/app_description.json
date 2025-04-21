@@ -58,7 +58,6 @@
     "queryHistoryLimit": 10,
     "queryResultPagination": "Client",
     "savedLists": {
-      "enumLists": [],
       "numberLists": [],
       "stringLists": []
     },
@@ -96,7 +95,6 @@
       "font-size": "20px"
     }
   },
-  "enumMapping": {},
   "objects": {
     "PATH": {
       "properties": {
