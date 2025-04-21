@@ -1,15 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
-import {
-  sample_1,
-  sample_2,
-  sample_3,
-  sample_4,
-  sample_5,
-  sample_6,
-  sample_7,
-} from "../../../../sample_gfas/sample_gfas";
+import { sample_1 } from "../../../../sample_gfas/sample_gfas";
 import { CLUSTER_CLASS, SAMPLE_DATABASES } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GFAData } from "../db-service/data-types";
@@ -68,46 +60,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
             id: "nbi07",
             actions: [
               {
-                text: "Sample 1",
+                text: "Mock GFA",
                 id: "nbi07-0",
                 function: "sampleGFASelected",
                 parameters: sample_1,
-              },
-              {
-                text: "Sample 2",
-                id: "nbi07-1",
-                function: "sampleGFASelected",
-                parameters: sample_2,
-              },
-              {
-                text: "Sample 3",
-                id: "nbi07-2",
-                function: "sampleGFASelected",
-                parameters: sample_3,
-              },
-              {
-                text: "Sample 4",
-                id: "nbi07-3",
-                function: "sampleGFASelected",
-                parameters: sample_4,
-              },
-              {
-                text: "Sample 5",
-                id: "nbi07-4",
-                function: "sampleGFASelected",
-                parameters: sample_5,
-              },
-              {
-                text: "Sample 6",
-                id: "nbi07-5",
-                function: "sampleGFASelected",
-                parameters: sample_6,
-              },
-              {
-                text: "Sample 7",
-                id: "nbi07-6",
-                function: "sampleGFASelected",
-                parameters: sample_7,
               },
               {
                 text: SAMPLE_DATABASES[1],
