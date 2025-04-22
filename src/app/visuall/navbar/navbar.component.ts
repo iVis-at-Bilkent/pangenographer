@@ -60,7 +60,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
             id: "nbi07",
             actions: [
               {
-                text: "Mock GFA",
+                text: "Mock GFA: Switches to Freebase",
                 id: "nbi07-0",
                 function: "sampleGFASelected",
                 parameters: sample_1,
@@ -98,7 +98,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
             ],
           },
           {
-            text: "Import GFA..",
+            text: "Import GFA...",
             id: "nbi04",
             function: "loadGFAFile2Db",
           },
@@ -352,6 +352,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   // Triggered when the user selects the "Import GFA" option from the file dropdown
   loadGFAFile2Db() {
+    // Switch to the Freebase database
+    this._g.setSampleDatabase(SAMPLE_DATABASES[0]);
+
     this._modalService
       // Open the clear database modal to certify that the user wants to clear the database
       .open(ClearDatabaseModalComponent)
