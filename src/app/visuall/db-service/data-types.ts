@@ -76,7 +76,6 @@ export interface DbService {
     isUp: boolean
   );
 
-  importGFA(GFAData: GFAData, cb: () => void);
   // import GFA data with a sequence of promises
   importGFAPromised(GFAData: GFAData): Promise<any>;
 

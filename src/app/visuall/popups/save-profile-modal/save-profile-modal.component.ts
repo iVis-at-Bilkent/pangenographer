@@ -17,7 +17,7 @@ export class SaveProfileModalComponent implements AfterViewChecked {
     public activeModal: NgbActiveModal,
     private _profile: UserProfileService
   ) {}
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
   boolSettings = [
     {
       text: "Settings",
@@ -30,7 +30,7 @@ export class SaveProfileModalComponent implements AfterViewChecked {
   ];
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 
   save2File() {

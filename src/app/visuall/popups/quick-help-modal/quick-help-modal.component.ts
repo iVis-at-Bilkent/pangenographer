@@ -12,11 +12,11 @@ import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
   styleUrls: ["./quick-help-modal.component.css"],
 })
 export class QuickHelpModalComponent implements AfterViewChecked {
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
 
   constructor(public activeModal: NgbActiveModal) {}
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 }

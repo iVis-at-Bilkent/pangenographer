@@ -14,7 +14,7 @@ import { CytoscapeService } from "../../cytoscape.service";
   styleUrls: ["./clear-database-modal.component.css"],
 })
 export class ClearDatabaseModalComponent implements AfterViewChecked {
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
   @Input() clearDatabase: boolean = true; // Clear database by default
 
   constructor(
@@ -23,7 +23,7 @@ export class ClearDatabaseModalComponent implements AfterViewChecked {
   ) {}
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 
   clear() {

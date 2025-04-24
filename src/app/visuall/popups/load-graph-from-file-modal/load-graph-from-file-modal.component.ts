@@ -20,10 +20,10 @@ export class LoadGraphFromFileModalComponent implements AfterViewChecked {
     public activeModal: NgbActiveModal,
     public _g: GlobalVariableService
   ) {}
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 
   replace() {

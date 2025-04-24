@@ -718,17 +718,6 @@ export class CytoscapeService {
     }
   }
 
-  // Read GFA sample and call the callback function with the GFA data
-  readGFASample(sample: string, callback: (GFAData: GFAData) => Promise<any>) {
-    // Status message
-    this._g.statusMessage.next("Importing GFA sample...");
-
-    // Read the GFA sample and call the callback function with the GFA data
-    this._fileReaderService.readGFASample(sample, (GFAData: GFAData) => {
-      return callback(GFAData);
-    });
-  }
-
   // Clear database and cytoscape graph
   // Remove external tools, clear graph history, and remove all elements from cytoscape graph
   clear(clearDatabase: boolean = true) {

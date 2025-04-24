@@ -18,7 +18,7 @@ import { GlobalVariableService } from "../../global-variable.service";
 export class AboutModalComponent
   implements OnInit, AfterViewChecked, OnDestroy
 {
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
   toolName: string;
   softwareVersion: string;
   buildTime: string;
@@ -45,7 +45,7 @@ export class AboutModalComponent
   }
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 
   ngOnDestroy(): void {

@@ -751,18 +751,6 @@ export class FileReaderService {
     reader.read().then(processBatch).catch(processError);
   }
 
-  // Read a GFA sample and process it synchronously in one go without splitting it into chunks
-  readGFASample(
-    gfaSample: string,
-    callback: (GFAData: GFAData) => Promise<void>
-  ) {
-    // Parse the GFA sample and call the callback function
-    callback(this.parseGFA(gfaSample.split(/\n/))).then(() => {
-      console.log("Processed GFA sample");
-      this._g.statusMessage.next("Processed GFA sample");
-    });
-  }
-
   parseGFA(lines: string[]): GFAData {
     let GFAData: GFAData = {
       segments: [],

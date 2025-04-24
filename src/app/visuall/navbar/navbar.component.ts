@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
-import { sample_1 } from "../../../../sample_gfas/sample_gfas";
 import { CLUSTER_CLASS, SAMPLE_DATABASES } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GFAData } from "../db-service/data-types";
@@ -25,7 +24,9 @@ import { NavbarAction, NavbarDropdown } from "./inavbar";
   styleUrls: ["./navbar.component.css"],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  @ViewChild("file", { static: false }) file;
+  @ViewChild("file", { static: false }) file: {
+    nativeElement: { files: File[]; value: string; click: () => void };
+  };
 
   menu: NavbarDropdown[];
   closeResult: string;
@@ -41,7 +42,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _modalService: NgbModal,
     private _g: GlobalVariableService,
     private _profile: UserProfileService,
-    private _urlload: URLLoadService,
+    private _urlLoad: URLLoadService,
     private _fileReaderService: FileReaderService
   ) {
     this.menu = [
@@ -60,10 +61,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
             id: "nbi07",
             actions: [
               {
-                text: "Mock GFA: Switches to Freebase",
+                text: "Freebase",
                 id: "nbi07-0",
-                function: "sampleGFASelected",
-                parameters: sample_1,
+                function: "freebaseSelected",
               },
               {
                 text: SAMPLE_DATABASES[1],
@@ -262,7 +262,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         this.toolLogo = x.appInfo.icon;
       }
     });
-    this._urlload.init();
+    this._urlLoad.init();
   }
 
   ngOnDestroy() {
@@ -308,28 +308,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Triggered when the user selects a sample from the samples dropdown
-  sampleGFASelected(sample: string) {
-    // If the user selects a sample, open the clear database modal
+  freebaseSelected() {
     this._g.setSampleDatabase(SAMPLE_DATABASES[0]);
-    this._modalService
-      // Open the clear database modal to certify that the user wants to clear the database
-      .open(ClearDatabaseModalComponent)
-      .result.then(
-        () => {}, // Execute nothing when the modal is closed
-        (reason) => {
-          // Execute the callback function when the modal is dismissed
-
-          // Prepare the GFA load, set the isLoadFile4Graph and isLoadFileGFA flags to true
-          this.prepareGFALoad();
-
-          // Read the GFA sample name and itself then import the GFA data to the database
-          this._cyService.readGFASample(sample, (GFAData: GFAData) => {
-            // Import GFA data to the database and return a promise
-            return this._dbService.getGFAData2ImportGFAPromised(GFAData);
-          });
-        }
-      );
   }
 
   setSampleDatabase(sampleDatabase: string) {
@@ -461,7 +441,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   openQuickHelp() {
-    this._modalService.open(QuickHelpModalComponent);
+    this._modalService.open(QuickHelpModalComponent, {
+      size: "lg",
+    });
   }
 
   openAbout() {

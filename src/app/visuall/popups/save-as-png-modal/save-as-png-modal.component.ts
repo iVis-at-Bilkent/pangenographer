@@ -17,10 +17,10 @@ export class SaveAsPngModalComponent implements AfterViewChecked {
     public activeModal: NgbActiveModal,
     public _cyService: CytoscapeService
   ) {}
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 
   saveWhole() {

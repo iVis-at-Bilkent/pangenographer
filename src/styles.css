@@ -314,13 +314,9 @@ app-operation-tabs {
   user-select: none;
 }
 
-.standart-input-height {
+.standard-input-height {
   height: 2em;
   padding: 0.25rem !important;
-}
-
-.standart-input-height-sec {
-  height: 2.25em;
 }
 
 .modal-dialog {

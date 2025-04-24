@@ -314,7 +314,9 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openQuickHelp() {
-    this.modalService.open(QuickHelpModalComponent);
+    this.modalService.open(QuickHelpModalComponent, {
+      size: "lg",
+    });
   }
 
   openAbout() {

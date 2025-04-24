@@ -224,11 +224,6 @@ export class DbAdapterService {
     );
   }
 
-  getGFAData2ImportGFA(GFAData: GFAData, callback: () => void) {
-    this._g.add2GraphHistory("Import GFA");
-    this._db.importGFA(GFAData, callback);
-  }
-
   getGFAData2ImportGFAPromised(GFAData: GFAData): Promise<any> {
     this._g.add2GraphHistory("Import GFA");
     return this._db.importGFAPromised(GFAData);

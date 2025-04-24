@@ -759,11 +759,6 @@ export class Neo4jDb implements DbService {
     return null;
   }
 
-  // Import GFA data to the database by converting it to CQL
-  importGFA(GFAData: GFAData, callback: () => void) {
-    this.runQuery(this.GFAData2CQL(GFAData), callback, 0, false); // 0 is for generic response type, false is for isTimeboxed
-  }
-
   // Import GFA data to the database by converting it to CQL and return a promise
   importGFAPromised(GFAData: GFAData): Promise<any> {
     return this.runQueryPromised(this.GFAData2CQL(GFAData), 0, false);

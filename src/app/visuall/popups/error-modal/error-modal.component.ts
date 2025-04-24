@@ -13,7 +13,7 @@ import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
   styleUrls: ["./error-modal.component.css"],
 })
 export class ErrorModalComponent implements OnInit, AfterViewChecked {
-  @ViewChild("closeBtn", { static: false }) closeBtnRef: ElementRef;
+  @ViewChild("closeBtn", { static: false }) closeButtonRef: ElementRef;
   @Input() msg: string;
   @Input() title: string;
   constructor(public activeModal: NgbActiveModal) {}
@@ -21,6 +21,6 @@ export class ErrorModalComponent implements OnInit, AfterViewChecked {
   ngOnInit() {}
 
   ngAfterViewChecked() {
-    this.closeBtnRef.nativeElement.blur();
+    this.closeButtonRef.nativeElement.blur();
   }
 }
