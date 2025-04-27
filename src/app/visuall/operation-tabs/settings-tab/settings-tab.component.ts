@@ -85,9 +85,9 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.pangenographerBoolSettings = [
       {
-        text: "Highlight in/out-degree zero nodes",
+        text: "Emphasize in/out-degree zero nodes",
         isEnable: true,
-        path2userPref: "isHighlightInZeroOutZero",
+        path2userPref: "isEmphasizeInZeroOutZero",
       },
       {
         text: "Enable/disable show up/downstream cues",
@@ -197,15 +197,15 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     this.currentHighlightStyles = up.highlightStyles.map((_, i) => {
       return this.getHighlightStyleName(i);
     });
-    this.highlightStyleIdx = up.currHighlightIdx.getValue();
+    this.highlightStyleIdx = up.currentHighlightIndex.getValue();
     this.highlightColor =
       up.highlightStyles[
-        this._g.userPreferences.currHighlightIdx.getValue()
+        this._g.userPreferences.currentHighlightIndex.getValue()
       ].color.getValue();
     this.highlightWidth =
       up.highlightStyles[
-        this._g.userPreferences.currHighlightIdx.getValue()
-      ].wid.getValue();
+        this._g.userPreferences.currentHighlightIndex.getValue()
+      ].width.getValue();
     this.selectionColor = up.selectionColor.getValue();
     this.selectionWidth = up.selectionWidth.getValue();
     this._g.cy
@@ -220,7 +220,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       up.lengthOfBlastSelectedSegmentsPath.getValue();
     this.lengthOfUpDownstream = up.lengthOfUpDownstream.getValue(); // get the length of the upstream and downstream
     this.pangenographerBoolSettings[0].isEnable =
-      up.isHighlightInZeroOutZero.getValue();
+      up.isEmphasizeInZeroOutZero.getValue();
     this.pangenographerBoolSettings[1].isEnable =
       up.isShowUpDownstreamCues.getValue();
     this.seedSourceTargetCount = up.seedSourceTargetCount.getValue(); // get the seed source target count of the get some zero degree nodes
@@ -233,7 +233,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
 
     this.setHighlightStyles();
     this.highlightStyleSelected(
-      this._g.userPreferences.currHighlightIdx.getValue()
+      this._g.userPreferences.currentHighlightIndex.getValue()
     );
   }
 
@@ -249,10 +249,10 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       let w = styles[i].node["underlay-padding"];
       if (this._g.userPreferences.highlightStyles[i]) {
         this._g.userPreferences.highlightStyles[i].color.next(c);
-        this._g.userPreferences.highlightStyles[i].wid.next(w);
+        this._g.userPreferences.highlightStyles[i].width.next(w);
       } else {
         this._g.userPreferences.highlightStyles[i] = {
-          wid: new BehaviorSubject<number>(w),
+          width: new BehaviorSubject<number>(w),
           color: new BehaviorSubject<string>(c),
         };
       }
@@ -276,7 +276,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
     for (let i = 0; i < vuStyles.length; i++) {
       let cyStyle = getCyStyleFromColorAndWid(
         styles[i].color.getValue(),
-        styles[i].wid.getValue()
+        styles[i].width.getValue()
       );
       this._g.viewUtils.changeHighlightStyle(i, cyStyle.node, cyStyle.edge);
     }
@@ -518,7 +518,7 @@ export class SettingsTabComponent implements OnInit, OnDestroy {
       i = (<HTMLSelectElement>t).selectedIndex;
     }
     this.highlightStyleIdx = i;
-    this._g.userPreferences.currHighlightIdx.next(i);
+    this._g.userPreferences.currentHighlightIndex.next(i);
     let style = this._g.viewUtils.getHighlightStyles()[i];
     this.highlightColor = style.node["underlay-color"];
     this.highlightWidth = style.node["underlay-padding"];

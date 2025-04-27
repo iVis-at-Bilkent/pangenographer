@@ -207,41 +207,14 @@ export class GlobalVariableService {
 
   removeHighlights(elements?: any) {
     elements = elements || this.cy.elements();
-    if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
-      elements.forEach((element: any) => {
-        if (
-          this.zeroIncomerAndOutgoerNodes.source.indexOf(element) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.target.indexOf(element) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(element) < 0
-        ) {
-          this.viewUtils.removeHighlights(element);
-        }
-      });
-    } else {
-      this.viewUtils.removeHighlights(elements);
-    }
+    this.viewUtils.removeHighlights(elements);
   }
 
   highlightElements(elements: any, index?: number) {
-    if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
-      elements.forEach((element: any) => {
-        if (
-          this.zeroIncomerAndOutgoerNodes.source.indexOf(element) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.target.indexOf(element) < 0 &&
-          this.zeroIncomerAndOutgoerNodes.sourceAndTarget.indexOf(element) < 0
-        ) {
-          this.viewUtils.highlight(
-            element,
-            index ? index : this.userPreferences.currHighlightIdx.getValue()
-          );
-        }
-      });
-    } else {
-      this.viewUtils.highlight(
-        elements,
-        index ? index : this.userPreferences.currHighlightIdx.getValue()
-      );
-    }
+    this.viewUtils.highlight(
+      elements,
+      index ? index : this.userPreferences.currentHighlightIndex.getValue()
+    );
   }
 
   hideTypesNotToShow() {
@@ -418,17 +391,36 @@ export class GlobalVariableService {
     };
   }
 
-  changeHighlightInZeroOutZero() {
+  prepareZeroIncomerAndOutgoerNodes() {
+    let zeroIncomerAndOutgoerBorderWidth = 1;
     this.cy.startBatch();
 
     if (this.zeroIncomerAndOutgoerNodes.source) {
       this.zeroIncomerAndOutgoerNodes.source.forEach((x) => {
-        this.viewUtils.removeHighlights(x);
+        x.style({
+          "border-width":
+            this.appDescription.getValue().objects.SEGMENT.style[
+              "border-width"
+            ],
+          "border-color":
+            this.appDescription.getValue().objects.SEGMENT.style[
+              "border-color"
+            ],
+        });
       });
     }
     if (this.zeroIncomerAndOutgoerNodes.target) {
       this.zeroIncomerAndOutgoerNodes.target.forEach((x) => {
-        this.viewUtils.removeHighlights(x);
+        x.style({
+          "border-width":
+            this.appDescription.getValue().objects.SEGMENT.style[
+              "border-width"
+            ],
+          "border-color":
+            this.appDescription.getValue().objects.SEGMENT.style[
+              "border-color"
+            ],
+        });
       });
     }
 
@@ -441,13 +433,25 @@ export class GlobalVariableService {
     this.cy.nodes(":visible").forEach((x: any) => {
       if (x.incomers().length === 0 && x.outgoers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.source.push(x);
-        if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
-          this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroIndegree); // highlight source nodes
+        if (this.userPreferences.isEmphasizeInZeroOutZero.getValue()) {
+          x.style({
+            "border-width": zeroIncomerAndOutgoerBorderWidth,
+            "border-color":
+              this.userPreferences.highlightStyles[
+                HIGHLIGHT_INDEX.zeroIndegree
+              ].color.getValue(),
+          });
         }
       } else if (x.outgoers().length === 0 && x.incomers().length > 0) {
         this.zeroIncomerAndOutgoerNodes.target.push(x);
-        if (this.userPreferences.isHighlightInZeroOutZero.getValue()) {
-          this.viewUtils.highlight(x, HIGHLIGHT_INDEX.zeroOutdegree); // highlight target nodes
+        if (this.userPreferences.isEmphasizeInZeroOutZero.getValue()) {
+          x.style({
+            "border-width": zeroIncomerAndOutgoerBorderWidth,
+            "border-color":
+              this.userPreferences.highlightStyles[
+                HIGHLIGHT_INDEX.zeroOutdegree
+              ].color.getValue(),
+          });
         }
       }
     });
@@ -458,7 +462,7 @@ export class GlobalVariableService {
   }
 
   prepareConstraints() {
-    this.changeHighlightInZeroOutZero();
+    this.prepareZeroIncomerAndOutgoerNodes();
     let longestPath = -1;
 
     let sourceShortests = {};
@@ -905,7 +909,7 @@ export class GlobalVariableService {
 
   private addStyle4Emphasize() {
     const color = "#da14ff";
-    const wid = this.userPreferences.highlightStyles[0].wid.getValue();
+    const width = this.userPreferences.highlightStyles[0].width.getValue();
     const OPACITY_DIFF = 0.05;
 
     this.cy
@@ -914,7 +918,7 @@ export class GlobalVariableService {
       .style({
         "underlay-color": color,
         "underlay-opacity": HIGHLIGHT_OPACITY + OPACITY_DIFF,
-        "underlay-padding": wid,
+        "underlay-padding": width,
       })
       .update();
 
@@ -925,7 +929,7 @@ export class GlobalVariableService {
         "underlay-color": color,
         "underlay-opacity": HIGHLIGHT_OPACITY + OPACITY_DIFF,
         "underlay-padding": (e: any) => {
-          return (wid + e.width()) / 2 + "px";
+          return (width + e.width()) / 2 + "px";
         },
       })
       .update();

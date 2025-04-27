@@ -431,14 +431,13 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     const seedNodes = this._g.cy
       .nodes()
       .filter((node: any) => dbIds.has(node.id().substring(1)));
-    // add a new higlight style
+    // add a new highlight style
     if (this._g.userPreferences.highlightStyles.length < 2) {
       const cyStyle = getCyStyleFromColorAndWid("#0b9bcd", 4.5);
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);
     }
-    const currHighlightIdx =
-      this._g.userPreferences.currHighlightIdx.getValue();
-    if (currHighlightIdx == 0) {
+
+    if (this._g.userPreferences.currentHighlightIndex.getValue() == 0) {
       this._g.viewUtils.highlight(seedNodes, 1);
     } else {
       this._g.viewUtils.highlight(seedNodes, 0);
@@ -455,7 +454,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
       .nodes()
       .filter((node: any) => dbIds.has(node.id().substring(1)));
 
-    // add a new higlight style
+    // add a new highlight style
     if (this._g.userPreferences.highlightStyles.length < 3) {
       const cyStyle = getCyStyleFromColorAndWid("#04f06a", 4.5);
       this._g.viewUtils.addHighlightStyle(cyStyle.node, cyStyle.edge);

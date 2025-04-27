@@ -45,7 +45,7 @@ export const EXPAND_COLLAPSE_FAST_OPT = {
 };
 
 export const PANGENOGRAPHER_SETTING_NAMES = [
-  "isHighlightInZeroOutZero",
+  "isEmphasizeInZeroOutZero",
   "isShowUpDownstreamCues",
   "lengthOfBlastSelectedSegmentsPath",
   "lengthOfUpDownstream",
@@ -380,19 +380,19 @@ export function arrayDiff(smallArr: string[], bigArr: string[]): string[] {
 
 export function getCyStyleFromColorAndWid(
   color: string,
-  wid: number
+  width: number
 ): { node: any; edge: any } {
   return {
     node: {
       "underlay-color": color,
       "underlay-opacity": HIGHLIGHT_OPACITY,
-      "underlay-padding": wid,
+      "underlay-padding": width,
     },
     edge: {
       "underlay-color": color,
       "underlay-opacity": HIGHLIGHT_OPACITY,
       "underlay-padding": (e) => {
-        return (wid + e.width()) / 2 + "px";
+        return (width + e.width()) / 2 + "px";
       },
     },
   };

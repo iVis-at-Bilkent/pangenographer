@@ -211,7 +211,7 @@ export class CyExtService {
       let w: any, c: any;
       try {
         c = style.color.getValue();
-        w = style.wid.getValue();
+        w = style.width.getValue();
       } catch (err) {
         c = "#6c757d";
         w = 3;

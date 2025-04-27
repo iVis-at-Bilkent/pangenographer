@@ -59,8 +59,8 @@ export class UserPrefHelper {
 
       // PanGenoGrapher Settings
       // Change the length of upstream/downstream function
-      up.isHighlightInZeroOutZero.subscribe(() => {
-        this._g.changeHighlightInZeroOutZero();
+      up.isEmphasizeInZeroOutZero.subscribe(() => {
+        this._g.prepareZeroIncomerAndOutgoerNodes();
       });
 
       // Change the show upstream/downstream cues function

@@ -1,7 +1,7 @@
 {
     "avgNodeSize": 36,
     "compoundPadding": "5%",
-    "currHighlightIdx": 0,
+    "currentHighlightIndex": 0,
     "dataPageLimit": 15,
     "queryResultPageSize": 15,
     "dbTimeout": 100,
@@ -10,21 +10,21 @@
     "highlightStyles": [
         {
             "color": "#FCE903",
-            "wid": 3
+            "width": 3
         },
         {
             "color": "#00ffff",
-            "wid": 3
+            "width": 3
         },
         {
             "color": "#04f06a",
-            "wid": 3
+            "width": 3
         }
     ],
     "isAutoIncrementalLayoutOnChange": true,
     "isCollapseEdgesBasedOnType": false,
     "isCollapseMultiEdgesOnLoad": true,
-    "isHighlightInZeroOutZero": true,
+    "isEmphasizeInZeroOutZero": true,
     "isHighlightOnHover": true,
     "isIgnoreCaseInText": false,
     "isLimitDbQueries2range": true,

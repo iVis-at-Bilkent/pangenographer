@@ -3,14 +3,14 @@ import { QueryRule } from "./operation-tabs/map-tab/query-types";
 
 export interface UserPreferences {
   compoundPadding: BehaviorSubject<string>;
-  currHighlightIdx: BehaviorSubject<number>;
+  currentHighlightIndex: BehaviorSubject<number>;
   dataPageLimit: BehaviorSubject<number>;
   queryResultPageSize: BehaviorSubject<number>;
   dbTimeout: BehaviorSubject<number>;
   edgeCollapseLimit: BehaviorSubject<number>;
   groupingOption: BehaviorSubject<GroupingOptionTypes>;
   highlightStyles: {
-    wid: BehaviorSubject<number>;
+    width: BehaviorSubject<number>;
     color: BehaviorSubject<string>;
   }[];
   isAutoIncrementalLayoutOnChange: BehaviorSubject<boolean>;
@@ -35,7 +35,7 @@ export interface UserPreferences {
   tilingPadding: BehaviorSubject<number>;
 
   // PanGenoGrapher Settings
-  isHighlightInZeroOutZero: BehaviorSubject<boolean>; // highlight in zero out zero
+  isEmphasizeInZeroOutZero: BehaviorSubject<boolean>; // highlight in zero out zero
   isShowUpDownstreamCues: BehaviorSubject<boolean>; // show upstream/downstream cues
   lengthOfUpDownstream: BehaviorSubject<number>; // length of upstream/downstream
   lengthOfBlastSelectedSegmentsPath: BehaviorSubject<number>; // length of blast selected segments path
