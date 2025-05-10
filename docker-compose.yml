@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "5200:5200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start
+    restart: unless-stopped

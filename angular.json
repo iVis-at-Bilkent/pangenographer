@@ -48,12 +48,7 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
+              "fileReplacements": [],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -67,14 +62,6 @@
                   "type": "initial",
                   "maximumWarning": "2mb",
                   "maximumError": "5mb"
-                }
-              ]
-            },
-            "heroku": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.heroku.ts"
                 }
               ]
             }
@@ -114,18 +101,6 @@
               "src/assets"
             ]
           }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "src/tsconfig.app.json",
-              "src/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
-          }
         }
       }
     },
@@ -144,15 +119,6 @@
             "production": {
               "devServerTarget": "ng-visuall:serve:production"
             }
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": "e2e/tsconfig.e2e.json",
-            "exclude": [
-              "**/node_modules/**"
-            ]
           }
         }
       }
