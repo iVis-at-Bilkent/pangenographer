@@ -3,7 +3,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build-prod
+RUN npm cache clean --force && \
+    rm -rf dist && \
+    npm run build-prod
 
 FROM node:14.20.1 AS runtime
 WORKDIR /app

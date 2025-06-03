@@ -98,6 +98,7 @@ export interface DbService {
 }
 
 export interface GraphResponse {
+  paths?: string[][];
   nodes: CyNode[];
   edges: CyEdge[];
 }

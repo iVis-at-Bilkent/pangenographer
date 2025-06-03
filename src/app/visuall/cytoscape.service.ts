@@ -537,6 +537,7 @@ export class CytoscapeService {
     const classes = node.labels.join(" ");
     let properties = node.properties;
     properties.id = id;
+    properties.elementId = id;
 
     return { data: properties, classes: classes };
   }
@@ -544,6 +545,7 @@ export class CytoscapeService {
   createCyEdge(edge: CyEdge, id: string) {
     let properties = edge.properties || {};
     properties.id = id;
+    properties.elementId = id;
     properties.source = "n" + edge.startNodeElementId;
     properties.target = "n" + edge.endNodeElementId;
 

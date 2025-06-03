@@ -44,7 +44,23 @@ export class CustomQueriesComponent implements OnInit {
     isHide0: false,
     queriedSequences: undefined,
   };
+  sequenceChainTableIsFilled = new Subject<boolean>();
+  sequenceChainTableInput: TableViewInput = {
+    columns: [],
+    results: [],
+    tableTitle: "Sequence Chain Results",
+    isEmphasizeOnHover: true,
+    isShowExportAsCSV: true,
+    resultCount: 0,
+    currentPage: 1,
+    pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
+    isLoadGraph: false,
+    isMergeGraph: false,
+    isNodeData: true,
+    paths: [],
+  };
   clearTableFilter = new Subject<boolean>();
+  clearSequenceChainTableFilter = new Subject<boolean>();
 
   sequences: string = "";
   segmentNames: string = "";
@@ -73,13 +89,61 @@ export class CustomQueriesComponent implements OnInit {
     });
   }
 
+  private convertResponse(response: any): any {
+    if (this.selectedQuery === this.queries[2]) { // sequence chain search
+      let convertedResponse: any = { nodes: [], edges: [], paths: [] };
+
+      for (let i = 0; i < response.data[0][0].length; i++) {
+        let node = {
+          elementId: response.data[0][3][i], // fourth column is the node id
+          properties: response.data[0][0][i], // first column is node properties "nodes"
+          id: response.data[0][3][i], // the id is the last part of the node id
+          labels: [response.data[0][2][i]], // second column is the node labels
+        };
+        node.properties.elementId = node.elementId;
+        node.properties.id = node.id;
+
+        convertedResponse.nodes.push(node);
+      }
+
+      for (let i = 0; i < response.data[0][4].length; i++) {
+        let edge = {
+          elementId: response.data[0][6][i], // seventh column is the edge id
+          properties: response.data[0][4][i], // fifth column is the edge properties
+          startNodeElementId: response.data[0][7][i][0], // eighth column is the start node id
+          startNode: response.data[0][7][i][0], // eighth column is the start node id
+          endNodeElementId: response.data[0][7][i][1], // eighth column is the end node id
+          endNode: response.data[0][7][i][1], // eighth column is the end node id
+          
+          id: response.data[0][6][i], // the id is the last part of the edge id
+          type: response.data[0][5][i], // sixth column is the edge type
+        };
+        convertedResponse.edges.push(edge);
+      }
+
+      convertedResponse.paths = response.data[0][8];
+
+      return convertedResponse;
+    } else {
+      return response;
+    }
+  }
+
   execute() {
     this.tableInput.currentPage = 1;
     this.clearTableFilter.next(true);
 
     const callback = (response: any) => {
-      this.databaseResponse.graphData = response;
+      const convertedResponse = this.convertResponse(response);
+      this.databaseResponse.graphData = convertedResponse;
       this.filterTable({
+        orderBy: null,
+        orderDirection: null,
+        txt: "",
+        skip: null,
+      } as TableFiltering);
+
+      this.filterSequenceChainTable({
         orderBy: null,
         orderDirection: null,
         txt: "",
@@ -88,7 +152,7 @@ export class CustomQueriesComponent implements OnInit {
 
       if (this.tableInput.isLoadGraph) {
         this._cyService.loadElementsFromDatabase(
-          response,
+          convertedResponse,
           this.tableInput.isMergeGraph
         );
       }
@@ -153,6 +217,44 @@ export class CustomQueriesComponent implements OnInit {
     }
   }
 
+  filterSequenceChainTable(filter: TableFiltering) {
+    const filteredResponse = this.filterDatabaseResponse(
+      deepCopy(this.databaseResponse),
+      filter
+    );
+
+    // fill the table
+    this.fillSequenceChainTable(filteredResponse.graphData);
+
+    this.sequenceChainTableInput.resultCount = filteredResponse.graphData.paths.length;
+  }
+
+  private fillSequenceChainTable(graphResponse: GraphResponse) {
+    this.sequenceChainTableIsFilled.next(false);
+    this.sequenceChainTableInput.results = [];
+    this.sequenceChainTableInput.columns = ['Path'];
+
+    // Convert each path array into a string representation
+    for (let i = 0; i < graphResponse.paths.length; i++) {
+      const path = graphResponse.paths[i].map((id: any, index: number) => {
+        if (index % 2 === 0) { // node
+          // find the node in the nodes array
+          const node = graphResponse.nodes.find((node: any) => node.id === id);
+          return node.properties.segmentName;
+        } else { // edge
+          // find the edge in the edges array
+          const edge = graphResponse.edges.find((edge: any) => edge.id === id);
+          return edge.type;
+        }
+      });
+      const row = [{value: graphResponse.paths[i]}, { value: path }];
+      this.sequenceChainTableInput.results.push(row);
+    }
+
+    this.sequenceChainTableInput.resultCount = this.sequenceChainTableInput.results.length;
+    this.sequenceChainTableIsFilled.next(true);
+  }
+
   filterTable(filter: TableFiltering) {
     const filteredResponse = this.filterDatabaseResponse(
       deepCopy(this.databaseResponse),
@@ -184,7 +286,7 @@ export class CustomQueriesComponent implements OnInit {
       tableData: { columns: [], data: [] },
     };
 
-    let tempData: { graph: any; table: any }[] = [];
+    let tempData: { graph: any; table: any; }[] = [];
 
     for (let i = 0; i < databaseResponse.graphData.nodes.length; i++) {
       const values = Object.values(databaseResponse.graphData.nodes[i]).join(

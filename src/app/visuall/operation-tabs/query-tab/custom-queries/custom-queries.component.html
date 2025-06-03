@@ -193,6 +193,14 @@
 </div>
 
 <app-table-view
+  *ngIf="selectedQuery === queries[2]"
+  [params]="sequenceChainTableInput"
+  [tableFilled]="sequenceChainTableIsFilled"
+  (onFilteringChanged)="filterSequenceChainTable($event)"
+  [clearFilter]="clearSequenceChainTableFilter"
+></app-table-view>
+
+<app-table-view
   *ngIf="selectedQuery !== ''"
   [params]="tableInput"
   [tableFilled]="tableIsFilled"

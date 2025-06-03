@@ -384,7 +384,7 @@ export class Neo4jDb implements DbService {
               WHERE elementId(startNode) = '${nodeId}' 
               MATCH path = (startNode)`;
 
-              query += "<"; // Reverse direction
+              query += "<";
 
               query += `-[*1..${distance}]-`;
 
@@ -596,8 +596,12 @@ export class Neo4jDb implements DbService {
     const currentPage = 1;
 
     this.runQuery(
-      `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, ${minSubsequenceMatchLength}, [], ${pageSize}, ${currentPage}, ${timeout})`,
-      callback
+      `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, ${minSubsequenceMatchLength}, [], ${pageSize}, ${currentPage}, ${timeout}) 
+       YIELD nodes, totalNodeCount, nodeClass, nodeElementId, edges, edgeClass, edgeElementId, edgeSourceTargets, paths
+       RETURN nodes, totalNodeCount, nodeClass, nodeElementId, edges, edgeClass, edgeElementId, edgeSourceTargets, paths`,
+      callback,
+      DbResponseType.table,
+      false
     );
   }
 
