@@ -95,10 +95,10 @@ export class CustomQueriesComponent implements OnInit {
 
       for (let i = 0; i < response.data[0][0].length; i++) {
         let node = {
-          elementId: response.data[0][3][i], // fourth column is the node id
-          properties: response.data[0][0][i], // first column is node properties "nodes"
-          id: response.data[0][3][i], // the id is the last part of the node id
-          labels: [response.data[0][2][i]], // second column is the node labels
+          elementId: response.data[0][2][i],
+          properties: response.data[0][0][i],
+          id: response.data[0][2][i],
+          labels: [response.data[0][1][i]],
         };
         node.properties.elementId = node.elementId;
         node.properties.id = node.id;
@@ -106,22 +106,21 @@ export class CustomQueriesComponent implements OnInit {
         convertedResponse.nodes.push(node);
       }
 
-      for (let i = 0; i < response.data[0][4].length; i++) {
+      for (let i = 0; i < response.data[0][3].length; i++) {
         let edge = {
-          elementId: response.data[0][6][i], // seventh column is the edge id
-          properties: response.data[0][4][i], // fifth column is the edge properties
-          startNodeElementId: response.data[0][7][i][0], // eighth column is the start node id
-          startNode: response.data[0][7][i][0], // eighth column is the start node id
-          endNodeElementId: response.data[0][7][i][1], // eighth column is the end node id
-          endNode: response.data[0][7][i][1], // eighth column is the end node id
-          
-          id: response.data[0][6][i], // the id is the last part of the edge id
-          type: response.data[0][5][i], // sixth column is the edge type
+          elementId: response.data[0][5][i],
+          properties: response.data[0][3][i], 
+          startNodeElementId: response.data[0][6][i][0],
+          startNode: response.data[0][6][i][0], 
+          endNodeElementId: response.data[0][6][i][1],
+          endNode: response.data[0][6][i][1],
+          id: response.data[0][5][i],
+          type: response.data[0][4][i],
         };
         convertedResponse.edges.push(edge);
       }
 
-      convertedResponse.paths = response.data[0][8];
+      convertedResponse.paths = response.data[0][7];
 
       return convertedResponse;
     } else {
