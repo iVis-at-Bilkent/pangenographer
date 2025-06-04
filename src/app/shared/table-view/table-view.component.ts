@@ -29,6 +29,7 @@ import {
   TableViewInput,
   getClassNameFromProperties,
 } from "./table-view-types";
+import { DbAdapterService } from "../../visuall/db-service/db-adapter.service";
 
 @Pipe({ name: "replace" })
 export class ReplacePipe implements PipeTransform {
@@ -93,6 +94,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
   constructor(
     private _cyService: CytoscapeService,
     private _g: GlobalVariableService,
+    private _dbService: DbAdapterService,
     private _ngZone: NgZone,
     private _extTool: ExternalToolService
   ) {}
@@ -285,10 +287,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  isNumber(v: any) {
-    return typeof v === "number";
-  }
-
   resetPosition(isDraggable: boolean) {
     this.isDraggable = isDraggable;
     if (this.isDraggable) {
@@ -338,13 +336,13 @@ export class TableViewComponent implements OnInit, OnDestroy {
     t: EventTarget = undefined, // undefined for setting checked status
     forceCheck?: boolean
   ) {
+    // Get the checked status of the checkbox
+    const isChecked = (<HTMLInputElement>t).checked;
+
     // t is the target HTML element of the event
     // if t is undefined, it means that the function is called to set the checked status of the checkbox
     // if t is defined, it means that the function is called by the checkbox click event
     if (t !== undefined) {
-      // Get the checked status of the checkbox
-      const isChecked = (<HTMLInputElement>t).checked;
-
       // Update the checkedIndex object according to the checked status of the checkbox
       if (isChecked) {
         this.checkedIndex[index] = true;
@@ -376,6 +374,51 @@ export class TableViewComponent implements OnInit, OnDestroy {
       // The cues need to be updated after the badges are placed on the graph
       // as the nodes are resized according to the maximum percentage values
       this._g.refreshCuesBadges();
+    }
+
+    if (isChecked && this.params.paths && this.params.paths.length > 0) {
+      let highlightIndex = 3;
+      let paths = JSON.parse(JSON.stringify(this.params.paths[index])); // perform deep copy
+      for (let i = 0; i < paths.length; i++) {
+        if (i%2 == 0) {
+          paths[i] = "n" + paths[i];
+        } else {
+          paths[i] = "e" + paths[i];
+        }
+      }
+      
+      // if all the path elements are not currently in the graph, fetch them
+      let isInGraph = paths.every((x: string) => { 
+        return this._g.cy.elements(`[id = "${x}"]`).length > 0;
+      });
+      if (!isInGraph) { 
+        this._dbService.getElements(
+            this.params.paths[index], // do not need n,e prefix
+            (x: any) => {
+              this._cyService.loadElementsFromDatabase(x, true);
+              // Highlight the path elements after they are loaded
+              this._cyService.highlightElements(paths, highlightIndex);
+            },
+            { isEdgeQuery: true }
+          )
+      } else {
+        // If elements are already in the graph, highlight them immediately
+        this._cyService.highlightElements(paths, highlightIndex);
+      }
+    } else if (!isChecked && this.params.paths && this.params.paths.length > 0) {
+      // remove the elements from the graph
+      let paths = JSON.parse(JSON.stringify(this.params.paths[index])); // perform deep copy
+      for (let i = 0; i < paths.length; i++) {
+        if (i%2 == 0) {
+          paths[i] = "n" + paths[i];
+        } else {
+          paths[i] = "e" + paths[i];
+        }
+      }
+      let elements = this._g.cy.elements().filter((x: any) => {
+        return paths.includes(x.id());
+      });
+      this._g.cy.remove(elements);
     }
   }
 

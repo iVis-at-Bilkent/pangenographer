@@ -574,9 +574,6 @@ export class MapTabComponent implements OnInit, OnDestroy {
   }
 
   getDataForQueryResult(e: TableRowMeta) {
-    let fn = (x: any) => {
-      this._cyService.loadElementsFromDatabase(x, this.tableInput.isMergeGraph);
-    };
     let historyMeta: HistoryMetaData = {
       customTxt: "Loaded from table: ",
       isNode: !this.queryRule.isEdge,
@@ -614,7 +611,9 @@ export class MapTabComponent implements OnInit, OnDestroy {
     } else {
       this._dbService.getElements(
         e.dbIds,
-        fn,
+        (x: any) => {
+          this._cyService.loadElementsFromDatabase(x, this.tableInput.isMergeGraph);
+        },
         { isEdgeQuery: this.queryRule.isEdge },
         historyMeta
       );

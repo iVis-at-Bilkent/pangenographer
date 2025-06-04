@@ -24,8 +24,9 @@ export interface TableViewInput {
   classNames?: string[];
   isBlastResultTable?: boolean;
   allChecked?: boolean;
+  allCheckedHide?: boolean;
   queriedSequences?: string;
-  paths?: string[];
+  paths?: string[][];
 }
 
 export interface TableFiltering {

@@ -502,7 +502,11 @@ export class CytoscapeService {
     return collapsedEdgeIds;
   }
 
-  highlightElements(elementIds: string[]) {
+  highlightElements(elementIds: string[], styleIndex: number = this._g.userPreferences.currentHighlightIndex.getValue()) {
+    let oldHighlightIndex = this._g.userPreferences.currentHighlightIndex.getValue();
+    // Switch to the style index
+    this._g.userPreferences.currentHighlightIndex.next(styleIndex);
+
     // remove all existing highlights before highlighting new elements
     const newElementIndicator =
       this._g.userPreferences.mergedElementIndicator.getValue();
@@ -531,6 +535,9 @@ export class CytoscapeService {
     } else if (newElementIndicator == MergedElementIndicatorTypes.highlight) {
       this._g.highlightElements(ele2highlight);
     }
+
+    // Switch back to the old highlight index
+    this._g.userPreferences.currentHighlightIndex.next(oldHighlightIndex);
   }
 
   createCyNode(node: CyNode, id: string) {

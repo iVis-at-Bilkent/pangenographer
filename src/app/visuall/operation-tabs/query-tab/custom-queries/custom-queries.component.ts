@@ -57,7 +57,8 @@ export class CustomQueriesComponent implements OnInit {
     isLoadGraph: false,
     isMergeGraph: false,
     isNodeData: true,
-    paths: [],
+    paths: undefined,
+    allCheckedHide: true,
   };
   clearTableFilter = new Subject<boolean>();
   clearSequenceChainTableFilter = new Subject<boolean>();
@@ -249,6 +250,8 @@ export class CustomQueriesComponent implements OnInit {
       const row = [{value: graphResponse.paths[i]}, { value: path }];
       this.sequenceChainTableInput.results.push(row);
     }
+
+    this.sequenceChainTableInput.paths = graphResponse.paths;
 
     this.sequenceChainTableInput.resultCount = this.sequenceChainTableInput.results.length;
     this.sequenceChainTableIsFilled.next(true);

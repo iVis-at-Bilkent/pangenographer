@@ -132,7 +132,7 @@
           >
             <span>...</span>
           </th>
-          <th scope="col" [hidden]="params.isLoadGraph">
+          <th scope="col" [hidden]="params.isLoadGraph || params.allCheckedHide">
             <input
               type="checkbox"
               class="m-1 cb-table-all"
