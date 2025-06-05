@@ -606,7 +606,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
 
     let queries = this.params.queriedSequences
-      .slice(0, lastIndexOf(this.params.queriedSequences))
+      .slice(0, lastIndexOf(this.params.queriedSequences) + 1)
       .split(",");
     let result: {
       text: { type: string; text: string }[];
