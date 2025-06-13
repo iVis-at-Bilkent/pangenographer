@@ -27,6 +27,11 @@ export interface TableViewInput {
   allCheckedHide?: boolean;
   queriedSequences?: string;
   paths?: string[][];
+  maxJumpLength?: number;
+  minSubsequenceMatchLength?: number;
+  indices?: {
+    [key: string]: number[][];
+  };
 }
 
 export interface TableFiltering {

@@ -42,6 +42,7 @@ export class CustomQueriesComponent implements OnInit {
     isMergeGraph: false,
     isNodeData: true,
     isHide0: false,
+    indices: undefined,
     queriedSequences: undefined,
   };
   sequenceChainTableIsFilled = new Subject<boolean>();
@@ -122,6 +123,7 @@ export class CustomQueriesComponent implements OnInit {
       }
 
       convertedResponse.paths = response.data[0][7];
+      convertedResponse.indices = response.data[0][8];
 
       return convertedResponse;
     } else {
@@ -136,6 +138,22 @@ export class CustomQueriesComponent implements OnInit {
     const callback = (response: any) => {
       const convertedResponse = this.convertResponse(response);
       this.databaseResponse.graphData = convertedResponse;
+
+      // sequence chain search
+      if (this.selectedQuery === this.queries[2]) {
+        this.tableInput.indices = {};
+        
+        for (let i = 0; i < convertedResponse.indices.length; i++) {
+          for (let j = 0; j < convertedResponse.indices[i].length; j++) {
+            if (this.tableInput.indices[convertedResponse.indices[i][j][0]] === undefined) {
+              this.tableInput.indices[convertedResponse.indices[i][j][0]] = [];
+            }
+            this.tableInput.indices[convertedResponse.indices[i][j][0]].push([Number(convertedResponse.indices[i][j][1]), j]);
+          }
+        }
+      }
+      
+
       this.filterTable({
         orderBy: null,
         orderDirection: null,
@@ -166,12 +184,10 @@ export class CustomQueriesComponent implements OnInit {
 
     if (this.selectedQuery === this.queries[2]) {
       // Search by sequence chain
-      this.tableInput.queriedSequences =
-        sequences.replace(/'/g, "") +
-        "," +
-        this.maxJumpLength +
-        "," +
-        this.minSubsequenceMatchLength;
+      this.tableInput.queriedSequences = sequences.replace(/'/g, "");
+      this.tableInput.maxJumpLength = this.maxJumpLength;
+      this.tableInput.minSubsequenceMatchLength = this.minSubsequenceMatchLength;
+
       this._dbService.sequenceChainSearch(
         sequences,
         this.maxJumpLength,
@@ -232,22 +248,49 @@ export class CustomQueriesComponent implements OnInit {
   private fillSequenceChainTable(graphResponse: GraphResponse) {
     this.sequenceChainTableIsFilled.next(false);
     this.sequenceChainTableInput.results = [];
-    this.sequenceChainTableInput.columns = ['Path'];
+    this.sequenceChainTableInput.columns = ['Matched Indices', 'Path'];
+    let idToNameMap: { [key: string]: string } = {}; // Helper map to convert node ids to names
 
     // Convert each path array into a string representation
     for (let i = 0; i < graphResponse.paths.length; i++) {
-      const path = graphResponse.paths[i].map((id: any, index: number) => {
+      let path = graphResponse.paths[i].map((id: any, index: number) => {
         if (index % 2 === 0) { // node
-          // find the node in the nodes array
-          const node = graphResponse.nodes.find((node: any) => node.id === id);
-          return node.properties.segmentName;
-        } else { // edge
-          // find the edge in the edges array
-          const edge = graphResponse.edges.find((edge: any) => edge.id === id);
-          return edge.type;
+          if (!(id in idToNameMap)) {
+            // find the node in the nodes array
+            const node = graphResponse.nodes.find((node: any) => node.id === id);
+            idToNameMap[id] = node.properties.segmentName;
+          }
+          return idToNameMap[id];
         }
+      })
+      path = path.filter((x: any) => x !== undefined);
+
+      let addedIds: Set<string> = new Set();
+
+      let matchedIndices: string = "";
+      graphResponse.indices[i].forEach((pair:string[], index: any) => {
+        if (addedIds.has(pair[0])) {
+          return;
+        }
+        addedIds.add(pair[0]);
+
+        if (!(pair[0] in idToNameMap)) {
+          const node = graphResponse.nodes.find((node: any) => node.id === pair[0]);
+          idToNameMap[pair[0]] = node.properties.segmentName;
+        }
+
+        matchedIndices += idToNameMap[pair[0]] + ": [";
+        
+        this.tableInput.indices[pair[0]].forEach((indices: number[]) => {
+          matchedIndices += indices[0] + ",";
+        });
+        matchedIndices = matchedIndices.slice(0, -1);
+        matchedIndices += "],\n";
       });
-      const row = [{value: graphResponse.paths[i]}, { value: path }];
+
+      matchedIndices = matchedIndices.slice(0, -2);
+
+      const row = [{value: graphResponse.paths[i]}, {value: matchedIndices}, { value: path }];
       this.sequenceChainTableInput.results.push(row);
     }
 

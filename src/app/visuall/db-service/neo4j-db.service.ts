@@ -597,8 +597,8 @@ export class Neo4jDb implements DbService {
 
     this.runQuery(
       `CALL sequenceChainSearch([${sequences}], ${maxJumpLength}, ${minSubsequenceMatchLength}, [], ${pageSize}, ${currentPage}, ${timeout}) 
-       YIELD nodes, nodeClass, nodeElementId, edges, edgeClass, edgeElementId, edgeSourceTargets, paths
-       RETURN nodes, nodeClass, nodeElementId, edges, edgeClass, edgeElementId, edgeSourceTargets, paths`,
+       YIELD nodes, nodeClass, nodeElementId, edges, edgeClass, edgeElementId, edgeSourceTargets, paths, indices
+       RETURN nodes, nodeClass, nodeElementId, edges, edgeClass, edgeElementId, edgeSourceTargets, paths, indices`,
       callback,
       DbResponseType.table,
       false

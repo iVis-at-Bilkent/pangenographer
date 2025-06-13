@@ -582,74 +582,45 @@ export class TableViewComponent implements OnInit, OnDestroy {
     text: string,
     rowIndex: number
   ): { text: { type: string; text: string }[]; queriedSequences: string } {
-    if (!this.params.queriedSequences || !text) {
+    rowIndex = rowIndex - 1;
+    if (!this.params.queriedSequences || !text || !this.params.indices || !this.params.indices[this.params.results[rowIndex][0].value]) {
       return { text: [{ type: "normal", text: text }], queriedSequences: "" };
     }
-
+    
     if (
-      this.highlightedTexts[rowIndex] &&
-      this.highlightedTexts[rowIndex].queriedSequences == // value equality check
-        this.params.queriedSequences
+      this.highlightedTexts[rowIndex] && 
+      this.highlightedTexts[rowIndex].queriedSequences == this.params.queriedSequences &&
+      this.highlightedTexts[rowIndex].maxJumpLength == this.params.maxJumpLength &&
+      this.highlightedTexts[rowIndex].minSubsequenceMatchLength == this.params.minSubsequenceMatchLength
     ) {
       return this.highlightedTexts[rowIndex];
     } else {
       delete this.highlightedTexts[rowIndex];
     }
 
-    function lastIndexOf(str: string) {
-      for (let i = str.length - 1; i >= 0; i--) {
-        if (/[A-Za-z]/.test(str[i])) {
-          return i;
-        }
-      }
-      return -1;
-    }
-
-    let queries = this.params.queriedSequences
-      .slice(0, lastIndexOf(this.params.queriedSequences) + 1)
-      .split(",");
+    let queries = this.params.queriedSequences.split(",");
     let result: {
       text: { type: string; text: string }[];
       queriedSequences: string;
+      maxJumpLength: number;
+      minSubsequenceMatchLength: number;
     } = {
       text: [],
       queriedSequences: this.params.queriedSequences + "",
+      maxJumpLength: this.params.maxJumpLength,
+      minSubsequenceMatchLength: this.params.minSubsequenceMatchLength,
     };
 
-    let lastIndex = 0,
-      lastQueriedSequenceIndex = queries.length - 1,
-      found = true;
-    while (lastIndex < text.length && found) {
-      found = false;
-      let i = (lastQueriedSequenceIndex + 1) % queries.length;
-      while (true) {
-        let index = text.indexOf(queries[i], lastIndex);
-        if (index >= 0) {
-          found = true;
-          if (lastIndex < index) {
-            result.text.push({
-              type: "normal",
-              text: text.substring(lastIndex, index),
-            });
-          }
-          result.text.push({ type: "highlight", text: queries[i] });
-          lastIndex = index + queries[i].length;
-          lastQueriedSequenceIndex = i;
-          break;
-        } else if (lastQueriedSequenceIndex === i) {
-          break;
-        }
-        i = (i + 1) % queries.length;
-      }
+    let indices = this.params.indices[this.params.results[rowIndex][0].value];
+    let lastIndex = 0;
+    for (let i = 0; i < indices.length; i++) {
+      let index = indices[i][0];
+      let queriedSequenceIndex = indices[i][1];
+      result.text.push({ type: "normal", text: text.substring(lastIndex, index) });
+      result.text.push({ type: "highlight", text: text.substring(index, index + queries[queriedSequenceIndex].length) });
+      lastIndex = index + queries[queriedSequenceIndex].length;
     }
-    // if the last index is not at the end of the text, add the remaining text as normal
-    if (lastIndex < text.length) {
-      result.text.push({ type: "normal", text: text.substring(lastIndex) });
-    }
-    // if the result is empty, it means that the text is not found in the queries
-    if (result.text.length == 0) {
-      result.text.push({ type: "normal", text: text });
-    }
+    result.text.push({ type: "normal", text: text.substring(lastIndex) });
 
     this.highlightedTexts[rowIndex] = result;
 
