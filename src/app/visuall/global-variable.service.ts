@@ -908,8 +908,9 @@ export class GlobalVariableService {
   }
 
   private addStyle4Emphasize() {
-    const color = "#da14ff";
-    const width = this.userPreferences.highlightStyles[0].width.getValue();
+    let highlightIndex = 5;
+    const color = this.userPreferences.highlightStyles[highlightIndex].color.getValue();
+    const width = this.userPreferences.highlightStyles[highlightIndex].width.getValue();
     const OPACITY_DIFF = 0.05;
 
     this.cy

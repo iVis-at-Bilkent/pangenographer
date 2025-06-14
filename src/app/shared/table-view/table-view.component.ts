@@ -238,14 +238,25 @@ export class TableViewComponent implements OnInit, OnDestroy {
     });
   }
 
-  onMouseEnter(id: string) {
+  onMouseEnter(id: string | string[]) {
     if (
       this.params.isDisableHover ||
       !this._g.userPreferences.isHighlightOnHover.getValue()
     ) {
       return;
     }
-    if (this.params.isUseCySelector4Highlight) {
+
+    if (Array.isArray(id) && this.params.isUseCySelector4Highlight) {
+      for (let i = 0; i < id.length; i++) {
+        let x = id[i];
+        if (i % 2 == 0) {
+          x = "n" + x;
+        } else {
+          x = "e" + x;
+        }
+        this.highlighterFn({ target: null, type: EV_MOUSE_ON, cySelector: x });
+      }
+    } else if (this.params.isUseCySelector4Highlight && !Array.isArray(id)) {
       this.highlighterFn({ target: null, type: EV_MOUSE_ON, cySelector: id });
     } else {
       let target = this._g.cy.elements(`[id = "n${id}"]`);
@@ -256,14 +267,25 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
   }
 
-  onMouseExit(id: string) {
+  onMouseExit(id: string | string[]) {
     if (
       this.params.isDisableHover ||
       !this._g.userPreferences.isHighlightOnHover.getValue()
     ) {
       return;
     }
-    if (this.params.isUseCySelector4Highlight) {
+
+    if (Array.isArray(id) && this.params.isUseCySelector4Highlight) {
+      for (let i = 0; i < id.length; i++) {
+        let x = id[i];
+        if (i % 2 == 0) {
+          x = "n" + x;
+        } else {
+          x = "e" + x;
+        }
+        this.highlighterFn({ target: null, type: EV_MOUSE_OFF, cySelector: x });
+      }
+    } else if (this.params.isUseCySelector4Highlight && !Array.isArray(id)) {
       this.highlighterFn({ target: null, type: EV_MOUSE_OFF, cySelector: id });
     } else {
       let target = this._g.cy.elements(`[id = "n${id}"]`);
@@ -376,49 +398,41 @@ export class TableViewComponent implements OnInit, OnDestroy {
       this._g.refreshCuesBadges();
     }
 
-    if (isChecked && this.params.paths && this.params.paths.length > 0) {
-      let highlightIndex = 3;
+    if (this.params.paths && this.params.paths.length > 0) {
       let paths = JSON.parse(JSON.stringify(this.params.paths[index])); // perform deep copy
-      for (let i = 0; i < paths.length; i++) {
-        if (i%2 == 0) {
-          paths[i] = "n" + paths[i];
-        } else {
-          paths[i] = "e" + paths[i];
+        for (let i = 0; i < paths.length; i++) {
+          if (i % 2 == 0) {
+            paths[i] = "n" + paths[i];
+          } else {
+            paths[i] = "e" + paths[i];
+          }
         }
-      }
-      
-      // if all the path elements are not currently in the graph, fetch them
-      let isInGraph = paths.every((x: string) => { 
-        return this._g.cy.elements(`[id = "${x}"]`).length > 0;
-      });
-      if (!isInGraph) { 
-        this._dbService.getElements(
-            this.params.paths[index], // do not need n,e prefix
-            (x: any) => {
-              this._cyService.loadElementsFromDatabase(x, true);
-              // Highlight the path elements after they are loaded
-              this._cyService.highlightElements(paths, highlightIndex);
-            },
-            { isEdgeQuery: true }
-          )
+      if (isChecked) {
+        let highlightIndex = 5;
+        
+        // if all the path elements are not currently in the graph, fetch them
+        let isInGraph = paths.every((x: string) => { 
+          return this._g.cy.elements(`[id = "${x}"]`).length > 0;
+        });
+        if (!isInGraph) { 
+          this._dbService.getElements(
+              this.params.paths[index], // do not need n,e prefix
+              (x: any) => {
+                this._cyService.loadElementsFromDatabase(x, true);
+                // Highlight the path elements after they are loaded
+                this._cyService.highlightElements(paths, highlightIndex);
+              },
+              { isEdgeQuery: this.params.paths.length > 1 }
+            )
+        } else {
+          // If elements are already in the graph, highlight them immediately
+          this._cyService.highlightElements(paths, highlightIndex);
+        }
       } else {
-        // If elements are already in the graph, highlight them immediately
-        this._cyService.highlightElements(paths, highlightIndex);
+        this._g.removeHighlights(this._g.cy.elements().filter((x: any) => {
+          return paths.includes(x.id());
+        }));
       }
-    } else if (!isChecked && this.params.paths && this.params.paths.length > 0) {
-      // remove the elements from the graph
-      let paths = JSON.parse(JSON.stringify(this.params.paths[index])); // perform deep copy
-      for (let i = 0; i < paths.length; i++) {
-        if (i%2 == 0) {
-          paths[i] = "n" + paths[i];
-        } else {
-          paths[i] = "e" + paths[i];
-        }
-      }
-      let elements = this._g.cy.elements().filter((x: any) => {
-        return paths.includes(x.id());
-      });
-      this._g.cy.remove(elements);
     }
   }
 

@@ -35,6 +35,10 @@
       {
         "color": "#04f06a",
         "width": 3
+      },
+      {
+        "color": "#da14ff",
+        "width": 3
       }
     ],
     "isAutoIncrementalLayoutOnChange": true,
