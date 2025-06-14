@@ -182,13 +182,13 @@
                   "
                 >
                   <ngb-highlight
-                    *ngIf="seg.type === 'highlight' && k % 2 === 0"
+                    *ngIf="seg.type === 'highlight' && k % 4 === 1"
                     [result]="seg.text"
                     [term]="filterTxt"
                     style="color: #05be14; font-weight: bold"
                   ></ngb-highlight>
                   <ngb-highlight
-                    *ngIf="seg.type === 'highlight' && k % 2 !== 0"
+                    *ngIf="seg.type === 'highlight' && k % 4 === 3"
                     [result]="seg.text"
                     [term]="filterTxt"
                     style="color: #be05b5; font-weight: bold"

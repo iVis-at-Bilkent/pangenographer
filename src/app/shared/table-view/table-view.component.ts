@@ -626,18 +626,26 @@ export class TableViewComponent implements OnInit, OnDestroy {
     };
 
     let indices = this.params.indices[this.params.results[rowIndex][0].value];
+    // remove duplicates
+    indices = indices.filter((x: any, index: number, self: any) =>
+      index === self.findIndex((t: any) => t[0] === x[0] && t[1] === x[1])
+    );
+    indices.sort((a: any, b: any) => a[0] - b[0]);
+
     let lastIndex = 0;
     for (let i = 0; i < indices.length; i++) {
       let index = indices[i][0];
       let queriedSequenceIndex = indices[i][1];
-      result.text.push({ type: "normal", text: text.substring(lastIndex, index) });
-      result.text.push({ type: "highlight", text: text.substring(index, index + queries[queriedSequenceIndex].length) });
-      lastIndex = index + queries[queriedSequenceIndex].length;
+
+      if (lastIndex <= index) {
+        result.text.push({ type: "normal", text: text.substring(lastIndex, index) });
+        result.text.push({ type: "highlight", text: text.substring(index, index + queries[queriedSequenceIndex].length) });
+        lastIndex = index + queries[queriedSequenceIndex].length;
+      }
     }
     result.text.push({ type: "normal", text: text.substring(lastIndex) });
 
     this.highlightedTexts[rowIndex] = result;
-
     return result;
   }
 

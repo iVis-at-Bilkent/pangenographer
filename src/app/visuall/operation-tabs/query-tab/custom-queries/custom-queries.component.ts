@@ -141,21 +141,6 @@ export class CustomQueriesComponent implements OnInit {
       const convertedResponse = this.convertResponse(response);
       this.databaseResponse.graphData = convertedResponse;
 
-      // sequence chain search
-      if (this.selectedQuery === this.queries[2]) {
-        this.tableInput.indices = {};
-        
-        for (let i = 0; i < convertedResponse.indices.length; i++) {
-          for (let j = 0; j < convertedResponse.indices[i].length; j++) {
-            if (this.tableInput.indices[convertedResponse.indices[i][j][0]] === undefined) {
-              this.tableInput.indices[convertedResponse.indices[i][j][0]] = [];
-            }
-            this.tableInput.indices[convertedResponse.indices[i][j][0]].push([Number(convertedResponse.indices[i][j][1]), j]);
-          }
-        }
-      }
-      
-
       this.filterTable({
         orderBy: null,
         orderDirection: null,
@@ -267,30 +252,27 @@ export class CustomQueriesComponent implements OnInit {
       })
       path = path.filter((x: any) => x !== undefined);
 
-      let addedIds: Set<string> = new Set();
-
       let matchedIndices: string = "";
-      graphResponse.indices[i].forEach((pair:string[], index: any) => {
-        if (addedIds.has(pair[0])) {
-          return;
-        }
-        addedIds.add(pair[0]);
-
+      let lastMatchedNodeId: string = "";
+      graphResponse.indices[i].forEach((pair:string[]) => {
         if (!(pair[0] in idToNameMap)) {
           const node = graphResponse.nodes.find((node: any) => node.id === pair[0]);
           idToNameMap[pair[0]] = node.properties.segmentName;
         }
 
-        matchedIndices += idToNameMap[pair[0]] + ": [";
-        
-        this.tableInput.indices[pair[0]].forEach((indices: number[]) => {
-          matchedIndices += indices[0] + ",";
-        });
-        matchedIndices = matchedIndices.slice(0, -1);
-        matchedIndices += "],\n";
-      });
+        if (lastMatchedNodeId !== pair[0]) {
+          if (lastMatchedNodeId !== "") {
+            matchedIndices = matchedIndices.slice(0, -1);
+            matchedIndices += "],\n";
+          }
+          lastMatchedNodeId = pair[0];
+          matchedIndices += idToNameMap[pair[0]] + ": [";
+        }
 
-      matchedIndices = matchedIndices.slice(0, -2);
+        matchedIndices += pair[1] + ",";
+      });
+      matchedIndices = matchedIndices.slice(0, -1);
+      matchedIndices += "]";
 
       const row = [{value: graphResponse.paths[i]}, {value: matchedIndices}, { value: path }];
       this.sequenceChainTableInput.results.push(row);
@@ -315,6 +297,23 @@ export class CustomQueriesComponent implements OnInit {
         filteredResponse.graphData as GraphResponse,
         this.tableInput.isMergeGraph && this._g.cy.elements().length > 0
       );
+    }
+
+    // sequence chain search
+    if (this.selectedQuery === this.queries[2]) {
+      this.tableInput.indices = {};
+      
+      for (let i = 0; i < filteredResponse.graphData.indices.length; i++) {
+        for (let j = 0; j < filteredResponse.graphData.indices[i].length; j++) {
+          // 0 is the node id, 1 is the index of the queried sequence
+          if (this.tableInput.indices[filteredResponse.graphData.indices[i][j][0]] === undefined) {
+            this.tableInput.indices[filteredResponse.graphData.indices[i][j][0]] = [];
+          }
+
+          // index of the queried sequence in the text, index of the node in the path
+          this.tableInput.indices[filteredResponse.graphData.indices[i][j][0]].push([Number(filteredResponse.graphData.indices[i][j][1]), j]);
+        }
+      }
     }
 
     this.tableInput.resultCount = filteredResponse.count;
