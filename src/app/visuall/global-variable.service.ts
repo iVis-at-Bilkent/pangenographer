@@ -492,10 +492,24 @@ export class GlobalVariableService {
     }
 
     for (const key in sourceShortests) {
-      longestPath = Math.max(longestPath, sourceShortests[key]);
+      if (sourceShortests[key] === Infinity) {
+        delete sourceShortests[key];
+        this.zeroIncomerAndOutgoerNodes.source = this.zeroIncomerAndOutgoerNodes.source.filter(
+          (x) => x.id() !== key
+        );
+      } else {
+        longestPath = Math.max(longestPath, sourceShortests[key]);
+      }
     }
     for (const key in targetShortests) {
-      longestPath = Math.max(longestPath, targetShortests[key]);
+      if (targetShortests[key] === Infinity) {
+        delete targetShortests[key];
+        this.zeroIncomerAndOutgoerNodes.target = this.zeroIncomerAndOutgoerNodes.target.filter(
+          (x) => x.id() !== key
+        );
+      } else {
+        longestPath = Math.max(longestPath, targetShortests[key]);
+      }
     }
 
     let halfOfIdealEdgeLength = 43;
