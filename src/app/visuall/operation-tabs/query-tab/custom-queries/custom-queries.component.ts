@@ -72,6 +72,7 @@ export class CustomQueriesComponent implements OnInit {
   maxJumpLength: number = 0;
   minSubsequenceMatchLength: number = 2;
   graphEdges: boolean = true;
+  searchedSequences: string[] = [];
 
   queries: string[] = [
     "Search segment by name",
@@ -184,6 +185,11 @@ export class CustomQueriesComponent implements OnInit {
     } else if (this.selectedQuery === this.queries[1]) {
       // Search by sequence
       this.tableInput.queriedSequences = sequences.replace(/'/g, "");
+      this.tableInput.maxJumpLength = 0; // no jump allowed
+      this.tableInput.minSubsequenceMatchLength = 0; // no subsequence match allowed
+      this.searchedSequences = this.tableInput.queriedSequences.split(",");
+      this.tableInput.indices = {};
+      
       const cypherQuery =
         `
       WITH [${sequences}] as sequences
@@ -490,6 +496,25 @@ export class CustomQueriesComponent implements OnInit {
         this.tableInput.columns,
         segment.elementId
       );
+
+      // Search by sequence
+      if (this.selectedQuery === this.queries[1] && this.searchedSequences.length > 0) { 
+        // index of the segment data column
+        let startIndexes: string = "Starts: [";
+        let startIndexesArray: number[][] = [];
+        for (let j = 0; j < this.searchedSequences.length; j++) {
+          const startIndex = row[3].value.indexOf(this.searchedSequences[j]);
+          if (startIndex !== -1) {
+            startIndexes += startIndex + ", ";
+            startIndexesArray.push([startIndex, j]);
+          }
+        }
+        startIndexes = startIndexes.slice(0, -2);
+        startIndexes += "]";
+        row[3].value = startIndexes + " " + row[3].value;
+
+        this.tableInput.indices[row[0].value] = startIndexesArray;
+      }
 
       this.tableInput.results.push(row); // Add the row to the table
     }

@@ -436,6 +436,20 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
   }
 
+  translateColumnName(column: string): string {
+    /* {{
+      params.isReplace_inHeaders ? (col | replace : "[_]" : " ") : col
+    }} */
+
+    if (column.startsWith("Segment ")) {
+      return column.replace("Segment ", "").charAt(0).toUpperCase() + column.replace("Segment ", "").slice(1);
+    } else if (this.params.isReplace_inHeaders) {
+      return column.replace("[_]", " ");
+    }
+    
+    return column;
+  }
+
   // This function is called to place percentage badges on the graph nodes for the checked rows
   private placeBlastTableResultBadges() {
     // Destroy the existing badges on the graph
@@ -631,6 +645,11 @@ export class TableViewComponent implements OnInit, OnDestroy {
       index === self.findIndex((t: any) => t[0] === x[0] && t[1] === x[1])
     );
     indices.sort((a: any, b: any) => a[0] - b[0]);
+
+    if (text.includes("Starts: ")) {
+      result.text.push({ type: "normal", text: text.substring(0, text.indexOf("] ")+2) });
+      text = text.substring(text.indexOf("] ") + 2);
+    }
 
     let lastIndex = 0;
     for (let i = 0; i < indices.length; i++) {

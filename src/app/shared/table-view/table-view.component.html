@@ -117,9 +117,7 @@
             "
           >
             <a href="#" class="table-header" (click)="columnClicked(i)">
-              {{
-                params.isReplace_inHeaders ? (col | replace : "[_]" : " ") : col
-              }}
+              {{ translateColumnName(col) }}
               <span *ngIf="sortingIndex == i">
                 <span *ngIf="sortDirection == 'asc'">&#9650;</span>
                 <span *ngIf="sortDirection == 'desc'">&#9660;</span>
@@ -182,13 +180,13 @@
                   "
                 >
                   <ngb-highlight
-                    *ngIf="seg.type === 'highlight' && k % 4 === 1"
+                    *ngIf="seg.type === 'highlight' && (k % 4 === 1 || k % 4 === 2)"
                     [result]="seg.text"
                     [term]="filterTxt"
                     style="color: #05be14; font-weight: bold"
                   ></ngb-highlight>
                   <ngb-highlight
-                    *ngIf="seg.type === 'highlight' && k % 4 === 3"
+                    *ngIf="seg.type === 'highlight' && (k % 4 === 3 || k % 4 === 0)"
                     [result]="seg.text"
                     [term]="filterTxt"
                     style="color: #be05b5; font-weight: bold"
