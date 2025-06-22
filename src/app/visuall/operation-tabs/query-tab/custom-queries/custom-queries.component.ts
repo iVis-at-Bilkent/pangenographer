@@ -60,6 +60,7 @@ export class CustomQueriesComponent implements OnInit {
     isMergeGraph: false,
     isNodeData: true,
     paths: undefined,
+    allChecked: this.tableInput.isLoadGraph,
     allCheckedHide: true,
   };
   clearTableFilter = new Subject<boolean>();
@@ -131,6 +132,7 @@ export class CustomQueriesComponent implements OnInit {
       isNodeData: true,
       isShowTable: false,
       paths: undefined,
+      allChecked: this.tableInput.isLoadGraph,
       allCheckedHide: true,
     }
     this.searchedSequences = [];
@@ -241,13 +243,13 @@ export class CustomQueriesComponent implements OnInit {
       this.tableInput.minSubsequenceMatchLength = 0; // no subsequence match allowed
       this.searchedSequences = this.tableInput.queriedSequences.split(",");
       this.tableInput.indices = {};
-      
+
       const cypherQuery =
         `
-      WITH [${sequences}] as sequences
-      MATCH (segment:SEGMENT)
-      WHERE any(sequence IN sequences WHERE segment.segmentData CONTAINS sequence)
-      ` +
+        WITH [${sequences}] as sequences
+        MATCH (segment:SEGMENT)
+        WHERE any(sequence IN sequences WHERE segment.segmentData CONTAINS sequence)
+        ` +
         (this.graphEdges
           ? `
         OPTIONAL MATCH (segment)-[r]-(relatedSegment:SEGMENT)
@@ -274,6 +276,7 @@ export class CustomQueriesComponent implements OnInit {
           `
           : `RETURN segment`) +
         ` LIMIT ${dataCount}`;
+
       this._dbService.runQuery(cypherQuery, callback);
     }
   }
@@ -481,6 +484,11 @@ export class CustomQueriesComponent implements OnInit {
     } else {
       this.neighborDistance = Number(event.target.value);
     }
+  }
+
+  onIsLoadGraphChange(event: any) {
+    this.tableInput.isLoadGraph = event.target.checked;
+    this.sequenceChainTableInput.isLoadGraph = this.tableInput.isLoadGraph;
   }
 
   private fillTable(graphResponse: GraphResponse) {
