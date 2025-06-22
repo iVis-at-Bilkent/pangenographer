@@ -231,7 +231,6 @@ export class BlastTabComponent implements OnInit {
     resultCount: 0,
     isNodeData: false,
     isShowExportAsCSV: false,
-    isHide0: false,
     isUseCySelector4Highlight: true,
     isHideLoadGraph: true,
     isReplace_inHeaders: false,

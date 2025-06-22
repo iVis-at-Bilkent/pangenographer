@@ -1,6 +1,6 @@
 <div
   class="d-flex flex-wrap align-items-center justify-content-end m-1"
-  *ngIf="isShowTable"
+  *ngIf="params.isShowTable"
 >
   <input
     [disabled]="isLoading"
@@ -74,7 +74,7 @@
 </div>
 
 <div
-  *ngIf="isShowTable"
+  *ngIf="params.isShowTable"
   #dynamicDiv
   [ngResizable]="isDraggable"
   [rzHandles]="'n,e,s,w,se,sw,nw'"
@@ -155,7 +155,7 @@
             <span
               *ngIf="
                 typeOfData(e.value) === 'number' &&
-                (e.value !== 0 || !params.isHide0)
+                (e.value !== 0)
               "
               >{{ e.value | number : "1.0-2" }}</span
             >

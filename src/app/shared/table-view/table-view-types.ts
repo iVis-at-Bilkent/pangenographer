@@ -14,11 +14,11 @@ export interface TableViewInput {
   isNodeData: boolean;
   isShowExportAsCSV: boolean;
   columnLimit?: number;
-  isHide0?: boolean;
   isUseCySelector4Highlight?: boolean;
   isHideLoadGraph?: boolean;
   isReplace_inHeaders?: boolean;
   isDisableHover?: boolean;
+  isShowTable?: boolean;
   tableTitle?: string;
   isEmphasizeOnHover?: boolean;
   classNames?: string[];

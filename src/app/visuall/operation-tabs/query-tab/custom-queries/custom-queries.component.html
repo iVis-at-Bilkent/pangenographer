@@ -3,6 +3,7 @@
     <select
       class="form-select tight-select filter-form va-small-text query-select"
       [(ngModel)]="selectedQuery"
+      (ngModelChange)="onSelectedQueryChange($event)"
       title="Choose a query"
     >
       <option value="">Choose a query</option>

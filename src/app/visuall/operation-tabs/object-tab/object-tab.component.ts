@@ -40,7 +40,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   tableInput: TableViewInput = {
     columns: ["Type", "Count", "Selected", "Hidden"],
-    isHide0: true,
     results: [],
     resultCount: 0,
     currentPage: 1,
@@ -58,7 +57,6 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
 
   multipleObjectTableInput: TableViewInput = {
     columns: ["Type"],
-    isHide0: true,
     results: [],
     resultCount: 0,
     currentPage: 1,

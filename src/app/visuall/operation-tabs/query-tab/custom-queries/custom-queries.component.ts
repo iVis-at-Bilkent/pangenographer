@@ -41,7 +41,6 @@ export class CustomQueriesComponent implements OnInit {
     isLoadGraph: false,
     isMergeGraph: false,
     isNodeData: true,
-    isHide0: false,
     indices: undefined,
     queriedSequences: undefined,
   };
@@ -92,6 +91,59 @@ export class CustomQueriesComponent implements OnInit {
     this._g.userPreferences.queryResultPageSize.subscribe((pageSize) => {
       this.tableInput.pageSize = pageSize;
     });
+  }
+
+  onSelectedQueryChange(selectedQuery: string) {
+    this.tableIsFilled.next(false);
+    this.sequenceChainTableIsFilled.next(false);
+    this.clearTableFilter.next(true);
+    this.clearSequenceChainTableFilter.next(true);
+    // reset the table inputs
+    this.tableInput = {
+      columns: [],
+      results: [],
+      tableTitle: "Query Results",
+      isEmphasizeOnHover: true,
+      isShowExportAsCSV: true,
+      resultCount: 0,
+      currentPage: 1,
+      pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
+      isLoadGraph: false,
+      isMergeGraph: false,
+      isNodeData: true,
+      isShowTable: false,
+      indices: undefined,
+      queriedSequences: undefined,
+    };
+    this.sequenceChainTableInput = {
+      columns: [],
+      results: [],
+      tableTitle: "Sequence Chain Results",
+      isEmphasizeOnHover: true,
+      isDisableHover: false,
+      isShowExportAsCSV: true,
+      resultCount: 0,
+      currentPage: 1,
+      pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
+      isUseCySelector4Highlight: true,
+      isLoadGraph: false,
+      isMergeGraph: false,
+      isNodeData: true,
+      isShowTable: false,
+      paths: undefined,
+      allCheckedHide: true,
+    }
+    this.searchedSequences = [];
+    this.neighborDistance = 0;
+    this.maxJumpLength = 0;
+    this.minSubsequenceMatchLength = 2;
+    this.graphEdges = true;
+    this.selectedQuery = selectedQuery;
+    
+    /* if (selectedQuery === this.queries[0]) {
+    } else if (selectedQuery === this.queries[1]) {
+    } else if (selectedQuery === this.queries[2]) {
+    } */
   }
 
   private convertResponse(response: any): any {
@@ -231,6 +283,10 @@ export class CustomQueriesComponent implements OnInit {
       deepCopy(this.databaseResponse),
       filter
     );
+
+    if (filteredResponse.graphData.paths === undefined || filteredResponse.graphData.paths.length === 0) {
+      return;
+    }
 
     // fill the table
     this.fillSequenceChainTable(filteredResponse.graphData);

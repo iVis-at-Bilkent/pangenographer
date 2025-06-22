@@ -66,7 +66,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
   sortDirection: "asc" | "desc" | "" = "";
   sortingIndex: number = -1;
   isLoading: boolean = false;
-  isShowTable: boolean = false;
   filterTxtChanged: () => void;
   @ViewChild("dynamicDiv", { static: false }) dynamicDiv;
   checkedIndex: any = {};
@@ -215,9 +214,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
     this.elementBadgeMaxPercentages = {};
     this.isCheckbox4AllChecked = this.params.allChecked;
     if (this.params.results && this.params.results.length > 0) {
-      this.isShowTable = true;
+      this.params.isShowTable = true;
     } else if (this.filterTxt.length == 0) {
-      this.isShowTable = false;
+      this.params.isShowTable = false;
     }
     this.resetHoverEvents();
     this.setColumnLimit();
