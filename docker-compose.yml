@@ -4,8 +4,8 @@ services:
       context: .
       target: runtime
     ports:
-      - "5200:5200"
+      - "4200:4200"
     environment:
       - NODE_ENV=development
-    command: npm run start
+    command: npm run ng serve -- --host 0.0.0.0 --port 4200
     restart: unless-stopped

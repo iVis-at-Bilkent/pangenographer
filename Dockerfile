@@ -1,17 +1,7 @@
-FROM node:14.20.1 AS builder
+FROM node:14.20.1 AS runtime
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm cache clean --force && \
-    rm -rf dist && \
-    npm run build-prod
-
-FROM node:14.20.1 AS runtime
-WORKDIR /app
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/server.js ./server.js
-COPY --from=builder /app/package*.json ./
-RUN npm install
-EXPOSE 5200
-CMD ["npm", "run", "start"]
+EXPOSE 4200
+CMD ["npm", "run", "ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
