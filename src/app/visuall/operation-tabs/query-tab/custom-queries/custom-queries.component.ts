@@ -94,7 +94,7 @@ export class CustomQueriesComponent implements OnInit {
     });
   }
 
-  onSelectedQueryChange(selectedQuery: string) {
+  private resetTableInputs() {
     this.tableIsFilled.next(false);
     this.sequenceChainTableIsFilled.next(false);
     this.clearTableFilter.next(true);
@@ -109,8 +109,8 @@ export class CustomQueriesComponent implements OnInit {
       resultCount: 0,
       currentPage: 1,
       pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
-      isLoadGraph: false,
-      isMergeGraph: false,
+      isLoadGraph: this.tableInput.isLoadGraph,
+      isMergeGraph: this.tableInput.isMergeGraph,
       isNodeData: true,
       isShowTable: false,
       indices: undefined,
@@ -127,14 +127,18 @@ export class CustomQueriesComponent implements OnInit {
       currentPage: 1,
       pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
       isUseCySelector4Highlight: true,
-      isLoadGraph: false,
-      isMergeGraph: false,
+      isLoadGraph: this.tableInput.isLoadGraph,
+      isMergeGraph: this.tableInput.isMergeGraph,
       isNodeData: true,
       isShowTable: false,
       paths: undefined,
       allChecked: this.tableInput.isLoadGraph,
       allCheckedHide: true,
     }
+  }
+
+  onSelectedQueryChange(selectedQuery: string) {
+    this.resetTableInputs();
     this.searchedSequences = [];
     this.neighborDistance = 0;
     this.maxJumpLength = 0;
@@ -191,6 +195,8 @@ export class CustomQueriesComponent implements OnInit {
   execute() {
     this.tableInput.currentPage = 1;
     this.clearTableFilter.next(true);
+
+    this.resetTableInputs();
 
     const callback = (response: any) => {
       const convertedResponse = this.convertResponse(response);
