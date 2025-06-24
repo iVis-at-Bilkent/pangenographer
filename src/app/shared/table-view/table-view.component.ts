@@ -358,14 +358,13 @@ export class TableViewComponent implements OnInit, OnDestroy {
     forceCheck?: boolean
   ) {
     // Get the checked status of the checkbox
-    const isChecked = (<HTMLInputElement>t).checked;
 
     // t is the target HTML element of the event
     // if t is undefined, it means that the function is called to set the checked status of the checkbox
     // if t is defined, it means that the function is called by the checkbox click event
     if (t !== undefined) {
       // Update the checkedIndex object according to the checked status of the checkbox
-      if (isChecked) {
+      if ((<HTMLInputElement>t).checked) {
         this.checkedIndex[index] = true;
       }
       // If the checkbox is unchecked, remove the index from the checkedIndex object
@@ -397,7 +396,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
       this._g.refreshCuesBadges();
     }
 
-    if (this.params.paths && this.params.paths.length > 0) {
+    if (this.params.paths && this.params.paths.length > 0 && t !== undefined) {
       let paths = JSON.parse(JSON.stringify(this.params.paths[index])); // perform deep copy
         for (let i = 0; i < paths.length; i++) {
           if (i % 2 == 0) {
@@ -406,7 +405,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
             paths[i] = "e" + paths[i];
           }
         }
-      if (isChecked) {
+      if ((<HTMLInputElement>t).checked) {
         let highlightIndex = 5;
         
         // if all the path elements are not currently in the graph, fetch them
@@ -421,7 +420,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
                 // Highlight the path elements after they are loaded
                 this._cyService.highlightElements(paths, highlightIndex);
               },
-              { isEdgeQuery: this.params.paths.length > 1 }
+              { isEdgeQuery: this.params.paths[index].length > 1 }
             )
         } else {
           // If elements are already in the graph, highlight them immediately
