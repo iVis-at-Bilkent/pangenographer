@@ -38,7 +38,7 @@ export class CustomQueriesComponent implements OnInit {
     resultCount: 0,
     currentPage: 1,
     pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
-    isLoadGraph: false,
+    isLoadGraph: true,
     isMergeGraph: false,
     isNodeData: true,
     indices: undefined,
@@ -60,7 +60,7 @@ export class CustomQueriesComponent implements OnInit {
     isMergeGraph: false,
     isNodeData: true,
     paths: undefined,
-    allChecked: this.tableInput.isLoadGraph,
+    allChecked: false,
     allCheckedHide: true,
   };
   clearTableFilter = new Subject<boolean>();
@@ -73,6 +73,7 @@ export class CustomQueriesComponent implements OnInit {
   minSubsequenceMatchLength: number = 2;
   graphEdges: boolean = true;
   searchedSequences: string[] = [];
+  isLoadGraph: boolean = false;
 
   queries: string[] = [
     "Search segment by name",
@@ -109,7 +110,7 @@ export class CustomQueriesComponent implements OnInit {
       resultCount: 0,
       currentPage: 1,
       pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
-      isLoadGraph: this.tableInput.isLoadGraph,
+      isLoadGraph: true,
       isMergeGraph: this.tableInput.isMergeGraph,
       isNodeData: true,
       isShowTable: false,
@@ -127,12 +128,12 @@ export class CustomQueriesComponent implements OnInit {
       currentPage: 1,
       pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
       isUseCySelector4Highlight: true,
-      isLoadGraph: this.tableInput.isLoadGraph,
+      isLoadGraph: this.isLoadGraph,
       isMergeGraph: this.tableInput.isMergeGraph,
       isNodeData: true,
       isShowTable: false,
       paths: undefined,
-      allChecked: this.tableInput.isLoadGraph,
+      allChecked: this.isLoadGraph,
       allCheckedHide: true,
     }
   }
@@ -216,7 +217,7 @@ export class CustomQueriesComponent implements OnInit {
         skip: null,
       } as TableFiltering);
 
-      if (this.tableInput.isLoadGraph) {
+      if (this.isLoadGraph) {
         this._cyService.loadElementsFromDatabase(
           convertedResponse,
           this.tableInput.isMergeGraph
@@ -363,7 +364,7 @@ export class CustomQueriesComponent implements OnInit {
 
     this.fillTable(filteredResponse.graphData);
 
-    if (this.tableInput.isLoadGraph) {
+    if (this.isLoadGraph) {
       this._cyService.loadElementsFromDatabase(
         filteredResponse.graphData as GraphResponse,
         this.tableInput.isMergeGraph && this._g.cy.elements().length > 0
@@ -493,8 +494,8 @@ export class CustomQueriesComponent implements OnInit {
   }
 
   onIsLoadGraphChange(event: any) {
-    this.tableInput.isLoadGraph = event.target.checked;
-    this.sequenceChainTableInput.isLoadGraph = this.tableInput.isLoadGraph;
+    this.isLoadGraph = event.target.checked;
+    this.sequenceChainTableInput.isLoadGraph = this.isLoadGraph;
   }
 
   private fillTable(graphResponse: GraphResponse) {
