@@ -130,7 +130,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
   // Checks all in the page if all conditions are met with the help of a delay
   private checkAll() {
-    if (this.params.allChecked) {
+    if (this.params.allChecked && !this.params.isRadioButton) {
       setTimeout(() => this.checkbox4AllChanged(), TABLE_ALL_CHECK_DELAY);
     }
   }
@@ -357,7 +357,9 @@ export class TableViewComponent implements OnInit, OnDestroy {
     t: EventTarget = undefined, // undefined for setting checked status
     forceCheck?: boolean
   ) {
-    // Get the checked status of the checkbox
+    if (this.params.isRadioButton) {
+      this.checkedIndex = {};
+    }
 
     // t is the target HTML element of the event
     // if t is undefined, it means that the function is called to set the checked status of the checkbox
@@ -397,39 +399,45 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
 
     if (this.params.paths && this.params.paths.length > 0 && t !== undefined) {
+      if (this.params.isRadioButton) {
+        this._cyService.clear(false);
+      }
+
       let paths = JSON.parse(JSON.stringify(this.params.paths[index])); // perform deep copy
-        for (let i = 0; i < paths.length; i++) {
-          if (i % 2 == 0) {
-            paths[i] = "n" + paths[i];
-          } else {
-            paths[i] = "e" + paths[i];
-          }
+      for (let i = 0; i < paths.length; i++) {
+        if (i % 2 == 0) {
+          paths[i] = "n" + paths[i];
+        } else {
+          paths[i] = "e" + paths[i];
         }
+      }
       if ((<HTMLInputElement>t).checked) {
         let highlightIndex = 5;
-        
+
         // if all the path elements are not currently in the graph, fetch them
-        let isInGraph = paths.every((x: string) => { 
+        let isInGraph = paths.every((x: string) => {
           return this._g.cy.elements(`[id = "${x}"]`).length > 0;
         });
-        if (!isInGraph) { 
+        if (!isInGraph) {
           this._dbService.getElements(
-              this.params.paths[index], // do not need n,e prefix
-              (x: any) => {
-                this._cyService.loadElementsFromDatabase(x, true);
-                // Highlight the path elements after they are loaded
-                this._cyService.highlightElements(paths, highlightIndex);
-              },
-              { isEdgeQuery: this.params.paths[index].length > 1 }
-            )
+            this.params.paths[index], // do not need n,e prefix
+            (x: any) => {
+              this._cyService.loadElementsFromDatabase(x, true);
+              // Highlight the path elements after they are loaded
+              this._cyService.highlightElements(paths, highlightIndex);
+            },
+            { isEdgeQuery: this.params.paths[index].length > 1 }
+          );
         } else {
           // If elements are already in the graph, highlight them immediately
           this._cyService.highlightElements(paths, highlightIndex);
         }
       } else {
-        this._g.removeHighlights(this._g.cy.elements().filter((x: any) => {
-          return paths.includes(x.id());
-        }));
+        this._g.removeHighlights(
+          this._g.cy.elements().filter((x: any) => {
+            return paths.includes(x.id());
+          })
+        );
       }
     }
   }
@@ -440,11 +448,14 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }} */
 
     if (column.startsWith("Segment ")) {
-      return column.replace("Segment ", "").charAt(0).toUpperCase() + column.replace("Segment ", "").slice(1);
+      return (
+        column.replace("Segment ", "").charAt(0).toUpperCase() +
+        column.replace("Segment ", "").slice(1)
+      );
     } else if (this.params.isReplace_inHeaders) {
       return column.replace("[_]", " ");
     }
-    
+
     return column;
   }
 
@@ -609,15 +620,23 @@ export class TableViewComponent implements OnInit, OnDestroy {
     rowIndex: number
   ): { text: { type: string; text: string }[]; queriedSequences: string } {
     rowIndex = rowIndex - 1;
-    if (!this.params.queriedSequences || !text || !this.params.indices || !this.params.indices[this.params.results[rowIndex][0].value]) {
+    if (
+      !this.params.queriedSequences ||
+      !text ||
+      !this.params.indices ||
+      !this.params.indices[this.params.results[rowIndex][0].value]
+    ) {
       return { text: [{ type: "normal", text: text }], queriedSequences: "" };
     }
-    
+
     if (
-      this.highlightedTexts[rowIndex] && 
-      this.highlightedTexts[rowIndex].queriedSequences == this.params.queriedSequences &&
-      this.highlightedTexts[rowIndex].maxJumpLength == this.params.maxJumpLength &&
-      this.highlightedTexts[rowIndex].minSubsequenceMatchLength == this.params.minSubsequenceMatchLength
+      this.highlightedTexts[rowIndex] &&
+      this.highlightedTexts[rowIndex].queriedSequences ==
+        this.params.queriedSequences &&
+      this.highlightedTexts[rowIndex].maxJumpLength ==
+        this.params.maxJumpLength &&
+      this.highlightedTexts[rowIndex].minSubsequenceMatchLength ==
+        this.params.minSubsequenceMatchLength
     ) {
       return this.highlightedTexts[rowIndex];
     } else {
@@ -639,13 +658,17 @@ export class TableViewComponent implements OnInit, OnDestroy {
 
     let indices = this.params.indices[this.params.results[rowIndex][0].value];
     // remove duplicates
-    indices = indices.filter((x: any, index: number, self: any) =>
-      index === self.findIndex((t: any) => t[0] === x[0] && t[1] === x[1])
+    indices = indices.filter(
+      (x: any, index: number, self: any) =>
+        index === self.findIndex((t: any) => t[0] === x[0] && t[1] === x[1])
     );
     indices.sort((a: any, b: any) => a[0] - b[0]);
 
     if (text.includes("Starts: ")) {
-      result.text.push({ type: "normal", text: text.substring(0, text.indexOf("] ")+2) });
+      result.text.push({
+        type: "normal",
+        text: text.substring(0, text.indexOf("] ") + 2),
+      });
       text = text.substring(text.indexOf("] ") + 2);
     }
 
@@ -655,8 +678,17 @@ export class TableViewComponent implements OnInit, OnDestroy {
       let queriedSequenceIndex = indices[i][1];
 
       if (lastIndex <= index) {
-        result.text.push({ type: "normal", text: text.substring(lastIndex, index) });
-        result.text.push({ type: "highlight", text: text.substring(index, index + queries[queriedSequenceIndex].length) });
+        result.text.push({
+          type: "normal",
+          text: text.substring(lastIndex, index),
+        });
+        result.text.push({
+          type: "highlight",
+          text: text.substring(
+            index,
+            index + queries[queriedSequenceIndex].length
+          ),
+        });
         lastIndex = index + queries[queriedSequenceIndex].length;
       }
     }

@@ -130,7 +130,14 @@
           >
             <span>...</span>
           </th>
-          <th scope="col" [hidden]="params.isLoadGraph || params.allCheckedHide">
+          <th
+            scope="col"
+            [hidden]="
+              params.isLoadGraph ||
+              params.allCheckedHide ||
+              params.isRadioButton
+            "
+          >
             <input
               type="checkbox"
               class="m-1 cb-table-all"
@@ -152,13 +159,9 @@
             {{ (params.currentPage - 1) * params.pageSize + i + 1 }}
           </td>
           <td *ngFor="let e of r | slice : 1 : columnLimit + 1; let j = index">
-            <span
-              *ngIf="
-                typeOfData(e.value) === 'number' &&
-                (e.value !== 0)
-              "
-              >{{ e.value | number : "1.0-2" }}</span
-            >
+            <span *ngIf="typeOfData(e.value) === 'number' && e.value !== 0">{{
+              e.value | number : "1.0-2"
+            }}</span>
             <span
               *ngIf="typeOfData(e.value) !== 'number'"
               [table-tooltip]="e.value"
@@ -180,13 +183,17 @@
                   "
                 >
                   <ngb-highlight
-                    *ngIf="seg.type === 'highlight' && (k % 4 === 1 || k % 4 === 2)"
+                    *ngIf="
+                      seg.type === 'highlight' && (k % 4 === 1 || k % 4 === 2)
+                    "
                     [result]="seg.text"
                     [term]="filterTxt"
                     style="color: #05be14; font-weight: bold"
                   ></ngb-highlight>
                   <ngb-highlight
-                    *ngIf="seg.type === 'highlight' && (k % 4 === 3 || k % 4 === 0)"
+                    *ngIf="
+                      seg.type === 'highlight' && (k % 4 === 3 || k % 4 === 0)
+                    "
                     [result]="seg.text"
                     [term]="filterTxt"
                     style="color: #be05b5; font-weight: bold"
@@ -206,8 +213,20 @@
           <td [hidden]="params.isLoadGraph">
             <!-- row-cb class is used in TS, it is useless in CSS -->
             <input
+              *ngIf="!params.isRadioButton"
               type="checkbox"
+              name="table-row-selection"
               class="m-1 row-cb"
+              [checked]="checkedIndex[i]"
+              (change)="checkboxChanged(i, $event.target)"
+              title="Select row"
+            />
+            <input
+              *ngIf="params.isRadioButton"
+              type="radio"
+              name="table-row-selection"
+              class="m-1 row-cb"
+              [checked]="checkedIndex[i]"
               (change)="checkboxChanged(i, $event.target)"
               title="Select row"
             />

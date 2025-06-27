@@ -62,6 +62,7 @@ export class CustomQueriesComponent implements OnInit {
     paths: undefined,
     allChecked: false,
     allCheckedHide: true,
+    isRadioButton: true,
   };
   clearTableFilter = new Subject<boolean>();
   clearSequenceChainTableFilter = new Subject<boolean>();
@@ -135,6 +136,7 @@ export class CustomQueriesComponent implements OnInit {
       paths: undefined,
       allChecked: this.isLoadGraph,
       allCheckedHide: true,
+      isRadioButton: true,
     }
   }
 

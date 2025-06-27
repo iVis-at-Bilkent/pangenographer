@@ -23,6 +23,7 @@ export interface TableViewInput {
   isEmphasizeOnHover?: boolean;
   classNames?: string[];
   isBlastResultTable?: boolean;
+  isRadioButton?: boolean;
   allChecked?: boolean;
   allCheckedHide?: boolean;
   queriedSequences?: string;
