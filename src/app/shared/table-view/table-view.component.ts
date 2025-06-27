@@ -664,12 +664,12 @@ export class TableViewComponent implements OnInit, OnDestroy {
     );
     indices.sort((a: any, b: any) => a[0] - b[0]);
 
-    if (text.includes("Starts: ")) {
+    if (text.includes(" in ")) {
       result.text.push({
         type: "normal",
-        text: text.substring(0, text.indexOf("] ") + 2),
+        text: text.substring(0, text.indexOf("] in ") + 5),
       });
-      text = text.substring(text.indexOf("] ") + 2);
+      text = text.substring(text.indexOf("] in ") + 5);
     }
 
     let lastIndex = 0;

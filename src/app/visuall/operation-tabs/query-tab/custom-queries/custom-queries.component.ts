@@ -137,7 +137,7 @@ export class CustomQueriesComponent implements OnInit {
       allChecked: this.isLoadGraph,
       allCheckedHide: true,
       isRadioButton: true,
-    }
+    };
   }
 
   onSelectedQueryChange(selectedQuery: string) {
@@ -148,7 +148,7 @@ export class CustomQueriesComponent implements OnInit {
     this.minSubsequenceMatchLength = 2;
     this.graphEdges = true;
     this.selectedQuery = selectedQuery;
-    
+
     /* if (selectedQuery === this.queries[0]) {
     } else if (selectedQuery === this.queries[1]) {
     } else if (selectedQuery === this.queries[2]) {
@@ -156,7 +156,8 @@ export class CustomQueriesComponent implements OnInit {
   }
 
   private convertResponse(response: any): any {
-    if (this.selectedQuery === this.queries[2]) { // sequence chain search
+    if (this.selectedQuery === this.queries[2]) {
+      // sequence chain search
       let convertedResponse: any = { nodes: [], edges: [], paths: [] };
 
       for (let i = 0; i < response.data[0][0].length; i++) {
@@ -175,9 +176,9 @@ export class CustomQueriesComponent implements OnInit {
       for (let i = 0; i < response.data[0][3].length; i++) {
         let edge = {
           elementId: response.data[0][5][i],
-          properties: response.data[0][3][i], 
+          properties: response.data[0][3][i],
           startNodeElementId: response.data[0][6][i][0],
-          startNode: response.data[0][6][i][0], 
+          startNode: response.data[0][6][i][0],
           endNodeElementId: response.data[0][6][i][1],
           endNode: response.data[0][6][i][1],
           id: response.data[0][5][i],
@@ -237,7 +238,8 @@ export class CustomQueriesComponent implements OnInit {
       // Search by sequence chain
       this.tableInput.queriedSequences = sequences.replace(/'/g, "");
       this.tableInput.maxJumpLength = this.maxJumpLength;
-      this.tableInput.minSubsequenceMatchLength = this.minSubsequenceMatchLength;
+      this.tableInput.minSubsequenceMatchLength =
+        this.minSubsequenceMatchLength;
 
       this._dbService.sequenceChainSearch(
         sequences,
@@ -296,41 +298,50 @@ export class CustomQueriesComponent implements OnInit {
       filter
     );
 
-    if (filteredResponse.graphData.paths === undefined || filteredResponse.graphData.paths.length === 0) {
+    if (
+      filteredResponse.graphData.paths === undefined ||
+      filteredResponse.graphData.paths.length === 0
+    ) {
       return;
     }
 
     // fill the table
     this.fillSequenceChainTable(filteredResponse.graphData);
 
-    this.sequenceChainTableInput.resultCount = filteredResponse.graphData.paths.length;
+    this.sequenceChainTableInput.resultCount =
+      filteredResponse.graphData.paths.length;
   }
 
   private fillSequenceChainTable(graphResponse: GraphResponse) {
     this.sequenceChainTableIsFilled.next(false);
     this.sequenceChainTableInput.results = [];
-    this.sequenceChainTableInput.columns = ['Matched Indices', 'Path'];
+    this.sequenceChainTableInput.columns = ["Matched Indices", "Path"];
     let idToNameMap: { [key: string]: string } = {}; // Helper map to convert node ids to names
 
     // Convert each path array into a string representation
     for (let i = 0; i < graphResponse.paths.length; i++) {
       let path = graphResponse.paths[i].map((id: any, index: number) => {
-        if (index % 2 === 0) { // node
+        if (index % 2 === 0) {
+          // node
           if (!(id in idToNameMap)) {
             // find the node in the nodes array
-            const node = graphResponse.nodes.find((node: any) => node.id === id);
+            const node = graphResponse.nodes.find(
+              (node: any) => node.id === id
+            );
             idToNameMap[id] = node.properties.segmentName;
           }
           return idToNameMap[id];
         }
-      })
+      });
       path = path.filter((x: any) => x !== undefined);
 
       let matchedIndices: string = "";
       let lastMatchedNodeId: string = "";
-      graphResponse.indices[i].forEach((pair:string[]) => {
+      graphResponse.indices[i].forEach((pair: string[]) => {
         if (!(pair[0] in idToNameMap)) {
-          const node = graphResponse.nodes.find((node: any) => node.id === pair[0]);
+          const node = graphResponse.nodes.find(
+            (node: any) => node.id === pair[0]
+          );
           idToNameMap[pair[0]] = node.properties.segmentName;
         }
 
@@ -348,13 +359,18 @@ export class CustomQueriesComponent implements OnInit {
       matchedIndices = matchedIndices.slice(0, -1);
       matchedIndices += "]";
 
-      const row = [{value: graphResponse.paths[i]}, {value: matchedIndices}, { value: path }];
+      const row = [
+        { value: graphResponse.paths[i] },
+        { value: matchedIndices },
+        { value: path },
+      ];
       this.sequenceChainTableInput.results.push(row);
     }
 
     this.sequenceChainTableInput.paths = graphResponse.paths;
 
-    this.sequenceChainTableInput.resultCount = this.sequenceChainTableInput.results.length;
+    this.sequenceChainTableInput.resultCount =
+      this.sequenceChainTableInput.results.length;
     this.sequenceChainTableIsFilled.next(true);
   }
 
@@ -376,16 +392,24 @@ export class CustomQueriesComponent implements OnInit {
     // sequence chain search
     if (this.selectedQuery === this.queries[2]) {
       this.tableInput.indices = {};
-      
+
       for (let i = 0; i < filteredResponse.graphData.indices.length; i++) {
         for (let j = 0; j < filteredResponse.graphData.indices[i].length; j++) {
           // 0 is the node id, 1 is the index of the queried sequence
-          if (this.tableInput.indices[filteredResponse.graphData.indices[i][j][0]] === undefined) {
-            this.tableInput.indices[filteredResponse.graphData.indices[i][j][0]] = [];
+          if (
+            this.tableInput.indices[
+              filteredResponse.graphData.indices[i][j][0]
+            ] === undefined
+          ) {
+            this.tableInput.indices[
+              filteredResponse.graphData.indices[i][j][0]
+            ] = [];
           }
 
           // index of the queried sequence in the text, index of the node in the path
-          this.tableInput.indices[filteredResponse.graphData.indices[i][j][0]].push([Number(filteredResponse.graphData.indices[i][j][1]), j]);
+          this.tableInput.indices[
+            filteredResponse.graphData.indices[i][j][0]
+          ].push([Number(filteredResponse.graphData.indices[i][j][1]), j]);
         }
       }
     }
@@ -406,7 +430,7 @@ export class CustomQueriesComponent implements OnInit {
       tableData: { columns: [], data: [] },
     };
 
-    let tempData: { graph: any; table: any; }[] = [];
+    let tempData: { graph: any; table: any }[] = [];
 
     for (let i = 0; i < databaseResponse.graphData.nodes.length; i++) {
       const values = Object.values(databaseResponse.graphData.nodes[i]).join(
@@ -571,9 +595,12 @@ export class CustomQueriesComponent implements OnInit {
       );
 
       // Search by sequence
-      if (this.selectedQuery === this.queries[1] && this.searchedSequences.length > 0) { 
+      if (
+        this.selectedQuery === this.queries[1] &&
+        this.searchedSequences.length > 0
+      ) {
         // index of the segment data column
-        let startIndexes: string = "Starts: [";
+        let startIndexes: string = "[";
         let startIndexesArray: number[][] = [];
         for (let j = 0; j < this.searchedSequences.length; j++) {
           const startIndex = row[3].value.indexOf(this.searchedSequences[j]);
@@ -583,8 +610,8 @@ export class CustomQueriesComponent implements OnInit {
           }
         }
         startIndexes = startIndexes.slice(0, -2);
-        startIndexes += "]";
-        row[3].value = startIndexes + " " + row[3].value;
+        startIndexes += "] in ";
+        row[3].value = startIndexes + row[3].value;
 
         this.tableInput.indices[row[0].value] = startIndexesArray;
       }
