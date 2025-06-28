@@ -181,6 +181,7 @@
       type="checkbox"
       class="form-check-input"
       [(ngModel)]="tableInput.isMergeGraph"
+      (change)="onIsMergeGraphChange($event)"
       id="isMerge"
       title="If checked, the queried elements will be merged into current graph"
       placeholder="Merge Graph"

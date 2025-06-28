@@ -399,7 +399,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
 
     if (this.params.paths && this.params.paths.length > 0 && t !== undefined) {
-      if (this.params.isRadioButton) {
+      if (this.params.isRadioButton && !this.params.isMergeGraph) {
         this._cyService.clear(false);
       }
 

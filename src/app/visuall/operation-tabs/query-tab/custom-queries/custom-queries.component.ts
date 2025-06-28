@@ -39,7 +39,7 @@ export class CustomQueriesComponent implements OnInit {
     currentPage: 1,
     pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
     isLoadGraph: true,
-    isMergeGraph: false,
+    isMergeGraph: true,
     isNodeData: true,
     indices: undefined,
     queriedSequences: undefined,
@@ -57,7 +57,7 @@ export class CustomQueriesComponent implements OnInit {
     pageSize: this._g.userPreferences.queryResultPageSize.getValue(),
     isUseCySelector4Highlight: true,
     isLoadGraph: false,
-    isMergeGraph: false,
+    isMergeGraph: true,
     isNodeData: true,
     paths: undefined,
     allChecked: false,
@@ -522,6 +522,11 @@ export class CustomQueriesComponent implements OnInit {
   onIsLoadGraphChange(event: any) {
     this.isLoadGraph = event.target.checked;
     this.sequenceChainTableInput.isLoadGraph = this.isLoadGraph;
+  }
+
+  onIsMergeGraphChange(event: any) {
+    this.tableInput.isMergeGraph = event.target.checked;
+    this.sequenceChainTableInput.isMergeGraph = event.target.checked;
   }
 
   private fillTable(graphResponse: GraphResponse) {
