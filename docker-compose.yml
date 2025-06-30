@@ -5,6 +5,9 @@ services:
       target: runtime
     ports:
       - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
     command: npm run ng serve -- --host 0.0.0.0 --port 4200
