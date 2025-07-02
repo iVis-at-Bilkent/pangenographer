@@ -10,6 +10,7 @@ import { GlobalVariableService } from "../global-variable.service";
 import { URLLoadService } from "../load-from-url.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
 import { ClearDatabaseModalComponent } from "../popups/clear-database-modal/clear-database-modal.component";
+import { FileSizeWarningModalComponent } from "../popups/file-size-warning-modal/file-size-warning-modal.component";
 import { LegendModalComponent } from "../popups/legend-modal/legend-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
@@ -288,23 +289,65 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // If the file is a JSON file, load the JSON file
   // If the file is a text file, read the text file and set the user profile
   fileSelected() {
+    const selectedFile = this.file.nativeElement.files[0];
+
+    // Get file size information
+    const fileSize = selectedFile.size; // Size in bytes
+    const fileSizeMB = Math.round((fileSize / 1024 / 1024) * 100) / 100; // Size in MB
+
+    if (fileSizeMB > 10) {
+      this._g.statusMessage.next(
+        `File size is too large. It may take a while to load. File size: ${fileSizeMB} MB`
+      );
+
+      const modalRef = this._modalService.open(FileSizeWarningModalComponent, {
+        size: "md",
+      });
+
+      // Set the modal inputs
+      modalRef.componentInstance.fileName = selectedFile.name;
+      modalRef.componentInstance.fileSizeMB = fileSizeMB;
+
+      // Handle the modal result
+      modalRef.result.then(
+        (result) => {
+          // User clicked "Continue Loading"
+          this.processFile(selectedFile);
+        },
+        (reason) => {
+          // User clicked "Cancel" or closed the modal
+          this._g.statusMessage.next("File loading cancelled by user");
+        }
+      );
+
+      return; // Exit early, don't process the file yet
+    }
+
+    // If file is not too large, process it immediately
+    this.processFile(selectedFile);
+  }
+
+  // Process the selected file based on the current mode
+  private processFile(selectedFile: File) {
+    const fileSizeMB =
+      Math.round((selectedFile.size / 1024 / 1024) * 100) / 100;
+
+    // Display loading message
+    this._g.statusMessage.next(
+      `Loading file: ${selectedFile.name} (${fileSizeMB} MB)`
+    );
+
     if (this.isLoadFileGFA) {
-      this._cyService.readGFAFile(
-        this.file.nativeElement.files[0],
-        (GFAData: GFAData) => {
-          // Import GFA data to the database and return a promise
-          return this._dbService.getGFAData2ImportGFAPromised(GFAData);
-        }
-      );
+      this._cyService.readGFAFile(selectedFile, (GFAData: GFAData) => {
+        // Import GFA data to the database and return a promise
+        return this._dbService.getGFAData2ImportGFAPromised(GFAData);
+      });
     } else if (this.isLoadFile4Graph) {
-      this._cyService.loadFile(this.file.nativeElement.files[0]);
+      this._cyService.loadFile(selectedFile);
     } else {
-      this._fileReaderService.readTxtFile(
-        this.file.nativeElement.files[0],
-        (s) => {
-          this._profile.setUserProfile(s);
-        }
-      );
+      this._fileReaderService.readTxtFile(selectedFile, (s) => {
+        this._profile.setUserProfile(s);
+      });
     }
   }
 

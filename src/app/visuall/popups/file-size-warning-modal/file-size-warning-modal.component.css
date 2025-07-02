@@ -1,0 +1,36 @@
+.modal-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.modal-body p {
+  margin-bottom: 1rem;
+}
+
+.modal-body p:last-child {
+  margin-bottom: 0;
+}
+
+.text-warning {
+  color: #ffc107 !important;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
+  color: #212529;
+}

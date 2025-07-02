@@ -27,6 +27,7 @@ import { PanelContainerComponent } from "./panel-container/panel-container.compo
 import { AboutModalComponent } from "./popups/about-modal/about-modal.component";
 import { ClearDatabaseModalComponent } from "./popups/clear-database-modal/clear-database-modal.component";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
+import { FileSizeWarningModalComponent } from "./popups/file-size-warning-modal/file-size-warning-modal.component";
 import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-modal/load-graph-from-file-modal.component";
 import { QuickHelpModalComponent } from "./popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "./popups/save-as-png-modal/save-as-png-modal.component";
@@ -55,6 +56,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     ColorPickerComponent,
     PropertyRuleComponent,
     ErrorModalComponent,
+    FileSizeWarningModalComponent,
     GraphTheoreticPropertiesTabComponent,
     GraphHistoryComponent,
     SaveProfileModalComponent,
@@ -84,6 +86,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     AboutModalComponent,
     ErrorModalComponent,
     ClearDatabaseModalComponent,
+    FileSizeWarningModalComponent,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,49 @@
+<!-- Modal to warn user about large file size -->
+<div class="modal-header">
+  <div class="modal-title va-heading1 text-center">
+    Large File Warning
+  </div>
+  <div>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
+  </div>
+</div>
+<div class="modal-body">
+  <div class="va-text text-center">
+    <p>
+      The file <strong>{{ fileName }}</strong> is {{ fileSizeMB }} MB in size.
+    </p>
+    <p>
+      Loading large files may take a significant amount of time and could impact
+      performance.
+    </p>
+    <p class="text-warning">
+      <i class="fas fa-clock me-1"></i>
+      This operation may take several minutes to complete.
+    </p>
+  </div>
+</div>
+<div class="modal-footer">
+  <button
+    type="button"
+    class="btn btn-warning va-text me-2"
+    id="continue-btn"
+    (click)="continue()"
+  >
+    Continue Loading
+  </button>
+  <button
+    type="button"
+    class="btn btn-secondary va-text"
+    id="cancel-btn"
+    (click)="cancel()"
+  >
+    Cancel
+  </button>
+</div>
