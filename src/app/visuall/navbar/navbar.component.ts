@@ -18,6 +18,7 @@ import { SaveProfileModalComponent } from "../popups/save-profile-modal/save-pro
 import { GroupingOptionTypes } from "../user-preference";
 import { UserProfileService } from "../user-profile.service";
 import { NavbarAction, NavbarDropdown } from "./inavbar";
+import { ErrorModalComponent } from "../popups/error-modal/error-modal.component";
 
 @Component({
   selector: "app-navbar",
@@ -295,7 +296,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const fileSize = selectedFile.size; // Size in bytes
     const fileSizeMB = Math.round((fileSize / 1024 / 1024) * 100) / 100; // Size in MB
 
-    if (fileSizeMB > 10) {
+    if (fileSizeMB > 25) {
+      // If file is too large, show a warning message and do not process the file
+      this._g.statusMessage.next(
+        `File size is larger than 25 MB. It won't be loaded. File size: ${fileSizeMB} MB`
+      );
+
+      const modalRef = this._modalService.open(ErrorModalComponent, {
+        size: "md",
+      });
+
+      modalRef.componentInstance.msg = `File size is larger than 25 MB. It won't be loaded. File size: ${fileSizeMB} MB`;
+      modalRef.componentInstance.title = "File Size Too Large";
+
+      return;
+    } else if (fileSizeMB > 10) {
       this._g.statusMessage.next(
         `File size is too large. It may take a while to load. File size: ${fileSizeMB} MB`
       );
@@ -319,12 +334,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
           this._g.statusMessage.next("File loading cancelled by user");
         }
       );
-
-      return; // Exit early, don't process the file yet
+    } else {
+      // If file is not too large, process it immediately
+      this.processFile(selectedFile);
     }
-
-    // If file is not too large, process it immediately
-    this.processFile(selectedFile);
   }
 
   // Process the selected file based on the current mode
