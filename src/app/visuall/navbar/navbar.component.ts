@@ -306,7 +306,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         size: "md",
       });
 
-      modalRef.componentInstance.msg = `File size is larger than 25 MB. It won't be loaded. File size: ${fileSizeMB} MB`;
+      modalRef.componentInstance.msg = `File size is ${fileSizeMB} MB. This demo application will only allow files of size no larger than 25 MB.`;
       modalRef.componentInstance.title = "File Size Too Large";
 
       return;
