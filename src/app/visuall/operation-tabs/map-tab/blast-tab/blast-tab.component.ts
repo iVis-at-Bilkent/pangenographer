@@ -35,9 +35,9 @@ export class BlastTabComponent implements OnInit {
   selectedTypeIndex: number = 0; // 0: Standalone service, 1: Web service, -1: Invalid type
 
   // Selected segments path finding variables
-  selectedSegmentMap: any = {}; // Map of selected segments with their ids as keys
-  selectedSegmentPaths: any[] = []; // Array of selected segments' paths
-  currentSelectedSegmentPath: any[] = []; // Current selected segment path
+  selectedSegmentMap: any = {};
+  selectedSegmentPaths: any[] = [];
+  currentSelectedSegmentPath: any[] = [];
 
   // Web service variables
   webDatabases: webDatabaseType[] = [
@@ -1004,6 +1004,11 @@ export class BlastTabComponent implements OnInit {
       (res) => {
         this.standaloneResult = res.results;
         this.standaloneIsTableInput = res.isFormat6;
+
+        if (res.results.trim() === "") {
+          this.standaloneIsTableInput = false;
+          this.standaloneResult = "No results found";
+        }
 
         if (this.standaloneIsTableInput) {
           this.onStandaloneTableFilterChange({
