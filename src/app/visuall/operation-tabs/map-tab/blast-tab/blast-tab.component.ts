@@ -42,19 +42,19 @@ export class BlastTabComponent implements OnInit {
   // Web service variables
   webDatabases: webDatabaseType[] = [
     {
-      name: "Non-redundant nucleotide sequences (nt)",
-      value: "nt",
+      name: "Core nucleotide database (core_nt)",
+      value: "core_nt",
       types: ["blastn", "tblastn", "tblastx"],
     },
     {
       name: "Non-redundant protein sequences (nr)",
       value: "nr",
-      types: ["blastn", "blastp", "blastx", "tblastn", "tblastx"],
+      types: ["blastp", "blastx"],
     },
     {
-      name: "RefSeq Select RNA sequences (refseq_select)",
+      name: "RefSeq Select proteins (refseq_select)",
       value: "refseq_select",
-      types: ["blastn", "blastp", "blastx", "tblastn", "tblastx"],
+      types: ["blastp", "blastx"],
     },
     {
       name: "Reference proteins (refseq_protein)",
@@ -67,14 +67,34 @@ export class BlastTabComponent implements OnInit {
       types: ["blastp", "blastx"],
     },
     {
-      name: "Swiss-Prot (swissprot)",
+      name: "UniProtKB/Swiss-Prot (swissprot)",
       value: "swissprot",
       types: ["blastp", "blastx"],
     },
     {
-      name: "Patended protein sequences (pataa)",
+      name: "Patented protein sequences (pataa)",
       value: "pataa",
       types: ["blastp", "blastx"],
+    },
+    {
+      name: "Protein Data Bank proteins (pdb)",
+      value: "pdb", 
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Metagenomic proteins (env_nr)",
+      value: "env_nr",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "Trancriptome Shotgun Assembly proteins (tsa_nr)",
+      value: "tsa_nr",
+      types: ["blastp", "blastx"],
+    },
+    {
+      name: "RefSeq Select RNA sequences (refseq_select)",
+      value: "refseq_select",
+      types: ["blastn", "tblastn", "tblastx"],
     },
     {
       name: "Reference RNA sequences (refseq_rna)",
@@ -82,13 +102,18 @@ export class BlastTabComponent implements OnInit {
       types: ["blastn", "tblastn", "tblastx"],
     },
     {
-      name: "RetSeq Representative genomes (retseq_representative_genomes)",
-      value: "retseq_representative_genomes",
+      name: "RefSeq Reference genomes (refseq_reference_genomes)",
+      value: "refseq_reference_genomes",
       types: ["blastn", "tblastn", "tblastx"],
     },
     {
-      name: "RetSeq Genome Database (retseq_genomes)",
-      value: "retseq_genomes",
+      name: "RefSeq Genome Database (refseq_genomes)",
+      value: "refseq_genomes",
+      types: ["blastn", "tblastn", "tblastx"],
+    },
+    {
+      name: "Nucleotide collection (nr/nt)",
+      value: "nt",
       types: ["blastn", "tblastn", "tblastx"],
     },
     {
@@ -127,22 +152,12 @@ export class BlastTabComponent implements OnInit {
       types: ["blastn", "tblastn", "tblastx"],
     },
     {
-      name: "Protein Data Bank (pdb)",
+      name: "PDB nucleotide sequences (pdb)",
       value: "pdb",
-      types: ["blastn", "blastp", "blastx", "tblastn", "tblastx"],
+      types: ["blastn", "tblastn", "tblastx"],
     },
     {
-      name: "Metagenomic sequences (env_nr)",
-      value: "env_nr",
-      types: ["blastp", "blastx"],
-    },
-    {
-      name: "Transcriptome Shotgun Assembly proteins (tsa_nr)",
-      value: "tsa_nr",
-      types: ["blastp", "blastx"],
-    },
-    {
-      name: "Human RefSeqGene sequences(RefSeq_Gene)",
+      name: "Human RefSeqGene sequences (RefSeq_Gene)",
       value: "RefSeq_Gene",
       types: ["blastn", "tblastn", "tblastx"],
     },
@@ -591,7 +606,7 @@ export class BlastTabComponent implements OnInit {
   executeWebBlastQueryWithParams() {
     let queryParams = "CMD=Put";
     if (this.query) {
-      queryParams += "&QUERY=" + this.query;
+      queryParams += "&QUERY=" + encodeURIComponent(this.query);
     } else {
       this._g.showErrorModal(
         "No query sequence",
@@ -660,6 +675,9 @@ export class BlastTabComponent implements OnInit {
         "&COMPOSITION_BASED_STATISTICS=" +
         this.webSelectedCompositionBasedStatistic;
     }
+
+    console.log(queryParams);
+
     this.runWebBlastQuery(queryParams, (result: any) => {
       let match = result.match(/^    RID = (.*)$/m);
       this.webRid = match && match[1];
