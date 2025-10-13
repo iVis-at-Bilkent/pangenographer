@@ -505,9 +505,21 @@
       </div>
 
       <div>
-        <label class="va-text"
-          >Command Line Arguments (Use -outfmt 6 for tabular output)</label
+        <label
+          class="va-text"
+          title="More about command line arguments can be found at https://www.ncbi.nlm.nih.gov/books/NBK279684/"
         >
+          Command Line Arguments (-outfmt 6 for tabular output)
+          <a
+            href="https://www.ncbi.nlm.nih.gov/books/NBK279684/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="va-text link"
+            title="Open BLAST command line docs (opens in new tab)"
+          >
+            (more info)
+          </a>
+        </label>
         <div class="form-inline">
           <textarea
             (change)="onStandaloneCommandLineArgumentsChange($event)"

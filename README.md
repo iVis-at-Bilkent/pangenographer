@@ -12,7 +12,7 @@ A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/
 
 `npm run ng serve` for development and debugging
 
-`npm run serve-public` for making development server accesible on network
+`npm run serve-public` for making development server accessible on network
 
 `npm run ng build` to generate a production build, `npm run build-prod` to generate a minified, uglified production build
 
