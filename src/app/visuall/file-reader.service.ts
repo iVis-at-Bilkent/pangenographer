@@ -23,7 +23,7 @@ export class FileReaderService {
   previousBatchRemainders: string; // Save the remainder of the previous batch to be added to the next batch
   readLineCount: number = 0; // Count the number of lines read from the GFA file
 
-  constructor(private _g: GlobalVariableService) {}
+  constructor(private _g: GlobalVariableService) { }
 
   readTxtFile(file: File, callback: (s: string) => void) {
     const fileReader = new FileReader();
@@ -294,10 +294,6 @@ export class FileReaderService {
     if (pathLineTabSeparated[2].indexOf(";") !== -1) {
       // Split the segment names and overlaps into arrays
       for (let i = 0; i < segmentNamesArray.length - 1; i++) {
-        // Extract the overlap between the segments
-        let overlap =
-          path.overlaps.split(",")[i].indexOf("J") !== -1 ? "J" : undefined;
-
         // Add the edge to the edges array
         edges.push({
           pathName: path.pathName,
@@ -305,7 +301,6 @@ export class FileReaderService {
           sourceOrientation: segmentOrientationsArray[i],
           target: segmentNamesArray[i + 1],
           targetOrientation: segmentOrientationsArray[i + 1],
-          overlap: overlap,
         });
       }
 
@@ -320,7 +315,7 @@ export class FileReaderService {
         source: segmentNamesArray[i],
         sourceOrientation: segmentOrientationsArray[i],
         target: segmentNamesArray[i + 1],
-        targetOrientation: segmentOrientationsArray[i + 1],
+        targetOrientation: segmentOrientationsArray[i + 1]
       });
     }
 
@@ -712,8 +707,8 @@ export class FileReaderService {
         console.log("Processed batch " + this.readLineCount + " lines");
         this._g.statusMessage.next(
           "Importing GFA sample, processed batch " +
-            this.readLineCount +
-            " lines..."
+          this.readLineCount +
+          " lines..."
         );
 
         // Continue reading the GFA file by processing the next batch of lines
@@ -807,8 +802,8 @@ export class FileReaderService {
       // remove 1, as the first chunk will be at the segment
       let segmentDataCount = Math.ceil(
         GFAData.segments[i].segmentData.length /
-          this._g.userPreferences.segmentDataSizeQueryLimit.getValue() -
-          1
+        this._g.userPreferences.segmentDataSizeQueryLimit.getValue() -
+        1
       );
 
       // Create segmentData objects for each segment, this is done by clipping the segmentData into chunks
@@ -823,14 +818,14 @@ export class FileReaderService {
         let toTakeLength = Math.min(
           this._g.userPreferences.segmentDataSizeQueryLimit.getValue(),
           GFAData.segments[i].segmentData.length -
-            this._g.userPreferences.segmentDataSizeQueryLimit.getValue()
+          this._g.userPreferences.segmentDataSizeQueryLimit.getValue()
         );
 
         // Take the segmentData from the segment
         segmentData.segmentData = GFAData.segments[i].segmentData.substring(
           this._g.userPreferences.segmentDataSizeQueryLimit.getValue(),
           this._g.userPreferences.segmentDataSizeQueryLimit.getValue() +
-            toTakeLength
+          toTakeLength
         );
 
         // Add the segmentData to the GFAData
@@ -844,7 +839,7 @@ export class FileReaderService {
           ) +
           GFAData.segments[i].segmentData.substring(
             this._g.userPreferences.segmentDataSizeQueryLimit.getValue() +
-              toTakeLength
+            toTakeLength
           );
 
         segmentDataCount--;

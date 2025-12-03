@@ -213,7 +213,6 @@ export interface GFAPathEdge {
   sourceOrientation: string;
   target: string;
   targetOrientation: string;
-  overlap?: string; // Undefined for links, J for jumps
 }
 
 export interface GFAWalk {

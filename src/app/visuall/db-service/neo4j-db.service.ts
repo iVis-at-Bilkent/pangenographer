@@ -34,7 +34,7 @@ export class Neo4jDb implements DbService {
   constructor(
     protected _http: HttpClient,
     protected _g: GlobalVariableService
-  ) {}
+  ) { }
 
   runQuery(
     query: string,
@@ -352,26 +352,26 @@ export class Neo4jDb implements DbService {
 
     let queries = nodeIds.length
       ? nodeIds.map((nodeId) => {
-          let query = `
+        let query = `
           MATCH (startNode)
           WHERE elementId(startNode) = '${nodeId}' 
           MATCH path = (startNode)`;
 
-          if (isUp) {
-            query += "<";
-          }
+        if (isUp) {
+          query += "<";
+        }
 
-          query += `-[*1..${distance}]-`;
+        query += `-[*1..${distance}]-`;
 
-          if (!isUp) {
-            query += ">";
-          }
+        if (!isUp) {
+          query += ">";
+        }
 
-          query +=
-            "(endNode) RETURN '${nodeId}' AS nodeId, nodes(path) AS nodes, relationships(path) AS relationships";
+        query +=
+          "(endNode) RETURN '${nodeId}' AS nodeId, nodes(path) AS nodes, relationships(path) AS relationships";
 
-          return query;
-        })
+        return query;
+      })
       : [];
 
     // If isUp is undefined, add a query for the reverse direction as well
@@ -379,20 +379,20 @@ export class Neo4jDb implements DbService {
       queries = queries.concat(
         nodeIds.length
           ? nodeIds.map((nodeId) => {
-              let query = `
+            let query = `
               MATCH (startNode)
               WHERE elementId(startNode) = '${nodeId}' 
               MATCH path = (startNode)`;
 
-              query += "<";
+            query += "<";
 
-              query += `-[*1..${distance}]-`;
+            query += `-[*1..${distance}]-`;
 
-              query +=
-                "(endNode) RETURN '${nodeId}' AS nodeId, nodes(path) AS nodes, relationships(path) AS relationships";
+            query +=
+              "(endNode) RETURN '${nodeId}' AS nodeId, nodes(path) AS nodes, relationships(path) AS relationships";
 
-              return query;
-            })
+            return query;
+          })
           : []
       );
     }
@@ -1110,12 +1110,6 @@ export class Neo4jDb implements DbService {
   private createEdgeKey(edge: GFAPathEdge | GFAWalkEdge): string {
     let key = "";
 
-    // If the edge is path edge and has overlaps, add overlaps to the key
-    if (edge.hasOwnProperty("overlap")) {
-      edge = edge as GFAPathEdge;
-      key += CQL_QUERY_CHANGE_MARKER + edge.overlap;
-    }
-
     // Add the rest
     return (
       edge.source +
@@ -1367,8 +1361,7 @@ export class Neo4jDb implements DbService {
           pathEdge.source === link.source &&
           pathEdge.target === link.target &&
           pathEdge.sourceOrientation === link.sourceOrientation &&
-          pathEdge.targetOrientation === link.targetOrientation &&
-          !pathEdge.overlap
+          pathEdge.targetOrientation === link.targetOrientation
         ) {
           element2Create += `'${pathEdge.pathName}', `;
 
@@ -1426,8 +1419,7 @@ export class Neo4jDb implements DbService {
           pathEdge.source === jump.source &&
           pathEdge.target === jump.target &&
           pathEdge.sourceOrientation === jump.sourceOrientation &&
-          pathEdge.targetOrientation === jump.targetOrientation &&
-          pathEdge.overlap === "J"
+          pathEdge.targetOrientation === jump.targetOrientation
         ) {
           element2Create += `'${pathEdge.pathName}', `;
 
@@ -1659,18 +1651,8 @@ export class Neo4jDb implements DbService {
       // Add the edges to match
       for (let edgeKey in edgesToMatch) {
         let edge = edgeKey.split(CQL_QUERY_CHANGE_MARKER);
-
-        // If the edge is a jump edge
-        if (edge.length === 4) {
-          matchClause += `()-[e${edgeKey}:JUMP {source: '${edge[0]}', target: '${edge[1]}', `;
-          matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
-        }
-        // Else if the edge is a link edge
-        else {
-          // Add the match clause for the edge link
-          matchClause += `()-[e${edgeKey}:LINK {source: '${edge[0]}', target: '${edge[1]}', `;
-          matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
-        }
+        matchClause += `()-[e${edgeKey} {source: '${edge[0]}', target: '${edge[1]}', `;
+        matchClause += `sourceOrientation: '${edge[2]}', targetOrientation: '${edge[3]}' }]->(),\n`;
       }
 
       // Add the match clause to the beginning of the query by removing the last comma and newline
