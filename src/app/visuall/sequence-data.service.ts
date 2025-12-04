@@ -181,7 +181,7 @@ export class SequenceDataService {
     let secondSequence = ""; // The sequence of the overlap
 
     // If the overlap is "*", the sequence length is the sum of the lengths of the first and third sequences
-    if (element.data("overlap") === "*") {
+    if (element.data("overlap") === "*" || !element.data("overlap").match(OVERLAP_REGEX)) {
       let sequenceLength = firstSequence.length + thirdSequence.length; // The length of the combined sequence
 
       return {

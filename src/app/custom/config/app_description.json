@@ -4,7 +4,7 @@
     "html_header": "PanGenoGrapher",
     "icon": "app/custom/assets/logo.png",
     "name": "PanGenoGrapher",
-    "version": "1.0.0 beta"
+    "version": "1.0.0"
   },
   "appPreferences": {
     "avgNodeSize": 36,

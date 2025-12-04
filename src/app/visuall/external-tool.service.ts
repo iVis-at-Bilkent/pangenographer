@@ -381,7 +381,7 @@ export class ExternalToolService {
 
                 content.appendChild(firstSequence);
 
-                if (edge.data("overlap") && !edge.data("pos")) {
+                if (edge.data("overlap") && !edge.data("pos") && text.lengths.secondSequence > 0) {
                   let overlapIdentifier = edge
                     .data("overlap")
                     .split(/[0-9]+/)
