@@ -272,8 +272,13 @@ export class CytoscapeService {
     }
 
     const shouldRandomize = !isIncremental || wasEmpty;
-    const hasNew = this.hasNewElement(elementIds, previousElements);
-    if (hasNew) {
+    const newElements = this.hasNewElement(elementIds, previousElements);
+    if (newElements.length > 0) {
+      // Override dontFit to false if the brought element size is bigger than the current graph size
+      if (newElements.length > previousElements.length) {
+        dontFit = false;
+      }
+
       this._g.performLayout(
         shouldRandomize,
         false, // animate
@@ -418,19 +423,20 @@ export class CytoscapeService {
     };
   }
 
-  hasNewElement(newElementIds: string[], previousElements: any): boolean {
+  hasNewElement(newElementIds: string[], previousElements: any): string[] {
     let d = {};
 
     for (let i = 0; i < previousElements.length; i++) {
       d[previousElements[i].id()] = true;
     }
 
+    const newElements: string[] = [];
     for (let i = 0; i < newElementIds.length; i++) {
       if (!d[newElementIds[i]]) {
-        return true;
+        newElements.push(newElementIds[i]);
       }
     }
-    return false;
+    return newElements;
   }
 
   collapseMultiEdges(edges2Collapse?: any, isSetFlag = true) {
@@ -823,7 +829,7 @@ export class CytoscapeService {
         if (
           data.nodes[i].properties.segmentName !== sourceNodeName &&
           data.nodes[i].properties.segmentName ===
-            this._g.cy.nodes()[j].data().segmentName
+          this._g.cy.nodes()[j].data().segmentName
         ) {
           this.removeExternalTools(this._g.cy.nodes()[j]);
           this._g.cy.remove(this._g.cy.nodes()[j]);
