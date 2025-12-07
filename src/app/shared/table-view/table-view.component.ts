@@ -96,7 +96,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     private _dbService: DbAdapterService,
     private _ngZone: NgZone,
     private _extTool: ExternalToolService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.tableFillSubscription = this.tableFilled.subscribe(
@@ -220,6 +220,7 @@ export class TableViewComponent implements OnInit, OnDestroy {
     }
     this.resetHoverEvents();
     this.setColumnLimit();
+    this.checkAll();
   }
 
   private onClearFilter() {
@@ -296,8 +297,6 @@ export class TableViewComponent implements OnInit, OnDestroy {
   }
 
   pageChanged(newPage: number) {
-    this.isCheckbox4AllChecked = this.params.allChecked;
-    this.checkAll();
     let o = this.params.columns[this.sortingIndex];
     let skip = (newPage - 1) * this.params.pageSize;
     this.onFilteringChanged.emit({
@@ -632,11 +631,11 @@ export class TableViewComponent implements OnInit, OnDestroy {
     if (
       this.highlightedTexts[rowIndex] &&
       this.highlightedTexts[rowIndex].queriedSequences ==
-        this.params.queriedSequences &&
+      this.params.queriedSequences &&
       this.highlightedTexts[rowIndex].maxJumpLength ==
-        this.params.maxJumpLength &&
+      this.params.maxJumpLength &&
       this.highlightedTexts[rowIndex].minSubsequenceMatchLength ==
-        this.params.minSubsequenceMatchLength
+      this.params.minSubsequenceMatchLength
     ) {
       return this.highlightedTexts[rowIndex];
     } else {

@@ -78,7 +78,7 @@ export class BlastTabComponent implements OnInit {
     },
     {
       name: "Protein Data Bank proteins (pdb)",
-      value: "pdb", 
+      value: "pdb",
       types: ["blastx"],
     },
     {
@@ -254,6 +254,7 @@ export class BlastTabComponent implements OnInit {
     isEmphasizeOnHover: true,
     isBlastResultTable: true,
     allChecked: true,
+    allCheckedHide: false,
   };
   standaloneQuery: string = "";
   standaloneResult: string = "";
@@ -271,9 +272,9 @@ export class BlastTabComponent implements OnInit {
     private _cyService: CytoscapeService,
     private _sequenceDataService: SequenceDataService,
     private _dbService: DbAdapterService
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   // Fill query textarea with selected segments sequence
   fillQueryTextareaWithSelectedSegmentsSequence() {
@@ -523,7 +524,7 @@ export class BlastTabComponent implements OnInit {
     node2 =
       node2 ||
       this.currentSelectedSegmentPath[
-        this.currentSelectedSegmentPath.length - 1
+      this.currentSelectedSegmentPath.length - 1
       ];
 
     // Get all edges between node1 and node2 and filter non-jump edges
@@ -861,8 +862,8 @@ export class BlastTabComponent implements OnInit {
         // Show status message for the number of sequences added to the database
         this._g.statusMessage.next(
           "Succesfully added " +
-            res.results.split("\n")[9].split(" ")[5] +
-            " sequences "
+          res.results.split("\n")[9].split(" ")[5] +
+          " sequences "
         );
       }
     );
@@ -994,8 +995,8 @@ export class BlastTabComponent implements OnInit {
 
         this._g.statusMessage.next(
           "Successfully added " +
-            res.nodes.length +
-            " sequences to the BLAST database creation"
+          res.nodes.length +
+          " sequences to the BLAST database creation"
         );
 
         this.standaloneFastaData2CreateDB =
@@ -1030,7 +1031,7 @@ export class BlastTabComponent implements OnInit {
         if (this.standaloneIsTableInput) {
           this.onStandaloneTableFilterChange({
             txt: "",
-            orderBy: "Query Name",
+            orderBy: "Query name",
             orderDirection: "asc",
           });
         } else {

@@ -2,9 +2,15 @@
 
 PanGenoGrapher is a web-based tool for analyzing pan-genome graphs visually. The tool is based on [Visu*all*](https://github.com/ugurdogrusoz/visuall), which in turn is based on the [Cytoscape.js](http://js.cytoscape.org) library.
 
-A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/). Below is a sample screenshot from PG2.
+A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/). Below is a sample screenshot from PG2. A demo video highlighting PG2 features can be found [here](https://www.youtube.com/watch?v=yCd7-aGY6CQ).
 
 ![image](https://github.com/iVis-at-Bilkent/pangenographer/assets/3874988/49608774-9b00-4f7d-a710-d434209d7dda)
+
+### How to Cite Usage
+
+Please cite the following when you use PG2:
+
+G.K. Solun, U. Dogrusoz, Z. Bingol and C. Alkan, *"PG2: algorithms and a web-based tool for effective layout and visual analysis of pangenome graphs"*, under revision, 2025.
 
 ## Running a local instance
 
