@@ -49,47 +49,47 @@ export class BlastTabComponent implements OnInit {
     {
       name: "Non-redundant protein sequences (nr)",
       value: "nr",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "RefSeq Select proteins (refseq_select)",
       value: "refseq_select",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "Reference proteins (refseq_protein)",
       value: "refseq_protein",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "Model Organisms (landmark)",
       value: "landmark",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "UniProtKB/Swiss-Prot (swissprot)",
       value: "swissprot",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "Patented protein sequences (pataa)",
       value: "pataa",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "Protein Data Bank proteins (pdb)",
       value: "pdb", 
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "Metagenomic proteins (env_nr)",
       value: "env_nr",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "Trancriptome Shotgun Assembly proteins (tsa_nr)",
       value: "tsa_nr",
-      types: ["blastp", "blastx"],
+      types: ["blastx"],
     },
     {
       name: "RefSeq Select RNA sequences (refseq_select)",
@@ -174,7 +174,7 @@ export class BlastTabComponent implements OnInit {
   ];
   webSelectedDatabaseName: string = this.webDatabases[0].name;
   webSelectedDatabase: webDatabaseType = this.webDatabases[0];
-  webPrograms: string[] = ["blastn", "blastp", "blastx", "tblastn", "tblastx"];
+  webPrograms: string[] = ["blastn", "blastx", "tblastn", "tblastx"];
   webSelectedProgram: string = "blastn";
   webEnableMegaBlast: boolean = false;
   webFilters: string[] = ["F", "T", "L", "mT", "mL"];
@@ -727,7 +727,6 @@ export class BlastTabComponent implements OnInit {
     this.webSelectedProgram = event.target.value.trim();
 
     if (
-      this.webSelectedProgram === "blastp" ||
       this.webSelectedProgram === "blastx"
     ) {
       this.onWebDatabaseChange({
