@@ -4,7 +4,7 @@ PanGenoGrapher is a web-based tool for analyzing pan-genome graphs visually. The
 
 A sample demo deployment can be found [here](http://ivis.cs.bilkent.edu.tr:5200/). Below is a sample screenshot from PG2. A demo video highlighting PG2 features can be found [here](https://www.youtube.com/watch?v=yCd7-aGY6CQ).
 
-![image](https://github.com/iVis-at-Bilkent/pangenographer/assets/3874988/49608774-9b00-4f7d-a710-d434209d7dda)
+<img width="2401" height="1918" alt="image" src="https://github.com/user-attachments/assets/cb16cca7-be78-4dd0-8bf0-995427c187bf" />
 
 ### How to Cite Usage
 
