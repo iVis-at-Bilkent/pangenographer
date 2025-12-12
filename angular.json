@@ -124,7 +124,6 @@
       }
     }
   },
-  "defaultProject": "ng-visuall",
   "cli": {
     "analytics": false
   }
