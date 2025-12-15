@@ -31,6 +31,7 @@ export class GlobalVariableService {
   viewUtils: any;
   layoutUtils: any;
   layout: {
+    name: string;
     clusters: string[][];
     randomize: boolean;
     tile: boolean;

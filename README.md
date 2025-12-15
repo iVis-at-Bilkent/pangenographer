@@ -14,19 +14,25 @@ G.K. Solun, U. Dogrusoz, Z. Bingol and C. Alkan, *"PG2: algorithms and a web-bas
 
 ## Running a local instance
 
-`npm install` for loading dependencies
+`docker compose up prod` starts the production build using Docker.
 
-`npm run ng serve` for development and debugging
+`docker compose up dev` starts the development build using Docker.
 
-`npm run serve-public` for making development server accessible on network
+Use Node.js version 14.20.1.
 
-`npm run ng build` to generate a production build, `npm run build-prod` to generate a minified, uglified production build
+`npm install` installs the dependencies.
 
-`npm run ng build` and `npm run build-prod` commands generate files inside ***dist\ng-visuall*** folder. An HTTP server should serve these files. You should use [server.js](server.js) file to run a server with command `node server.js`.
+`npm run ng serve` starts the server for development and debugging.
 
-`cd src` and `node style-generator.js {application description filename}` to generate customized application, this changes [styles.css](src/styles.css) and [index.html](src/index.html). Notice that the application description file is inside the `assets` folder.
+`npm run serve-public` makes the development server accessible over the network.
 
-`cd src/app/blast` and `node blast.js` to run the BLAST server. This setup allows the application to process BLAST queries. Note that the BLAST standalone must be installed beforehand.
+`npm run ng build` generates a production build. `npm run build-prod` generates a minified, uglified production build.
+
+The `npm run ng build` and `npm run build-prod` commands generate files inside the `dist/ng-visuall` folder. These files should be served by an HTTP server. You can use [server.js](server.js) to run a server with the command `node server.js`.
+
+Run `cd src` followed by `node style-generator.js {application description filename}` to generate a customized application. This updates [styles.css](src/styles.css) and [index.html](src/index.html). Note that the application description file must be located in the `assets` folder.
+
+Run `cd src/app/blast` and `node blast.js` to run the BLAST server. This allows the application to process BLAST queries. Note that the BLAST standalone must be installed beforehand.
 
 ## User Guide
 
@@ -34,14 +40,14 @@ A User Guide for the sample application of PanGenoGrapher can be found [here](ht
 
 ## Credits
 
-Icons made by [Freepik](http://www.freepik.com), 
-[Daniel Bruce](http://www.flaticon.com/authors/daniel-bruce), 
+Icons made by [Freepik](http://www.freepik.com),
+[Daniel Bruce](http://www.flaticon.com/authors/daniel-bruce),
 [TutsPlus](http://www.flaticon.com/authors/tutsplus),
 [Robin Kylander](http://www.flaticon.com/authors/robin-kylander),
 [Catalin Fertu](http://www.flaticon.com/authors/catalin-fertu),
 [Yannick](http://www.flaticon.com/authors/yannick),
 [Icon Works](http://www.flaticon.com/authors/icon-works),
-[Flaticon](http://www.flaticon.com) and licensed with 
+[Flaticon](http://www.flaticon.com) and licensed with
 [Creative Commons BY 3.0](http://creativecommons.org/licenses/by/3.0/)
 
 Third-party libraries:
