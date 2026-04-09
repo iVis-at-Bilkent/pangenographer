@@ -12,11 +12,38 @@ Please cite the following when you use PG2:
 
 G.K. Solun, U. Dogrusoz, Z. Bingol and C. Alkan, *"PG2: algorithms and a web-based tool for effective layout and visual analysis of pangenome graphs"*, under revision, 2025.
 
-## Running a local instance
+## Database setup and running the application
+
+### Database setup (Neo4j)
+
+Follow these steps to prepare a local Neo4j database for PG2.
+
+1. Install Neo4j (Neo4j Desktop is optional; it may be used, but it is not required).
+2. Create a local database with Neo4j version `5.10`.
+3. Use password `12345678` for user `neo4j`.
+4. If you prefer a different password or username, update [src/environments/environment.ts](src/environments/environment.ts) at `dbConfig`.
+5. Install the APOC plugin for the database.
+6. Open the database configuration file `neo4j.conf` and comment out this line:
+
+   ```properties
+   #dbms.security.procedures.allowlist=apoc.*
+   ```
+
+7. Download the custom plugin JAR from:
+   `https://github.com/iVis-at-Bilkent/visuall-advanced-query/blob/pangenographer/advanced-queries-0.0.1.jar`
+   (this is the same `advanced-queries-0.0.1.jar` file also present under `src/assets/`).
+8. Copy `advanced-queries-0.0.1.jar` into the Neo4j database `plugins` folder.
+9. Start the Neo4j database.
+
+After startup, PG2 can connect to the local database using the configuration in [src/environments/environment.ts](src/environments/environment.ts).
+
+### Running the application with Docker
 
 `docker compose up prod` starts the production build using Docker.
 
 `docker compose up dev` starts the development build using Docker.
+
+### Running the application without Docker
 
 Use Node.js version 14.20.1.
 
@@ -54,8 +81,6 @@ Third-party libraries:
 [Cytoscape.js](https://github.com/cytoscape/cytoscape.js) and many of its extensions,
 [Angular](https://angular.io/),
 [Google Charts](https://developers.google.com/chart/) and npm dependencies inside package.json file.
-
-For the database, it uses the free and openly available Neo4j database. To use advanced queries, a plugin in `src/assets/` named `advanced-queries-0.0.1.jar` must be present in the Neo4j plugins folder.
 
 ## Team
 

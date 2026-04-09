@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   dbConfig: {
     urls: [
-      "https://pg2.cs.bilkent.edu.tr/browser/db/neo4j/tx/commit",
+      "http://localhost:7474/db/neo4j/tx/commit", // https://pg2.cs.bilkent.edu.tr/browser/db/neo4j/tx/commit for remote server
       "https://pg2.cs.bilkent.edu.tr/browser/sample1/db/neo4j/tx/commit",
       "https://pg2.cs.bilkent.edu.tr/browser/sample2/db/neo4j/tx/commit",
       "https://pg2.cs.bilkent.edu.tr/browser/sample3/db/neo4j/tx/commit",
