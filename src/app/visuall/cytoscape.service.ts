@@ -39,7 +39,7 @@ export class CytoscapeService {
     private _modalService: NgbModal,
     private _dbService: DbAdapterService,
     private _fileReaderService: FileReaderService,
-    private _externalToolService: ExternalToolService
+    private _externalToolService: ExternalToolService,
   ) {
     this.userPrefHelper = new UserPrefHelper(this, this._g, this._profile);
     this.louvainClusterer = new LouvainClustering();
@@ -99,7 +99,7 @@ export class CytoscapeService {
     });
     this._g.cy.on(
       "add",
-      C.debounce(this.applyStyle4NewElements, C.CY_BATCH_END_DELAY).bind(this)
+      C.debounce(this.applyStyle4NewElements, C.CY_BATCH_END_DELAY).bind(this),
     );
     this.userPrefHelper.listen4UserPref();
     this._g.listen4graphEvents();
@@ -169,7 +169,7 @@ export class CytoscapeService {
     data: GraphResponse,
     isIncremental: boolean,
     dontFit: boolean = false,
-    dontHighlight: boolean = false
+    dontHighlight: boolean = false,
   ) {
     // Show loading spinner
     this._g.statusMessage.next("Loading elements from database...");
@@ -199,7 +199,8 @@ export class CytoscapeService {
     this._g.userPreferences.isAutoIncrementalLayoutOnChange.next(isIncremental);
 
     let cyEdges = [];
-    let collapsedEdgeIds = {};
+    let collapsedEdgeIds: Record<string, string> = {};
+    console.log("collapsedEdgeIds: ", collapsedEdgeIds);
     if (isIncremental) {
       collapsedEdgeIds = this.getCollapsedEdgeIds();
     }
@@ -251,7 +252,7 @@ export class CytoscapeService {
     this._g.viewUtils.show(
       this._g.cy
         .elements()
-        .filter((element: any) => elementIdSet.has(element.id()))
+        .filter((element: any) => elementIdSet.has(element.id())),
     );
 
     // Hide the elements that are not supposed to be shown
@@ -283,7 +284,7 @@ export class CytoscapeService {
         shouldRandomize,
         false, // animate
         C.LAYOUT_ANIMATION_DURATION,
-        dontFit
+        dontFit,
       );
     }
 
@@ -299,7 +300,7 @@ export class CytoscapeService {
 
     this._g.isLoadFromDB = true;
     this._g.statusMessage.next(
-      "Loaded " + elementIdSet.size + " elements from database!"
+      "Loaded " + elementIdSet.size + " elements from database!",
     );
     this._g.setLoadingStatus(false);
   }
@@ -310,7 +311,7 @@ export class CytoscapeService {
   addExternalTools(
     showUpDownstream: (nodeId: any, length: number, up: boolean) => void,
     nodes: any = undefined,
-    edges: any = undefined
+    edges: any = undefined,
   ) {
     // Add tooltips
     this._externalToolService.addTooltips(nodes, edges);
@@ -335,18 +336,18 @@ export class CytoscapeService {
     length: number,
     isUp: boolean,
     dontFit: boolean = true,
-    dontHighlight: boolean = false
+    dontHighlight: boolean = false,
   ) {
     const callback = (data: any) => {
       this.loadElementsFromDatabase(data, true, dontFit, dontHighlight); // isIncremental = true
     };
 
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
     this._dbService.getElementsUpToCertainDistance(
       nodeIds,
       length,
       callback,
-      isUp
+      isUp,
     );
   }
 
@@ -355,7 +356,7 @@ export class CytoscapeService {
   async showUpDownstreamAsync(
     nodeIds: string[],
     length: number,
-    isUp: boolean
+    isUp: boolean,
   ): Promise<void> {
     return new Promise<void>((resolve) => {
       this.showUpDownstream(nodeIds, length, isUp, false, true); // dontFit = false, dontHighlight = true
@@ -368,35 +369,35 @@ export class CytoscapeService {
     await this.showUpDownstreamAsync(
       elements.map((x: any) => x.elementId),
       length,
-      undefined // Show both upstream and downstream nodes
+      false, // Show both upstream and downstream nodes
     );
   }
 
   // Get some nodes with zero degree from the database
   getSomeZeroDegreeNodes() {
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
     this._dbService.getSomeZeroDegreeNodes(this.getZeroDegreeNodesLoad());
   }
 
   // Get all nodes with zero degree from the database
   getAllZeroDegreeNodes() {
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
     this._dbService.getAllZeroDegreeNodes(this.getZeroDegreeNodesLoad());
   }
 
   // Get all nodes with zero incoming degree from the database
   getAllZeroIncomingDegreeNodes() {
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
     this._dbService.getAllZeroIncomingDegreeNodes(
-      this.getZeroDegreeNodesLoad()
+      this.getZeroDegreeNodesLoad(),
     );
   }
 
   // Get all nodes with zero outgoing degree from the database
   getAllZeroOutgoingDegreeNodes() {
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
     this._dbService.getAllZeroOutgoingDegreeNodes(
-      this.getZeroDegreeNodesLoad()
+      this.getZeroDegreeNodesLoad(),
     );
   }
 
@@ -418,13 +419,13 @@ export class CytoscapeService {
       // Get all upstream or downstream nodes of the selected nodes
       this.getAllUpDownstreamNodes(
         data.nodes,
-        this._g.userPreferences.lengthOfUpDownstream.getValue()
+        this._g.userPreferences.lengthOfUpDownstream.getValue(),
       );
     };
   }
 
   hasNewElement(newElementIds: string[], previousElements: any): string[] {
-    let d = {};
+    let d: { [key: string]: boolean } = {};
 
     for (let i = 0; i < previousElements.length; i++) {
       d[previousElements[i].id()] = true;
@@ -444,16 +445,19 @@ export class CytoscapeService {
       edges2Collapse = this._g.cy.edges(":visible");
     }
     edges2Collapse = edges2Collapse.filter("[^originalEnds]"); // do not collapse meta-edges
-    let sourceTargetPairs = {};
+    let sourceTargetPairs: Record<
+      string,
+      { cnt: number; s: string; t: string }
+    > = {};
     let isCollapseBasedOnType =
       this._g.userPreferences.isCollapseEdgesBasedOnType.getValue();
     let edgeCollapseLimit =
       this._g.userPreferences.edgeCollapseLimit.getValue();
     for (let i = 0; i < edges2Collapse.length; i++) {
       let e = edges2Collapse[i];
-      const s = e.data("source");
-      const t = e.data("target");
-      let edgeId = s + t;
+      const s: string = e.data("source");
+      const t: string = e.data("target");
+      let edgeId: string = s + t;
       if (isCollapseBasedOnType) {
         edgeId = e.classes()[0] + s + t;
       }
@@ -480,12 +484,13 @@ export class CytoscapeService {
     if (!edges2Expand) {
       edges2Expand = this._g.cy.edges("." + C.COLLAPSED_EDGE_CLASS);
     }
+    console.log("edges2Expand: ", edges2Expand);
     edges2Expand = edges2Expand.not("." + C.META_EDGE_CLASS);
     this._externalToolService.addTooltips(
       undefined,
       this._g.expandCollapseApi.expandEdges(edges2Expand).edges,
       false,
-      true
+      true,
     );
     this._g.isLoadFromExpandCollapse = true;
   }
@@ -496,9 +501,9 @@ export class CytoscapeService {
     }
   }
 
-  private getCollapsedEdgeIds(): any {
+  private getCollapsedEdgeIds(): Record<string, string> {
     let compoundEdges = this._g.cy.edges("." + C.COLLAPSED_EDGE_CLASS);
-    let collapsedEdgeIds = {};
+    let collapsedEdgeIds: Record<string, string> = {};
     for (let i = 0; i < compoundEdges.length; i++) {
       let collapsed = compoundEdges[i].data("collapsedEdges");
       for (let j = 0; j < collapsed.length; j++) {
@@ -508,8 +513,12 @@ export class CytoscapeService {
     return collapsedEdgeIds;
   }
 
-  highlightElements(elementIds: string[], styleIndex: number = this._g.userPreferences.currentHighlightIndex.getValue()) {
-    let oldHighlightIndex = this._g.userPreferences.currentHighlightIndex.getValue();
+  highlightElements(
+    elementIds: string[],
+    styleIndex: number = this._g.userPreferences.currentHighlightIndex.getValue(),
+  ) {
+    let oldHighlightIndex =
+      this._g.userPreferences.currentHighlightIndex.getValue();
     // Switch to the style index
     this._g.userPreferences.currentHighlightIndex.next(styleIndex);
 
@@ -619,7 +628,7 @@ export class CytoscapeService {
   }
 
   highlightNeighbors() {
-    return function (event: {
+    return (function (this: any, event: {
       target: any;
       type: string;
       cySelector?: string;
@@ -639,7 +648,7 @@ export class CytoscapeService {
       } else {
         elements2remain.removeClass("emphasize");
       }
-    }.bind(this);
+    }).bind(this);
   }
 
   setOtherElementsOpacity(elements: any[], opacity: any) {
@@ -667,7 +676,7 @@ export class CytoscapeService {
   removeHighlights() {
     this._g.removeHighlights();
     this._g.viewUtils.removeHighlights(
-      this._g.filterRemovedElements(() => true)
+      this._g.filterRemovedElements(() => true),
     );
     this._externalToolService.destroyCurrentBadgePoppers();
   }
@@ -700,7 +709,7 @@ export class CytoscapeService {
           this.addExternalTools(this.showUpDownstream);
         } else {
           const modal = this._modalService.open(
-            LoadGraphFromFileModalComponent
+            LoadGraphFromFileModalComponent,
           );
           modal.componentInstance.txt = txt;
         }
@@ -728,7 +737,7 @@ export class CytoscapeService {
     } else {
       this._g.showErrorModal(
         "File type is not suitable",
-        type + " is not suitable!"
+        type + " is not suitable!",
       );
     }
   }
@@ -772,7 +781,7 @@ export class CytoscapeService {
   saveSelectedAsJson() {
     this._g.expandCollapseApi.saveJson(
       this._g.cy.$(":selected"),
-      "visuall.json"
+      "visuall.json",
     );
   }
 
@@ -829,7 +838,7 @@ export class CytoscapeService {
         if (
           data.nodes[i].properties.segmentName !== sourceNodeName &&
           data.nodes[i].properties.segmentName ===
-          this._g.cy.nodes()[j].data().segmentName
+            this._g.cy.nodes()[j].data().segmentName
         ) {
           this.removeExternalTools(this._g.cy.nodes()[j]);
           this._g.cy.remove(this._g.cy.nodes()[j]);
@@ -848,7 +857,7 @@ export class CytoscapeService {
         properties: { end_datetime: 0, begin_datetime: 0, name: name },
         elementId: "",
       },
-      id
+      id,
     );
     this._g.cy.add(parentNode);
     this._g.cy.elements(`[id = "${id}"]`).move({ parent: parent });
@@ -919,9 +928,9 @@ export class CytoscapeService {
   }
 
   removeGroup4Selected(
-    elements = undefined,
+    elements: any = undefined,
     isRunLayout = true,
-    isCompoundGrouping = null
+    isCompoundGrouping: boolean | null = null,
   ) {
     if (isCompoundGrouping === null) {
       isCompoundGrouping =
@@ -931,8 +940,11 @@ export class CytoscapeService {
     if (!elements) {
       elements = this._g.cy.nodes(":selected");
       if (isCompoundGrouping) {
-        elements = elements.filter("." + C.CLUSTER_CLASS);
+        elements = (elements as any)?.filter("." + C.CLUSTER_CLASS);
       }
+    }
+    if (!elements) {
+      return;
     }
     if (elements.length < 1) {
       return;
@@ -943,7 +955,7 @@ export class CytoscapeService {
         if (elements[i].hasClass(C.COLLAPSED_NODE_CLASS)) {
           this._g.expandCollapseApi.expand(
             elements[i],
-            C.EXPAND_COLLAPSE_FAST_OPT
+            C.EXPAND_COLLAPSE_FAST_OPT,
           );
         }
         const grandParent = elements[i].parent().id() ?? null;
@@ -978,12 +990,12 @@ export class CytoscapeService {
       this._g.viewUtils.show(this._g.cy.$());
       this._g.applyClassFiltering();
       this._g.hideTypesNotToShow();
-      this.showCollapsed(null, null);
+      this.showCollapsed([], []);
       const currentVisible = this._g.cy.$(":visible");
       if (!currentVisible.same(prevVisible)) {
         if (prevVisible.length > 0) {
           this._g.layoutUtils.placeNewNodes(
-            currentVisible.difference(prevVisible).nodes()
+            currentVisible.difference(prevVisible).nodes(),
           );
         }
         this._g.performLayout(false);
@@ -1051,7 +1063,7 @@ export class CytoscapeService {
       .union(elements.connectedEdges())
       .filter("." + C.COLLAPSED_EDGE_CLASS)
       .map((x: any) => x.id());
-    const edgeIdDict = {};
+    const edgeIdDict: { [key: string]: boolean } = {};
     for (const i of collapsedEdgeIds) {
       edgeIdDict[i] = true;
     }
@@ -1141,7 +1153,7 @@ export class CytoscapeService {
         clusters[i].move({ parent: "c" + i });
       }
     } else {
-      let array = [];
+      let array: string[][] = [];
       for (let i = 0; i < clusters.length; i++) {
         let a = [];
         for (let j = 0; j < clusters[i].length; j++) {
@@ -1155,7 +1167,7 @@ export class CytoscapeService {
 
   louvainClustering() {
     let clustering = this.louvainClusterer.cluster(this._g.cy.$(":visible"));
-    let clusters = {};
+    let clusters: Record<string, boolean> = {};
     for (let n in clustering) {
       clusters[clustering[n]] = true;
     }
@@ -1174,7 +1186,7 @@ export class CytoscapeService {
           .move({ parent: "c" + clustering[n] });
       }
     } else {
-      let array = [];
+      let array: string[][] = [];
       for (let i in clusters) {
         array.push([]);
       }
@@ -1188,7 +1200,7 @@ export class CytoscapeService {
   deleteClusteringNodes() {
     this._g.cy.$().move({ parent: null });
     this._g.cy.remove("node." + C.CLUSTER_CLASS);
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
   }
 
   expandAllCompounds() {
@@ -1224,7 +1236,7 @@ export class CytoscapeService {
 
   private getVisibleComponentOf(e: any) {
     const components = this._g.cy.collection();
-    const visited = {};
+    const visited: Record<string, boolean> = {};
     const stack = [];
     if (e.isNode()) {
       components.merge(e);
@@ -1243,7 +1255,7 @@ export class CytoscapeService {
       visited[curr.id()] = true;
       const connectedEdges = curr.connectedEdges(":visible");
       const neighbors = connectedEdges.union(
-        connectedEdges.connectedNodes(":visible")
+        connectedEdges.connectedNodes(":visible"),
       );
       components.merge(neighbors);
       const neigNodes = neighbors.nodes();
@@ -1309,12 +1321,12 @@ export class CytoscapeService {
       this.removeGroup4Selected(
         this._g.cy.nodes("." + C.CLUSTER_CLASS),
         true,
-        true
+        true,
       );
     } else if (x === GroupingOptionTypes.compound) {
       // Clusters are always non-nested. If cise support nested clusters, below logic should be recursive
       if (!this._g.layout || !this._g.layout.clusters) {
-        this._g.layout.clusters = null;
+        this._g.layout.clusters = [];
         return;
       }
       let i = 0;
@@ -1325,7 +1337,7 @@ export class CytoscapeService {
         }
         i++;
       }
-      this._g.layout.clusters = null;
+      this._g.layout.clusters = [];
       this._g.performLayout(false);
     }
   }

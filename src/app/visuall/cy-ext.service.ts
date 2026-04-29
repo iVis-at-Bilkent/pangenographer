@@ -59,7 +59,10 @@ export class CyExtService {
     const cyNaviClass = "cytoscape-navigator-wrapper";
     const div = document.createElement("div");
     div.className = cyNaviClass;
-    document.getElementById("cy").append(div);
+    const cyElement = document.getElementById("cy");
+    if (cyElement) {
+      cyElement.append(div);
+    }
 
     this.setNavigatorPosition();
     let defaults = {
@@ -132,7 +135,7 @@ export class CyExtService {
       setVisibilityOnHide: false, // whether to set visibility on hide/show
       setDisplayOnHide: true, // whether to set display on hide/show
       zoomAnimationDuration: 500, //default duration for zoom animation speed
-      neighbor: function (node) {
+      neighbor: function (node: cytoscape.NodeSingular): boolean {
         // return desired neighbors of tapheld node
         return false;
       },

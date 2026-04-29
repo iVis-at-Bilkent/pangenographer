@@ -107,12 +107,15 @@ export class FileReaderService {
     jump.sourceOrientation = this.convertOrientation(jumpLineTabSeparated[2]);
     jump.target = jumpLineTabSeparated[3];
     jump.targetOrientation = this.convertOrientation(jumpLineTabSeparated[4]);
-    for (let i = 4; i < jumpLineTabSeparated.length; i++) {
+    if (jumpLineTabSeparated.length > 5) {
+      jump.distance = jumpLineTabSeparated[5];
+    } else {
+      jump.distance = "*";
+    }
+    for (let i = 6; i < jumpLineTabSeparated.length; i++) {
       let optionalField = (jumpLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("SC")) {
         jump.indirectShortcutConnections = Number(optionalField.substring(5));
-      } else {
-        jump.distance = optionalField;
       }
     }
     return jump;
@@ -140,7 +143,7 @@ export class FileReaderService {
     );
     containment.pos = Number(containmentLineTabSeparated[5]);
     containment.overlap = containmentLineTabSeparated[6];
-    for (let i = 4; i < containmentLineTabSeparated.length; i++) {
+    for (let i = 7; i < containmentLineTabSeparated.length; i++) {
       let optionalField = (containmentLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("RC")) {
         containment.readCount = Number(optionalField.substring(5));
@@ -171,7 +174,13 @@ export class FileReaderService {
     link.target = linkLineTabSeparated[3];
     link.targetOrientation = this.convertOrientation(linkLineTabSeparated[4]);
 
-    for (let i = 4; i < linkLineTabSeparated.length; i++) {
+    if (linkLineTabSeparated.length > 5) {
+      link.overlap = linkLineTabSeparated[5];
+    } else {
+      link.overlap = "*";
+    }
+
+    for (let i = 6; i < linkLineTabSeparated.length; i++) {
       let optionalField = (linkLineTabSeparated[i] as string).trim();
       if (optionalField.startsWith("MQ")) {
         link.mappingQuality = Number(optionalField.substring(5));
@@ -185,8 +194,6 @@ export class FileReaderService {
         link.kmerCount = Number(optionalField.substring(5));
       } else if (optionalField.startsWith("ID")) {
         link.edgeIdentifier = optionalField;
-      } else {
-        link.overlap = optionalField;
       }
     }
 

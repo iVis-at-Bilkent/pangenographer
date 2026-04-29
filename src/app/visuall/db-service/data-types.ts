@@ -1,17 +1,37 @@
 import { TableFiltering } from "../../shared/table-view/table-view-types";
 import { ClassBasedRules } from "../operation-tabs/map-tab/query-types";
 
+export interface CuePosition {
+  x: number;
+  y: number;
+}
+
+export interface CytoscapeNode {
+  _private: {
+    cy: {
+      zoom(): number;
+      width(): number;
+      height(): number;
+    };
+  };
+  position(key: string): number;
+  width(): number;
+  height(): number;
+  renderedWidth(): number;
+  css(property: string): string;
+}
+
 export interface DbService {
   getNeighbors(
     elementIds: string[] | number[],
     callback: (x: GraphResponse) => any,
-    queryMeta?: DbQueryMeta
+    queryMeta?: DbQueryMeta,
   );
 
   getElements(
     ids: string[] | number[],
     callback: (x: GraphResponse) => any,
-    meta: DbQueryMeta
+    meta: DbQueryMeta,
   );
 
   getFilteringResult(
@@ -20,7 +40,7 @@ export interface DbService {
     skip: number,
     limit: number,
     type: DbResponseType,
-    callback: (x: GraphResponse | TableResponse) => any
+    callback: (x: GraphResponse | TableResponse) => any,
   );
 
   getGraphOfInterest(
@@ -31,7 +51,7 @@ export interface DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    cb: (x: any) => void,
   );
 
   getCommonStream(
@@ -42,7 +62,7 @@ export interface DbService {
     type: DbResponseType,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    cb: (x: any) => void,
   );
 
   getNeighborhood(
@@ -52,28 +72,28 @@ export interface DbService {
     isDirected: boolean,
     filter: TableFiltering,
     idFilter: (string | number)[],
-    cb: (x: any) => void
+    cb: (x: any) => void,
   );
 
   sequenceChainSearch(
     sequences: string,
     maxJumpLength: number,
     minSubsequenceMatchLength: number,
-    callback: (x: GraphResponse) => any
+    callback: (x: GraphResponse) => any,
   );
 
   getConsecutiveNodes(
     properties: (string | number)[],
     propertyType: string,
     objectType: string,
-    callback: (x: GraphResponse) => any
+    callback: (x: GraphResponse) => any,
   );
 
   getElementsUpToCertainDistance(
     nodeIds: string[],
     distance: number,
     callback: (x: GraphResponse) => any,
-    isUp: boolean
+    isUp: boolean,
   );
 
   // import GFA data with a sequence of promises
@@ -93,7 +113,7 @@ export interface DbService {
 
   getSegmentsByNames(
     segmentNames: string[],
-    callback: (x: GraphResponse) => any
+    callback: (x: GraphResponse) => any,
   );
 }
 
@@ -146,8 +166,8 @@ export interface GFASegment {
   kmerCount?: number;
   Sha256Checksum?: string;
   UriOrLocalSystemPath?: string;
-  pathNames?: string;
-  walkSampleIdentifiers?: string;
+  pathNames?: string[];
+  walkSampleIdentifiers?: string[];
 }
 
 export interface GFASegmentData {
@@ -167,6 +187,8 @@ export interface GFALink {
   fragmentCount?: number;
   kmerCount?: number;
   edgeIdentifier?: string;
+  pathNames?: string[];
+  walkSampleIdentifiers?: string[];
 }
 
 export interface GFAJump {
@@ -176,6 +198,8 @@ export interface GFAJump {
   targetOrientation: string;
   distance: string;
   indirectShortcutConnections?: number;
+  pathNames?: string[];
+  walkSampleIdentifiers?: string[];
 }
 
 export interface GFAContainment {
@@ -188,6 +212,8 @@ export interface GFAContainment {
   readCount?: number;
   numberOfMismatchesOrGaps?: number;
   edgeIdentifier?: string;
+  pathNames?: string[];
+  walkSampleIdentifiers?: string[];
 }
 
 export interface GFAPath {

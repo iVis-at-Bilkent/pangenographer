@@ -10,6 +10,7 @@ import { GlobalVariableService } from "../global-variable.service";
 import { URLLoadService } from "../load-from-url.service";
 import { AboutModalComponent } from "../popups/about-modal/about-modal.component";
 import { ClearDatabaseModalComponent } from "../popups/clear-database-modal/clear-database-modal.component";
+import { ErrorModalComponent } from "../popups/error-modal/error-modal.component";
 import { FileSizeWarningModalComponent } from "../popups/file-size-warning-modal/file-size-warning-modal.component";
 import { LegendModalComponent } from "../popups/legend-modal/legend-modal.component";
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
@@ -18,7 +19,6 @@ import { SaveProfileModalComponent } from "../popups/save-profile-modal/save-pro
 import { GroupingOptionTypes } from "../user-preference";
 import { UserProfileService } from "../user-profile.service";
 import { NavbarAction, NavbarDropdown } from "./inavbar";
-import { ErrorModalComponent } from "../popups/error-modal/error-modal.component";
 
 @Component({
   selector: "app-navbar",
@@ -45,7 +45,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _g: GlobalVariableService,
     private _profile: UserProfileService,
     private _urlLoad: URLLoadService,
-    private _fileReaderService: FileReaderService
+    private _fileReaderService: FileReaderService,
   ) {
     this.menu = [
       {
@@ -97,6 +97,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
                 function: "setSampleDatabase",
                 parameters: SAMPLE_DATABASES[5],
               },
+              {
+                text: SAMPLE_DATABASES[6],
+                id: SAMPLE_DATABASES[6],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[6],
+              },
+              {
+                text: SAMPLE_DATABASES[7],
+                id: SAMPLE_DATABASES[7],
+                function: "setSampleDatabase",
+                parameters: SAMPLE_DATABASES[7],
+              }
             ],
           },
           {
@@ -274,10 +286,23 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   triggerAct(action: NavbarAction) {
-    if (action.parameters) {
-      this[action.function](action.parameters);
-    } else {
-      this[action.function]();
+    const functionName = action.function as keyof NavbarComponent | undefined;
+
+    if (!functionName) {
+      return;
+    }
+
+    const targetFunction = this[functionName];
+
+    if (typeof targetFunction === "function") {
+      if (action.parameters !== undefined) {
+        (targetFunction as (parameters: unknown) => void).call(
+          this,
+          action.parameters,
+        );
+      } else {
+        (targetFunction as () => void).call(this);
+      }
     }
   }
 
@@ -296,10 +321,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
     const fileSize = selectedFile.size; // Size in bytes
     const fileSizeMB = Math.round((fileSize / 1024 / 1024) * 100) / 100; // Size in MB
 
-    if (fileSizeMB > 25) {
+    if (fileSizeMB > 25000) {
       // If file is too large, show a warning message and do not process the file
       this._g.statusMessage.next(
-        `File size is larger than 25 MB. It won't be loaded. File size: ${fileSizeMB} MB`
+        `File size is larger than 25 MB. It won't be loaded. File size: ${fileSizeMB} MB`,
       );
 
       const modalRef = this._modalService.open(ErrorModalComponent, {
@@ -312,7 +337,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       return;
     } else if (fileSizeMB > 10) {
       this._g.statusMessage.next(
-        `File size is too large. It may take a while to load. File size: ${fileSizeMB} MB`
+        `File size is too large. It may take a while to load. File size: ${fileSizeMB} MB`,
       );
 
       const modalRef = this._modalService.open(FileSizeWarningModalComponent, {
@@ -325,14 +350,14 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
       // Handle the modal result
       modalRef.result.then(
-        (result) => {
+        (result: unknown): void => {
           // User clicked "Continue Loading"
           this.processFile(selectedFile);
         },
-        (reason) => {
+        (reason: unknown): void => {
           // User clicked "Cancel" or closed the modal
           this._g.statusMessage.next("File loading cancelled by user");
-        }
+        },
       );
     } else {
       // If file is not too large, process it immediately
@@ -347,7 +372,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     // Display loading message
     this._g.statusMessage.next(
-      `Loading file: ${selectedFile.name} (${fileSizeMB} MB)`
+      `Loading file: ${selectedFile.name} (${fileSizeMB} MB)`,
     );
 
     if (this.isLoadFileGFA) {
@@ -376,13 +401,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
   loadFile() {
     // Open the clear database modal to certify that the user wants to clear the database
     this._modalService.open(ClearDatabaseModalComponent).result.then(
-      () => {}, // Execute nothing when the modal is closed
-      (reason) => {
+      (): void => {}, // Execute nothing when the modal is closed
+      (reason: unknown): void => {
         // Execute the callback function when the modal is dismissed
         this.isLoadFile4Graph = true; // Set the isLoadFile4Graph flag to true
         this.isLoadFileGFA = false; // Set the isLoadFileGFA flag to false
         this.openFileInput(); // Open the file input to allow the user to select a file
-      }
+      },
     );
   }
 
@@ -396,7 +421,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .open(ClearDatabaseModalComponent)
       .result.then(
         () => {}, // Execute nothing when the modal is closed
-        (reason) => {
+        (reason: unknown): void => {
           // Execute the callback function when the modal is dismissed
 
           // Prepare the GFA load and set the isLoadFile4Graph and isLoadFileGFA flags to true
@@ -404,7 +429,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
           // Open the file input to allow the user to select a file
           this.openFileInput();
-        }
+        },
       );
   }
 
@@ -453,7 +478,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
       GroupingOptionTypes.compound
     ) {
       this._cyService.removeGroup4Selected(
-        this._g.cy.nodes("." + CLUSTER_CLASS)
+        this._g.cy.nodes("." + CLUSTER_CLASS),
       );
     } else {
       this._cyService.removeGroup4Selected(this._g.cy.nodes());
@@ -473,7 +498,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   search2Highlight() {
-    document.getElementById("highlight-search-input").focus();
+    document.getElementById("highlight-search-input")?.focus();
   }
 
   highlightSelected() {
@@ -560,12 +585,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   // Get all nodes with zero degree
-  // Sets the layout clusters to null to remove the clusters from the graph
+  // Sets the layout clusters to an empty list to remove the clusters from the graph
   // Uses the database service to get all nodes with zero degree
   // Gives the callback function to the database service to get the data in the form of a graph response,
   // cytoscape service is used to load the elements from the database
   getSampleData() {
-    this._g.layout.clusters = null;
+    this._g.layout.clusters = [];
     this._g.statusMessage.next("Getting sample data");
     this._dbService.getSampleData((x) => {
       this._cyService.loadElementsFromDatabase(x, false);

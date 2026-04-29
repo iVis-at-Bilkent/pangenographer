@@ -1,3 +1,5 @@
+import type { CuePosition, CytoscapeNode } from "./db-service/data-types";
+
 export const CY_NAVI_POSITION_WAIT_DUR = 500;
 export const MAX_HIGHLIGHT_WIDTH = 20;
 export const MIN_HIGHLIGHT_WIDTH = 1;
@@ -37,6 +39,7 @@ export const DEFAULT_NODE_HEIGHT = 18;
 export const MIN_NODE_WIDTH = DEFAULT_NODE_WIDTH * 0.85;
 export const BADGE_POPPER_UPDATE_DELAY = 100;
 export const OVERLAP_REGEX = /[MIDNSHPX=]/;
+export const IMPORT_BATCH_SIZE = 10000;
 
 export const EXPAND_COLLAPSE_FAST_OPT = {
   layoutBy: null,
@@ -126,6 +129,8 @@ export const SAMPLE_DATABASES = [
   "Human HLA Pangenome",
   "Bifrost Ecoli Pangenome",
   "PGGB Ecoli Pangenome",
+  "Human Chromosome Y Pangenome",
+  "Human Whole Genome Pangenome"
 ];
 
 export const CYPHER_WRITE_QUERY_TYPES = [
@@ -186,10 +191,10 @@ export function debounce(
   func: Function,
   wait: number,
   immediate: boolean = false,
-  preConditionFn = null
+  preConditionFn: Function | null = null,
 ) {
   let timeout: any;
-  return function () {
+  return function (this: any) {
     if (preConditionFn && !preConditionFn()) {
       return;
     }
@@ -210,7 +215,7 @@ export function debounce(
 export function debounce2(fn1: Function, wait: number, fn2: Function) {
   let timeout: any;
   let isInit = true;
-  return function () {
+  return function (this: any) {
     const context = this,
       args = arguments;
     const later = function () {
@@ -233,8 +238,8 @@ export function getPropNamesFromObject(objects: any, types: any) {
   let s1 = new Set<string>();
 
   for (const object of objects) {
-    for (const [, value] of Object.entries(object)) {
-      for (const [k2, v2] of Object.entries(value)) {
+    for (const [, value] of Object.entries(object as Record<string, any>)) {
+      for (const [k2, v2] of Object.entries(value as Record<string, any>)) {
         if (!types) {
           s1.add(k2);
         } else if (types.includes(v2)) {
@@ -259,7 +264,7 @@ export function isClose(a1: number, a2: number, margin = 1000) {
   return Math.abs(a1 - a2) < margin;
 }
 
-export function expandCollapseCuePosition(node) {
+export function expandCollapseCuePosition(node: CytoscapeNode): CuePosition {
   const zoom = node._private.cy.zoom();
   let smallness = 1 - node.renderedWidth() / node._private.cy.width();
   if (smallness < 0) {
@@ -365,7 +370,7 @@ export const deepCopy = <T>(target: T): T => {
 
 export function arrayDiff(smallArr: string[], bigArr: string[]): string[] {
   let diff: string[] = [];
-  let d = {};
+  let d: { [key: string]: boolean } = {};
   for (let i = 0; i < smallArr.length; i++) {
     d[smallArr[i]] = true;
   }
@@ -380,7 +385,7 @@ export function arrayDiff(smallArr: string[], bigArr: string[]): string[] {
 
 export function getCyStyleFromColorAndWid(
   color: string,
-  width: number
+  width: number,
 ): { node: any; edge: any } {
   return {
     node: {

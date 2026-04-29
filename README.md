@@ -20,22 +20,46 @@ Follow these steps to prepare a local Neo4j database for PG2.
 
 1. Install Neo4j (Neo4j Desktop is optional; it may be used, but it is not required).
 2. Create a local database with Neo4j version `5.10`.
-3. Use password `12345678` for user `neo4j`.
-4. If you prefer a different password or username, update [src/environments/environment.ts](src/environments/environment.ts) at `dbConfig`.
-5. Install the APOC plugin for the database.
-6. Open the database configuration file `neo4j.conf` and comment out this line:
+3. Use password `12345678` for user `neo4j`. If you prefer a different password or username, update [src/environments/environment.ts](src/environments/environment.ts) at `dbConfig`.
+4. Install the APOC plugin for the database.
+5. Open the database configuration file `neo4j.conf` and comment out this line:
 
    ```properties
    #dbms.security.procedures.allowlist=apoc.*
    ```
 
-7. Download the custom plugin JAR from:
+6. Download the custom plugin JAR from:
    `https://github.com/iVis-at-Bilkent/visuall-advanced-query/blob/pangenographer/advanced-queries-0.0.1.jar`
    (this is the same `advanced-queries-0.0.1.jar` file also present under `src/assets/`).
-8. Copy `advanced-queries-0.0.1.jar` into the Neo4j database `plugins` folder.
-9. Start the Neo4j database.
+7. Copy `advanced-queries-0.0.1.jar` into the Neo4j database `plugins` folder.
+8. Start the Neo4j database.
 
 After startup, PG2 can connect to the local database using the configuration in [src/environments/environment.ts](src/environments/environment.ts).
+
+### Bulk-importing a GFA file into Neo4j
+
+[import_gfa_to_neo4j.py](import_gfa_to_neo4j.py) loads a `.gfa` file directly into Neo4j using the same schema the web app writes. It is significantly faster than importing through the UI for large files.
+
+#### With Docker
+
+[import_gfa_docker.sh](import_gfa_docker.sh) builds a one-shot image from [Dockerfile.importer](Dockerfile.importer), runs the import against the Neo4j instance on the host, and removes both the container (`--rm`) and the image when the import finishes or fails.
+
+```sh
+./import_gfa_docker.sh sample_1.gfa --clear
+./import_gfa_docker.sh sample_1.gfa --password 12345678 --batch-size 100000
+```
+
+Any flag supported by the Python importer can be appended — they are forwarded to the script inside the container. The default `--uri` targets `bolt://host.docker.internal:7687` so the container reaches Neo4j running on the host (works on macOS, Windows, and Linux via a host-gateway mapping). Override with `--uri bolt://<host>:7687` to point at a remote Neo4j instance.
+
+#### Without Docker
+
+```sh
+pip install neo4j
+python import_gfa_to_neo4j.py sample_1.gfa --clear
+python import_gfa_to_neo4j.py sample_1.gfa --uri bolt://localhost:7687 --password 12345678 --batch-size 100000
+```
+
+Run `python import_gfa_to_neo4j.py --help` for the full flag list.
 
 ### Running the application with Docker
 

@@ -1,0 +1,11 @@
+# One-shot image for import_gfa_to_neo4j.py.
+# Built and torn down by import_gfa_docker.sh — not used by docker-compose.
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir "neo4j>=5.10,<6"
+
+COPY import_gfa_to_neo4j.py ./
+
+ENTRYPOINT ["python", "import_gfa_to_neo4j.py"]

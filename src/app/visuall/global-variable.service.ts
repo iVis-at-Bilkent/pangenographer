@@ -32,7 +32,7 @@ export class GlobalVariableService {
   layoutUtils: any;
   layout: {
     name: string;
-    clusters: string[][];
+    clusters: string[][] | null;
     randomize: boolean;
     tile: boolean;
     animationDuration: number;
@@ -40,10 +40,20 @@ export class GlobalVariableService {
     tilingPaddingHorizontal: number;
     idealEdgeLength: number;
     fit: boolean;
+  } = {
+    name: "fcose",
+    clusters: [],
+    randomize: false,
+    tile: true,
+    animationDuration: LAYOUT_ANIMATION_DURATION,
+    tilingPaddingVertical: 4,
+    tilingPaddingHorizontal: 4,
+    idealEdgeLength: 50,
+    fit: true,
   };
   expandCollapseApi: any;
   hiddenClasses: Set<string>;
-  setLoadingStatus: (boolean: boolean) => void;
+  setLoadingStatus: (boolean: boolean) => void = () => {};
   selectedSampleDatabase = new BehaviorSubject<string>(SAMPLE_DATABASES[0]);
   userPreferences: UserPreferences = {} as UserPreferences;
   userPreferencesFromFiles: UserPreferences = {} as UserPreferences;
@@ -84,47 +94,50 @@ export class GlobalVariableService {
     sourceAndTarget: [],
   };
 
-  constructor(private _http: HttpClient, private _modalService: NgbModal) {
+  constructor(
+    private _http: HttpClient,
+    private _modalService: NgbModal,
+  ) {
     this.hiddenClasses = new Set([]);
     // set user preferences statically (necessary for rendering html initially)
     this.setUserPreferences(appPreferences, this.userPreferences);
     // set default values dynamically
-    this._http.get("./assets/appPreferences.json").subscribe((x) => {
+    this._http.get("./assets/appPreferences.json").subscribe((x: any) => {
       this.setUserPreferences(x, this.userPreferences);
       this.setUserPreferences(x, this.userPreferencesFromFiles);
 
       // set user preferred values. These will be overridden if "Store User Profile" is checked
+      interface AppDescriptionResponse {
+        appPreferences: Record<string, unknown>;
+        [key: string]: unknown;
+      }
+
       this._http
-        .get("/app/custom/config/app_description.json")
-        .subscribe((x) => {
+        .get<AppDescriptionResponse>("/app/custom/config/app_description.json")
+        .subscribe((x: AppDescriptionResponse) => {
           this.appDescription.next(x);
           this.setUserPreferences(x["appPreferences"], this.userPreferences);
           this.setUserPreferences(
             x["appPreferences"],
-            this.userPreferencesFromFiles
+            this.userPreferencesFromFiles,
           );
           this.isUserPrefReady.next(true);
         }, this.showErr.bind(this));
     }, this.showErr.bind(this));
 
-    let isGraphEmpty = () => {
-      return this.cy.elements().not(":hidden, :transparent").length > 0;
-    };
-
     this.performLayout = debounce(
       this.performLayoutFn,
       LAYOUT_ANIMATION_DURATION,
       false, // immediate call is not needed
-      isGraphEmpty
     );
 
     // set cytoscape.js style dynamically
-    this._http.get("./assets/generated/stylesheet.json").subscribe((x) => {
+    this._http.get("./assets/generated/stylesheet.json").subscribe((x: any) => {
       this.cy.style(x);
       this.addOtherStyles();
     }, this.showErr.bind(this));
 
-    this._http.get("./assets/generated/properties.json").subscribe((x) => {
+    this._http.get("./assets/generated/properties.json").subscribe((x: any) => {
       this.dataModel.next(x);
     }, this.showErr.bind(this));
   }
@@ -162,7 +175,7 @@ export class GlobalVariableService {
     }
 
     layout.promiseOn("layoutstop", () => {
-      callback();
+      callback?.();
     });
 
     layout.run();
@@ -172,18 +185,20 @@ export class GlobalVariableService {
 
   private removeDeletedClusters() {
     const clusters = [];
-    for (let i = 0; i < this.layout.clusters.length; i++) {
-      const c = [];
-      for (let j = 0; j < this.layout.clusters[i].length; j++) {
-        if (this.cy.$id(this.layout.clusters[i][j]).length > 0) {
-          c.push(this.layout.clusters[i][j]);
+    if (this.layout.clusters) {
+      for (let i = 0; i < this.layout.clusters.length; i++) {
+        const c = [];
+        for (let j = 0; j < this.layout.clusters[i].length; j++) {
+          if (this.cy.$id(this.layout.clusters[i][j]).length > 0) {
+            c.push(this.layout.clusters[i][j]);
+          }
+        }
+        if (c.length > 0) {
+          clusters.push(c);
         }
       }
-      if (c.length > 0) {
-        clusters.push(c);
-      }
+      this.layout.clusters = clusters;
     }
-    this.layout.clusters = clusters;
   }
 
   switchLayoutRandomization(isRandomize: boolean) {
@@ -214,7 +229,7 @@ export class GlobalVariableService {
   highlightElements(elements: any, index?: number) {
     this.viewUtils.highlight(
       elements,
-      index ? index : this.userPreferences.currentHighlightIndex.getValue()
+      index ? index : this.userPreferences.currentHighlightIndex.getValue(),
     );
   }
 
@@ -290,17 +305,17 @@ export class GlobalVariableService {
   getLabels4Elements(
     elementIds: string[],
     isNode: boolean = true,
-    objectData: GraphElement[] = null
+    objectData: GraphElement[] | null = null,
   ): string {
     return this.getLabels4ElementsAsArray(elementIds, isNode, objectData).join(
-      ","
+      ",",
     );
   }
 
   getLabels4ElementsAsArray(
     elementIds: string[],
     isNode: boolean = true,
-    objectData: GraphElement[] = null
+    objectData: GraphElement[] | null = null,
   ): string[] {
     let cyIds: string[] = [];
     let idChar = "n";
@@ -335,7 +350,7 @@ export class GlobalVariableService {
         let propertyName = s.slice(s.indexOf("(") + 1, s.indexOf(")"));
         if (!objectData) {
           labels.push(
-            this.cy.elements(`[id = "${cyIds[i]}"]`).data(propertyName)
+            this.cy.elements(`[id = "${cyIds[i]}"]`).data(propertyName),
           );
         } else {
           const currentData = objectData[i].data;
@@ -466,8 +481,8 @@ export class GlobalVariableService {
     this.prepareZeroIncomerAndOutgoerNodes();
     let longestPath = -1;
 
-    let sourceShortests = {};
-    let targetShortests = {};
+    let sourceShortests: Record<string, number> = {};
+    let targetShortests: Record<string, number> = {};
 
     if (
       this.zeroIncomerAndOutgoerNodes.source.length &&
@@ -480,13 +495,15 @@ export class GlobalVariableService {
         });
         this.zeroIncomerAndOutgoerNodes.target.forEach((target) => {
           let dist = dijkstra.distanceTo(target);
-          sourceShortests[source.id()] = Math.min(
-            sourceShortests[source.id()] || Infinity,
-            dist
+          const sourceId = String(source.id());
+          const targetId = String(target.id());
+          sourceShortests[sourceId] = Math.min(
+            sourceShortests[sourceId] ?? Infinity,
+            dist,
           );
-          targetShortests[target.id()] = Math.min(
-            targetShortests[target.id()] || Infinity,
-            dist
+          targetShortests[targetId] = Math.min(
+            targetShortests[targetId] ?? Infinity,
+            dist,
           );
         });
       });
@@ -495,9 +512,8 @@ export class GlobalVariableService {
     for (const key in sourceShortests) {
       if (sourceShortests[key] === Infinity) {
         delete sourceShortests[key];
-        this.zeroIncomerAndOutgoerNodes.source = this.zeroIncomerAndOutgoerNodes.source.filter(
-          (x) => x.id() !== key
-        );
+        this.zeroIncomerAndOutgoerNodes.source =
+          this.zeroIncomerAndOutgoerNodes.source.filter((x) => x.id() !== key);
       } else {
         longestPath = Math.max(longestPath, sourceShortests[key]);
       }
@@ -505,9 +521,8 @@ export class GlobalVariableService {
     for (const key in targetShortests) {
       if (targetShortests[key] === Infinity) {
         delete targetShortests[key];
-        this.zeroIncomerAndOutgoerNodes.target = this.zeroIncomerAndOutgoerNodes.target.filter(
-          (x) => x.id() !== key
-        );
+        this.zeroIncomerAndOutgoerNodes.target =
+          this.zeroIncomerAndOutgoerNodes.target.filter((x) => x.id() !== key);
       } else {
         longestPath = Math.max(longestPath, targetShortests[key]);
       }
@@ -555,17 +570,19 @@ export class GlobalVariableService {
       this.zeroIncomerAndOutgoerNodes.target.length
     ) {
       this.zeroIncomerAndOutgoerNodes.source.forEach((n) => {
+        const nodeId = String(n.id());
         this.constraints.relativePlacementConstraints.push({
           left: n.id(),
           right:
-            "PSEUDOSOURCENODE" + (longestPath - sourceShortests[n.id()] + 1),
+            "PSEUDOSOURCENODE" + (longestPath - sourceShortests[nodeId] + 1),
           gap: halfOfIdealEdgeLength * 2,
         });
       });
       this.zeroIncomerAndOutgoerNodes.target.forEach((n) => {
+        const nodeId = String(n.id());
         this.constraints.relativePlacementConstraints.push({
           left:
-            "PSEUDOTARGETNODE" + (longestPath - targetShortests[n.id()] + 1),
+            "PSEUDOTARGETNODE" + (longestPath - targetShortests[nodeId] + 1),
           right: n.id(),
           gap: halfOfIdealEdgeLength * 2,
         });
@@ -690,7 +707,7 @@ export class GlobalVariableService {
     isRandomize: boolean,
     isDirectCommand: boolean = false,
     animationDuration: number = LAYOUT_ANIMATION_DURATION,
-    dontFit: boolean = false
+    dontFit: boolean = false,
   ) {
     if (
       !this.userPreferences.isAutoIncrementalLayoutOnChange.getValue() &&
@@ -924,8 +941,10 @@ export class GlobalVariableService {
 
   private addStyle4Emphasize() {
     let highlightIndex = 5;
-    const color = this.userPreferences.highlightStyles[highlightIndex].color.getValue();
-    const width = this.userPreferences.highlightStyles[highlightIndex].width.getValue();
+    const color =
+      this.userPreferences.highlightStyles[highlightIndex].color.getValue();
+    const width =
+      this.userPreferences.highlightStyles[highlightIndex].width.getValue();
     const OPACITY_DIFF = 0.05;
 
     this.cy
@@ -968,7 +987,7 @@ export class GlobalVariableService {
   }
 
   private doElementsMultiClasses(elements: any) {
-    let classDictionary = {};
+    const classDictionary: Record<string, boolean> = {};
     for (let i = 0; i < elements.length; i++) {
       let classes = elements[i].classes();
       for (let j = 0; j < classes.length; j++) {
