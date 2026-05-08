@@ -32,6 +32,7 @@ import { LoadGraphFromFileModalComponent } from "./popups/load-graph-from-file-m
 import { QuickHelpModalComponent } from "./popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "./popups/save-as-png-modal/save-as-png-modal.component";
 import { SaveProfileModalComponent } from "./popups/save-profile-modal/save-profile-modal.component";
+import { WelcomeModalComponent } from "./popups/welcome-modal/welcome-modal.component";
 import { PropertyRuleComponent } from "./property-rule/property-rule.component";
 import { RuleDropdownComponent } from "./rule-dropdown/rule-dropdown.component";
 import { RuleTreeComponent } from "./rule-tree/rule-tree.component";
@@ -67,6 +68,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     LoadGraphFromFileModalComponent,
     BlastTabComponent,
     CustomQueriesComponent,
+    WelcomeModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -87,6 +89,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     ErrorModalComponent,
     ClearDatabaseModalComponent,
     FileSizeWarningModalComponent,
+    WelcomeModalComponent,
   ],
 })
 export class AppModule {}

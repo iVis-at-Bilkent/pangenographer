@@ -775,14 +775,156 @@ export class CytoscapeService {
   }
 
   saveAsJson() {
-    this._g.expandCollapseApi.saveJson(this._g.cy.$(), "visuall.json");
+    this._g.expandCollapseApi.saveJson(this._g.cy.$(), "pangenographer.json");
   }
 
   saveSelectedAsJson() {
     this._g.expandCollapseApi.saveJson(
       this._g.cy.$(":selected"),
-      "visuall.json",
+      "pangenographer.json",
     );
+  }
+
+  // Export visible canvas objects as a GFA v1.2 file (S/L/J/C lines).
+  // Collapsed meta edges are unrolled into their underlying real edges so the
+  // export reflects what the user sees, not the cytoscape representation.
+  saveAsGFA() {
+    const orient = (o: string): string => (o === "reverse" ? "-" : "+");
+
+    const numTag = (tag: string, val: any): string | null => {
+      if (val === undefined || val === null || val === "") return null;
+      const n = Number(val);
+      if (!Number.isFinite(n)) return null;
+      return `${tag}:i:${n}`;
+    };
+    const zTag = (tag: string, val: any): string | null => {
+      if (val === undefined || val === null || val === "") return null;
+      return `${tag}:Z:${val}`;
+    };
+    // Fields like SH, UR, ID are stored as the full "TAG:TYPE:VALUE" string by the parser
+    const rawTag = (val: any): string | null => {
+      if (val === undefined || val === null || val === "") return null;
+      return String(val);
+    };
+    const join = (cols: (string | null | undefined)[]): string =>
+      cols.filter((x) => x !== null && x !== undefined).join("\t");
+
+    const lines: string[] = [];
+    lines.push("H\tVN:Z:1.2");
+
+    // Visible segments (skip cluster/compound/collapsed-compound nodes)
+    const segments = this._g.cy
+      .nodes(":visible.SEGMENT")
+      .not("." + C.COLLAPSED_NODE_CLASS);
+    const segMap: Record<string, string> = {};
+    for (let i = 0; i < segments.length; i++) {
+      const n = segments[i];
+      const d = n.data();
+      if (!d.segmentName) continue;
+      segMap[n.id()] = d.segmentName;
+      const seq = d.segmentData ? d.segmentData : "*";
+      lines.push(
+        join([
+          "S",
+          d.segmentName,
+          seq,
+          numTag("LN", d.segmentLength),
+          numTag("RC", d.readCount),
+          numTag("FC", d.fragmentCount),
+          numTag("KC", d.kmerCount),
+          rawTag(d.Sha256Checksum),
+          rawTag(d.UriOrLocalSystemPath),
+          zTag("SN", d.stableSequenceName),
+          numTag("SO", d.stableSequenceOffset),
+          numTag("SR", d.stableSequenceRank),
+        ]),
+      );
+    }
+
+    // Resolve visible edges; unfold collapsed meta-edges into their underlying edges
+    const visibleEdges = this._g.cy
+      .edges(":visible")
+      .not("." + C.META_EDGE_CLASS);
+    let realEdges: any = this._g.cy.collection();
+    for (let i = 0; i < visibleEdges.length; i++) {
+      const e = visibleEdges[i];
+      if (e.hasClass(C.COLLAPSED_EDGE_CLASS)) {
+        const collapsed = e.data("collapsedEdges");
+        if (collapsed) {
+          realEdges = realEdges.union(collapsed);
+        }
+      } else {
+        realEdges = realEdges.union(e);
+      }
+    }
+
+    for (let i = 0; i < realEdges.length; i++) {
+      const e = realEdges[i];
+      const cls = e.classes()[0];
+      const d = e.data();
+      const sName = segMap[d.source];
+      const tName = segMap[d.target];
+      if (!sName || !tName) continue;
+      const so = orient(d.sourceOrientation);
+      const to = orient(d.targetOrientation);
+      if (cls === "LINK") {
+        lines.push(
+          join([
+            "L",
+            sName,
+            so,
+            tName,
+            to,
+            d.overlap ? d.overlap : "*",
+            numTag("MQ", d.mappingQuality),
+            numTag("NM", d.numberOfMismatchesOrGaps),
+            numTag("RC", d.readCount),
+            numTag("FC", d.fragmentCount),
+            numTag("KC", d.kmerCount),
+            rawTag(d.edgeIdentifier),
+          ]),
+        );
+      } else if (cls === "JUMP") {
+        lines.push(
+          join([
+            "J",
+            sName,
+            so,
+            tName,
+            to,
+            d.distance ? d.distance : "*",
+            numTag("SC", d.indirectShortcutConnections),
+          ]),
+        );
+      } else if (cls === "CONTAINMENT") {
+        const pos =
+          d.pos !== undefined && d.pos !== null && d.pos !== "" ? d.pos : 0;
+        lines.push(
+          join([
+            "C",
+            sName,
+            so,
+            tName,
+            to,
+            String(pos),
+            d.overlap ? d.overlap : "*",
+            numTag("RC", d.readCount),
+            numTag("NM", d.numberOfMismatchesOrGaps),
+            rawTag(d.edgeIdentifier),
+          ]),
+        );
+      }
+    }
+
+    if (lines.length <= 1) {
+      this._g.showErrorModal(
+        "Empty Graph",
+        "No visible segments to export as GFA!",
+      );
+      return;
+    }
+
+    this.saveAsTxt(lines.join("\n") + "\n", "pangenographer.gfa");
   }
 
   saveAsCSV(objs: GraphElement[]) {
@@ -800,7 +942,7 @@ export class CytoscapeService {
       ]);
     }
     const str = arr.map((x) => x.join("|")).join("\n");
-    this.str2file(str, "visuall_objects.csv");
+    this.str2file(str, "pangenographer_objects.csv");
   }
 
   saveAsPng(isWholeGraph: boolean) {
@@ -811,7 +953,7 @@ export class CytoscapeService {
       .then((res) => res.blob())
       .then((x) => {
         const anchor = document.createElement("a");
-        anchor.download = "visuall.png";
+        anchor.download = "pangenographer.png";
         anchor.href = window.URL.createObjectURL(x);
         anchor.click();
       });

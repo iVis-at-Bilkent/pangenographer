@@ -16,6 +16,7 @@ import { LegendModalComponent } from "../popups/legend-modal/legend-modal.compon
 import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-modal.component";
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
 import { SaveProfileModalComponent } from "../popups/save-profile-modal/save-profile-modal.component";
+import { WelcomeModalComponent } from "../popups/welcome-modal/welcome-modal.component";
 import { GroupingOptionTypes } from "../user-preference";
 import { UserProfileService } from "../user-profile.service";
 import { NavbarAction, NavbarDropdown } from "./inavbar";
@@ -58,6 +59,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
             id: "nbi02",
             function: "saveSelectedAsJson",
           },
+          { text: "Save as GFA...", id: "nbi08", function: "saveAsGFA" },
           {
             text: "Samples",
             id: "nbi07",
@@ -277,6 +279,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
       }
     });
     this._urlLoad.init();
+
+    // Skip when the user is loading from a ?URL= query param — that flow
+    // populates the canvas itself and shouldn't be overridden by sample data.
+    const hasUrlParam = new URLSearchParams(window.location.search).has("URL");
+    if (!hasUrlParam) {
+      // Wait for cytoscape and the database connection to finish initializing
+      // (initCy runs in a child component's ngOnInit on the same tick).
+      setTimeout(() => {
+        this.getSampleData();
+        this._modalService.open(WelcomeModalComponent);
+      }, 1000);
+    }
   }
 
   ngOnDestroy() {
@@ -450,6 +464,10 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   saveSelectedAsJson() {
     this._cyService.saveSelectedAsJson();
+  }
+
+  saveAsGFA() {
+    this._cyService.saveAsGFA();
   }
 
   saveAsPng() {

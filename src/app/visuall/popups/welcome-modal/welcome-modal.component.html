@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <div class="modal-title va-heading1 text-center">Welcome</div>
+  <div>
+    <button
+      #closeBtn
+      type="button"
+      class="btn-close"
+      data-dismiss="modal"
+      aria-label="Close"
+      (click)="activeModal.dismiss('Cross click')"
+    ></button>
+  </div>
+</div>
+<div class="modal-body text-center">
+  <div class="va-text">
+    The canvas initially has some sample data from the current pangenome graph
+    model. Refer to <b>"Help &gt; Quick Help"</b> to get started.
+  </div>
+</div>
