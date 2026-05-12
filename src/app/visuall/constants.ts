@@ -133,6 +133,9 @@ export const SAMPLE_DATABASES = [
   "Human Whole Genome Pangenome"
 ];
 
+export const USER_GUIDE_URL =
+  "https://docs.google.com/document/d/1mcU4-yAy6IvdUOxchygTyjTWp144sjvDrJE_gzmAbmA/edit?usp=sharing";
+
 export const CYPHER_WRITE_QUERY_TYPES = [
   "CREATE",
   "MERGE",

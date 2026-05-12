@@ -36,7 +36,7 @@ Follow these steps to prepare a local Neo4j database for PG2.
 
 After startup, PG2 can connect to the local database using the configuration in [src/environments/environment.ts](src/environments/environment.ts).
 
-### Bulk-importing a GFA file into Neo4j
+### Bulk importing a GFA file into Neo4j
 
 [import_gfa_to_neo4j.py](import_gfa_to_neo4j.py) loads a `.gfa` file directly into Neo4j using the same schema the web app writes. It is significantly faster than importing through the UI for large files.
 

@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import appPreferences from "../../assets/appPreferences.json";
 import {
   CLUSTER_CLASS,
@@ -58,6 +58,10 @@ export class GlobalVariableService {
   userPreferences: UserPreferences = {} as UserPreferences;
   userPreferencesFromFiles: UserPreferences = {} as UserPreferences;
   shownElementsChanged = new BehaviorSubject<boolean>(true);
+  // Fires whenever the canvas is cleared (sample-database switch, "Clear Data"
+  // menu, etc.). Side panels subscribe to drop stale state belonging to the
+  // previous graph (query results, the object inspector contents, etc.).
+  graphCleared = new Subject<void>();
   operationTabChanged = new BehaviorSubject<number>(1);
   isSwitch2ObjectTabOnSelect: boolean = true;
   graphHistory: GraphHistoryItem[] = [];

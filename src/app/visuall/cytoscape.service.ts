@@ -748,6 +748,8 @@ export class CytoscapeService {
     this.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());
+    this._g.graphHistory = [];
+    this._g.graphCleared.next();
     if (clearDatabase) {
       this._dbService.clearDatabase(() => {
         // Status message after clearing the database

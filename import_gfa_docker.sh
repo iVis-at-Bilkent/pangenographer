@@ -15,6 +15,16 @@
 #     Neo4j running on the host machine on Mac, Windows, and Linux
 #     (host-gateway mapping handles Linux).
 #   - Override with `--uri` if Neo4j lives elsewhere.
+#
+# Profiling and resource recording (both opt-in):
+#   - Add `--profile` to print per-phase wall-clock timing and a summary table.
+#   - Add `--resource-log /output/<name>.csv` to record RAM + CPU usage over
+#     time to a CSV. The host's current directory is bind-mounted as /output
+#     (writable), so anything written there appears in your CWD on the host
+#     after the run.
+#   - Example:
+#       ./import_gfa_docker.sh sample_1.gfa --clear --profile \
+#           --resource-log /output/import_gfa_resources.csv
 
 set -euo pipefail
 
@@ -57,8 +67,11 @@ if ! $has_uri; then
   URI_ARGS=(--uri "bolt://host.docker.internal:7687")
 fi
 
+OUTPUT_DIR="$(pwd)"
+
 docker run --rm \
   --add-host=host.docker.internal:host-gateway \
   -v "$INPUT_ABS:/data/$INPUT_NAME:ro" \
+  -v "$OUTPUT_DIR:/output" \
   "$IMAGE_TAG" \
   "/data/$INPUT_NAME" "${URI_ARGS[@]}" "$@"

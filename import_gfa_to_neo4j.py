@@ -27,10 +27,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
+import os
 import re
 import sys
+import threading
 import time
 from collections import defaultdict
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +43,229 @@ try:
 except ImportError:
     print("The 'neo4j' package is required. Install it with:  pip install neo4j", file=sys.stderr)
     sys.exit(1)
+
+try:
+    import psutil  # type: ignore[import-untyped]
+    _HAS_PSUTIL = True
+except ImportError:
+    psutil = None  # type: ignore[assignment]
+    _HAS_PSUTIL = False
+
+
+# ---------------------------------------------------------------------------
+# Profiling: per-phase wall-clock + RSS, plus peak RSS across the whole run
+# ---------------------------------------------------------------------------
+
+def _fmt_bytes(b: int) -> str:
+    if b <= 0:
+        return "n/a"
+    if b < 1024 ** 2:
+        return f"{b / 1024:.1f} KB"
+    if b < 1024 ** 3:
+        return f"{b / 1024 ** 2:.1f} MB"
+    return f"{b / 1024 ** 3:.2f} GB"
+
+
+class Profiler:
+    """Per-phase wall-clock + process RSS, with running peak RSS.
+
+    Disabled by default — call `enable()` to start tracking. When disabled,
+    `phase()` and `report()` are no-ops, and `rss()` returns 0.
+    """
+
+    def __init__(self) -> None:
+        self.enabled = False
+        self.phases: list[tuple[str, float, int, int, int]] = []
+        self.peak_rss = 0
+        self._proc: Any = None
+
+    def enable(self) -> None:
+        self.enabled = True
+        if _HAS_PSUTIL:
+            self._proc = psutil.Process(os.getpid())
+        else:
+            print(
+                "Note: 'psutil' is not installed — RSS columns will show 'n/a'. "
+                "Install with:  pip install psutil",
+                file=sys.stderr,
+            )
+
+    def rss(self) -> int:
+        if not self.enabled or self._proc is None:
+            return 0
+        try:
+            r = int(self._proc.memory_info().rss)
+        except Exception:
+            return 0
+        if r > self.peak_rss:
+            self.peak_rss = r
+        return r
+
+    @contextmanager
+    def phase(self, name: str):
+        if not self.enabled:
+            yield
+            return
+        rss_in = self.rss()
+        t0 = time.time()
+        try:
+            yield
+        finally:
+            dt = time.time() - t0
+            rss_out = self.rss()
+            self.phases.append((name, dt, rss_in, rss_out, self.peak_rss))
+            print(
+                f"  [{name}] {dt:.2f}s   RSS {_fmt_bytes(rss_in)} -> {_fmt_bytes(rss_out)}"
+                f"  (peak {_fmt_bytes(self.peak_rss)})"
+            )
+
+    def system_memory_line(self) -> str:
+        if not self.enabled or not _HAS_PSUTIL:
+            return ""
+        vm = psutil.virtual_memory()
+        return (
+            f"System memory: total {_fmt_bytes(vm.total)}, "
+            f"available {_fmt_bytes(vm.available)}, used {vm.percent:.1f}%"
+        )
+
+    def report(self) -> None:
+        if not self.enabled or not self.phases:
+            return
+        print()
+        print("=" * 86)
+        print("Profiler summary")
+        print("=" * 86)
+        sm = self.system_memory_line()
+        if sm:
+            print(sm)
+        print(f"{'Phase':<36} {'Time':>10} {'RSS in':>12} {'RSS out':>12} {'Peak':>12}")
+        print("-" * 86)
+        total_time = 0.0
+        for name, dt, ri, ro, pk in self.phases:
+            total_time += dt
+            print(
+                f"{name:<36} {dt:>9.2f}s "
+                f"{_fmt_bytes(ri):>12} {_fmt_bytes(ro):>12} {_fmt_bytes(pk):>12}"
+            )
+        print("-" * 86)
+        print(
+            f"{'Total':<36} {total_time:>9.2f}s "
+            f"{'':>12} {'':>12} {_fmt_bytes(self.peak_rss):>12}"
+        )
+        print("=" * 86)
+
+
+PROF = Profiler()
+
+
+# ---------------------------------------------------------------------------
+# Resource recorder: background-thread sampler that writes a CSV with
+# wall-clock time, RAM (process RSS + system memory used), and CPU usage.
+# ---------------------------------------------------------------------------
+
+class ResourceRecorder:
+    """Sample resource usage from a background thread into a CSV.
+
+    Columns:
+        elapsed_seconds       wall-clock seconds since recording started
+        rss_bytes             this process's resident set size
+        system_used_bytes     system-wide memory used (psutil.virtual_memory)
+        cpu_percent           process CPU% since the previous sample
+        cpu_user_seconds      cumulative user-mode CPU time
+        cpu_system_seconds    cumulative system-mode CPU time
+
+    Tracks peak RSS across the whole run. No-ops when psutil is unavailable
+    or `output_path` is None.
+    """
+
+    SAMPLE_INTERVAL_SEC = 0.5
+
+    def __init__(self, output_path: Path | None) -> None:
+        self.output_path = output_path
+        self.interval = self.SAMPLE_INTERVAL_SEC
+        self.peak_rss = 0
+        self.sample_count = 0
+        self.enabled = bool(_HAS_PSUTIL and output_path is not None)
+        self._proc = psutil.Process(os.getpid()) if self.enabled else None
+        self._thread: threading.Thread | None = None
+        self._stop = threading.Event()
+        self._fp = None
+        self._writer = None
+        self._t0: float | None = None
+
+    def __enter__(self) -> "ResourceRecorder":
+        if not self.enabled:
+            return self
+        assert self.output_path is not None and self._proc is not None
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
+        self._fp = self.output_path.open("w", newline="")
+        self._writer = csv.writer(self._fp)
+        self._writer.writerow(
+            [
+                "elapsed_seconds",
+                "rss_bytes",
+                "system_used_bytes",
+                "cpu_percent",
+                "cpu_user_seconds",
+                "cpu_system_seconds",
+            ]
+        )
+        # Prime cpu_percent: the first call returns 0.0 because it needs a
+        # baseline; subsequent calls return CPU% since the previous call.
+        try:
+            self._proc.cpu_percent(interval=None)
+        except Exception:
+            pass
+        self._t0 = time.monotonic()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+        return self
+
+    def __exit__(self, *exc: Any) -> None:
+        if not self.enabled:
+            return
+        self._stop.set()
+        if self._thread is not None:
+            self._thread.join(timeout=2.0)
+        if self._fp is not None:
+            self._fp.close()
+
+    def _run(self) -> None:
+        assert self._proc is not None and self._writer is not None and self._fp is not None
+        while True:
+            elapsed = time.monotonic() - (self._t0 or time.monotonic())
+            try:
+                rss = int(self._proc.memory_info().rss)
+                sys_used = int(psutil.virtual_memory().used)
+                cpu_pct = float(self._proc.cpu_percent(interval=None))
+                cpu_t = self._proc.cpu_times()
+                cpu_user = float(cpu_t.user)
+                cpu_sys = float(cpu_t.system)
+            except Exception:
+                rss = 0
+                sys_used = 0
+                cpu_pct = 0.0
+                cpu_user = 0.0
+                cpu_sys = 0.0
+            self._writer.writerow(
+                [
+                    f"{elapsed:.3f}",
+                    rss,
+                    sys_used,
+                    f"{cpu_pct:.2f}",
+                    f"{cpu_user:.3f}",
+                    f"{cpu_sys:.3f}",
+                ]
+            )
+            try:
+                self._fp.flush()
+            except Exception:
+                pass
+            self.sample_count += 1
+            if rss > self.peak_rss:
+                self.peak_rss = rss
+            if self._stop.wait(self.interval):
+                break
 
 
 # ---------------------------------------------------------------------------
@@ -411,19 +638,97 @@ def validate_edge_endpoints(data: dict[str, list[dict[str, Any]]]) -> dict[str, 
 # Neo4j import
 # ---------------------------------------------------------------------------
 
+def _estimate_record_bytes(item: dict[str, Any]) -> int:
+    """Rough size estimate for one row when serialised over Bolt.
+    Cheap heuristic — doesn't need to be precise, just proportional.
+    """
+    n = 32  # bookkeeping overhead per record
+    for k, v in item.items():
+        n += len(k) + 8
+        if isinstance(v, str):
+            n += len(v) + 4
+        elif isinstance(v, (list, tuple)):
+            n += 16
+            for x in v:
+                n += (len(x) + 4) if isinstance(x, str) else 16
+        else:
+            n += 16
+    return n
+
+
+# Keep each Bolt message comfortably under typical OS send-buffer / Neo4j
+# transaction-memory limits. macOS's socket.sendall() returns OSError 22
+# (EINVAL) for very large messages, so this also avoids that crash.
+TARGET_BYTES_PER_BATCH = 20 * 1024 * 1024  # 20 MB
+
+
+def _adaptive_batch_size(items: list[dict[str, Any]], requested: int, label: str) -> int:
+    """Cap `requested` so each batch stays under TARGET_BYTES_PER_BATCH."""
+    if not items:
+        return requested
+    sample = items[: min(500, len(items))]
+    avg = max(1, sum(_estimate_record_bytes(x) for x in sample) // len(sample))
+    safe = max(1, TARGET_BYTES_PER_BATCH // avg)
+    effective = min(requested, safe)
+    if effective < requested:
+        print(
+            f"    [{label}] adaptive batch size: {requested:,} -> {effective:,} "
+            f"(~{avg:,} B/record, target {TARGET_BYTES_PER_BATCH // 1024 // 1024} MB/batch)"
+        )
+    return effective
+
+
 def _run_batched(session, query: str, items: list[dict[str, Any]], batch_size: int, label: str) -> None:
     total = len(items)
     if total == 0:
         return
+    effective_size = _adaptive_batch_size(items, batch_size, label)
     done = 0
     start = time.time()
-    for i in range(0, total, batch_size):
-        batch = items[i : i + batch_size]
-        session.run(query, batch=batch).consume()
+
+    # Wrap each batch in a managed write transaction so the driver retries
+    # on transient errors (connection drops, leader switches, etc.) instead of
+    # killing the import. Using execute_write also ensures every batch is
+    # committed before the next is sent, bounding the server-side memory.
+    def _do_write(tx, _batch: list[dict[str, Any]]) -> None:
+        tx.run(query, batch=_batch).consume()
+
+    for i in range(0, total, effective_size):
+        batch = items[i : i + effective_size]
+        session.execute_write(_do_write, batch)
         done += len(batch)
         elapsed = time.time() - start
         rate = done / elapsed if elapsed > 0 else 0
-        print(f"    {label}: {done:,}/{total:,}  ({rate:,.0f}/s)")
+        rss_str = ""
+        if PROF.enabled:
+            rss = PROF.rss()
+            if rss > 0:
+                rss_str = f"  RSS {_fmt_bytes(rss)}"
+        print(f"    {label}: {done:,}/{total:,}  ({rate:,.0f}/s){rss_str}")
+
+
+def clear_neo4j_database(uri: str, username: str, password: str) -> None:
+    """DETACH DELETE every node in the database. Intentionally not wrapped in
+    Profiler/ResourceRecorder so clearing time/RAM doesn't appear in import logs.
+
+    Uses CALL { ... } IN TRANSACTIONS, which commits in chunks server-side
+    instead of paying client round-trip latency per chunk like the old loop.
+    """
+    print("Clearing database...")
+    start = time.time()
+    driver = GraphDatabase.driver(uri, auth=(username, password))
+    try:
+        with driver.session() as session:
+            session.run(
+                """
+                MATCH (n)
+                CALL { WITH n DETACH DELETE n }
+                IN TRANSACTIONS OF 50000 ROWS
+                """
+            ).consume()
+        print(f"    cleared in {time.time() - start:.1f}s")
+    finally:
+        driver.close()
 
 
 def import_to_neo4j(
@@ -432,99 +737,96 @@ def import_to_neo4j(
     username: str,
     password: str,
     batch_size: int,
-    clear: bool,
 ) -> None:
-    driver = GraphDatabase.driver(uri, auth=(username, password))
+    with PROF.phase("neo4j connect"):
+        driver = GraphDatabase.driver(uri, auth=(username, password))
     try:
         with driver.session() as session:
-            if clear:
-                print("Clearing database...")
-                while True:
-                    summary = session.run(
-                        "MATCH (n) WITH n LIMIT 50000 DETACH DELETE n RETURN count(n) AS c"
-                    ).single()
-                    if not summary or summary["c"] == 0:
-                        break
-                    print(f"    deleted {summary['c']:,} nodes")
-
             print("Ensuring indexes...")
-            session.run(
-                "CREATE INDEX segment_name_idx IF NOT EXISTS FOR (n:SEGMENT) ON (n.segmentName)"
-            ).consume()
+            with PROF.phase("neo4j indexes"):
+                session.run(
+                    "CREATE INDEX segment_name_idx IF NOT EXISTS FOR (n:SEGMENT) ON (n.segmentName)"
+                ).consume()
 
             # Nodes
             print(f"Importing {len(data['paths']):,} PATH nodes")
-            _run_batched(
-                session,
-                "UNWIND $batch AS row CREATE (p:PATH) SET p = row",
-                data["paths"],
-                batch_size,
-                "paths",
-            )
+            with PROF.phase("import paths"):
+                _run_batched(
+                    session,
+                    "UNWIND $batch AS row CREATE (p:PATH) SET p = row",
+                    data["paths"],
+                    batch_size,
+                    "paths",
+                )
 
             print(f"Importing {len(data['walks']):,} WALK nodes")
-            _run_batched(
-                session,
-                "UNWIND $batch AS row CREATE (w:WALK) SET w = row",
-                data["walks"],
-                batch_size,
-                "walks",
-            )
+            with PROF.phase("import walks"):
+                _run_batched(
+                    session,
+                    "UNWIND $batch AS row CREATE (w:WALK) SET w = row",
+                    data["walks"],
+                    batch_size,
+                    "walks",
+                )
 
             print(f"Importing {len(data['segments']):,} SEGMENT nodes")
-            _run_batched(
-                session,
-                "UNWIND $batch AS row CREATE (s:SEGMENT) SET s = row",
-                data["segments"],
-                batch_size,
-                "segments",
-            )
+            with PROF.phase("import segments"):
+                _run_batched(
+                    session,
+                    "UNWIND $batch AS row CREATE (s:SEGMENT) SET s = row",
+                    data["segments"],
+                    batch_size,
+                    "segments",
+                )
 
             # Edges (MATCH by segmentName, which is indexed)
             print(f"Importing {len(data['links']):,} LINK edges")
-            _run_batched(
-                session,
-                """
-                UNWIND $batch AS row
-                MATCH (src:SEGMENT {segmentName: row.source})
-                MATCH (tgt:SEGMENT {segmentName: row.target})
-                CREATE (src)-[e:LINK]->(tgt)
-                SET e = row
-                """,
-                data["links"],
-                batch_size,
-                "links",
-            )
+            with PROF.phase("import links"):
+                _run_batched(
+                    session,
+                    """
+                    UNWIND $batch AS row
+                    MATCH (src:SEGMENT {segmentName: row.source})
+                    MATCH (tgt:SEGMENT {segmentName: row.target})
+                    CREATE (src)-[e:LINK]->(tgt)
+                    SET e = row
+                    """,
+                    data["links"],
+                    batch_size,
+                    "links",
+                )
 
             print(f"Importing {len(data['jumps']):,} JUMP edges")
-            _run_batched(
-                session,
-                """
-                UNWIND $batch AS row
-                MATCH (src:SEGMENT {segmentName: row.source})
-                MATCH (tgt:SEGMENT {segmentName: row.target})
-                CREATE (src)-[e:JUMP]->(tgt)
-                SET e = row
-                """,
-                data["jumps"],
-                batch_size,
-                "jumps",
-            )
+            with PROF.phase("import jumps"):
+                _run_batched(
+                    session,
+                    """
+                    UNWIND $batch AS row
+                    MATCH (src:SEGMENT {segmentName: row.source})
+                    MATCH (tgt:SEGMENT {segmentName: row.target})
+                    CREATE (src)-[e:JUMP]->(tgt)
+                    SET e = row
+                    """,
+                    data["jumps"],
+                    batch_size,
+                    "jumps",
+                )
 
             print(f"Importing {len(data['containments']):,} CONTAINMENT edges")
-            _run_batched(
-                session,
-                """
-                UNWIND $batch AS row
-                MATCH (src:SEGMENT {segmentName: row.source})
-                MATCH (tgt:SEGMENT {segmentName: row.target})
-                CREATE (src)-[e:CONTAINMENT]->(tgt)
-                SET e = row
-                """,
-                data["containments"],
-                batch_size,
-                "containments",
-            )
+            with PROF.phase("import containments"):
+                _run_batched(
+                    session,
+                    """
+                    UNWIND $batch AS row
+                    MATCH (src:SEGMENT {segmentName: row.source})
+                    MATCH (tgt:SEGMENT {segmentName: row.target})
+                    CREATE (src)-[e:CONTAINMENT]->(tgt)
+                    SET e = row
+                    """,
+                    data["containments"],
+                    batch_size,
+                    "containments",
+                )
     finally:
         driver.close()
 
@@ -552,6 +854,21 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="DETACH DELETE all existing nodes before importing",
     )
+    parser.add_argument(
+        "--profile",
+        action="store_true",
+        help="Print per-phase wall-clock timing and a summary table "
+        "(adds RSS columns when psutil is installed). Off by default.",
+    )
+    parser.add_argument(
+        "--resource-log",
+        type=Path,
+        default=None,
+        help="Path to write a CSV recording resource usage over time "
+        "(columns: elapsed_seconds, rss_bytes, system_used_bytes, "
+        "cpu_percent, cpu_user_seconds, cpu_system_seconds). "
+        "Off unless this flag is provided.",
+    )
     return parser.parse_args()
 
 
@@ -563,10 +880,51 @@ def main() -> None:
     if args.batch_size <= 0:
         raise ValueError("--batch-size must be greater than 0")
 
+    # Clear before any profiling/recording starts so the wipe doesn't show
+    # up in the resource CSV or the per-phase summary.
+    if args.clear:
+        clear_neo4j_database(args.uri, args.username, args.password)
+
     t0 = time.time()
 
+    if args.profile:
+        PROF.enable()
+        sm = PROF.system_memory_line()
+        if sm:
+            print(sm)
+
+    resource_log_path: Path | None = args.resource_log
+    recorder = ResourceRecorder(resource_log_path)
+    if recorder.enabled:
+        print(
+            f"Recording resources every {recorder.interval:.2f}s -> {resource_log_path}"
+        )
+    elif resource_log_path is not None and not _HAS_PSUTIL:
+        print(
+            "Warning: --resource-log was requested but 'psutil' is not installed; "
+            "no resource CSV will be written. Install with: pip install psutil",
+            file=sys.stderr,
+        )
+
+    with recorder:
+        run_import(args, t0)
+
+    if args.profile:
+        PROF.report()
+
+    if recorder.enabled:
+        print()
+        print(
+            f"Peak RSS: {_fmt_bytes(recorder.peak_rss)}  "
+            f"(sampled {recorder.sample_count:,} points every {recorder.interval:.2f}s)"
+        )
+        print(f"Resource log:  {resource_log_path}")
+
+
+def run_import(args: argparse.Namespace, t0: float) -> None:
     print(f"Parsing {args.input_file}...")
-    data = parse_gfa(args.input_file)
+    with PROF.phase("parse GFA"):
+        data = parse_gfa(args.input_file)
     print(
         "Parsed: "
         f"{len(data['segments']):,} segments, "
@@ -574,15 +932,19 @@ def main() -> None:
         f"{len(data['jumps']):,} jumps, "
         f"{len(data['containments']):,} containments, "
         f"{len(data['paths']):,} paths ({len(data['pathEdges']):,} edges), "
-        f"{len(data['walks']):,} walks ({len(data['walkEdges']):,} edges) "
-        f"in {time.time() - t0:.1f}s"
+        f"{len(data['walks']):,} walks ({len(data['walkEdges']):,} edges)"
     )
 
-    print("Encoding names and aggregating path/walk memberships...")
-    encode_names_in_place(data)
-    enrich_with_path_and_walk_membership(data)
+    print("Encoding names...")
+    with PROF.phase("encode names"):
+        encode_names_in_place(data)
 
-    orphans = validate_edge_endpoints(data)
+    print("Aggregating path/walk memberships...")
+    with PROF.phase("aggregate path/walk membership"):
+        enrich_with_path_and_walk_membership(data)
+
+    with PROF.phase("validate endpoints"):
+        orphans = validate_edge_endpoints(data)
     total_orphans = sum(orphans.values())
     if total_orphans:
         print(
@@ -598,7 +960,6 @@ def main() -> None:
         username=args.username,
         password=args.password,
         batch_size=args.batch_size,
-        clear=args.clear,
     )
 
     print(f"Done in {time.time() - t0:.1f}s")

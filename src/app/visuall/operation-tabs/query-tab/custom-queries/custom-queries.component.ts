@@ -1,5 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { Subject } from "rxjs";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Subject, Subscription } from "rxjs";
 import {
   object2TableRow,
   TableData,
@@ -27,7 +27,8 @@ import { GlobalVariableService } from "../../../global-variable.service";
   templateUrl: "./custom-queries.component.html",
   styleUrls: ["./custom-queries.component.css"],
 })
-export class CustomQueriesComponent implements OnInit {
+export class CustomQueriesComponent implements OnInit, OnDestroy {
+  private graphClearedSubscription: Subscription;
   tableIsFilled = new Subject<boolean>();
   tableInput: TableViewInput = {
     columns: [],
@@ -94,6 +95,29 @@ export class CustomQueriesComponent implements OnInit {
     this._g.userPreferences.queryResultPageSize.subscribe((pageSize: number) => {
       this.tableInput.pageSize = pageSize;
     });
+    this.graphClearedSubscription = this._g.graphCleared.subscribe(() => {
+      this.resetState();
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.graphClearedSubscription) {
+      this.graphClearedSubscription.unsubscribe();
+    }
+  }
+
+  private resetState() {
+    this.resetTableInputs();
+    this.selectedQuery = "";
+    this.sequences = "";
+    this.segmentNames = "";
+    this.searchedSequences = [];
+    this.neighborDistance = 0;
+    this.maxJumpLength = 0;
+    this.minSubsequenceMatchLength = 2;
+    this.graphEdges = true;
+    this.isLoadGraph = false;
+    this.databaseResponse = {} as DbResponse;
   }
 
   private resetTableInputs() {

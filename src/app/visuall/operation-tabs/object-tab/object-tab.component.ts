@@ -78,6 +78,7 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
   shownElementsSubscription: Subscription;
   appDescSubscription: Subscription;
   dataModelSubscription: Subscription;
+  graphClearedSubscription: Subscription;
 
   constructor(
     private _g: GlobalVariableService,
@@ -125,6 +126,9 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
         ).bind(this);
       });
     });
+    this.graphClearedSubscription = this._g.graphCleared.subscribe(() => {
+      this.resetPanel();
+    });
   }
 
   ngOnDestroy(): void {
@@ -137,6 +141,26 @@ export class ObjectTabComponent implements OnInit, OnDestroy {
     if (this.shownElementsSubscription) {
       this.shownElementsSubscription.unsubscribe();
     }
+    if (this.graphClearedSubscription) {
+      this.graphClearedSubscription.unsubscribe();
+    }
+  }
+
+  private resetPanel() {
+    this.selectedItemProperties = {};
+    this.selectedClasses = "";
+    this.isShowObjectTable = false;
+    this.isShowStatsTable = false;
+    this.highlightedPathWalk = "";
+    this.tableInput.results = [];
+    this.tableInput.resultCount = 0;
+    this.tableInput.currentPage = 1;
+    this.multipleObjectTableInput.results = [];
+    this.multipleObjectTableInput.resultCount = 0;
+    this.multipleObjectTableInput.currentPage = 1;
+    this.tableFilled.next(false);
+    this.multiObjectTableFilled.next(false);
+    this.clearMultiObjectTableFilter.next(true);
   }
 
   showObjectProperties() {

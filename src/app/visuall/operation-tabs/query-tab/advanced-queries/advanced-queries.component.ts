@@ -18,6 +18,11 @@ import {
 import { DbAdapterService } from "../../../db-service/db-adapter.service";
 import { GlobalVariableService } from "../../../global-variable.service";
 
+interface DataModelClasses {
+  nodes: Record<string, unknown>;
+  edges: Record<string, unknown>;
+}
+
 @Component({
   selector: "app-advanced-queries",
   templateUrl: "./advanced-queries.component.html",
@@ -52,21 +57,22 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     allChecked: false,
   };
   tableFilter: TableFiltering = {
-    orderBy: null,
-    orderDirection: null,
+    orderBy: "",
+    orderDirection: "",
     txt: "",
-    skip: null,
+    skip: undefined,
   };
   tableFilled = new Subject<boolean>();
   dataPageSizeSubscription: Subscription;
   dataModelSubscription: Subscription;
+  graphClearedSubscription: Subscription;
   dbResponse = null;
 
   constructor(
     private _g: GlobalVariableService,
     private _dbService: DbAdapterService,
     private _cyService: CytoscapeService,
-    private _fileReaderService: FileReaderService
+    private _fileReaderService: FileReaderService,
   ) {
     this.queries = [
       "Get neighborhood",
@@ -77,7 +83,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.dataModelSubscription = this._g.dataModel.subscribe((x) => {
+    this.dataModelSubscription = this._g.dataModel.subscribe((x: DataModelClasses | null) => {
       if (x) {
         for (const n in x.nodes) {
           this.nodeEdgeClasses.push(n);
@@ -89,11 +95,14 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     });
     this.selectedQuery = "";
     this.dataPageSizeSubscription =
-      this._g.userPreferences.queryResultPageSize.subscribe((x) => {
+      this._g.userPreferences.queryResultPageSize.subscribe((x: number) => {
         this.tableInput.pageSize = x;
         this.tableInput.currentPage = 1;
         this.tableFilter.skip = 0;
       });
+    this.graphClearedSubscription = this._g.graphCleared.subscribe(() => {
+      this.resetState();
+    });
   }
 
   ngOnDestroy(): void {
@@ -103,6 +112,33 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     if (this.dataPageSizeSubscription) {
       this.dataPageSizeSubscription.unsubscribe();
     }
+    if (this.graphClearedSubscription) {
+      this.graphClearedSubscription.unsubscribe();
+    }
+  }
+
+  private resetState() {
+    this.selectedQuery = "";
+    this.selectedIndex = -1;
+    this.selectedNodes = [];
+    this.selectedClass = "";
+    this.targetOrRegulator = 0;
+    this.clickedNodeIndex = -1;
+    this.addNodeButtonTxt = "Select Nodes to Add";
+    this.ignoredTypes = [];
+    this.lengthLimit = 2;
+    this.isDirected = true;
+    this.dbResponse = null;
+    this.tableInput.results = [];
+    this.tableInput.resultCount = 0;
+    this.tableInput.currentPage = 1;
+    this.tableFilter = {
+      orderBy: "",
+      orderDirection: "",
+      txt: "",
+      skip: undefined,
+    };
+    this.tableFilled.next(false);
   }
 
   changeAdvancedQuery(event: any) {
@@ -170,8 +206,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
         if (isClientSidePagination) {
           const clientSideX = this.filterDbResponse(
             x,
-            isFromFilter ? this.tableFilter : null,
-            idFilter
+            this.tableFilter,
+            idFilter,
           );
           this.fillTable(clientSideX, !isFromFilter, isClientSidePagination);
         } else {
@@ -182,17 +218,17 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
         if (isClientSidePagination) {
           const clientSideX = this.filterDbResponse(
             x,
-            isFromFilter ? this.tableFilter : null,
-            idFilter
+            this.tableFilter,
+            idFilter,
           );
           this._cyService.loadElementsFromDatabase(
             this.prepareElements4Cy(clientSideX),
-            this.tableInput.isMergeGraph
+            this.tableInput.isMergeGraph,
           );
         } else {
           this._cyService.loadElementsFromDatabase(
             this.prepareElements4Cy(x),
-            this.tableInput.isMergeGraph
+            this.tableInput.isMergeGraph,
           );
         }
         this.highlightSeedNodes();
@@ -211,8 +247,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           this.isDirected,
           DbResponseType.table,
           this.tableFilter,
-          idFilter,
-          prepareDataFn
+          idFilter ?? [],
+          prepareDataFn,
         );
       } else if (this.selectedIndex == 2) {
         let dir: Neo4jEdgeDirection = this.targetOrRegulator;
@@ -226,8 +262,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           dir,
           DbResponseType.table,
           this.tableFilter,
-          idFilter,
-          prepareDataFn
+          idFilter ?? [],
+          prepareDataFn,
         );
       } else if (this.selectedIndex == 0) {
         this._dbService.getNeighborhood(
@@ -236,8 +272,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           this.lengthLimit,
           this.isDirected,
           this.tableFilter,
-          idFilter,
-          prepareDataFn
+          idFilter ?? [],
+          prepareDataFn,
         );
       }
     }
@@ -251,9 +287,9 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   private filterDbResponse(
     x: any,
     filter: TableFiltering,
-    idFilter: (string | number)[]
+    idFilter: (string | number)[] | null,
   ) {
-    const r = {
+    const r: any = {
       columns: x.columns,
       data: [[null, null, null, null, null, null, null, null]],
     };
@@ -360,7 +396,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
 
     tempNodes = tempNodes.slice(
       skip,
-      skip + this._g.userPreferences.queryResultPageSize.getValue()
+      skip + this._g.userPreferences.queryResultPageSize.getValue(),
     );
     r.data[0][indexNodes] = tempNodes.map((x) => x.node);
     r.data[0][indexNodeClass] = tempNodes.map((x) => x.cls);
@@ -372,7 +408,7 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
   private fillTable(
     data: any,
     isRefreshColumns = true,
-    isClientSidePagination = true
+    isClientSidePagination = true,
   ) {
     const indexNodes = data.columns.indexOf("nodes");
     const indexNodeId = data.columns.indexOf("nodeElementId");
@@ -444,13 +480,13 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     }
   }
 
-  private highlightTargetRegulators(data) {
-    const idxTargetRegulator = data.columns.indexOf("targetRegulatorNodeIds");
-    const dbIds = new Set(data.data[0][idxTargetRegulator]);
+  private highlightTargetRegulators(data: any): void {
+    const idxTargetRegulator: number = data.columns.indexOf("targetRegulatorNodeIds");
+    const dbIds: Set<string> = new Set(data.data[0][idxTargetRegulator]);
     if (!dbIds || dbIds.size < 1) {
       return;
     }
-    const cyNodes = this._g.cy
+    const cyNodes: any = this._g.cy
       .nodes()
       .filter((node: any) => dbIds.has(node.id().substring(1)));
 
@@ -482,12 +518,12 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           for (let i = 1; i < arr.length; i++) {
             if (
               this.selectedNodes.find(
-                (x) => x.dbId == arr[i][idx4id].substring(1)
+                (x) => x.dbId == arr[i][idx4id].substring(1),
               )
             ) {
               continue;
             }
-            const o = {};
+            const o: { [key: string]: string } = {};
             for (let j = 1; j < arr[0].length; j++) {
               o[arr[0][j]] = arr[i][j];
             }
@@ -497,27 +533,27 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
           elements = JSON.parse(txt) as GraphElement[];
           const fn1 = (x: any) =>
             this.selectedNodes.find(
-              (y) => y.dbId === x.data.id.substring(1)
+              (y) => y.dbId === x.data.id.substring(1),
             ) === undefined;
           if (!(elements instanceof Array)) {
             elements = (JSON.parse(txt).nodes as any[]).filter(fn1);
           } else {
             elements = elements.filter(
-              (x) => x.data.id.startsWith("n") && fn1(x)
+              (x) => x.data.id.startsWith("n") && fn1(x),
             );
           }
         }
 
-        const labels = this._g.getLabels4ElementsAsArray(null, true, elements);
+        const labels = this._g.getLabels4ElementsAsArray([], true, elements);
         this.selectedNodes = this.selectedNodes.concat(
           elements.map((x, i) => {
             return {
               dbId: x.data.id.substring(1),
               label: x.classes.split(" ")[0] + ":" + labels[i],
             };
-          })
+          }),
         );
-      }
+      },
     );
   }
 
@@ -569,8 +605,8 @@ export class AdvancedQueriesComponent implements OnInit, OnDestroy {
     const edgeId = data.data[0][indexEdgeId];
     const edgeSourceTarget = data.data[0][indexEdgeSourceTarget];
 
-    const cyData = { nodes: [], edges: [] };
-    const nodeIdsDictionary = {};
+    const cyData: { nodes: any[]; edges: any[] } = { nodes: [], edges: [] };
+    const nodeIdsDictionary: { [key: string]: boolean } = {};
     for (let i = 0; i < nodes.length; i++) {
       cyData.nodes.push({
         elementId: nodeId[i],

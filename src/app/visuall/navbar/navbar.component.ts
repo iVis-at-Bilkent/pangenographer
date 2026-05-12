@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Subscription } from "rxjs";
-import { CLUSTER_CLASS, SAMPLE_DATABASES } from "../constants";
+import { CLUSTER_CLASS, SAMPLE_DATABASES, USER_GUIDE_URL } from "../constants";
 import { CytoscapeService } from "../cytoscape.service";
 import { GFAData } from "../db-service/data-types";
 import { DbAdapterService } from "../db-service/db-adapter.service";
@@ -345,7 +345,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
         size: "md",
       });
 
-      modalRef.componentInstance.msg = `File size is ${fileSizeMB} MB. This demo application will only allow files of size no larger than 25 MB.`;
+      modalRef.componentInstance.msg =
+        `File size is ${fileSizeMB} MB. This demo application only ` +
+        `allows files up to 25 MB. ` +
+        `To work with a larger pangenome, set up your own Neo4j database ` +
+        `with the provided import script — see the ` +
+        `<a href="${USER_GUIDE_URL}" target="_blank" rel="noopener noreferrer">User Guide</a> ` +
+        `for instructions.`;
       modalRef.componentInstance.title = "File Size Too Large";
 
       return;
