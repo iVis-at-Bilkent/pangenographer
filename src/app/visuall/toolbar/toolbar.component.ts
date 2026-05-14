@@ -20,14 +20,22 @@ import { QuickHelpModalComponent } from "../popups/quick-help-modal/quick-help-m
 import { SaveAsPngModalComponent } from "../popups/save-as-png-modal/save-as-png-modal.component";
 import { ToolbarAction, ToolbarDiv } from "./toolbar";
 
+interface FileInputViewChild {
+  nativeElement: HTMLInputElement;
+}
+
+interface CyElementLike {
+  data(propertyName: string): unknown;
+}
+
 @Component({
   selector: "app-toolbar",
   templateUrl: "./toolbar.component.html",
   styleUrls: ["./toolbar.component.css"],
 })
 export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild("file", { static: false }) file;
-  searchTxt: string;
+  @ViewChild("file", { static: false }) file!: FileInputViewChild;
+  searchTxt: string = "";
   sampleDatabases: string[] = SAMPLE_DATABASES;
   selectedSampleDatabase: string = this._g.selectedSampleDatabase.getValue();
   menu: ToolbarDiv[];
@@ -37,14 +45,14 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
   userPreferenceSubscription: Subscription;
   selectedSampleDatabaseSubscription: Subscription;
   messageStarted2Show: number = 0;
-  isLimitDbQueries2range: boolean;
+  isLimitDbQueries2range: boolean = false;
   @ViewChild("dbQueryDate1", { static: false }) dbQueryDate1: ElementRef;
   @ViewChild("dbQueryDate2", { static: false }) dbQueryDate2: ElementRef;
 
   constructor(
     private _cyService: CytoscapeService,
     private modalService: NgbModal,
-    private _g: GlobalVariableService
+    private _g: GlobalVariableService,
   ) {
     this.menu = [
       {
@@ -193,25 +201,29 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngOnInit() {
-    this.statusMessageSubscription = this._g.statusMessage.subscribe((x) => {
-      this.statusMessageQueue.push(x);
-      this.processMsgQueue();
-    });
-    this.userPreferenceSubscription = this._g.isUserPrefReady.subscribe((x) => {
-      if (!x) {
-        return;
-      }
-      // user preferences from local storage should be set
-      // Better way might be to use a shared behavior subject just like `isUserPrefReady`. Its name might be isUserPrefFromLocalStorageReady
-    });
+  ngOnInit(): void {
+    this.statusMessageSubscription = this._g.statusMessage.subscribe(
+      (x: string) => {
+        this.statusMessageQueue.push(x);
+        this.processMsgQueue();
+      },
+    );
+    this.userPreferenceSubscription = this._g.isUserPrefReady.subscribe(
+      (x: boolean) => {
+        if (!x) {
+          return;
+        }
+        // user preferences from local storage should be set
+        // Better way might be to use a shared behavior subject just like `isUserPrefReady`. Its name might be isUserPrefFromLocalStorageReady
+      },
+    );
     this.selectedSampleDatabaseSubscription =
       this._g.selectedSampleDatabase.subscribe(() => {
         this.selectedSampleDatabase = this._g.selectedSampleDatabase.getValue();
       });
   }
 
-  private processMsgQueue() {
+  private processMsgQueue(): void {
     if (this.statusMessageQueue.length < 1) {
       this.statusMessage = "";
       return;
@@ -226,55 +238,55 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
       // enough time didn't passed yet. Check again when it is passed.
       setTimeout(
         this.processMsgQueue.bind(this),
-        MIN_MESSAGE_DURATION - timePassed
+        MIN_MESSAGE_DURATION - timePassed,
       );
     }
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     // angular rendering harms previous manual positioning
     this._cyService.setNavigatorPosition();
   }
 
-  fileSelected() {
+  fileSelected(): void {
     this._cyService.loadFile(this.file.nativeElement.files[0]);
   }
 
-  triggerAct(act: ToolbarAction) {
+  triggerAct(act: ToolbarAction): void {
     this[act.fn]();
   }
 
-  load() {
+  load(): void {
     this.file.nativeElement.value = "";
     this.file.nativeElement.click();
   }
 
-  saveAsJson() {
+  saveAsJson(): void {
     this._cyService.saveAsJson();
   }
 
-  saveAsPng() {
+  saveAsPng(): void {
     this.modalService.open(SaveAsPngModalComponent);
   }
 
-  deleteSelected() {
+  deleteSelected(): void {
     this._cyService.deleteSelected(null);
   }
 
-  hideSelected() {
+  hideSelected(): void {
     this._cyService.showHideSelectedElements(true);
   }
 
-  showAll() {
+  showAll(): void {
     this._cyService.showHideSelectedElements(false);
   }
 
-  highlightSearch() {
-    const filterFn = (x: any) => {
+  highlightSearch(): void {
+    const filterFn = (x: CyElementLike): boolean => {
       const entityMap = this._g.dataModel.getValue();
       const propertyNames = getPropNamesFromObject(
         [entityMap.nodes, entityMap.edges],
-        false
+        false,
       );
       const isIgnoreCase =
         this._g.userPreferences.isIgnoreCaseInText.getValue();
@@ -292,43 +304,43 @@ export class ToolbarComponent implements OnInit, AfterViewInit, OnDestroy {
     };
     let satisfyingElements = this._g.cy.filter(filterFn);
     satisfyingElements = satisfyingElements.union(
-      this._g.filterRemovedElements(filterFn)
+      this._g.filterRemovedElements(filterFn),
     );
     this._g.highlightElements(satisfyingElements);
   }
 
-  highlightSelected() {
+  highlightSelected(): void {
     this._cyService.highlightSelected();
   }
 
-  removeHighlights() {
+  removeHighlights(): void {
     this._cyService.removeHighlights();
   }
 
-  performLayout() {
+  performLayout(): void {
     this._g.performLayout(false, true);
   }
 
-  reLayout() {
+  reLayout(): void {
     this._g.performLayout(true);
   }
 
-  openQuickHelp() {
+  openQuickHelp(): void {
     this.modalService.open(QuickHelpModalComponent, {
       size: "lg",
     });
   }
 
-  openAbout() {
+  openAbout(): void {
     this.modalService.open(AboutModalComponent);
   }
 
-  showHideGraphHistory() {
+  showHideGraphHistory(): void {
     const v = this._g.showHideGraphHistory.getValue();
     this._g.showHideGraphHistory.next(!v);
   }
 
-  setSampleDatabase() {
-    this._g.setSampleDatabase(this.selectedSampleDatabase);
+  setSampleDatabase(sampleDatabase: string): void {
+    this._cyService.switchSampleDatabase(sampleDatabase);
   }
 }

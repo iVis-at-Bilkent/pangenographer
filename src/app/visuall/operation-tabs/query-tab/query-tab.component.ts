@@ -5,6 +5,8 @@ import { Component, OnInit } from "@angular/core";
   styleUrls: ["./query-tab.component.css"],
 })
 export class QueryTabComponent implements OnInit {
+  isBenchmarkUrl = window.location.href.toLowerCase().includes("/benchmarks");
+
   constructor() {}
 
   ngOnInit() {}

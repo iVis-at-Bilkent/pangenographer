@@ -2,6 +2,7 @@
   <div class="panel">
     <div
       class="panel-heading"
+      [class.collapsed]="isBenchmarkUrl"
       data-bs-toggle="collapse"
       data-bs-target="#advanced-query-tab"
     >
@@ -10,7 +11,11 @@
       >
     </div>
 
-    <div id="advanced-query-tab" class="show collapse text-center m-1">
+    <div
+      id="advanced-query-tab"
+      class="collapse text-center m-1"
+      [class.show]="!isBenchmarkUrl"
+    >
       <app-advanced-queries></app-advanced-queries>
     </div>
   </div>
@@ -26,8 +31,29 @@
       >
     </div>
 
-    <div id="custom-query-tab" class="show collapse text-center m-1">
+    <div
+      id="custom-query-tab"
+      class="collapse text-center m-1"
+      [class.show]="!isBenchmarkUrl"
+    >
       <app-custom-queries></app-custom-queries>
+    </div>
+  </div>
+
+  <div class="panel" *ngIf="isBenchmarkUrl">
+    <div
+      class="panel-heading"
+      [class.collapsed]="!isBenchmarkUrl"
+      data-bs-toggle="collapse"
+      data-bs-target="#benchmark-query-tab"
+    >
+      <span class="panel-title accordion-toggle"
+        ><b class="va-heading2">Benchmarks</b></span
+      >
+    </div>
+
+    <div id="benchmark-query-tab" class="show collapse m-1">
+      <app-benchmark-tab></app-benchmark-tab>
     </div>
   </div>
 </div>

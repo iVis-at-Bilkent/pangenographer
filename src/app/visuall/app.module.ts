@@ -20,6 +20,7 @@ import { MapTabComponent } from "./operation-tabs/map-tab/map-tab.component";
 import { ObjectTabComponent } from "./operation-tabs/object-tab/object-tab.component";
 import { OperationTabsComponent } from "./operation-tabs/operation-tabs.component";
 import { AdvancedQueriesComponent } from "./operation-tabs/query-tab/advanced-queries/advanced-queries.component";
+import { BenchmarkTabComponent } from "./operation-tabs/query-tab/benchmark-tab/benchmark-tab.component";
 import { CustomQueriesComponent } from "./operation-tabs/query-tab/custom-queries/custom-queries.component";
 import { QueryTabComponent } from "./operation-tabs/query-tab/query-tab.component";
 import { SettingsTabComponent } from "./operation-tabs/settings-tab/settings-tab.component";
@@ -68,6 +69,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     LoadGraphFromFileModalComponent,
     BlastTabComponent,
     CustomQueriesComponent,
+    BenchmarkTabComponent,
     WelcomeModalComponent,
   ],
   imports: [
@@ -78,7 +80,7 @@ import { ToolbarComponent } from "./toolbar/toolbar.component";
     AutoSizeInputModule,
     AngularDraggableModule,
     SharedModule,
-    RouterModule.forRoot([]),
+    RouterModule.forRoot([{ path: "benchmarks", component: AppComponent }]),
   ],
   providers: [{ provide: APP_BASE_HREF, useValue: "/" }],
   bootstrap: [AppComponent],

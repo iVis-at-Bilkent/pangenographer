@@ -17,7 +17,6 @@ import {
   TYPES_NOT_TO_SHOW,
 } from "./constants";
 import { GraphElement, GraphHistoryItem } from "./db-service/data-types";
-import { ClearDatabaseModalComponent } from "./popups/clear-database-modal/clear-database-modal.component";
 import { ErrorModalComponent } from "./popups/error-modal/error-modal.component";
 import { GroupingOptionTypes, UserPreferences } from "./user-preference";
 
@@ -1001,23 +1000,25 @@ export class GlobalVariableService {
     return Object.keys(classDictionary).length > 1;
   }
 
-  setSampleDatabase(sampleDatabase: string) {
-    // If the selected sample database is the same as the new sample database, do nothing
+  // Update the selected sample database. Returns true when the selection
+  // actually changed so callers can orchestrate the canvas reset + new-sample
+  // load. Intentionally has no side effects on the canvas or modal stack —
+  // those are the caller's responsibility (see CytoscapeService).
+  setSampleDatabase(sampleDatabase: string): boolean {
+    const sampleDatabaseIndex = SAMPLE_DATABASES.indexOf(sampleDatabase);
+    if (sampleDatabaseIndex < 0) {
+      this.showErrorModal(
+        "Invalid Sample",
+        "Unknown sample database selected.",
+      );
+      return false;
+    }
     if (this.selectedSampleDatabase.getValue() === sampleDatabase) {
-      return;
+      return false;
     }
-    // If the selected sample database is different from the new sample database, update the selected sample database
-    this.sampleDatabaseIndex.next(SAMPLE_DATABASES.indexOf(sampleDatabase));
+    this.sampleDatabaseIndex.next(sampleDatabaseIndex);
     this.selectedSampleDatabase.next(sampleDatabase);
-
-    // If there is no existing graph, do nothing
-    if (this.cy.elements().length === 0) {
-      return;
-    }
-
-    // Reset the canvas
-    let modal = this._modalService.open(ClearDatabaseModalComponent);
-    modal.componentInstance.clearDatabase = false;
+    return true;
   }
 
   // Move all the elements to the right by 0.000001

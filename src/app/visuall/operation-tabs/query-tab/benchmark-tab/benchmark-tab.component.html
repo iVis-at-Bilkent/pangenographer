@@ -1,0 +1,190 @@
+<div class="benchmark-panel va-text">
+  <div class="benchmark-grid">
+    <label>
+      Warmup runs
+      <input
+        type="number"
+        min="0"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="options.warmupRuns"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Measured runs
+      <input
+        type="number"
+        min="1"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="options.measuredRuns"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Edge sample limits
+      <input
+        type="text"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="graphLimitsText"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Neighborhood radii
+      <input
+        type="text"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="neighborhoodRadiiText"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Procedure page size
+      <input
+        type="number"
+        min="1"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="options.procedurePageSize"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Cypher path limit
+      <input
+        type="number"
+        min="1"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="options.cypherPathLimit"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Auto seed count
+      <input
+        type="number"
+        min="1"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="options.seedCount"
+        [disabled]="isRunning"
+      />
+    </label>
+
+    <label>
+      Layout timeout ms
+      <input
+        type="number"
+        min="1000"
+        class="form-control standard-input-height va-small-text"
+        [(ngModel)]="options.layoutTimeoutMs"
+        [disabled]="isRunning"
+      />
+    </label>
+  </div>
+
+  <label class="w-100 mt-2">
+    Seed segment names
+    <textarea
+      class="form-control va-small-text"
+      [(ngModel)]="seedNamesText"
+      [disabled]="isRunning"
+      rows="3"
+      placeholder="Optional. Leave empty to auto-pick high-degree SEGMENT seeds."
+    ></textarea>
+  </label>
+
+  <div class="benchmark-cases">
+    <label
+      class="form-check"
+      *ngFor="let benchmarkCase of caseSelections"
+      [title]="benchmarkCase.rendersGraph ? 'Measures DB and Cytoscape rendering/layout' : 'Measures DB query only'"
+    >
+      <input
+        class="form-check-input"
+        type="checkbox"
+        [(ngModel)]="benchmarkCase.selected"
+        [disabled]="isRunning"
+      />
+      <span class="form-check-label">{{ benchmarkCase.label }}</span>
+    </label>
+  </div>
+
+  <div class="benchmark-actions">
+    <input
+      class="btn btn-sm btn-dark va-text m-1"
+      type="button"
+      value="Run Benchmarks"
+      (click)="runBenchmarks()"
+      [disabled]="isRunning"
+    />
+    <input
+      class="btn btn-sm btn-outline-dark va-text m-1"
+      type="button"
+      value="Stop"
+      (click)="stopBenchmarks()"
+      [disabled]="!isRunning"
+    />
+    <input
+      class="btn btn-sm btn-outline-dark va-text m-1"
+      type="button"
+      value="Export CSV"
+      (click)="exportCsv()"
+      [disabled]="results.length < 1"
+    />
+    <input
+      class="btn btn-sm btn-outline-dark va-text m-1"
+      type="button"
+      value="Clear"
+      (click)="clearResults()"
+      [disabled]="isRunning || results.length < 1"
+    />
+  </div>
+
+  <div class="benchmark-status va-small-text" *ngIf="status">{{ status }}</div>
+
+  <div class="benchmark-table-wrap" *ngIf="results.length > 0">
+    <table class="table table-sm benchmark-table va-small-text">
+      <thead>
+        <tr>
+          <th>Case</th>
+          <th>Params</th>
+          <th>Run</th>
+          <th>Status</th>
+          <th>DB ms</th>
+          <th>Conv ms</th>
+          <th>Add ms</th>
+          <th>Layout ms</th>
+          <th>Total ms</th>
+          <th>Nodes</th>
+          <th>Edges</th>
+          <th>Rows</th>
+          <th>KB</th>
+          <th>Heap MB</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let result of results" [class.text-muted]="!result.measured">
+          <td>{{ result.caseLabel }}</td>
+          <td>{{ result.params }}</td>
+          <td>{{ result.runIndex + 1 }}{{ result.measured ? "" : " warmup" }}</td>
+          <td>{{ result.layoutTimedOut ? "layout timeout" : result.status }}</td>
+          <td>{{ formatMs(result.queryMs) }}</td>
+          <td>{{ formatMs(result.conversionMs) }}</td>
+          <td>{{ formatMs(result.renderSetupMs) }}</td>
+          <td>{{ formatMs(result.layoutMs) }}</td>
+          <td>{{ formatMs(result.totalMs) }}</td>
+          <td>{{ formatNumber(result.nodes) }}</td>
+          <td>{{ formatNumber(result.edges) }}</td>
+          <td>{{ formatNumber(result.rows) }}</td>
+          <td>{{ formatNumber(result.payloadKb) }}</td>
+          <td>{{ formatNumber(result.browserHeapMb) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -35,7 +35,7 @@
             id="toolbar-element sample-database-select"
             title="Sample database selection"
             [(ngModel)]="selectedSampleDatabase"
-            (change)="setSampleDatabase()"
+            (ngModelChange)="setSampleDatabase($event)"
           >
             <option
               *ngFor="let sampleDatabase of sampleDatabases"

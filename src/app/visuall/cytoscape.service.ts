@@ -27,9 +27,10 @@ import { UserProfileService } from "./user-profile.service";
 })
 export class CytoscapeService {
   userPrefHelper: UserPrefHelper;
-  showObjPropsFn: Function;
-  showStatsFn: Function;
+  showObjPropsFn!: Function;
+  showStatsFn!: Function;
   louvainClusterer: LouvainClustering;
+  private sampleDataRequestId = 0;
 
   constructor(
     private _g: GlobalVariableService,
@@ -628,11 +629,14 @@ export class CytoscapeService {
   }
 
   highlightNeighbors() {
-    return (function (this: any, event: {
-      target: any;
-      type: string;
-      cySelector?: string;
-    }) {
+    return function (
+      this: any,
+      event: {
+        target: any;
+        type: string;
+        cySelector?: string;
+      },
+    ) {
       let elements2remain = null;
       if (event.cySelector != undefined) {
         elements2remain = this._g.cy.getElementById(event.cySelector);
@@ -648,7 +652,7 @@ export class CytoscapeService {
       } else {
         elements2remain.removeClass("emphasize");
       }
-    }).bind(this);
+    }.bind(this);
   }
 
   setOtherElementsOpacity(elements: any[], opacity: any) {
@@ -742,9 +746,46 @@ export class CytoscapeService {
     }
   }
 
+  // Pull sample data from the currently-selected sample database into the
+  // canvas. Used both by the welcome auto-load and by sample-database
+  // switching.
+  loadSampleData() {
+    const requestId = ++this.sampleDataRequestId;
+    const sampleDatabase = this._g.selectedSampleDatabase.getValue();
+    this._g.layout.clusters = [];
+    this._g.statusMessage.next("Getting sample data");
+    this._dbService.getSampleData((x) => {
+      if (
+        requestId !== this.sampleDataRequestId ||
+        sampleDatabase !== this._g.selectedSampleDatabase.getValue()
+      ) {
+        return;
+      }
+      this.loadElementsFromDatabase(x, false);
+    });
+  }
+
+  // Update the selected sample database; if it actually changed, reset the
+  // canvas + side panels and load sample data from the new database. No
+  // confirmation modal — switching samples is a single user gesture.
+  switchSampleDatabase(sampleDatabase: string) {
+    const wasSelected =
+      sampleDatabase === this._g.selectedSampleDatabase.getValue();
+    const changed = this._g.setSampleDatabase(sampleDatabase);
+    if (!changed) {
+      if (wasSelected && this._g.cy && this._g.cy.elements().length === 0) {
+        this.loadSampleData();
+      }
+      return;
+    }
+    this.clear(false);
+    this.loadSampleData();
+  }
+
   // Clear database and cytoscape graph
   // Remove external tools, clear graph history, and remove all elements from cytoscape graph
   clear(clearDatabase: boolean = true) {
+    this.sampleDataRequestId++;
     this.removeExternalTools();
     this._g.layout.clusters = null;
     this._g.cy.remove(this._g.cy.$());

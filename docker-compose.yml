@@ -8,6 +8,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - /app/dist
+      - /app/.angular
     environment:
       - NODE_ENV=development
     restart: unless-stopped

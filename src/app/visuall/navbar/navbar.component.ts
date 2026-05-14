@@ -48,6 +48,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private _urlLoad: URLLoadService,
     private _fileReaderService: FileReaderService,
   ) {
+    const sampleActions: NavbarAction[] = SAMPLE_DATABASES.map(
+      (sampleDatabase, index) => ({
+        text: sampleDatabase,
+        id: `nbi07-${index}`,
+        function: "setSampleDatabase",
+        parameters: sampleDatabase,
+      }),
+    );
+
     this.menu = [
       {
         dropdown: "File",
@@ -63,55 +72,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
           {
             text: "Samples",
             id: "nbi07",
-            actions: [
-              {
-                text: "Freebase",
-                id: "nbi07-0",
-                function: "freebaseSelected",
-              },
-              {
-                text: SAMPLE_DATABASES[1],
-                id: SAMPLE_DATABASES[1],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[1],
-              },
-              {
-                text: SAMPLE_DATABASES[2],
-                id: SAMPLE_DATABASES[2],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[2],
-              },
-              {
-                text: SAMPLE_DATABASES[3],
-                id: SAMPLE_DATABASES[3],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[3],
-              },
-              {
-                text: SAMPLE_DATABASES[4],
-                id: SAMPLE_DATABASES[4],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[4],
-              },
-              {
-                text: SAMPLE_DATABASES[5],
-                id: SAMPLE_DATABASES[5],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[5],
-              },
-              {
-                text: SAMPLE_DATABASES[6],
-                id: SAMPLE_DATABASES[6],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[6],
-              },
-              {
-                text: SAMPLE_DATABASES[7],
-                id: SAMPLE_DATABASES[7],
-                function: "setSampleDatabase",
-                parameters: SAMPLE_DATABASES[7],
-              }
-            ],
+            actions: sampleActions,
           },
           {
             text: "Import GFA...",
@@ -272,7 +233,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.appDescSubscription = this._g.appDescription.subscribe((x) => {
+    this.appDescSubscription = this._g.appDescription.subscribe((x: any) => {
       if (x != null) {
         this.toolName = x.appInfo.name;
         this.toolLogo = x.appInfo.icon;
@@ -410,11 +371,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   freebaseSelected() {
-    this._g.setSampleDatabase(SAMPLE_DATABASES[0]);
+    this._cyService.switchSampleDatabase(SAMPLE_DATABASES[0]);
   }
 
   setSampleDatabase(sampleDatabase: string) {
-    this._g.setSampleDatabase(sampleDatabase);
+    this._cyService.switchSampleDatabase(sampleDatabase);
   }
 
   // Load file selected by the user from the file input element
@@ -614,11 +575,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   // Gives the callback function to the database service to get the data in the form of a graph response,
   // cytoscape service is used to load the elements from the database
   getSampleData() {
-    this._g.layout.clusters = [];
-    this._g.statusMessage.next("Getting sample data");
-    this._dbService.getSampleData((x) => {
-      this._cyService.loadElementsFromDatabase(x, false);
-    });
+    this._cyService.loadSampleData();
   }
 
   // Clear database and cytoscape graph
