@@ -7,3 +7,5 @@ package-lock.json
 .github
 .git
 .*
+!.env.example
+src/environments/environment.ts

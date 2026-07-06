@@ -83,7 +83,7 @@ The `npm run ng build` and `npm run build-prod` commands generate files inside t
 
 Run `cd src` followed by `node style-generator.js {application description filename}` to generate a customized application. This updates [styles.css](src/styles.css) and [index.html](src/index.html). Note that the application description file must be located in the `assets` folder.
 
-Run `cd src/app/blast` and `node blast.js` to run the BLAST server. This allows the application to process BLAST queries. Note that the BLAST standalone must be installed beforehand.
+Create `src/environments/environment.ts` from `src/environments/environment.example.ts` for the Neo4j database and BLAST configuration. Also create `.env` before running `cd src/app/blast` and `node blast.js`. Note that the BLAST standalone must be installed beforehand.
 
 ## User Guide
 

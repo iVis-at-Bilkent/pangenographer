@@ -3,10 +3,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const fs = require("fs");
+const path = require("path");
+const fsp = fs.promises;
 
-// BLAST files path on the server
-// This should be changed for individual users
-const filePath = "/home/ivis/visuall/pangenographer/src/app/blast/";
+require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
+
+const filePath = process.env.BLAST_FILE_PATH || path.resolve(__dirname);
+const port = process.env.BLAST_PORT || 5205;
+const allNodesPath = path.join(filePath, "all_nodes.fasta");
+const queryPath = path.join(filePath, "query.fasta");
 
 const app = express();
 app.use(cors());
@@ -17,25 +22,22 @@ app.post("/makeBlastDb", async (req, res) => {
     // -in all_nodes.fasta -dbtype nucl
 
     const blastOutput = await new Promise((resolve, reject) => {
-      let fileError = undefined;
-
-      fs.writeFile(filePath + "all_nodes.fasta", req.body.fastaData, (err) => {
-        if (err) {
-          fileError = err;
-        }
-      });
-
-      exec(
-        "makeblastdb -in all_nodes.fasta -dbtype nucl",
-        (error, stdout, stderr) => {
-          if (error || fileError) {
-            error = error || fileError;
-            reject(error);
-          } else {
-            resolve(stdout);
-          }
-        }
-      );
+      fsp
+        .writeFile(allNodesPath, req.body.fastaData)
+        .then(() => {
+          exec(
+            "makeblastdb -in all_nodes.fasta -dbtype nucl",
+            { cwd: filePath },
+            (error, stdout, stderr) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(stdout);
+              }
+            }
+          );
+        })
+        .catch(reject);
     });
 
     res.json({ results: blastOutput });
@@ -50,26 +52,23 @@ app.post("/blastn", async (req, res) => {
     // -query query.fasta -db all_nodes.fasta
 
     const blastOutput = await new Promise((resolve, reject) => {
-      let fileError = undefined;
-
-      fs.writeFile(filePath + "query.fasta", req.body.fastaData, (err) => {
-        if (err) {
-          fileError = err;
-        }
-      });
-
-      exec(
-        "blastn -query query.fasta -db all_nodes.fasta " +
-          req.body.commandLineArguments,
-        (error, stdout, stderr) => {
-          if (error || fileError) {
-            error = error || fileError;
-            reject(error);
-          } else {
-            resolve(stdout);
-          }
-        }
-      );
+      fsp
+        .writeFile(queryPath, req.body.fastaData)
+        .then(() => {
+          exec(
+            "blastn -query query.fasta -db all_nodes.fasta " +
+              req.body.commandLineArguments,
+            { cwd: filePath },
+            (error, stdout, stderr) => {
+              if (error) {
+                reject(error);
+              } else {
+                resolve(stdout);
+              }
+            }
+          );
+        })
+        .catch(reject);
     });
 
     res.json({
@@ -82,6 +81,6 @@ app.post("/blastn", async (req, res) => {
   }
 });
 
-app.listen(5201, () => {
-  console.log("BLAST server running on port 5201");
+app.listen(port, () => {
+  console.log(`BLAST server running on port ${port}`);
 });
